@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 import * as S from "@/assets/css/Style.style";
+import { Popup } from "@/components/modal/Popup";
 
 export default function ResetPwPage() {
   const router = useRouter();
@@ -14,6 +15,30 @@ export default function ResetPwPage() {
     newPw: "",
     newPwConfirm: "",
   });
+
+  const [popupConfig, setPopupConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
+  const openPopup = (
+    title: string,
+    message: string,
+    onConfirm?: (() => void) | undefined,
+  ) => {
+    setPopupConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
+
+  const closePopup = () => {
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const hasConfirmValue =
     pwData.newPwConfirm.length > 0 && pwData.newPw.length > 0;
@@ -29,12 +54,22 @@ export default function ResetPwPage() {
   const handleResetPassword = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
-    if (!userId)
-      return alert("잘못된 접근입니다. 이메일 링크를 다시 확인해 주세요.");
-    if (!pwData.newPw || !pwData.newPwConfirm)
-      return alert("비밀번호를 모두 입력해 주세요.");
-    if (pwData.newPw !== pwData.newPwConfirm)
-      return alert("비밀번호가 서로 일치하지 않습니다.");
+    if (!userId) {
+      openPopup(
+        "이메일 오류",
+        "잘못된 접근입니다. 이메일 링크를 다시 확인해 주세요.",
+      );
+      return;
+    }
+    if (!pwData.newPw || !pwData.newPwConfirm) {
+      openPopup("입력 오류", "비밀번호를 모두 입력해 주세요.");
+      return;
+    }
+
+    if (pwData.newPw !== pwData.newPwConfirm) {
+      openPopup("비밀번호 오류", "비밀번호가 서로 일치하지 않습니다.");
+      return;
+    }
 
     try {
       const response = await fetch("http://127.0.0.1:4000/api/reset-password", {
@@ -48,16 +83,23 @@ export default function ResetPwPage() {
       });
       const result = await response.json();
       if (response.ok) {
-        alert(
+        openPopup(
+          "비밀번호 변경 성공",
           "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해 주세요.",
+          () => {
+            router.push("/admin");
+            closePopup();
+          },
         );
-        router.push("/admin"); //변경 후 로그인페이지로..
       } else {
-        alert(result.message || "비밀번호 변경에 실패했습니다.");
+        openPopup(
+          "비밀번호 변경 실패",
+          result.message || "비밀번호 변경에 실패했습니다.",
+        );
       }
     } catch (error) {
       console.error("비밀번호 변경 에러:", error);
-      alert("서버와 통신중 오류가 발생했습니다.");
+      openPopup("서버 오류", "서버와 통신중 오류가 발생했습니다.");
     }
   };
 
@@ -111,7 +153,14 @@ export default function ResetPwPage() {
           </S.Form>
         </S.Card>
       </S.PwWrapper>
-      ;
+      <Popup
+        isOpen={popupConfig.isOpen}
+        title={popupConfig.title}
+        onClose={closePopup}
+        onConfirm={popupConfig.onConfirm}
+      >
+        {popupConfig.message}
+      </Popup>
     </>
   );
 }

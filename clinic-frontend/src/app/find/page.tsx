@@ -3,11 +3,36 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 import * as S from "@/assets/css/Style.style";
+import { Popup } from "@/components/modal/Popup";
 
 export default function ChangePwPage() {
   const router = useRouter();
 
   const [userId, setUserId] = useState("");
+
+  const [popupConfig, setPopupConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
+  const openPopup = (
+    title: string,
+    message: string,
+    onConfirm?: (() => void) | undefined,
+  ) => {
+    setPopupConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
+
+  const closePopup = () => {
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   //패스워드 변경에 필요한 4가지 상태 값
   //   const [formData, setFormData] = useState({
@@ -33,7 +58,8 @@ export default function ChangePwPage() {
     e.preventDefault();
     //필수값 체크
     if (!userId) {
-      return alert("아이디를 먼저 입력해주세요.");
+      openPopup("입력 오류", "아이디를 먼저 입력해주세요.");
+      return;
     }
 
     router.push(`/find/pass?userId=${userId}`);
@@ -42,7 +68,7 @@ export default function ChangePwPage() {
 
     //새 비밀번호 일치여부 체크
     // if (!isMatch) {
-    //   return alert("새 비밀번호가 일치하지 않습니다.");
+    //   openPopup("새 비밀번호가 일치하지 않습니다.");
     // }
 
     // try {
@@ -147,6 +173,14 @@ export default function ChangePwPage() {
           </S.LinkGroup>
         </S.Card>
       </S.PwWrapper>
+      <Popup
+        isOpen={popupConfig.isOpen}
+        title={popupConfig.title}
+        onClose={closePopup}
+        onConfirm={popupConfig.onConfirm}
+      >
+        {popupConfig.message}
+      </Popup>
     </>
   );
 }

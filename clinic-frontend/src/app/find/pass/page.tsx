@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 import * as S from "@/assets/css/Style.style";
+import { Popup } from "@/components/modal/Popup";
 
 export default function MockPassPage() {
   const router = useRouter();
@@ -17,6 +18,30 @@ export default function MockPassPage() {
     phone: "",
   });
 
+  const [popupConfig, setPopupConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
+  const openPopup = (
+    title: string,
+    message: string,
+    onConfirm?: (() => void) | undefined,
+  ) => {
+    setPopupConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
+
+  const closePopup = () => {
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setAuthData((prev) => ({ ...prev, [name]: value }));
@@ -26,7 +51,8 @@ export default function MockPassPage() {
     e.preventDefault();
 
     if (!authData.userName || !authData.phone) {
-      return alert("이름과 휴대폰 번호를 모두 입력해 주세요.");
+      openPopup("입력 오류", "이름과 휴대폰 번호를 모두 입력해 주세요.");
+      return;
     }
 
     try {
@@ -47,73 +73,88 @@ export default function MockPassPage() {
       const result = await response.json();
 
       if (response.ok) {
-        alert(
+        openPopup(
+          "인증 완료",
           "본인인증 완료! 등록된 이메일로 비밀번호 재설정 링크가 발송되었습니다.",
+          () => {
+            router.push("/login");
+          },
         );
-        router.push("/login");
       } else {
-        alert(
-          result.message ||
-            "인증에 실패했습니다. 입력하신 정보를 다시 확인해 주세요.",
+        openPopup(
+          result.message || "인증 실패",
+          "인증에 실패했습니다. 입력하신 정보를 다시 확인해 주세요.",
         );
+        return;
       }
     } catch (error) {
       console.error("인증 및 발송 에러:", error);
-      alert("서버와 통신 중 오류가 발생했습니다.");
+      openPopup("서버 오류", "서버와 통신 중 오류가 발생했습니다.");
+      return;
     }
   };
 
   return (
-    <S.PwWrapper>
-      {/* 💡 카드를 살짝 좁게 만들어서 진짜 모바일 인증창 같은 느낌을 줍니다 */}
-      <S.Card style={{ maxWidth: "400px" }}>
-        <S.Header>
-          <S.PwTitle>휴대폰 본인인증</S.PwTitle>
-          <S.Description>
-            안전한 비밀번호 변경을 위해
-            <br />
-            가입 시 등록한 정보를 입력해 주세요.
-          </S.Description>
-        </S.Header>
+    <>
+      <S.PwWrapper>
+        {/* 💡 카드를 살짝 좁게 만들어서 진짜 모바일 인증창 같은 느낌을 줍니다 */}
+        <S.Card style={{ maxWidth: "400px" }}>
+          <S.Header>
+            <S.PwTitle>휴대폰 본인인증</S.PwTitle>
+            <S.Description>
+              안전한 비밀번호 변경을 위해
+              <br />
+              가입 시 등록한 정보를 입력해 주세요.
+            </S.Description>
+          </S.Header>
 
-        <S.Form onSubmit={handleMockAuth}>
-          <S.PwCol>
-            <S.PwInput
-              type="text"
-              name="userName"
-              placeholder=""
-              value={authData.userName}
-              onChange={handleChange}
-            />
-            <label htmlFor="userName">이름 (실명 입력)</label>
-          </S.PwCol>
-          <S.PwCol>
-            <S.PwInput
-              type="text"
-              name="phone"
-              placeholder=""
-              value={authData.phone}
-              onChange={handleChange}
-            />
-            <label htmlFor="phone">휴대폰 번호 (숫자만 입력)</label>
-          </S.PwCol>
+          <S.Form onSubmit={handleMockAuth}>
+            <S.PwCol>
+              <S.PwInput
+                type="text"
+                name="userName"
+                placeholder=""
+                value={authData.userName}
+                onChange={handleChange}
+              />
+              <label htmlFor="userName">이름 (실명 입력)</label>
+            </S.PwCol>
+            <S.PwCol>
+              <S.PwInput
+                type="text"
+                name="phone"
+                placeholder=""
+                value={authData.phone}
+                onChange={handleChange}
+              />
+              <label htmlFor="phone">휴대폰 번호 (숫자만 입력)</label>
+            </S.PwCol>
 
-          {/* 인증창 느낌을 내기 위해 버튼 색상을 살짝 다르게 줄 수도 있습니다 */}
-          <S.AuthButton type="submit">PASS 인증하기</S.AuthButton>
+            {/* 인증창 느낌을 내기 위해 버튼 색상을 살짝 다르게 줄 수도 있습니다 */}
+            <S.AuthButton type="submit">PASS 인증하기</S.AuthButton>
 
-          <S.PwButton
-            type="button"
-            onClick={() => router.back()}
-            style={{
-              backgroundColor: "#858796",
-              borderColor: "#858796",
-              marginTop: "0",
-            }}
-          >
-            취소
-          </S.PwButton>
-        </S.Form>
-      </S.Card>
-    </S.PwWrapper>
+            <S.PwButton
+              type="button"
+              onClick={() => router.back()}
+              style={{
+                backgroundColor: "#858796",
+                borderColor: "#858796",
+                marginTop: "0",
+              }}
+            >
+              취소
+            </S.PwButton>
+          </S.Form>
+        </S.Card>
+      </S.PwWrapper>
+      <Popup
+        isOpen={popupConfig.isOpen}
+        title={popupConfig.title}
+        onClose={closePopup}
+        onConfirm={popupConfig.onConfirm}
+      >
+        {popupConfig.message}
+      </Popup>
+    </>
   );
 }

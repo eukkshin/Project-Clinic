@@ -212,8 +212,10 @@ export default function TermsPage() {
       const result = await response.json();
 
       if (response.ok) {
-        openPopup("가입 완료", "회원가입이 완료되었습니다");
-        router.push("/");
+        openPopup("가입 완료", "회원가입이 완료되었습니다", () => {
+          router.push("/");
+          closePopup();
+        });
       } else {
         openPopup("가입 오류", result.message);
         return;
@@ -580,13 +582,7 @@ export default function TermsPage() {
         isOpen={popupConfig.isOpen}
         title={popupConfig.title}
         onClose={closePopup}
-        onConfirm={
-          popupConfig.onConfirm
-            ? () => {
-                popupConfig.onConfirm;
-              }
-            : undefined
-        }
+        onConfirm={popupConfig.onConfirm}
       >
         {popupConfig.message}
       </Popup>

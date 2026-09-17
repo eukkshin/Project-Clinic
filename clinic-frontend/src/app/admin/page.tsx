@@ -84,52 +84,63 @@ export default function LoginPage() {
   return (
     <>
       <S.LoginWrapper>
-        <S.LoginCard>
+        <S.LeftSection>
           <S.LoginHeader>
-            <S.LoginTitle>Admin System</S.LoginTitle>
+            <S.LoginTitle>Ahn's</S.LoginTitle>
+            <S.LoginDescription>
+              관리자 전용 페이지입니다. <br />
+              <small>
+                허가되지 않은 접근은 제한되며, 모든 시스템 접속 및 활동 내역은
+                보안 로그에 기록됩니다.
+              </small>
+            </S.LoginDescription>
           </S.LoginHeader>
+        </S.LeftSection>
+        <S.RightSection>
+          <S.LoginCard>
+            <S.LoginHeader></S.LoginHeader>
+            <S.LoginForm onSubmit={handleLogin}>
+              <S.LoginCol>
+                <S.LoginInput
+                  type="text"
+                  name="userId"
+                  placeholder=""
+                  value={formData.userId}
+                  onChange={handleChange}
+                />
+                <label htmlFor="userId">Enter User ID...</label>
+              </S.LoginCol>
+              <S.LoginCol>
+                <S.LoginInput
+                  type="password"
+                  name="userPw"
+                  placeholder=""
+                  value={formData.userPw}
+                  onChange={handleChange}
+                />
+                <label htmlFor="password">Password</label>
+              </S.LoginCol>
 
-          <S.LoginForm onSubmit={handleLogin}>
-            <S.LoginCol>
-              <S.LoginInput
-                type="text"
-                name="userId"
-                placeholder=""
-                value={formData.userId}
-                onChange={handleChange}
-              />
-              <label htmlFor="userId">Enter User ID...</label>
-            </S.LoginCol>
-            <S.LoginCol>
-              <S.LoginInput
-                type="password"
-                name="userPw"
-                placeholder=""
-                value={formData.userPw}
-                onChange={handleChange}
-              />
-              <label htmlFor="password">Password</label>
-            </S.LoginCol>
+              <S.CheckboxGroup>
+                <S.CheckboxInput type="checkbox" id="customCheck" />
+                <S.CheckboxLabel htmlFor="customCheck">
+                  Remember Me
+                </S.CheckboxLabel>
+              </S.CheckboxGroup>
 
-            <S.CheckboxGroup>
-              <S.CheckboxInput type="checkbox" id="customCheck" />
-              <S.CheckboxLabel htmlFor="customCheck">
-                Remember Me
-              </S.CheckboxLabel>
-            </S.CheckboxGroup>
+              <S.LoginButton type="submit">Login</S.LoginButton>
+            </S.LoginForm>
 
-            <S.LoginButton type="submit">Login</S.LoginButton>
-          </S.LoginForm>
+            <S.Divider />
 
-          <S.Divider />
-
-          <S.LinkGroup>
-            <S.StyledLink>Forgot Password?</S.StyledLink>
-            <S.StyledLink onClick={() => router.push("/register/terms")}>
-              Create an Account!
-            </S.StyledLink>
-          </S.LinkGroup>
-        </S.LoginCard>
+            <S.LinkGroup>
+              <S.StyledLink>Forgot Password?</S.StyledLink>
+              <S.StyledLink onClick={() => router.push("/register/terms")}>
+                Create an Account!
+              </S.StyledLink>
+            </S.LinkGroup>
+          </S.LoginCard>
+        </S.RightSection>
       </S.LoginWrapper>
       <Popup
         isOpen={popupConfig.isOpen}

@@ -96,26 +96,33 @@ export default function ChangePwPage() {
   return (
     <>
       <S.PwWrapper>
-        <S.Card>
+        <S.LeftSection>
           <S.Header>
-            <S.PwTitle>비밀번호 변경</S.PwTitle>
-            <S.Description>
-              계정 보호를 위해 기본 비밀번호와 <br />
-              새로운 비밀번호를 입력해주세요.
-            </S.Description>
+            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.LeftDescription>비밀번호 변경 페이지입니다.</S.LeftDescription>
           </S.Header>
-          <S.Form onSubmit={handleGotoPass}>
-            <S.PwCol>
-              <S.PwInput
-                type="text"
-                name="userId"
-                placeholder=""
-                value={userId}
-                onChange={handleChange}
-              />
-              <label htmlFor="userId">아이디</label>
-            </S.PwCol>
-            {/* <S.PwCol>
+        </S.LeftSection>
+        <S.RightSection>
+          <S.Card>
+            <S.Header>
+              <S.PwTitle>비밀번호 변경</S.PwTitle>
+              <S.Description>
+                계정 보호를 위해 기본 비밀번호와 <br />
+                새로운 비밀번호를 입력해주세요.
+              </S.Description>
+            </S.Header>
+            <S.Form onSubmit={handleGotoPass}>
+              <S.PwCol>
+                <S.PwInput
+                  type="text"
+                  name="userId"
+                  placeholder=""
+                  value={userId}
+                  onChange={handleChange}
+                />
+                <label htmlFor="userId">아이디</label>
+              </S.PwCol>
+              {/* <S.PwCol>
               <S.PwInput
                 type="password"
                 name="currentPw"
@@ -159,19 +166,20 @@ export default function ChangePwPage() {
                 ))}
             </S.PwCol> */}
 
-            <S.PwButton type="submit">본인인증 진행하기</S.PwButton>
-          </S.Form>
-          <S.Divider />
+              <S.PwButton type="submit">본인인증 진행하기</S.PwButton>
+            </S.Form>
+            <S.Divider />
 
-          <S.LinkGroup>
-            <S.StyledLink onClick={() => router.push("/register/terms")}>
-              아직 계정이 없으신가요? 회원가입&rarr;
-            </S.StyledLink>
-            <S.StyledLink onClick={() => router.push("/admin/login")}>
-              이미 계정이 있으신가요? 로그인&rarr;
-            </S.StyledLink>
-          </S.LinkGroup>
-        </S.Card>
+            <S.LinkGroup>
+              <S.StyledLink onClick={() => router.push("/register/terms")}>
+                아직 계정이 없으신가요? 회원가입&rarr;
+              </S.StyledLink>
+              <S.StyledLink onClick={() => router.push("/admin/login")}>
+                이미 계정이 있으신가요? 로그인&rarr;
+              </S.StyledLink>
+            </S.LinkGroup>
+          </S.Card>
+        </S.RightSection>
       </S.PwWrapper>
       <Popup
         isOpen={popupConfig.isOpen}

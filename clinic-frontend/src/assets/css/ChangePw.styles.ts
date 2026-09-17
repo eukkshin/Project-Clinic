@@ -19,9 +19,26 @@ export const PwWrapper = styled.div`
   ${LinearGradient};
   background-size: cover;
   height: 100vh;
-  ${FlexCenter};
-  padding: 1.4rem;
+  display: flex;
+
   width: 100%;
+`;
+
+export const LeftSection = styled.div`
+  flex: 0.7; /* 부모 너비의 정확히 절반을 차지 */
+  background-image: linear-gradient(135deg, #1b4d3e 0%, #3b7a57 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+// 3. 오른쪽 구역 (예: 로그인 폼)
+export const RightSection = styled.div`
+  flex: 1.3; /* 부모 너비의 정확히 절반을 차지 */
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const Card = styled.div`
@@ -39,11 +56,25 @@ export const Header = styled.header`
   margin-bottom: 2rem;
 `;
 
+export const LeftTitle = styled.h1`
+  font-family: "Times New Roman", serif;
+  font-size: 34px;
+  font-weight: 900;
+  color: #f4fbf7;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
+  margin: 0;
+`;
+
 export const PwTitle = styled.h1`
   font-size: 1.5rem;
-
-  color: #111;
+  color: #1b4d3e;
   margin-bottom: 1.5rem;
+`;
+
+export const LeftDescription = styled.p`
+  font-size: 16px;
+  color: #a3c6b8;
+  margin: 0;
 `;
 
 export const Description = styled.p`
@@ -96,7 +127,7 @@ export const PwInput = styled.input<PwInputProps>`
   border-radius: 10rem;
   border: 1px solid
     ${(props) =>
-      props.$isError ? "#ff4d4f" : props.$isSuccess ? "#27ae60" : "#d1d3e2"};
+      props.$isError ? "#ff4d4f" : props.$isSuccess ? "#27ae60" : "#d3d8d2"};
   color: #62707e;
   outline: none;
 
@@ -104,8 +135,8 @@ export const PwInput = styled.input<PwInputProps>`
 
   &:focus {
     ${(props) =>
-      props.$isError ? "#ff4d4f" : props.$isSuccess ? "#27ae60" : "#bac8f3"};
-    ${BoxShadow};
+      props.$isError ? "#ff4d4f" : props.$isSuccess ? "#27ae60" : "#246652"};
+    box-shadow: 0 0 0 0.2rem rgba(59, 122, 87, 0.25);
   }
   &:focus + label,
   &:not(:placeholder-shown) + label {
@@ -113,7 +144,7 @@ export const PwInput = styled.input<PwInputProps>`
     left: 1.5rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #4e73df;
+    color: #1b4d3e;
   }
 
   &:not(:focus):not(:placeholder-shown) + label {
@@ -132,29 +163,29 @@ export const PwMessage = styled.p<PwInputProps>`
 
 export const PwButton = styled.button`
   ${ButtonBasic};
-  background-color: #4e73df;
-  border: 1px solid #4e73df;
+  background-color: #1b4d3e;
+  border: 1px solid #1b4d3e;
   color: #fff;
   ${TransitionAll}
   margin-top: 10px;
 
   &:hover {
-    background-color: #2e59d9;
-    border-color: #2653d4;
+    background-color: #246652;
+    border-color: #246652;
   }
 `;
 
 export const AuthButton = styled.button`
   ${ButtonBasic};
-  background-color: #1cc88a;
-  border: 1px solid #1cc88a;
+  background-color: #1b4d3e;
+  border: 1px solid #1b4d3e;
   color: #fff;
   ${TransitionAll}
   margin-top: 10px;
 
   &:hover {
-    background-color: #149b6d;
-    border-color: #149b6d;
+    background-color: #246652;
+    border-color: #246652;
   }
 `;
 
@@ -172,12 +203,12 @@ export const LinkGroup = styled.div`
 
 export const StyledLink = styled.a`
   font-size: 0.8rem;
-  color: #4e73df;
+  color: #1b4d3e;
   text-decoration: none;
   cursor: pointer;
 
   &:hover {
     text-decoration: underline;
-    color: #224abe;
+    color: #246652;
   }
 `;

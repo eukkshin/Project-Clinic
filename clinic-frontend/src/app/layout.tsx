@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { GlobalStyle } from "@/assets/css/GlobalStyle";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import StyledComponentsRegistry from "@/lib/registry";
 
 /*import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -30,8 +31,10 @@ export default function RootLayout({
   return (
     <html lang="ko" data-scroll-behavior="smooth">
       <body className="min-h-full flex flex-col">
-        <GlobalStyle />
-        <ConditionalLayout>{children}</ConditionalLayout>
+        <StyledComponentsRegistry>
+          <GlobalStyle />
+          <ConditionalLayout>{children}</ConditionalLayout>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

@@ -522,3 +522,26 @@ export const SelfieViewCount = styled.div`
     margin-top: 4px;
   }
 `;
+
+export const LinkGroup = styled.div`
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const StyledLink = styled.a`
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 0.8rem;
+  color: #000;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    color: #333;
+  }
+`;

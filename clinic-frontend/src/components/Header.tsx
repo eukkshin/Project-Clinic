@@ -39,7 +39,8 @@ export default function Header() {
                 <GlobeIcon />
               </S.IconButton>
               <S.IconButton aria-label="My page">
-                <Link href="/register/terms">
+                {/* TODO: 상태에 따른 Link 변화 수정 필요 */}
+                <Link href="/register/login">
                   <UserIcon />
                 </Link>
               </S.IconButton>

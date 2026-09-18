@@ -106,52 +106,61 @@ export default function ResetPwPage() {
   return (
     <>
       <S.PwWrapper>
-        <S.Card>
+        <S.LeftSection>
           <S.Header>
-            <S.PwTitle>새 비밀번호 설정</S.PwTitle>
-            <S.Description>
-              앞으로 사용할 새로운 비밀번호를 입력해 주세요.
-            </S.Description>
+            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.Divider />
+            <S.LeftDescription>비밀번호 변경 페이지입니다.</S.LeftDescription>
           </S.Header>
+        </S.LeftSection>
+        <S.RightSection>
+          <S.Card>
+            <S.Header>
+              <S.PwTitle>새 비밀번호 설정</S.PwTitle>
+              <S.Description>
+                앞으로 사용할 새로운 비밀번호를 입력해 주세요.
+              </S.Description>
+            </S.Header>
 
-          <S.Form onSubmit={handleResetPassword}>
-            <S.PwCol>
-              <S.PwInput
-                type="password"
-                name="newPw"
-                placeholder=""
-                value={pwData.newPw}
-                onChange={handleChange}
-                $isError={isConfirmError}
-                $isSuccess={isConfirmSuccess}
-              />
-              <label htmlFor="newPw">새 비밀번호</label>
-            </S.PwCol>
-            <S.PwCol>
-              <S.PwInput
-                type="password"
-                name="newPwConfirm"
-                placeholder=""
-                value={pwData.newPwConfirm}
-                onChange={handleChange}
-                $isError={isConfirmError}
-                $isSuccess={isConfirmSuccess}
-              />
-              <label htmlFor="newPwConfirm">새 비밀번호 확인</label>
+            <S.Form onSubmit={handleResetPassword}>
+              <S.PwCol>
+                <S.PwInput
+                  type="password"
+                  name="newPw"
+                  placeholder=""
+                  value={pwData.newPw}
+                  onChange={handleChange}
+                  $isError={isConfirmError}
+                  $isSuccess={isConfirmSuccess}
+                />
+                <label htmlFor="newPw">새 비밀번호</label>
+              </S.PwCol>
+              <S.PwCol>
+                <S.PwInput
+                  type="password"
+                  name="newPwConfirm"
+                  placeholder=""
+                  value={pwData.newPwConfirm}
+                  onChange={handleChange}
+                  $isError={isConfirmError}
+                  $isSuccess={isConfirmSuccess}
+                />
+                <label htmlFor="newPwConfirm">새 비밀번호 확인</label>
 
-              {(isConfirmSuccess && (
-                <S.PwMessage $isSuccess>비밀번호가 일치합니다.</S.PwMessage>
-              )) ||
-                (isConfirmError && (
-                  <S.PwMessage $isError>
-                    비밀번호가 일치하지 않습니다.
-                  </S.PwMessage>
-                ))}
-            </S.PwCol>
+                {(isConfirmSuccess && (
+                  <S.PwMessage $isSuccess>비밀번호가 일치합니다.</S.PwMessage>
+                )) ||
+                  (isConfirmError && (
+                    <S.PwMessage $isError>
+                      비밀번호가 일치하지 않습니다.
+                    </S.PwMessage>
+                  ))}
+              </S.PwCol>
 
-            <S.PwButton type="submit">비밀번호 변경하기</S.PwButton>
-          </S.Form>
-        </S.Card>
+              <S.PwButton type="submit">비밀번호 변경하기</S.PwButton>
+            </S.Form>
+          </S.Card>
+        </S.RightSection>
       </S.PwWrapper>
       <Popup
         isOpen={popupConfig.isOpen}

@@ -64,8 +64,12 @@ export default function LoginPage() {
 
       //분기
       if (response.ok) {
-        const targetPath = result.isAdmin === 1 ? "/admin/total" : "/";
+        const targetPath = result.isAdmin === 1 ? "/admin/root" : "/";
         openPopup("로그인 성공", "로그인에 성공했습니다!", () => {
+          if (Number(result.isAdmin) === 1) {
+            //쿠키 설정
+            document.cookie = "admin_token=true; path=/; max-age=86400;";
+          }
           router.push(targetPath);
           closePopup();
         });
@@ -86,7 +90,8 @@ export default function LoginPage() {
       <S.LoginWrapper>
         <S.LeftSection>
           <S.LoginHeader>
-            <S.LoginTitle>Ahn's</S.LoginTitle>
+            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.Divider />
             <S.LoginDescription>
               관리자 전용 페이지입니다. <br />
               <small>
@@ -98,7 +103,9 @@ export default function LoginPage() {
         </S.LeftSection>
         <S.RightSection>
           <S.LoginCard>
-            <S.LoginHeader></S.LoginHeader>
+            <S.LoginHeader>
+              <S.LoginTitle>관리자 로그인</S.LoginTitle>
+            </S.LoginHeader>
             <S.LoginForm onSubmit={handleLogin}>
               <S.LoginCol>
                 <S.LoginInput

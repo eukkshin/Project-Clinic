@@ -74,10 +74,10 @@ export default function MockPassPage() {
 
       if (response.ok) {
         openPopup(
-          "인증 완료",
+          "발송 완료",
           "본인인증 완료! 등록된 이메일로 비밀번호 재설정 링크가 발송되었습니다.",
           () => {
-            router.push("/login");
+            router.push("/terms");
           },
         );
       } else {
@@ -97,55 +97,64 @@ export default function MockPassPage() {
   return (
     <>
       <S.PwWrapper>
-        {/* 💡 카드를 살짝 좁게 만들어서 진짜 모바일 인증창 같은 느낌을 줍니다 */}
-        <S.Card style={{ maxWidth: "400px" }}>
+        <S.LeftSection>
           <S.Header>
-            <S.PwTitle>휴대폰 본인인증</S.PwTitle>
-            <S.Description>
-              안전한 비밀번호 변경을 위해
-              <br />
-              가입 시 등록한 정보를 입력해 주세요.
-            </S.Description>
+            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.Divider />
+            <S.LeftDescription>휴대폰 본인인증 페이지입니다.</S.LeftDescription>
           </S.Header>
+        </S.LeftSection>
+        {/* 💡 카드를 살짝 좁게 만들어서 진짜 모바일 인증창 같은 느낌을 줍니다 */}
+        <S.RightSection>
+          <S.Card style={{ maxWidth: "400px" }}>
+            <S.Header>
+              <S.PwTitle>휴대폰 본인인증</S.PwTitle>
+              <S.Description>
+                안전한 비밀번호 변경을 위해
+                <br />
+                가입 시 등록한 정보를 입력해 주세요.
+              </S.Description>
+            </S.Header>
 
-          <S.Form onSubmit={handleMockAuth}>
-            <S.PwCol>
-              <S.PwInput
-                type="text"
-                name="userName"
-                placeholder=""
-                value={authData.userName}
-                onChange={handleChange}
-              />
-              <label htmlFor="userName">이름 (실명 입력)</label>
-            </S.PwCol>
-            <S.PwCol>
-              <S.PwInput
-                type="text"
-                name="phone"
-                placeholder=""
-                value={authData.phone}
-                onChange={handleChange}
-              />
-              <label htmlFor="phone">휴대폰 번호 (숫자만 입력)</label>
-            </S.PwCol>
+            <S.Form onSubmit={handleMockAuth}>
+              <S.PwCol>
+                <S.PwInput
+                  type="text"
+                  name="userName"
+                  placeholder=""
+                  value={authData.userName}
+                  onChange={handleChange}
+                />
+                <label htmlFor="userName">이름 (실명 입력)</label>
+              </S.PwCol>
+              <S.PwCol>
+                <S.PwInput
+                  type="text"
+                  name="phone"
+                  placeholder=""
+                  value={authData.phone}
+                  onChange={handleChange}
+                />
+                <label htmlFor="phone">휴대폰 번호 (숫자만 입력)</label>
+              </S.PwCol>
 
-            {/* 인증창 느낌을 내기 위해 버튼 색상을 살짝 다르게 줄 수도 있습니다 */}
-            <S.AuthButton type="submit">PASS 인증하기</S.AuthButton>
+              {/* 인증창 느낌을 내기 위해 버튼 색상을 살짝 다르게 줄 수도 있습니다 */}
+              <S.AuthButton type="submit">PASS 인증하기</S.AuthButton>
 
-            <S.PwButton
-              type="button"
-              onClick={() => router.back()}
-              style={{
-                backgroundColor: "#858796",
-                borderColor: "#858796",
-                marginTop: "0",
-              }}
-            >
-              취소
-            </S.PwButton>
-          </S.Form>
-        </S.Card>
+              <S.PwButton
+                type="button"
+                onClick={() => router.back()}
+                style={{
+                  backgroundColor: "#858796",
+                  borderColor: "#858796",
+                  marginTop: "0",
+                }}
+              >
+                취소
+              </S.PwButton>
+            </S.Form>
+          </S.Card>
+        </S.RightSection>
       </S.PwWrapper>
       <Popup
         isOpen={popupConfig.isOpen}

@@ -15,18 +15,24 @@ import {
 } from "@/assets/css/Common.styles";
 
 export const PwWrapper = styled.div`
-  background-color: #4e73df;
   ${LinearGradient};
+  background-image: url("/images/findetc/forest.jpg") !important;
   background-size: cover;
   height: 100vh;
   display: flex;
-
   width: 100%;
 `;
 
 export const LeftSection = styled.div`
   flex: 0.7; /* 부모 너비의 정확히 절반을 차지 */
-  background-image: linear-gradient(135deg, #1b4d3e 0%, #3b7a57 100%);
+  background-image: linear-gradient(
+    135deg,
+    rgba(27, 77, 62, 0.8) 0%,
+    rgba(59, 122, 87, 0.8) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0.8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,20 +41,22 @@ export const LeftSection = styled.div`
 // 3. 오른쪽 구역 (예: 로그인 폼)
 export const RightSection = styled.div`
   flex: 1.3; /* 부모 너비의 정확히 절반을 차지 */
-  background-color: #ffffff;
+  background-color: rgba(27, 77, 62, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
 export const Card = styled.div`
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.99);
   border: none;
   border-radius: 0.35rem;
   width: 100%;
   max-width: 500px;
   padding: 3rem;
-  ${BoxShadow};
+  box-shadow: 0 4px 30px -4px rgba(59, 122, 87, 0.25);
 `;
 
 export const Header = styled.header`
@@ -134,7 +142,7 @@ export const PwInput = styled.input<PwInputProps>`
   ${TransitionAll};
 
   &:focus {
-    ${(props) =>
+    border-color: ${(props) =>
       props.$isError ? "#ff4d4f" : props.$isSuccess ? "#27ae60" : "#246652"};
     box-shadow: 0 0 0 0.2rem rgba(59, 122, 87, 0.25);
   }

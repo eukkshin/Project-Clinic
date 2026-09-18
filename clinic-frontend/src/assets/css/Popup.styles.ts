@@ -39,7 +39,7 @@ export const PopupTitle = styled.h2`
   margin: 0;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #4e73df;
+  color: #1b4d3e;
 `;
 
 export const CloseIcon = styled.button`
@@ -88,14 +88,14 @@ export const CancelButton = styled.button`
 export const ConfirmButton = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 0.35rem;
-  background-color: #4e73df;
-  border: 1px solid #4e73df;
+  background-color: #1b4d3e;
+  border: 1px solid #1b4d3e;
   color: white;
   cursor: pointer;
   ${TransitionAll};
 
   &:hover {
-    background-color: #2e59d9;
-    border-color: #2e59d9;
+    background-color: #246652;
+    border-color: #246652;
   }
 `;

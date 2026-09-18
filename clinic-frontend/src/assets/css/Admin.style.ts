@@ -1,12 +1,10 @@
 import styled from "styled-components";
 
-// 🎯 SB Admin 시그니처: 블루 그라데이션 전체 화면 배경
 export const LoginWrapper = styled.div`
-  background-color: #4e73df;
-  background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
   background-size: cover;
   min-height: 100vh;
   display: flex;
+  background-image: url("/images/findetc/forest.jpg") !important;
 
   @media (max-width: 768px) {
     display: flex;
@@ -16,7 +14,14 @@ export const LoginWrapper = styled.div`
 
 export const LeftSection = styled.div`
   flex: 0.7; /* 부모 너비의 정확히 절반을 차지 */
-  background-image: linear-gradient(135deg, #1b4d3e 0%, #3b7a57 100%);
+  background-image: linear-gradient(
+    135deg,
+    rgba(27, 77, 62, 0.8) 0%,
+    rgba(59, 122, 87, 0.8) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0.8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,7 +30,9 @@ export const LeftSection = styled.div`
 // 3. 오른쪽 구역 (예: 로그인 폼)
 export const RightSection = styled.div`
   flex: 1.3; /* 부모 너비의 정확히 절반을 차지 */
-  background-color: #ffffff;
+  background-color: rgba(27, 77, 62, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -48,13 +55,19 @@ export const LoginHeader = styled.div`
   margin-bottom: 2rem;
 `;
 
-export const LoginTitle = styled.h1`
+export const LeftTitle = styled.h1`
   font-family: "Times New Roman", serif;
   font-size: 34px;
   font-weight: 900;
   color: #f4fbf7;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
   margin: 0;
+`;
+
+export const LoginTitle = styled.h1`
+  font-size: 1.5rem;
+  color: #1b4d3e;
+  margin-bottom: 1.5rem;
 `;
 
 export const LoginDescription = styled.p`

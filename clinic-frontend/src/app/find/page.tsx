@@ -99,16 +99,16 @@ export default function ChangePwPage() {
         <S.LeftSection>
           <S.Header>
             <S.LeftTitle>Ahn's</S.LeftTitle>
-            <S.LeftDescription>비밀번호 변경 페이지입니다.</S.LeftDescription>
+            <S.Divider />
+            <S.LeftDescription>본인 인증 페이지입니다.</S.LeftDescription>
           </S.Header>
         </S.LeftSection>
         <S.RightSection>
           <S.Card>
             <S.Header>
-              <S.PwTitle>비밀번호 변경</S.PwTitle>
+              <S.PwTitle>본인인증</S.PwTitle>
               <S.Description>
-                계정 보호를 위해 기본 비밀번호와 <br />
-                새로운 비밀번호를 입력해주세요.
+                비밀번호 변경을 위해 본인인증을 진행해주세요.
               </S.Description>
             </S.Header>
             <S.Form onSubmit={handleGotoPass}>

@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import CategoryNav from "@/components/CategoryNav";
 import CircularOverlay from "@/components/CircularOverlay";
+import { SafetySlider } from "@/components/main/SafetySlider";
 import Selfies from "@/components/main/Selfies";
 import { VlogSlider } from "@/components/main/VlogSlider";
 import MainCarousel from "@/components/MainCarousel";
@@ -16,6 +17,7 @@ export default function Home() {
       <Selfies />
       <CircularOverlay />
       <VlogSlider />
+      <SafetySlider />
     </>
   );
 }

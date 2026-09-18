@@ -22,6 +22,11 @@ export const FlexRow = css`
   flex-direction: row;
 `;
 
+export const FlexWrap = css`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
 export const FlexEnd = css`
   display: flex;
   justify-content: flex-end;
@@ -31,6 +36,12 @@ export const FlexStart = css`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+`;
+
+export const FlexTopBetween = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 `;
 
 export const BlueButtonTheme = css`
@@ -74,4 +85,21 @@ export const TextLeft = css`
 
 export const TextRight = css`
   text-align: flex-end;
+`;
+
+export const CircleBtn = css`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  cursor: pointer;
+`;
+
+export const Transparent = css`
+  background-color: transparent;
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
 `;

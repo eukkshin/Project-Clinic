@@ -1975,3 +1975,4 @@ export const SafetyCardDesc = styled.p`
 
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
+export * from "./AdminCommon.styles";

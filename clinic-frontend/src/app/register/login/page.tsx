@@ -103,6 +103,7 @@ export default function LoginPage() {
               name="userId"
               value={formData.userId}
               onChange={handleChange}
+              onKeyDown={handleLogin}
             />
           </S.FormGroup>
 
@@ -114,6 +115,7 @@ export default function LoginPage() {
               name="userPw"
               value={formData.userPw}
               onChange={handleChange}
+              onKeyDown={handleLogin}
             />
           </S.FormGroup>
           <S.LinkGroup>

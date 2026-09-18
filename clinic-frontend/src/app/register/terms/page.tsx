@@ -213,7 +213,7 @@ export default function TermsPage() {
 
       if (response.ok) {
         openPopup("가입 완료", "회원가입이 완료되었습니다", () => {
-          router.push("/");
+          router.push("/register/login");
           closePopup();
         });
       } else {

@@ -1827,7 +1827,7 @@ export const VlogCard = styled.div`
 `;
 export const VlogImageWrapper = styled.div`
   width: 100%;
-  height: 10rem;
+  height: 9.7rem;
   overflow: hidden;
   position: relative;
 
@@ -1976,3 +1976,6 @@ export const SafetyCardDesc = styled.p`
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
 export * from "./AdminCommon.styles";
+export * from "./Tone.styles";
+export * from "./NavSetting.styles";
+export * from "./Consult.styles";

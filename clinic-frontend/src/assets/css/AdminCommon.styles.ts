@@ -120,6 +120,7 @@ export const AdminTopBar = styled.nav`
   ${FlexBetween}
   padding: 0 1.5rem;
   z-index: 10;
+  box-shadow: 0px 8px 10px -6px rgba(0, 0, 0, 0.15);
 `;
 
 export const AdminMain = styled.main`

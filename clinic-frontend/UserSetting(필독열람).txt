@@ -1,0 +1,230 @@
+{
+  // ==========================================
+  // 1. VS Code 글로벌 기본 설정 (화면, 폰트, 아이콘)
+  // ==========================================
+  "editor.mouseWheelZoom": true,
+  "workbench.iconTheme": "catppuccin-perfect-aura",
+  "editor.fontFamily": "D2Coding ligature",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 16,
+  "catppuccin-noctis-icons.hidesExplorerArrows": false,
+
+  // ==========================================
+  // 2. 전역 자동완성 및 정렬 제안 설정
+  // ==========================================
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.snippetSuggestions": "top",
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.suggest.preselect": "none",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.watcherExclude": {
+    "**/.next/**": true,
+    "**/node_modules/**": true,
+  },
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    "strings": "on",
+  },
+
+  // ==========================================
+  // 3. 리액트 / HTML / CSS / Tailwind / Emmet 설정
+  // ==========================================
+  "html-css-class-completion.includeGlobPattern": "**/node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "css.styleSheets": ["https://jsdelivr.net"],
+  "css.classNameTrigger": "class|className",
+  "css.enabledLanguages": [
+    "html",
+    "css",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+  ],
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact",
+    "typescriptreact": "typescriptreact",
+  },
+  "files.associations": {
+    "*.css": "tailwindcss",
+  },
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+
+  // ==========================================
+  // 4. [언어별 격리 설정] - 서로 절대 침범 안 함!
+  // ==========================================
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+  },
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.selectionHighlight": false,
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off",
+  },
+
+  // ==========================================
+  // 5. [실무 커스텀] 에디터 화면 UI & 가독성 개선
+  // ==========================================
+  "workbench.colorCustomizations": {
+    "editor.lineHighlightBackground": "#2d343655",
+    "editor.selectionBackground": "#0984e366",
+    "editor.selectionHighlightBackground": "#00b89444",
+    "minimap.slider.activeBackground": "#6c5ce755",
+  },
+
+  // ==========================================
+  // 6. [실무 커스텀] 기본 주석 및 핵심 문법 명도 업
+  // ==========================================
+  "editor.tokenColorCustomizations": {
+    "comments": "#a29bfe",
+    "keywords": "#9b59b6",
+    "functions": "#ff7675",
+    "textMateRules": [
+      {
+        "scope": [
+          "comment.line", // 한 줄 주석 (//)
+          "comment.line.double-slash", // 이중 슬래시 주석
+          "punctuation.definition.comment", // // 이나 /* */ 같은 주석 기호 자체
+        ],
+        "settings": {
+          "foreground": "#a29bfe", // 원하는 보라색 코드로 통일
+        },
+      },
+    ],
+  },
+
+  // ==========================================
+  // 7. [Highlight 확장 설정] - 중복 결합 완료!
+  // ==========================================
+  "highlight.regexes": {
+    "(\\binterface\\b)\\s+([a-zA-Z0-9_$]+)": {
+      "decorations": [
+        {
+          "color": "#FF007F", // 1. (\\binterface\\b) -> 분홍색 정상 작동!
+          "backgroundColor": "#FF007F10",
+          "fontWeight": "bold",
+        },
+        {
+          "color": "#05FFA1", // 2. ([a-zA-Z0-9_$]+) -> 형광 라임 그린 정상 작동!
+          "backgroundColor": "#05FFA115",
+          "borderBottom": "2px dashed #05FFA180",
+          "fontWeight": "800",
+        },
+      ],
+    },
+    // 💡 true (쨍한 파란색 굵게)
+    "(?<=\\b)true(?=\\b)": {
+      "filterLanguageRegex": "javascript|typescript|dart|json|python",
+      "decorations": [{ "color": "#00d2ff", "fontWeight": "bold" }],
+    },
+    // ❌ false (쨍한 빨간색 굵게)
+    "(?<=\\b)false(?=\\b)": {
+      "filterLanguageRegex": "javascript|typescript|dart|json|python",
+      "decorations": [{ "color": "#ff4d4f", "fontWeight": "bold" }],
+    },
+    // ⚠️ 기존 고급 정규식 TODO 강조 처리
+    "((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *TODO(?:[\\t\\f\\v ]*\\([^\\r\\n)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^\\r\\n:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\r\\n@]*?)(?= *(?:[^\\r\\n:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^\\r\\n@]+)?))": {
+      "filterFileRegex": ".*(?<!CHANGELOG.md)$",
+      "decorations": [
+        {
+          "overviewRulerColor": "#ffcc00",
+          "backgroundColor": "#ffcc00",
+          "color": "#1f1f1f",
+          "fontWeight": "bold",
+        },
+        {
+          "backgroundColor": "#ffcc00",
+          "color": "#1f1f1f",
+        },
+      ],
+    },
+    // 🚨 기존 고급 정규식 FIXME / BUG 강조 처리
+    "((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *(?:FIXME|FIX|BUG|UGLY|DEBUG|HACK)(?:[\\t\\f\\v ]*\\([^\\r\\n)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^\\r\\n:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\r\\n@]*?)(?= *(?:[^\\r\\n:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^\\r\\n@]+)?))": {
+      "filterFileRegex": ".*(?<!CHANGELOG.md)$",
+      "decorations": [
+        {
+          "overviewRulerColor": "#cc0000",
+          "backgroundColor": "#cc0000",
+          "color": "#ffffff",
+          "fontWeight": "bold",
+        },
+        {
+          "backgroundColor": "#cc0000",
+          "color": "#ffffff",
+        },
+      ],
+    },
+    "\\b(e)(?=\\.)": {
+      "filterFileRegex": ".*",
+      "decorations": [
+        {
+          "backgroundColor": "transparent" /* 배경색 제거 */,
+          "color": "#FFEE00" /* 글자색만 쨍한 노란색으로 지정 */,
+          "fontWeight": "bold" /* 두껍게 처리 */,
+        },
+      ],
+    },
+    // 2. (e) => {} 나 function(e) 처럼 괄호 안에 들어있는 이벤트 객체 'e'
+    "(?<=\\(|\\s)(e)(?=\\s*=>|\\s*,|\\))": {
+      "filterFileRegex": ".*",
+      "decorations": [
+        {
+          "backgroundColor": "transparent",
+          "color": "#FFEE00",
+          "fontWeight": "bold",
+        },
+      ],
+    },
+    // 3. e: React.ChangeEvent 처럼 뒤에 콜론(:)이 오는 독립된 'e'
+    "\\b(e)(?=\\s*:)": {
+      "filterFileRegex": ".*",
+      "decorations": [
+        {
+          "backgroundColor": "transparent",
+          "color": "#FFEE00",
+          "fontWeight": "bold",
+        },
+      ],
+    },
+    "github.copilot.chat.welcomeMessage.enabled": false,
+    "chat.welcomeMessage.enabled": false,
+    "terminal.integrated.profiles.windows": {
+      "Command Prompt": {
+        "path": ["${env:windir}\\System32\\cmd.exe"],
+        "args": [],
+        "icon": "terminal-cmd",
+      },
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  },
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell",
+    },
+    "Command Prompt": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": [],
+    },
+    "Git Bash": {
+      "source": "Git Bash",
+      "icon": "terminal-git-bash",
+    },
+  },
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "workbench.colorTheme": "Night Owl Black",
+  "editor.minimap.size": "fit",
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "gitlens.graph.details.location": "auto",
+  "git.autofetch": true,
+}

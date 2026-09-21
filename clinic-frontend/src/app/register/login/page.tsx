@@ -103,10 +103,8 @@ export default function LoginPage() {
               name="userId"
               value={formData.userId}
               onChange={handleChange}
-              onKeyDown={handleLogin}
             />
           </S.FormGroup>
-
           <S.FormGroup>
             <S.Label>비밀번호</S.Label>
             <S.Input
@@ -115,9 +113,9 @@ export default function LoginPage() {
               name="userPw"
               value={formData.userPw}
               onChange={handleChange}
-              onKeyDown={handleLogin}
             />
           </S.FormGroup>
+          <hr style={{ opacity: 0.1 }} />
           <S.LinkGroup>
             <S.StyledLink onClick={() => router.push("/register/terms")}>
               계정이 없으신가요? 회원가입&rarr;
@@ -126,7 +124,7 @@ export default function LoginPage() {
               비밀번호를 잊으셨나요? 비밀번호 찾기&rarr;
             </S.StyledLink>
           </S.LinkGroup>
-
+          <hr style={{ opacity: 0.1 }} />
           <S.ButtonGroup>
             <S.Button $variant="solid" onClick={handleLogin}>
               로그인

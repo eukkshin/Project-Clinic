@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import { FlexCenter } from "@/assets/css/Common.styles";
+
 export const LoginWrapper = styled.div`
   background-size: cover;
   min-height: 100vh;
@@ -22,9 +24,7 @@ export const LeftSection = styled.div`
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   opacity: 0.8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
 `;
 
 // 3. 오른쪽 구역 (예: 로그인 폼)
@@ -33,9 +33,7 @@ export const RightSection = styled.div`
   background-color: rgba(27, 77, 62, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
 `;
 
 // 🎯 부드러운 그림자가 들어간 화이트 카드
@@ -218,3 +216,19 @@ export const StyledLink = styled.a`
     color: #246652;
   }
 `;
+
+export * from "./Dash.styles";
+
+export * from "../AdminCommon.styles";
+export * from "./Tone.styles";
+export * from "./NavSetting.styles";
+export * from "./Consult.styles";
+export * from "./Pop.styles";
+export * from "./News.styles";
+export * from "./Self.styles";
+export * from "./Event.styles";
+export * from "./Footer.styles";
+export * from "./User.styles";
+export * from "./Vlog.styles";
+export * from "./Safety.styles";
+export * from "./Board.styles";

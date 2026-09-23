@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import { FlexBetween, FlexCenter } from "@/assets/css/Common.styles";
+
 export const PopupContainer = styled.div<{ $top: number; $left: number }>`
   position: fixed;
   top: ${(props) => props.$top}px;
@@ -119,9 +121,7 @@ export const PrivacyText = styled.span`
 export const FooterWrapper = styled.div`
   background-color: #fff;
   padding: 10px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
 `;
 export const CloseLabel = styled.label`
   display: flex;

@@ -7,7 +7,7 @@ import {
   FlexColumn,
   FlexStart,
   TransitionAll,
-} from "./Common.styles";
+} from "../Common.styles";
 
 export const PopContainer = styled.div`
   width: 100%;
@@ -34,6 +34,7 @@ export const PopSaveButton = styled.button`
   border-radius: 0.35rem;
   font-size: 0.9rem;
   font-weight: 600;
+  gap: 0.5rem;
   cursor: pointer;
   ${BoxShadow};
   ${TransitionAll};
@@ -156,21 +157,23 @@ export const PopCheckboxLabel = styled.label`
   font-size: 0.85rem;
   color: #5a5c69;
   accent-color: #1b4d3e;
+  margin-bottom: 1.5rem;
 `;
 
 export const PopAddButton = styled.button`
-  ${FlexCenter}
-  width: 100%;
-  margin-top: 1rem;
   border: 1px dashed rgba(59, 122, 87, 0.3);
   color: #5a5c69;
   padding: 1rem;
+  width: 100%;
   border-radius: 0.35rem;
   font-weight: 600;
   ${TransitionAll};
+  ${FlexCenter}
   gap: 0.5rem;
-
   background-color: #f8f9fc;
+  flex-shrink: 0;
+  white-space: nowrap;
+
   &:hover {
     background-color: #fff;
     border-color: #1b4d3e;
@@ -279,16 +282,23 @@ interface PopBadghProps {
   $color: string;
 }
 export const PopBadge = styled.span<PopBadghProps>`
-  color: #fff;
+  background-color: ${(props) => props.$color};
+  color: white;
   padding: 0.3rem 0.6rem;
+  border-radius: 1rem;
   font-size: 0.8rem;
-  border-radius: 9999px;
-  user-select: none;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
   cursor: pointer;
-  font-weight: bold;
-  color: ${(props) => props.$color};
-  background-color: ${(props) => `${props.$color}10`};
-  border: 1px solid ${(props) => props.$color};
+  transition: opacity 0.2s;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export const PopDeleteBtn = styled.button`

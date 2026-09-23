@@ -6,7 +6,7 @@ import {
   FlexCenter,
   FlexStart,
   TransitionAll,
-} from "./Common.styles";
+} from "../Common.styles";
 
 export const SetNavContainer = styled.div`
   width: 100%;
@@ -33,6 +33,7 @@ export const SetNavSaveButton = styled.button`
   border-radius: 0.35rem;
   font-size: 0.9rem;
   font-weight: 600;
+  gap: 0.5rem;
   cursor: pointer;
   ${BoxShadow};
   ${TransitionAll};
@@ -226,18 +227,19 @@ export const SetNavDeleteButton = styled.button`
 `;
 
 export const NavAddButton = styled.button`
-  ${FlexCenter}
-  width: 100%;
-  margin-top: 1rem;
   border: 1px dashed rgba(59, 122, 87, 0.3);
   color: #5a5c69;
   padding: 1rem;
+  width: 100%;
   border-radius: 0.35rem;
   font-weight: 600;
   ${TransitionAll};
+  ${FlexCenter}
   gap: 0.5rem;
-
   background-color: #f8f9fc;
+  flex-shrink: 0;
+  white-space: nowrap;
+
   &:hover {
     background-color: #fff;
     border-color: #1b4d3e;

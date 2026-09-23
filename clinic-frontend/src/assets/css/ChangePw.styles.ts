@@ -33,9 +33,7 @@ export const LeftSection = styled.div`
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   opacity: 0.8;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
 `;
 
 // 3. 오른쪽 구역 (예: 로그인 폼)
@@ -44,9 +42,7 @@ export const RightSection = styled.div`
   background-color: rgba(27, 77, 62, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
 `;
 
 export const Card = styled.div`

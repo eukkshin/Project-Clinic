@@ -1,5 +1,7 @@
 import styled, { keyframes } from "styled-components";
 
+import { FlexBetween } from "../css/Common.styles";
+
 export const Wrapper = styled.div`
   width: 100%;
   max-width: 800px;
@@ -121,9 +123,7 @@ export const TermSection = styled.div`
 `;
 
 export const TermHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
   margin-bottom: 15px;
 `;
 

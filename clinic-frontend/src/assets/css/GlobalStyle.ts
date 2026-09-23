@@ -23,4 +23,39 @@ ul, ol, li {
     margin: 0;
     padding: 0;
 }
+&::selection {
+    background-color: #000;
+    color: #ffffff;
+  }
+  
+   html {
+    color-scheme: light;
+  }
+
+  html, body {
+    scrollbar-width: thin;
+    scrollbar-color: #ffccd5 #ffffff;
+  }
+
+  html::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background-color: #ffffff !important;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background-color: #ffccd5 !important;
+    border-radius: 10px;
+    border: 2px solid #ffffff;
+    background-clip: padding-box;
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background-color: #ff3377 !important;
+  }
+
 `;

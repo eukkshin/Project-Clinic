@@ -1,6 +1,10 @@
 import styled, { keyframes, Keyframes } from "styled-components";
 
-import { FlexBetween, FlexCenter } from "@/assets/css/Common.styles";
+import {
+  FlexBetween,
+  FlexCenter,
+  FlexColumn,
+} from "@/assets/css/Common.styles";
 
 export const MAIN_COLOR = "#ffe6f0";
 export const POINT_COLOR = "#ff1493";
@@ -28,8 +32,7 @@ export const EventHeader = styled.div`
   margin-bottom: 40px;
 `;
 export const EventTitleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
 `;
 export const EventMainTitle = styled.h2`
   font-size: 32px;
@@ -71,9 +74,7 @@ export const EventArrowBtn = styled.button`
   font-size: 16px;
   color: #fff;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
 
   &:hover {
     background-color: #444;
@@ -159,18 +160,14 @@ export const RankBadge = styled.div<{ $bgColor: string; $radius?: string }>`
   color: #000;
   font-size: 26px;
   font-weight: 900;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   border-radius: ${(props) => props.$radius || "50%"};
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 `;
 export const EventInfo = styled.div<{ $bgColor: string }>`
   background-color: ${(props) => props.$bgColor};
   padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
 `;
 export const SurgeryLabel = styled.div`
   background-color: #000;
@@ -195,9 +192,7 @@ export const EventPrice = styled.div`
 
 //카테고리나브
 export const NavContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   gap: 30px;
   padding-bottom: 15px;
   margin-top: 40px;
@@ -217,8 +212,7 @@ export const NavContainer = styled.div`
   }
 `;
 export const CategoryItem = styled.div<{ $active: boolean }>`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   align-items: center;
   cursor: pointer;
   position: relative;
@@ -266,9 +260,7 @@ export const ActiveOverlay = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(255, 209, 223, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   border-radius: 50%;
 `;
 export const CategoryText = styled.span<{ $active: boolean }>`
@@ -287,8 +279,7 @@ export const PopupContainer = styled.div<{ $top: number; $left: number }>`
   background-color: rgba(0, 0, 0, 0.8);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   z-index: 99999;
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
 `;
 export const ImageWrapper = styled.div`
   width: 100%;
@@ -382,9 +373,7 @@ export const PrivacyText = styled.span`
 export const FooterWrapper = styled.div`
   background-color: #fff;
   padding: 10px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
 `;
 export const CloseLabel = styled.label`
   display: flex;
@@ -469,8 +458,7 @@ export const ScheduleWrapper = styled.div`
   }
 `;
 export const ScheduleBlock = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 8px;
 `;
 export const ScheduleTitle = styled.div`
@@ -517,8 +505,7 @@ export const BottomSection = styled.div`
   }
 `;
 export const CompanyInfo = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 10px;
 `;
 export const CompanyName = styled.h2`
@@ -539,8 +526,7 @@ export const InfoText = styled.p`
   }
 `;
 export const BottomRight = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   align-items: flex-end;
   gap: 20px;
   @media (max-width: 1024px) {
@@ -590,8 +576,7 @@ export const FlaotingMenu = styled.div`
   position: fixed;
   right: 30px;
   bottom: 90px;
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 15px;
   z-index: 100;
   @media (max-width: 768px) {
@@ -601,8 +586,7 @@ export const FlaotingMenu = styled.div`
   }
 `;
 export const FabItem = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   align-items: center;
   gap: 5px;
   cursor: pointer;
@@ -1102,9 +1086,7 @@ export const TermSection = styled.div`
   margin-bottom: 30px;
 `;
 export const TermHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
   margin-bottom: 15px;
 `;
 export const TermTitle = styled.span`
@@ -1180,14 +1162,12 @@ export const PageTitle = styled.h2`
 `;
 export const FormContainer = styled.div`
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 24px;
   margin-top: 20px;
 `;
 export const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 10px;
 `;
 export const Label = styled.label`
@@ -1306,8 +1286,7 @@ export const SliderHeader = styled.div`
   margin-bottom: 30px;
 `;
 export const SliderTitleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
 `;
 export const SliderMainTitle = styled.h2`
   font-size: 32px;
@@ -1347,9 +1326,7 @@ export const SliderArrowBtn = styled.button`
   border: none;
   font-size: 16px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   &:hover {
     background-color: #333;
   }
@@ -1394,8 +1371,7 @@ export const SelfieCardOverlay = styled.div`
     rgba(0, 0, 0, 0) 60%,
     rgba(0, 0, 0, 0.6) 100%
   );
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   justify-content: space-between;
   padding: 20px;
 `;
@@ -1428,9 +1404,7 @@ export const SelfieViewCount = styled.div`
 export const SiteFooterWrapper = styled.footer`
   background-color: #000;
   padding: 20px 15px 120px 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  ${FlexBetween}
   border-top: 1px solid #eee;
 `;
 export const SiteFooterInner = styled.div`
@@ -1491,8 +1465,7 @@ export const SiteFooterScheduleText = styled.div`
   letter-spacing: -0.5px;
 `;
 export const SiteFooterScheduleBlock = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 8px;
 `;
 export const SiteFooterLocationBtn = styled.button`
@@ -1528,8 +1501,7 @@ export const SiteFooterBottom = styled.div`
   }
 `;
 export const SiteFooterCompany = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 10px;
 `;
 export const SiteFooterCompanyName = styled.h2`
@@ -1546,8 +1518,7 @@ export const SiteFooterInfoText = styled.p`
   letter-spacing: -0.3px;
 `;
 export const SiteFooterBottomRight = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   align-items: flex-end;
   gap: 20px;
 
@@ -1635,8 +1606,7 @@ export const DropdownMenu = styled.div<{ $isOpen: boolean }>`
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   overflow: hidden;
 
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 2px;
 
   max-height: 0px;
@@ -1688,8 +1658,7 @@ export const FloatingMenuWrapper = styled.div`
   position: fixed;
   right: 30px;
   bottom: 90px;
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   gap: 15px;
   z-index: 999999;
 
@@ -1700,8 +1669,7 @@ export const FloatingMenuWrapper = styled.div`
   }
 `;
 export const FloatingMenuItem = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   align-items: center;
   gap: 5px;
   cursor: pointer;
@@ -1868,8 +1836,7 @@ export const SafetyHeader = styled.div`
   margin-bottom: 2.86rem;
 `;
 export const SafetyTitleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
 `;
 export const SafetyMainTitle = styled.h2`
   font-size: 2.29rem;
@@ -1954,8 +1921,7 @@ export const SafetyTextOverlay = styled.div`
   bottom: 0;
   left: 0;
   padding: 40px 20px 20px 20px;
-  display: flex;
-  flex-direction: column;
+  ${FlexColumn}
   justify-content: flex-end;
 `;
 export const SafetyCardTitle = styled.h3`
@@ -1975,10 +1941,3 @@ export const SafetyCardDesc = styled.p`
 
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
-export * from "./AdminCommon.styles";
-export * from "./Tone.styles";
-export * from "./NavSetting.styles";
-export * from "./Consult.styles";
-export * from "./Pop.styles";
-export * from "./News.styles";
-export * from "./Self.styles";

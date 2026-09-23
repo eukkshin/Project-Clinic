@@ -9,7 +9,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
 interface CategoryData {

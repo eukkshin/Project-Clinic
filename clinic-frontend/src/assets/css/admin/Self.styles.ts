@@ -7,26 +7,26 @@ import {
   FlexColumn,
   FlexStart,
   TransitionAll,
-} from "./Common.styles";
+} from "../Common.styles";
 
-export const NewsContainer = styled.div`
+export const SelfContainer = styled.div`
   width: 100%;
 `;
 
-export const NewsPageHeader = styled.header`
+export const SelfPageHeader = styled.header`
   ${FlexBetween}
   width: 100%;
   margin-bottom: 1.5rem;
 `;
 
-export const NewsPageTitle = styled.h2`
+export const SelfPageTitle = styled.h2`
   font-size: 1.5rem;
   color: #5a5c69;
   font-weight: 700;
   margin: 0;
 `;
 
-export const NewsSaveButton = styled.button`
+export const SelfSaveButton = styled.button`
   ${FlexCenter};
   color: #fff;
   border: none;
@@ -34,6 +34,7 @@ export const NewsSaveButton = styled.button`
   border-radius: 0.35rem;
   font-size: 0.9rem;
   font-weight: 600;
+  gap: 0.5rem;
   cursor: pointer;
   ${BoxShadow};
   ${TransitionAll};
@@ -44,9 +45,9 @@ export const NewsSaveButton = styled.button`
   }
 `;
 
-export const NewsGrid = styled.div`
+export const SelfGrid = styled.div`
   display: grid;
-  grid-template-columns: 1.2fr 1.8fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   width: 100%;
 
@@ -55,44 +56,44 @@ export const NewsGrid = styled.div`
   }
 `;
 
-export const NewsLeftColumn = styled.div`
+export const SelfLeftColumn = styled.div`
   ${FlexColumn}
   gap: 1.5rem;
   width: 100%;
 `;
 
-export const NewsCard = styled.div`
+export const SelfCard = styled.div`
   border-radius: 0.35rem;
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
 `;
 
-export const NewsCardHeader = styled.header`
+export const SelfCardHeader = styled.header`
   background-color: #f8f9fc;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(59, 122, 87, 0.1);
 `;
 
-export const NewsCardTitle = styled.h6`
+export const SelfCardTitle = styled.h6`
   margin: 0;
   font-weight: 700;
   color: #1b4d3e;
 `;
 
-export const NewsCardBody = styled.div`
+export const SelfCardBody = styled.div`
   padding: 1.5rem;
   color: #858796;
 `;
 
-export const NewsFormGroup = styled.div`
+export const SelfFormGroup = styled.div`
   ${FlexColumn}
   width: 100%;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 `;
 
-export const NewsLabel = styled.label`
+export const SelfLabel = styled.label`
   font-size: 0.85rem;
   font-weight: 700;
   color: #5a5c69;
@@ -100,7 +101,7 @@ export const NewsLabel = styled.label`
   flex-shrink: 0;
 `;
 
-export const NewsInput = styled.input`
+export const SelfInput = styled.input`
   width: 100%;
   padding: 0.6rem 1rem;
   font-size: 0.9rem;
@@ -115,7 +116,7 @@ export const NewsInput = styled.input`
   }
 `;
 
-export const NewsFileInputWrapper = styled.div`
+export const SelfFileInputWrapper = styled.div`
   gap: 1rem;
   ${FlexStart}
 
@@ -127,11 +128,11 @@ export const NewsFileInputWrapper = styled.div`
   }
 `;
 
-export const NewsFileInput = styled.input`
+export const SelfFileInput = styled.input`
   display: none;
 `;
 
-export const NewsFileLabel = styled.label`
+export const SelfFileLabel = styled.label`
   background-color: #fff;
   border: 1px solid #d1d3e2;
   padding: 0.5rem 1rem;
@@ -147,21 +148,20 @@ export const NewsFileLabel = styled.label`
   }
 `;
 
-export const NewsPreviewCircle = styled.div``;
-
-export const NewsAddButton = styled.button`
-  ${FlexCenter}
-  width: 100%;
-  margin-top: 1rem;
+export const SelfAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
   color: #5a5c69;
   padding: 1rem;
+  width: 100%;
   border-radius: 0.35rem;
   font-weight: 600;
   ${TransitionAll};
+  ${FlexCenter}
   gap: 0.5rem;
-
   background-color: #f8f9fc;
+  flex-shrink: 0;
+  white-space: nowrap;
+
   &:hover {
     background-color: #fff;
     border-color: #1b4d3e;
@@ -169,15 +169,14 @@ export const NewsAddButton = styled.button`
   }
 `;
 
-export const NewsRightColumn = styled.div`
+export const SelfRightColumn = styled.div`
   ${FlexColumn}
   width: 100%;
 `;
 
-export const NewsTableWrapper = styled.div`
+export const SelfTableWrapper = styled.div`
   width: 100%;
   ${FlexStart}
-  padding: 1.5rem;
 `;
 
 const TableRowBase = `
@@ -186,7 +185,7 @@ const TableRowBase = `
   width: 100%;
 `;
 
-export const NewsTable = styled.table`
+export const SelfTable = styled.table`
   width: 100%;
   border-collapse: collapse;
 
@@ -208,10 +207,10 @@ export const NewsTable = styled.table`
           width: 20%;
         }
         &:nth-child(2) {
-          width: 20%;
+          width: 30%;
         }
         &:nth-child(3) {
-          width: 50%;
+          width: 20%;
         }
         &:nth-child(4) {
           width: 10%;
@@ -239,6 +238,7 @@ export const NewsTable = styled.table`
         padding: 12px 8px;
         white-space: nowrap;
         border-bottom: 1px solid #eaecf0;
+
         text-align: center;
         vertical-align: middle;
 
@@ -246,10 +246,10 @@ export const NewsTable = styled.table`
           width: 20%;
         }
         &:nth-child(2) {
-          width: 20%;
+          width: 30%;
         }
         &:nth-child(3) {
-          width: 50%;
+          width: 20%;
         }
         &:nth-child(4) {
           width: 10%;
@@ -259,17 +259,11 @@ export const NewsTable = styled.table`
   }
 `;
 
-export const NewsActionBtn = styled.button`
+export const SelfThumbnail = styled.div`
   ${FlexCenter}
-  border: none;
-  height: 36px;
-`;
+  width: 5rem;
+  height: 7rem;
 
-export const NewsThumbnail = styled.div`
-  ${FlexCenter}
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
   color: #5a5c69;
   background-color: #d1d3e2;
   font-size: 0.85rem;
@@ -283,22 +277,48 @@ export const NewsThumbnail = styled.div`
   }
 `;
 
-export const NewsDeleteBtn = styled.button`
+interface SelfStatusBadgeProps {
+  $isActive: boolean;
+}
+export const SelfStatusBadge = styled.span<SelfStatusBadgeProps>`
+  background-color: ${(props) => (props.$isActive ? "#2e7d32" : "#d39e00")};
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const SelfDeleteBtn = styled.button`
   background: transparent;
   border: none;
   color: #e74a3b;
   cursor: pointer;
   ${FlexCenter}
+  ${TransitionAll};
+  border-radius: 50%;
   width: 36px;
   height: 36px;
 
-  ${TransitionAll};
-  border-radius: 50%;
-
   margin: 0 auto;
+  flex-shrink: 0;
+  white-space: nowrap;
 
   &:hover {
     background-color: #fdeaea;
     color: #ff4d4f;
   }
 `;
+
+export const SelfPreviewRect = styled.div``;

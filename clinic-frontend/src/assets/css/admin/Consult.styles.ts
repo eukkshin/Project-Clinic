@@ -8,7 +8,7 @@ import {
   FlexEnd,
   FlexStart,
   TransitionAll,
-} from "../../assets/css/Common.styles";
+} from "../Common.styles";
 
 export const ConsultContainer = styled.div`
   width: 100%;
@@ -197,20 +197,23 @@ interface ConsultStatusBadgeProps {
 }
 export const ConsultStatusBadge = styled.span<ConsultStatusBadgeProps>`
   background-color: ${(props) =>
-    props.$status === "대기중" ? "#fff3cd " : "#e8f0fe "};
-  color: ${(props) => (props.$status === "대기중" ? "#b78103" : "#1a73e8 ")};
-  border: 1px solid
-    ${(props) => (props.$status === "대기중" ? "#b78103" : "#1a73e8 ")};
-
+    props.$status === "대기중" ? "#b78103" : "#1a73e8"};
+  color: white;
   padding: 0.3rem 0.6rem;
+  border-radius: 1rem;
   font-size: 0.8rem;
-  border-radius: 9999px;
-  margin: 0 auto;
-  overflow: hidden;
-  font-weight: bold;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s;
   user-select: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export const ConsultDeleteActionBtn = styled.button`

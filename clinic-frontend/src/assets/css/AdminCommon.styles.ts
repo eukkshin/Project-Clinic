@@ -16,6 +16,7 @@ import {
 
 interface AdminSidebarProps {
   $isCollapsed: boolean;
+  $isSelected?: boolean;
 }
 
 export const AdminContainer = styled.div`
@@ -134,6 +135,10 @@ export const AdminTopbarBrand = styled.div`
   color: #1b4d3e;
   font-weight: 800;
   letter-spacing: 0.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 `;
 
 export const AdminTopbarRight = styled.div`
@@ -146,6 +151,9 @@ export const AdminTopBarUser = styled.span`
   font-size: 0.9rem;
   color: #858796;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const AdminLogoutBtn = styled.button`
@@ -155,6 +163,9 @@ export const AdminLogoutBtn = styled.button`
   ${FlexCenter}
   gap: 0.3rem;
   ${TransitionAll}
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
 
   &:hover {
     color: #fff;

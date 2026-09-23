@@ -7,7 +7,7 @@ import {
   FiUserPlus,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/admin/Admin.style";
 
 export default function Root() {
   return (

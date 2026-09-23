@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FiCheck, FiSearch, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
 //임시데이터 인터페이스

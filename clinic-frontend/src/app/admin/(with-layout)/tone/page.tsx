@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FiCheck, FiMoon, FiSave, FiSun } from "react-icons/fi";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
 export default function TonePage() {

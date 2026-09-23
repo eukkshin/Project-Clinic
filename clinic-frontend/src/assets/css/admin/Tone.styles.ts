@@ -5,7 +5,7 @@ import {
   FlexBetween,
   FlexCenter,
   TransitionAll,
-} from "./Common.styles";
+} from "../Common.styles";
 
 export const ToneContainer = styled.div`
   width: 100%;
@@ -34,6 +34,7 @@ export const ToneSaveButton = styled.button`
   border-radius: 0.35rem;
   font-size: 0.9rem;
   font-weight: 600;
+  gap: 0.5rem;
   cursor: pointer;
   ${BoxShadow};
   ${TransitionAll};

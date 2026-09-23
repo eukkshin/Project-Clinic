@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import * as S from "@/assets/css/Admin.style";
+import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
 export default function LoginPage() {

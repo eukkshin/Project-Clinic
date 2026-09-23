@@ -1,9 +1,9 @@
 import styled from "styled-components";
 
+import { FlexCenter } from "@/assets/css/Common.styles";
+
 export const NavContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   gap: 30px;
   padding-bottom: 15px;
   margin-top: 40px;
@@ -73,9 +73,7 @@ export const ActiveOverlay = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(255, 209, 223, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${FlexCenter}
   border-radius: 50%;
 `;
 

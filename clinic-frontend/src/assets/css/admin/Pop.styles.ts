@@ -67,6 +67,7 @@ export const PopCard = styled.div`
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
+  background-color: #fff;
 `;
 
 export const PopCardHeader = styled.header`
@@ -217,18 +218,21 @@ export const PopTable = styled.table`
         box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
 
         &:nth-child(1) {
-          width: 30%;
+          width: 20%;
         }
         &:nth-child(2) {
           width: 20%;
         }
         &:nth-child(3) {
-          width: 10%;
+          width: 20%;
         }
         &:nth-child(4) {
           width: 10%;
         }
         &:nth-child(5) {
+          width: 10%;
+        }
+        &:nth-child(6) {
           width: 10%;
         }
       }
@@ -259,18 +263,21 @@ export const PopTable = styled.table`
         vertical-align: middle;
 
         &:nth-child(1) {
-          width: 30%;
+          width: 20%;
         }
         &:nth-child(2) {
           width: 20%;
         }
         &:nth-child(3) {
-          width: 10%;
+          width: 20%;
         }
         &:nth-child(4) {
           width: 10%;
         }
         &:nth-child(5) {
+          width: 10%;
+        }
+        &:nth-child(6) {
           width: 10%;
         }
       }

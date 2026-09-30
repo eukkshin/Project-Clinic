@@ -81,5 +81,10 @@ module.exports = new EntitySchema({
       type: "date",
       createDate: true,
     },
+    STATUS: {
+      type: "varchar2",
+      length: 20,
+      default: "'정상'",
+    },
   },
 });

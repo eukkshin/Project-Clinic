@@ -1,0 +1,40 @@
+svg xmlns=httpw3.org viewBox=0 0 1050 260 width=100% height=100%
+  defs
+    !-- 고해상도 선명한 로즈골드 그라데이션 --
+    linearGradient id=ultraRoseGold x1=0% y1=0% x2=100% y2=100%
+      stop offset=0% stop-color=#D49B86 
+      stop offset=50% stop-color=#F7D3C6 
+      stop offset=100% stop-color=#B3765D 
+    linearGradient
+  defs
+
+  !-- 여백 없이 좌우 꽉 찬 울트라 대형 레이아웃 --
+  g transform=translate(10, 10)
+    !-- 1. 울트라 볼드 대형 심볼 (선 두께 14px로 선명도 극대화) --
+    g transform=translate(0, 15)
+      circle cx=110 cy=110 r=105 fill=none stroke=url(#ultraRoseGold) stroke-width=14
+      !-- 피어나는 페이스 라인 A 아트 --
+      path d=M65,165 C75,115 95,65 110,45 C125,65 145,115 155,165 fill=none stroke=url(#ultraRoseGold) stroke-width=14 stroke-linecap=round
+      path d=M75,120 C95,115 125,115 145,120 fill=none stroke=url(#ultraRoseGold) stroke-width=10 stroke-linecap=round
+      !-- 스파클 포인트 --
+      path d=M150,50 L156,62 L168,65 L156,68 L150,80 L144,68 L132,65 L144,62 Z fill=url(#ultraRoseGold)
+    g
+
+    !-- 2. 압도적인 가시성의 대형 텍스트 영역 --
+    !-- 메인 타이틀 Ahn's (가장 두꺼운 900 두께 및 완전 블랙 #000000 적용) --
+    text x=260 y=135 
+          font-family='Playfair Display', 'Didot', 'Cinzel', 'Noto Serif KR', serif 
+          font-size=140 
+          font-weight=900 
+          fill=#000000 
+          letter-spacing=1Ahn'stext
+          
+    !-- 서브 타이틀 PLASTIC SURGERY (자간을 넓혀 고급스러운 가독성 확보) --
+    text x=265 y=210 
+          font-family='Montserrat', 'Helvetica', 'Noto Sans KR', sans-serif 
+          font-size=40 
+          font-weight=700 
+          fill=url(#ultraRoseGold) 
+          letter-spacing=16PLASTIC SURGERYtext
+  g
+svg

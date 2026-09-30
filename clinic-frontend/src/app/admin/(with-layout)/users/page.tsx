@@ -1,13 +1,22 @@
 "use client";
-import React, { useState } from "react";
-import { FiCheck, FiSearch, FiTrash2, FiUserX } from "react-icons/fi";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import {
+  FiCheck,
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronsLeft,
+  FiSearch,
+  FiTrash2,
+  FiUserX,
+} from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
 // 임시 회원 데이터 인터페이스
 interface UserData {
-  id: number;
+  idx: number;
   name: string;
   userId: string;
   phone: string;
@@ -15,66 +24,121 @@ interface UserData {
   status: "정상" | "정지";
 }
 
+interface RawUser {
+  USER_IDX: number;
+  USER_NAME: string;
+  USER_ID: string;
+  PHONE: string;
+  REG_DATE: string;
+  STATUS: string;
+}
+
+interface Pagination {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
 export default function Users() {
   // 🎯 상태 관리: 회원 목록
-  const [userList, setUserList] = useState<UserData[]>([
-    {
-      id: 1,
-      name: "홍길동",
-      userId: "hong123@test.com",
-      phone: "010-1234-5678",
-      joinDate: "2026-09-20",
-      status: "정상",
-    },
-    {
-      id: 2,
-      name: "김철수",
-      userId: "kim_ch@test.com",
-      phone: "010-9876-5432",
-      joinDate: "2026-09-18",
-      status: "정지",
-    },
-    {
-      id: 3,
-      name: "이영희",
-      userId: "young_hee@test.com",
-      phone: "010-5555-4444",
-      joinDate: "2026-09-15",
-      status: "정상",
-    },
-  ]);
+  const [userList, setUserList] = useState<UserData[]>([]);
+
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   // 🎯 상태 관리: 삭제 팝업
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [selectedDeleteId, setSelectedDeleteId] = useState<number | null>(null);
+  const [selectedDeleteIdx, setSelectedDeleteIdx] = useState<number | null>(
+    null,
+  );
 
-  // ----------------------------------------------------
-  // 1. 회원 상태 변경 토글 (정상 <-> 정지)
-  // ----------------------------------------------------
-  const toggleStatus = (id: number) => {
-    setUserList(
-      userList.map((item) =>
-        item.id === id
-          ? { ...item, status: item.status === "정상" ? "정지" : "정상" }
-          : item,
-      ),
-    );
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get<{
+          success: boolean;
+          data: RawUser[];
+          pagination: Pagination;
+        }>("http://localhost:4000/api/admin/users", {
+          params: { page: currentPage, limit: 10, search: searchKeyword },
+        });
+        if (response.data.success) {
+          const formattedUsers = response.data.data.map((user) => ({
+            idx: user.USER_IDX,
+            name: user.USER_NAME,
+            userId: user.USER_ID,
+            phone: user.PHONE,
+            status: user.STATUS as UserData["status"],
+            joinDate: user.REG_DATE
+              ? new Date(user.REG_DATE).toLocaleDateString("sv-SE")
+              : "2026-09-01",
+          }));
+          setUserList(formattedUsers);
+          setTotalCount(response.data.pagination.totalCount);
+          setTotalPages(response.data.pagination.totalPages);
+        } else {
+        }
+      } catch (error) {
+        console.error("회원 목록 불러오기 실패: ", error);
+      }
+    };
+    fetchUsers();
+  }, [currentPage, searchKeyword]);
+
+  //검색버튼클릭
+  const handleSearch = () => {
+    setSearchKeyword(searchInput);
+    setCurrentPage(1); //검색시 무조건 1페이지로 이동
   };
 
-  // ----------------------------------------------------
-  // 2. 회원 삭제 기능 (팝업 열기 & 실제 삭제)
-  // ----------------------------------------------------
-  const handleDeleteClick = (id: number) => {
-    setSelectedDeleteId(id);
+  const toggleStatus = async (idx: number) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:4000/api/admin/users/${idx}/status`,
+      );
+      if (response.data.success) {
+        setUserList(
+          userList.map((item) =>
+            item.idx === idx
+              ? { ...item, status: item.status === "정상" ? "정지" : "정상" }
+              : item,
+          ),
+        );
+        alert("유저 상태가 변경되었습니다!");
+      }
+    } catch (error) {
+      console.error("유저 상태 변경 실패: ", error);
+      alert("유저 상태 변경을 실패했습니다");
+    }
+  };
+
+  const handleDeleteClick = (idx: number) => {
+    setSelectedDeleteIdx(idx);
     setIsDeletePopupOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (selectedDeleteId !== null) {
-      setUserList(userList.filter((item) => item.id !== selectedDeleteId));
+  const confirmDelete = async () => {
+    if (selectedDeleteIdx !== null) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:4000/api/admin/users/${selectedDeleteIdx}`,
+        );
+        if (response.data.success) {
+          setUserList(
+            userList.filter((item) => item.idx !== selectedDeleteIdx),
+          );
+        }
+      } catch (error) {
+        console.error("회원 삭제 실패: ", error);
+        alert("회원 삭제에 실패했습니다");
+      }
     }
     setIsDeletePopupOpen(false);
-    setSelectedDeleteId(null);
+    setSelectedDeleteIdx(null);
   };
 
   return (
@@ -90,8 +154,11 @@ export default function Users() {
             <S.UserInput
               type="text"
               placeholder="이름, 아이디 또는 연락처 검색"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <S.UserSearchButton>
+            <S.UserSearchButton onClick={handleSearch}>
               <FiSearch size={16} /> 검색
             </S.UserSearchButton>
           </S.UserInputGroup>
@@ -120,8 +187,8 @@ export default function Users() {
               </thead>
               <tbody>
                 {userList.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{userList.length - index}</td>
+                  <tr key={item.idx}>
+                    <td>{totalCount - (currentPage - 1) * 10 - index}</td>
                     <td>
                       <strong>{item.name}</strong>
                     </td>
@@ -131,7 +198,7 @@ export default function Users() {
                     <td>
                       <S.UserStatusBadge
                         $status={item.status}
-                        onClick={() => toggleStatus(item.id)}
+                        onClick={() => toggleStatus(item.idx)}
                       >
                         {item.status === "정상" ? (
                           <FiCheck size={12} />
@@ -143,7 +210,7 @@ export default function Users() {
                     </td>
                     <td>
                       <S.UserDeleteActionBtn
-                        onClick={() => handleDeleteClick(item.id)}
+                        onClick={() => handleDeleteClick(item.idx)}
                       >
                         <FiTrash2 size={16} />
                       </S.UserDeleteActionBtn>
@@ -163,6 +230,37 @@ export default function Users() {
               </tbody>
             </S.UserTable>
           </S.UserTableWrapper>
+          {totalPages > 0 && (
+            <S.Pagenation>
+              <S.Prev
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage <= 1}
+              >
+                <FiChevronLeft size={16} />
+              </S.Prev>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <S.PagenationBtn
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    $active={page === currentPage}
+                  >
+                    {page}
+                  </S.PagenationBtn>
+                ),
+              )}
+
+              <S.Next
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                }
+                disabled={currentPage >= totalPages}
+              >
+                <FiChevronRight size={16} />
+              </S.Next>
+            </S.Pagenation>
+          )}
         </S.UserTableCard>
       </S.UserContainer>
 
@@ -172,7 +270,7 @@ export default function Users() {
         title="회원 삭제 확인"
         onClose={() => {
           setIsDeletePopupOpen(false);
-          setSelectedDeleteId(null);
+          setSelectedDeleteIdx(null);
         }}
         onConfirm={confirmDelete}
       >

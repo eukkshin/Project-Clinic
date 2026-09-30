@@ -61,6 +61,7 @@ export const ToneSettingsCard = styled.div`
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
+  background-color: #fff;
 `;
 
 export const ToneCardHeader = styled.div`
@@ -113,6 +114,14 @@ export const ToneColorBox = styled.div<ToneColorBoxProps>`
 
   border: ${(props) =>
     props.$isActive ? "5px solid #fff" : "1px solid rgba(59, 122, 87, 0.1)"};
+
+  ${(props) =>
+    !props.$isActive &&
+    `
+    &:hover {
+      transform: scale(0.98);
+    }
+  `}
 `;
 
 export const ToneToggleWrapper = styled.div`

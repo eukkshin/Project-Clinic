@@ -1,11 +1,6 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import {
-  BoxShadow,
-  FlexBetween,
-  FlexCenter,
-  TransitionAll,
-} from "../Common.styles";
+import { BoxShadow, FlexBetween, FlexCenter, TransitionAll } from '../Common.styles';
 
 // -----------------------------------------
 // 🎯 AdminVlog 관리 전용 스타일
@@ -210,8 +205,9 @@ export const AdminVlogTable = styled.table`
     color: #5a5c69;
     font-weight: 700;
     padding: 0.8rem;
-    border-bottom: 2px solid #e3e6f0;
+    border-bottom: 1px solid #eaecf0;
     white-space: nowrap;
+    box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
   }
 
   td {

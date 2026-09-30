@@ -7,6 +7,7 @@ import {
   FlexColumn,
   FlexEnd,
   FlexStart,
+  InlineFlexCenter,
   TransitionAll,
 } from "../Common.styles";
 
@@ -81,6 +82,7 @@ export const ConsultTableCard = styled.div`
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
+  background-color: #fff;
 `;
 
 export const ConsultCardHeader = styled.header`
@@ -203,9 +205,8 @@ export const ConsultStatusBadge = styled.span<ConsultStatusBadgeProps>`
   border-radius: 1rem;
   font-size: 0.8rem;
   font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  ${InlineFlexCenter}
+  width: 95px;
   gap: 0.2rem;
   cursor: pointer;
   transition: opacity 0.2s;

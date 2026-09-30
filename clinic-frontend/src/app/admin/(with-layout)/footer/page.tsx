@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
-import { FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import * as S from '@/assets/css/admin/Admin.style';
+import { Popup } from '@/components/modal/Popup';
 
 interface ScheduleData {
   id: number;
@@ -19,7 +20,7 @@ interface FamilySiteData {
   url: string;
 }
 
-export default function FooterPage() {
+export default function FooterSetting() {
   const [companyInfo, setCompanyInfo] = useState({
     name: "",
     address: "",
@@ -52,56 +53,102 @@ export default function FooterPage() {
     { id: 3, name: "Lifting Center", url: "#" },
   ]);
 
-  const [isSavePopupOpen, setIsSavePopupOpen] = useState(false);
-  const [isChangePopupOpen, setIsChangePopupOpen] = useState(false);
-  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  //const [isSavePopupOpen, setIsSavePopupOpen] =useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
-  const [selectedDeleteId, setSelectedDeleteId] = useState<number | null>(null);
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response =
+          //백앤드를 통해 데이터를 달라고 요청
+          await axios.get("http://localhost:4000/api/admin/footer");
+        //서버가 통신성공을 알리고 빈껍데기가 아닌 실제 데이터가 있다면
+        if (response.data.success && response.data.data) {
+          //서버가 보내준 데이터 덩어리에서 필요한 3가지 속성만 쏙 빼냅니다(구조 분해 할당)
+          const { companyInfo, schedules, familySites } = response.data.data;
+          // 빼낸 데이터들을 각각 프론트엔드의 상태에 채워 넣어 화면에 보여줌
+          setCompanyInfo(companyInfo);
+          setSchedules(schedules);
+          setFamilySites(familySites);
+        }
+      } catch (error) {
+        console.error("푸터 데이터 로드 실패", error);
+      }
+    };
+    fetchFooterData();
+  }, []);
 
-  const handleAddFamilySite = () => {
-    setFamilySites([...familySites, { id: Date.now(), name: "", url: "" }]);
-  };
-
+  //1. 진료시간 수정 핸들러 (입력창에 글자를 칠 때마다 실행)
   const handleScheduleChange = (
     id: number,
     field: keyof ScheduleData,
     value: string,
   ) => {
     setSchedules(
-      schedules.map((s) => (s.id === id ? { ...s, [field]: value } : s)),
+      schedules.map((sch) =>
+        // 현재 확인 중인 항목의 id가 내가 지금 글자를
+        // 치고 있는 항목의 id와 같다면?
+        sch.id === id
+          ? // 기존 데이터(...sch)는 그대로 유지한 채,
+            // 변경된 특정 칸([field])만 새로운 글자(value)로 덮어씌웁니다
+            { ...sch, [field]: value }
+          : //id가 다르면 내가 건드린 항목이 아니므로
+            // 아무것도 바꾸지 않고 그대로 둡니다.
+            sch,
+      ),
     );
-    setIsChangePopupOpen(true);
   };
 
+  //2. 패밀리 사이트 추가 핸들러 ('추가' 버튼 클릭 시 실행)
+  const handleAddFamilySite = () => {
+    setFamilySites([...familySites, { id: Date.now(), name: "", url: "" }]);
+  };
+  //3. 패밀리 사이트 삭제 핸들러 (휴지통 버튼 클릭 시 실행)
   const handleRemoveFamilySite = (id: number) => {
-    setFamilySites(familySites.filter((s) => s.id !== id));
-    setSelectedDeleteId(id);
-    setIsDeletePopupOpen(true);
+    /*
+filter 함수를 사용해, 휴지통을 누른 항목의 id와
+'일치하지 않는' 항목들만 걸러냅니다.
+선택된 녀석만 쏙 빼고 나머지들로만 새로운 배열을 만들어
+덮어씌우는 방식으로 삭제를 구현합니다.
+*/
+    setFamilySites(familySites.filter((site) => site.id !== id));
   };
-
+  //4. 패밀리 사이트 정보 수정 핸들러 (사이트명이나 URL 입력 시 실행)
   const handleFamilySiteChange = (
     id: number,
     field: keyof FamilySiteData,
     value: string,
   ) => {
     setFamilySites(
-      familySites.map((f) => (f.id === id ? { ...f, [field]: value } : f)),
+      familySites.map((site) =>
+        site.id === id ? { ...site, [field]: value } : site,
+      ),
     );
-    setIsChangePopupOpen(true);
   };
-
-  const handleSave = () => {
-    const payload = {
-      companyInfo,
-      schedules,
-      familySites,
-    };
-    console.log("DB에 저장될 Footer 데이터: ", payload);
-    setIsSavePopupOpen(true);
+  //5. 최종 저장 핸들러 ('설정 저장하기' 버튼 클릭 시 실행)
+  const handleSave = async () => {
+    //현재 화면에 사용자가 입력해둔 3가지 정보를 하나의 보따리로 패킹
+    const payload = { companyInfo, schedules, familySites };
+    try {
+      const response =
+        //백앤드 api주소로 방금 패킹한 것을 post방식으로 던져주고 기다림
+        await axios.post("http://localhost:4000/api/admin/footer", payload);
+      // 백앤드에서 DB저장에 성공했어라고 대답을 보내주면
+      if (response.data.success) {
+        // 성공 시 세팅
+        setPopupTitle("저장 완료");
+        setPopupMessage("푸터 설정이 성공적으로 저장되었습니다.");
+        setIsPopupOpen(true);
+      }
+    } catch (error) {
+      console.error("푸터 저장 실패", error);
+      setPopupTitle("저장실패");
+      setPopupMessage("저장 중 서버 오류가 발생했습니다. 다시 시도해 주세요");
+      setIsPopupOpen(true);
+    }
   };
-
-  const handleAddSchedule = () => {};
-
   return (
     <>
       <S.FooterAdminContainer>
@@ -135,7 +182,10 @@ export default function FooterPage() {
                   type="text"
                   value={companyInfo.address}
                   onChange={(e) =>
-                    setCompanyInfo({ ...companyInfo, address: e.target.value })
+                    setCompanyInfo({
+                      ...companyInfo,
+                      address: e.target.value,
+                    })
                   }
                 />
               </S.FooterFormGroup>
@@ -159,7 +209,10 @@ export default function FooterPage() {
                     type="text"
                     value={companyInfo.phone}
                     onChange={(e) =>
-                      setCompanyInfo({ ...companyInfo, phone: e.target.value })
+                      setCompanyInfo({
+                        ...companyInfo,
+                        phone: e.target.value,
+                      })
                     }
                   />
                 </S.FooterFormGroup>
@@ -169,7 +222,10 @@ export default function FooterPage() {
                     type="text"
                     value={companyInfo.email}
                     onChange={(e) =>
-                      setCompanyInfo({ ...companyInfo, email: e.target.value })
+                      setCompanyInfo({
+                        ...companyInfo,
+                        email: e.target.value,
+                      })
                     }
                   />
                 </S.FooterFormGroup>
@@ -191,7 +247,11 @@ export default function FooterPage() {
           </S.FooterCard>
 
           <div
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.5rem",
+            }}
           >
             {/* ⏰ 2. 진료 시간 안내 카드 */}
             <S.FooterCard>
@@ -321,6 +381,15 @@ export default function FooterPage() {
           </div>
         </S.FooterGrid>
       </S.FooterAdminContainer>
+
+      <Popup
+        isOpen={isPopupOpen}
+        title={popupTitle}
+        onClose={() => setIsPopupOpen(false)}
+        onConfirm={() => setIsPopupOpen(false)}
+      >
+        {popupMessage}
+      </Popup>
     </>
   );
 }

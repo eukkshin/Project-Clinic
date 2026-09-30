@@ -1,10 +1,24 @@
 require("dotenv").config();
+const { Like } = require("typeorm");
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const AppDataSource = require("./db"); // db.js 파일 경로 확인
+
 const Member = require("./src/entity/Member"); // Member.js 파일 경로 확인
+const FooterSettings = require("./src/entity/FooterSettings");
+const Consult = require("./src/entity/Consult");
+const NavSetting = require("./src/entity/NavSetting");
+const MainVisual = require("./src/entity/MainVisual");
+const ToneSetting = require("./src/entity/ToneSetting");
+const Popup = require("./src/entity/Popup");
+const PopupSetting = require("./src/entity/PopupSetting");
+
 const nodemailer = require("nodemailer");
+
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
@@ -16,6 +30,36 @@ app.use(
   }),
 );
 app.use(express.json());
+
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+const uploadDir = path.join(__dirname, "public/images");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
+  },
+});
+const upload = multer({ storage: storage });
+
+app.post("/api/admin/upload", upload.single("logoImage"), async (req, res) => {
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ success: false, message: "이미지 업로드 실패" });
+  }
+  res.status(200).json({
+    success: true,
+    fileName: req.file.filename,
+    message: "이미지 업로드 성공",
+  });
+});
 
 // 2. TypeORM 오라클 DB 연결
 AppDataSource.initialize()
@@ -51,7 +95,6 @@ app.post("/api/register", async (req, res) => {
       zipcode,
       address1,
       address2,
-      isAdmin,
     } = req.body;
 
     // 🎯 [추가됨] 필수값 검증 로직: 하나라도 없으면 DB까지 안 가고 서버에서 바로 차단
@@ -84,7 +127,6 @@ app.post("/api/register", async (req, res) => {
       ZIPCODE: zipcode,
       ADDRESS1: address1,
       ADDRESS2: address2,
-      IS_ADMIN: isAdmin,
     };
 
     // DB에 저장 실행
@@ -112,150 +154,609 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-//로그인 API 코드 추가하기
+//로그인 api 코드 추가하기
 app.post("/api/login", async (req, res) => {
   try {
+    // 프론트 앤드에서 보낸 아이디와 비밀번호 받기
     const { userId, userPw } = req.body;
-    //비워진 것에 대한 방어
+    // 비워진 것에 대한 방어
     if (!userId || !userPw) {
       return res.status(400).json({
         success: false,
-        message: "아이디와 비밀번호를 모두 입력해 주세요.",
+        message: "아이디와 패스워드를 모두 입력해 주세요",
       });
     }
-    //DB Repository 가져오기
+
+    //db 리파지토리 가져오기
     const memberRepository = AppDataSource.getRepository(Member);
-    //DB에서 해당 아이디를 가진 회원 찾기
+
+    //db에서 해당 아이디를 가진 회원 찾기
     const user = await memberRepository.findOne({
       where: { USER_ID: userId },
     });
-    console.log("조회된 유저 결과:", user);
+
     //가입된 아이디가 없는 경우
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "존재하지 않는 아이디입니다.",
+        message: "존재하지 않는 아이디입니다",
       });
     }
-    console.log("-----------------------------------------");
-    console.log("프론트 입력 비번 (평문):", userPw);
-    console.log(
-      "DB 저장 비번 (길이확인):",
-      user.USER_PW,
-      `[길이: ${user.USER_PW.length}]`,
-    );
-    console.log("-----------------------------------------");
-
-    const isMatch = await bcrypt.compare(userPw, user.USER_PW);
     //비밀번호 검증(프론트에서 온 평문 비밀번호 vs DB의 암호화된 비밀번호)
+    const isMatch = await bcrypt.compare(userPw, user.USER_PW);
+
+    //비밀번호가 틀린경우
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "비밀번호가 일치하지 않습니다.",
+        message: "비밀번호가 일치하지 않습니다",
       });
     }
-    //로그인 성공
+
+    //4 로그인 성공! (프론트앤드에서 라우팅을 위해 isAdmin값을 같이 넘겨줍니다)
     res.status(200).json({
       success: true,
-      message: "로그인에 성공했습니다.",
+      message: "로그인에 성공했습니다",
       isAdmin: user.IS_ADMIN,
       //관리자면 1, 일반 회원이면 0
     });
   } catch (error) {
-    console.error("로그인 에러: ", error);
+    console.error("로그인 에러:", error);
     res.status(500).json({
       success: false,
-      message: "로그인 중 서버 오류가 발생했습니다.",
+      message: "로그인 처리중 서버 오류가 발생했습니다",
     });
   }
 });
+
+// ============================================================================
+// 푸터 설정 관리
+// ============================================================================
+app.get("/api/admin/footer", async (req, res) => {
+  try {
+    // 테이블 데이터를 다룰수 있는 권한(저장소)를 가져 옵니다
+    const footerRepo = AppDataSource.getRepository(FooterSettings);
+    // 푸터 설정은 여러개가 필요 없습니다 무조건 고유번호가 1번인 데이터 딱 하나만 찾습니다
+    const footer = await footerRepo.findOne({ where: { id: 1 } });
+    // 만약 테이블을 방금 만들어서 아직 한번도 저장한 적이 없다면
+    if (!footer) {
+      //에러가 아니기에 프론트앤드가 뻗지 않게 빈 껍데기를 성공 상태로 보냅니다
+      return res.status(200).json({ success: true, data: null });
+    }
+    // db에서 찾은 데이터를 프론트엔드의 3가지 상태(state)구조에 완벽히 맞춰서 조립
+    res.status(200).json({
+      success: true,
+      data: {
+        companyInfo: {
+          name: footer.name || "",
+          address: footer.address || "",
+          clinicName: footer.clinicName || "",
+          phone: footer.phone || "",
+          email: footer.email || "",
+          locationUrl: footer.locationUrl || "",
+        },
+        schedules: footer.schedules || [],
+        familySites: footer.familySites || [],
+      },
+    });
+  } catch (error) {
+    console.error("푸터 조회 에러:", error);
+    res.status(500).json({
+      success: false,
+      message: "푸터 데이터를 불러오지 못했습니다",
+    });
+  }
+});
+//footer post
+app.post("/api/admin/footer", async (req, res) => {
+  try {
+    //1) 프론트에서 post로 보낸 데이터(req.body)를 3개의 덩어리로 분해
+    const { companyInfo, schedules, familySites } = req.body;
+    //2) 테이블 저장소를 가지고 옵니다
+    const footerRepo = AppDataSource.getRepository(FooterSettings);
+    /*3) 덮어쓰기를 하기 위해 기존에 저장된 설정(id가 1번인 데이터)이 
+있는지 먼저 찾아봅니다.*/
+    let footer = await footerRepo.findOne({ where: { id: 1 } });
+
+    //4. 만약 최초 저장이라 기존 데이터가 없다면?
+    if (!footer) {
+      //db에 새롭게 넣을 준비를 합니다 이때 고유번호(id)는 무조건 1로 강제 고정합니다!
+      footer = footerRepo.create({ id: 1 });
+    }
+
+    footer.name = companyInfo.name;
+    footer.address = companyInfo.address;
+    footer.clinicName = companyInfo.clinicName;
+    footer.phone = companyInfo.phone;
+    footer.email = companyInfo.email;
+    footer.locationUrl = companyInfo.locationUrl;
+    footer.schedules = schedules;
+    footer.familySites = familySites;
+
+    //footer객체를 최종적으로 저장
+    await footerRepo.save(footer);
+
+    //
+    res.status(200).json({
+      success: true,
+      message: "푸터설정이 성공적으로 저장되었습니다",
+    });
+  } catch (error) {
+    console.error("푸터 저장 에러: ", error);
+    res.status(500).json({
+      success: false,
+      message: "푸터 저장 중 서버 오류가 발생했습니다.",
+    });
+  }
+});
+
+// ============================================================================
+// 퀵상담 관리
+// ============================================================================
+app.post("/api/consult/quick", async (req, res) => {
+  try {
+    const { name, phone, department } = req.body;
+    //필수값 검증
+    if (!name || !phone || !department) {
+      return res.status(400).json({
+        success: false,
+        message: "이름, 연락처, 상담분야를 모두 입력해 주세요",
+      });
+    }
+    const consultRepo = AppDataSource.getRepository(Consult);
+
+    const newConsult = consultRepo.create({
+      NAME: name,
+      PHONE: phone,
+      DEPARTMENT: department,
+      PASSWORD: "0000",
+      USER_ID: "비회원",
+      TITLE: `[빠른상담] ${department} 문의입니다`,
+      CONTENT: `${name}님의 빠른 상담 신청입니다. 빠른 시일내에 연락바랍니다`,
+      STATUS: "대기중",
+    });
+    //3.DB저장
+    await consultRepo.save(newConsult);
+    res.status(200).json({
+      success: true,
+      message: "빠른 상담 신청이 완료되었습니다",
+    });
+  } catch (error) {
+    console.error("빠른 상담 신청 에러:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "상담 신청중 오류가 발생했습니다" });
+  }
+});
+
+//상담내역 전체 조회
+app.get("/api/admin/consult", async (req, res) => {
+  try {
+    const consultRepo = AppDataSource.getRepository(Consult);
+    const list = await consultRepo.find({ order: { CREATED_AT: "DESC" } });
+    res.status(200).json({ success: true, data: list });
+  } catch (error) {
+    console.error("상담 내역 조회 에러:", error);
+    res.status(500).json({ success: false });
+  }
+});
+//상담 상태 토글
+app.put("/api/admin/consult/:id/status", async (req, res) => {
+  try {
+    const consultRepo = AppDataSource.getRepository(Consult);
+    const consult = await consultRepo.findOne({ where: { ID: req.params.id } });
+    if (!consult)
+      return res
+        .status(404)
+        .json({ success: false, message: "데이터가 없습니다" });
+    consult.STATUS = consult.STATUS === "대기중" ? "상담완료" : "대기중";
+    await consultRepo.save(consult);
+    res.status(200).json({ success: true, message: "상태가 변경되었습니다" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "상태가 변경 실패" });
+  }
+});
+//상담 내역 삭제
+app.delete("/api/admin/consult/:id", async (req, res) => {
+  try {
+    const consultRepo = AppDataSource.getRepository(Consult);
+    await consultRepo.delete(req.params.id);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("상담 삭제 에러:", error);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ============================================================================
+// 네비게이션 설정
+// ============================================================================
+app.get("/api/admin/nav", async (req, res) => {
+  try {
+    const navRepo = AppDataSource.getRepository(NavSetting);
+    let setting = await navRepo.findOne({ where: { ID: 1 } });
+    //처음 세팅이라 DB에 값이 없다면 기본값을 내려줍니다.
+    if (!setting) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          LOGO_TYPE: "TEXT",
+          LOGO_TEXT: "안호범안스성형외과",
+          LOGO_FILE: "",
+          MENUS: "[]",
+        },
+      });
+    }
+    res.status(200).json({ success: true, data: setting });
+  } catch (error) {
+    console.error("내비게이션 조회 에러:", error);
+    res.status(500).json({ success: false });
+  }
+});
+
+//최초저장이거나 변경
+app.put("/api/admin/nav", async (req, res) => {
+  try {
+    const { logo, menus } = req.body;
+
+    const logoType = logo?.type || "TEXT";
+    const logoText = logo?.text || "";
+    const logoFileName = logo?.fileName || "";
+
+    const navRepo = AppDataSource.getRepository(NavSetting);
+    let setting = await navRepo.findOne({ where: { ID: 1 } });
+    if (!setting) {
+      setting = navRepo.create({ ID: 1 });
+    }
+
+    setting.LOGO_TYPE = logoType;
+    setting.LOGO_TEXT = logoText;
+    setting.LOGO_FILE = logoFileName;
+    setting.MENUS = JSON.stringify(menus);
+
+    await navRepo.save(setting);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "네비게이션 수정 성공" });
+  } catch (error) {
+    console.error("네비게이션 수정 에러: ", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "네비게이션 수정 에러" });
+  }
+});
+
+// ============================================================================
+// 캐러셀 관리 Main Visual 저장
+// ============================================================================
+app.get("/api/admin/visual", async (req, res) => {
+  try {
+    const visualRepo = AppDataSource.getRepository(MainVisual);
+    let setting = await visualRepo.findOne({ where: { ID: 1 } });
+    if (!setting) {
+      return res.status(200).json({ success: true, data: { SLIDES: "[]" } });
+    }
+    res.status(200).json({ success: true, data: setting });
+  } catch (error) {
+    console.error("비주얼 설정 로드 실패:", error);
+  }
+});
+
+app.put("/api/admin/visual", async (req, res) => {
+  try {
+    const { slides } = req.body;
+    const visualRepo = AppDataSource.getRepository(MainVisual);
+    let setting = await visualRepo.findOne({ where: { ID: 1 } });
+    if (!setting) {
+      setting = visualRepo.create({ ID: 1 });
+    }
+    setting.SLIDES = JSON.stringify(slides);
+    await visualRepo.save(setting);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("비주얼 설정 저장 실패:", error);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ============================================================================
+// 톤 설정 관리
+// ============================================================================
+app.get("/api/admin/tone", async (req, res) => {
+  try {
+    const toneRepo = AppDataSource.getRepository(ToneSetting);
+    let setting = await toneRepo.findOne({ where: { ID: 1 } });
+    if (!setting) {
+      return res.status(200).json({
+        success: true,
+        data: { PRIMARY_TONE: "BLUE", IS_DARKMODE: "N" },
+      });
+    }
+    res.status(200).json({ success: true, data: setting });
+  } catch (error) {
+    console.error("테마 설정 로드 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "테마 설정 로드 실패",
+    });
+  }
+});
+
+app.put("/api/admin/tone", async (req, res) => {
+  try {
+    const toneRepo = AppDataSource.getRepository(ToneSetting);
+    const { primaryTone, isDarkMode } = req.body;
+    let setting = await toneRepo.findOne({ where: { ID: 1 } });
+    if (!setting) {
+      setting = toneRepo.create({ ID: 1 });
+    }
+    setting.PRIMARY_TONE = primaryTone;
+    setting.IS_DARKMODE = isDarkMode;
+    await toneRepo.save(setting);
+
+    res.status(200).json({
+      success: true,
+      message: "테마 설정 저장 성공",
+    });
+  } catch (error) {
+    console.error("테마 설정 저장 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "테마 설정 저장 실패",
+    });
+  }
+});
+
+// ============================================================================
+// 회원목록전체조회
+// ============================================================================
+app.get("/api/admin/users", async (req, res) => {
+  try {
+    const memberRepo = AppDataSource.getRepository(Member);
+    //프론트에서 보낸 파라미터 받기(기본값 설정)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    //데이터베이스에게 건너뛸 갯수 계산
+    const skip = (page - 1) * limit;
+    //검색어가 있으면 이름(USER_NAME)으로 필터링
+    const whereClause = search
+      ? [
+          { USER_NAME: Like(`%${search}%`) },
+          { USER_ID: Like(`%${search}%`) },
+          { PHONE: Like(`%${search}%`) },
+        ]
+      : {};
+    //데이터 검색 및 전체개수(totalCount)같이 가져오기
+    const [users, totalCount] = await memberRepo.findAndCount({
+      where: whereClause,
+      order: { USER_IDX: "DESC" },
+      skip: skip,
+      take: limit,
+    });
+    //총 페이지 수 계산
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.status(200).json({
+      success: true,
+      data: users,
+      pagination: { totalCount, totalPages, currentPage: page, limit },
+    });
+  } catch (error) {
+    console.error("회원목록 조회 에러:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다" });
+  }
+});
+
+app.put("/api/admin/users/:idx/status", async (req, res) => {
+  try {
+    const memberRepo = AppDataSource.getRepository(Member);
+    const users = await memberRepo.findOneBy({
+      USER_IDX: req.params.idx,
+    });
+    if (!users)
+      return res
+        .status(404)
+        .json({ success: false, message: "유저 정보가 없습니다" });
+    users.STATUS = users.STATUS === "정지" ? "정상" : "정지";
+    await memberRepo.save(users);
+    res
+      .status(200)
+      .json({ success: true, message: "유저 상태가 변경되었습니다" });
+  } catch (error) {
+    console.error("유저 상태 변경 에러:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다" });
+  }
+});
+
+app.delete("/api/admin/users/:idx", async (req, res) => {
+  try {
+    const memberRepo = AppDataSource.getRepository(Member);
+    await memberRepo.delete(req.params.idx);
+    res.status(200).json({
+      success: true,
+      message: `${req.params.idx} 유저가 삭제되었습니다`,
+    });
+  } catch (error) {
+    console.error("회원 삭제 에러:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다" });
+  }
+});
+
+// ============================================================================
+// 팝업 관리
+// ============================================================================
+app.get("/api/admin/popups", async (req, res) => {
+  try {
+    const settingRepo = AppDataSource.getRepository(PopupSetting);
+    const popupRepo = AppDataSource.getRepository(Popup);
+    let setting = await settingRepo.findOne({ where: { ID: 1 } });
+    const popups = await popupRepo.find({ order: { POPUP_IDX: "DESC" } });
+    res.status(200).json({
+      success: true,
+      maxPopups: setting ? setting.MAX_POPUPS : 1,
+      popups,
+    });
+  } catch (error) {
+    console.error("팝업 목록 조회 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "팝업 목록 조회 실패",
+    });
+  }
+});
+
+//팝업 최대 노출 갯수 설정 저장
+app.put("/api/admin/popups/setting", async (req, res) => {
+  try {
+    const { maxPopups } = req.body;
+    const settingRepo = AppDataSource.getRepository(PopupSetting);
+    let setting = await settingRepo.findOne({ where: { ID: 1 } });
+    if (!setting) setting = settingRepo.create({ ID: 1 });
+    setting.MAX_POPUPS = maxPopups;
+    await settingRepo.save(setting);
+    res.status(200).json({
+      success: true,
+      message: "팝업 설정 저장 성공",
+    });
+  } catch (error) {
+    console.error("팝업 설정 저장 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "팝업 설정 저장 실패",
+    });
+  }
+});
+
+app.post("/api/admin/popups", upload.single("popupImage"), async (req, res) => {
+  try {
+    if (!req.file)
+      return res
+        .status(400)
+        .json({ success: false, message: "이미지 업로드 실패" });
+    const { title, link, startDate, endDate, useTodayClose } = req.body;
+    const popupRepo = AppDataSource.getRepository(Popup);
+    const newPopup = popupRepo.create({
+      TITLE: title,
+      LINK: link || "",
+      FILE_NAME: req.file.filename,
+      START_DATE: startDate,
+      END_DATE: endDate,
+      USE_TODAY_CLOSE: useTodayClose === "true" ? "Y" : "N",
+    });
+    await popupRepo.save(newPopup);
+    res.status(200).json({
+      success: true,
+      message: "팝업 저장 성공",
+    });
+  } catch (error) {
+    console.error("팝업 저장 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "팝업 저장 실패",
+    });
+  }
+});
+
+app.delete("/api/admin/popups/:idx", async (req, res) => {
+  try {
+    const popupRepo = AppDataSource.getRepository(Popup);
+    await popupRepo.delete(req.params.idx);
+    res.status(200).json({
+      success: true,
+      message: "팝업 삭제 성공",
+    });
+  } catch (error) {
+    console.error("팝업 삭제 실패: ", error);
+    res.status(500).json({
+      success: false,
+      message: "팝업 삭제 실패",
+    });
+  }
+});
+
+// 5. 서버 실행
+const PORT = process.env.PORT || 4000;
 
 //비밀번호 찾기
 app.post("/api/send-reset-email", async (req, res) => {
   try {
     const { userId, userName, phone } = req.body;
+
     if (!userId || !userName || !phone) {
       return res.status(400).json({
         success: false,
-        message: "인증 정보를 모두 입력해주세요.",
+        message: "인증 정보를 모두 입력해 주세요",
       });
     }
-    const cleanPhone = phone.replace(/[^0-9]/g, "");
 
-    // 2. 숫자를 010-XXXX-XXXX 형식의 하이픈 스타일로 변환
-    const formattedPhone = cleanPhone.replace(
-      /(\d{3})(\d{3,4})(\d{4})/,
-      "$1-$2-$3",
-    );
     const memberRepository = AppDataSource.getRepository(Member);
+
+    //오라클에서 찾기
     const user = await memberRepository.findOne({
-      where: { USER_ID: userId, USER_NAME: userName, PHONE: formattedPhone },
+      where: { USER_ID: userId, USER_NAME: userName, PHONE: phone },
     });
+
     if (!user) {
       return res.status(401).json({
-        success: false,
+        sucess: false,
         message: "입력하신 정보와 일치하는 회원이 없습니다.",
       });
     }
-    //이메일 발송 세팅 (gmail 기준)
+
+    //이메일 발송기 세팅(구글 gmail 기준)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "eukkshin030101@gmail.com",
-        pass: "dtbf eoak lvrw jbfm",
+        user: "anakyn01@gmail.com",
+        pass: "",
       },
     });
 
     const resetUrl = `http://localhost:3000/find/reset?userId=${user.USER_ID}`;
 
     const mailOptions = {
-      from: '"성형외과 관리자" <plastic@surgery.com>',
-      to: user.EMAIL,
-      subject: "[성형외과] 비밀번호 재설정 링크",
+      from: '"성형외과 관리자" <nop@nobodyhelpme.com>',
+      to: user.EMAIL, // DB에 저장된 유저의 이메일로 쏩니다!
+      subject: "[성형외과] 비밀번호 재설정 안내",
       html: `
-      <style>
-        /* 이메일 클라이언트가 읽을 수 있도록 내부에 스타일 선언 */
-        .reset-btn {
-          transition: background-color 0.2s ease;
-        }
-        .reset-btn:hover {
-          background-color: #2e59d9 !important; /* 마우스 올렸을 때 진한 파란색으로 변경 */
-        }
-      </style>
-      
-      <div style="padding: 20px; text-align: center; font-family: sans-serif;">
-        <h2>비밀번호 재설정</h2>
-        <p><strong>${user.USER_NAME}</strong>님, 본인인증이 완료되었습니다.</p>
-        <p>아래 버튼을 클릭하여 새로운 비밀번호를 설정해 주세요.</p>
-        <a href="${resetUrl}" 
-          class="reset-btn"
-          style="display:inline-block; padding:10px 20px; background-color:#4e73df; color:#fff; text-decoration:none; border-radius:5px; margin-top:20px; font-weight:bold;"
-        >
-            새 비밀번호 설정하기
-        </a>
-      </div>
-    `,
+<div style="padding: 20px; text-align: center;">
+<h2>비밀번호 재설정</h2>
+<p>${user.USER_NAME}님, 본인인증이 완료되었습니다.</p>
+<p>아래 버튼을 클릭하여 새로운 비밀번호를 설정해 주세요.</p>
+<a href="${resetUrl}" style="display:inline-block; padding:10px 20px; background-color:#4e73df; color:#fff; text-decoration:none; border-radius:5px; margin-top:20px;">
+새 비밀번호 설정하기
+</a>
+</div>
+`,
     };
-
     //이메일 전송
     await transporter.sendMail(mailOptions);
     res.status(200).json({
       success: true,
-      message: "이메일 발송이 완료되었습니다.",
+      message: "이메일 발송 성공",
     });
   } catch (error) {
-    console.error("이메일 발송 에러:", error);
+    console.error("이메일 발송 에러", error);
     res.status(500).json({
       success: false,
-      message: "이메일 발송 중 오류가 발생했습니다.",
+      message: "서버 오류가 발생했습니다",
     });
   }
 });
 
-//비밀번호 변경 API
+//비밀번호변경 api
 app.post("/api/reset-password", async (req, res) => {
   try {
     const { userId, newPw } = req.body;
+
     if (!userId || !newPw) {
       return res.status(400).json({
         success: false,
@@ -264,6 +765,7 @@ app.post("/api/reset-password", async (req, res) => {
     }
 
     const memberRepository = AppDataSource.getRepository(Member);
+
     const user = await memberRepository.findOne({
       where: { USER_ID: userId },
     });
@@ -275,15 +777,15 @@ app.post("/api/reset-password", async (req, res) => {
       });
     }
 
-    //새 비밀번호 암호화
+    //새비밀번호를 암호화
     const hashedPw = await bcrypt.hash(newPw, 10);
 
     user.USER_PW = hashedPw;
 
     await memberRepository.save(user);
 
-    return res.status(200).json({
-      success: true,
+    res.status(200).json({
+      success: false,
       message: "비밀번호가 성공적으로 변경되었습니다.",
     });
   } catch (error) {
@@ -294,33 +796,8 @@ app.post("/api/reset-password", async (req, res) => {
   }
 });
 
-// 5. 서버 실행
-const PORT = process.env.PORT || 4000;
+//포트폴리오로 고도화 아이디 확인하고 그사람에 가입 이메일을 판단하고..거기에 맞는 이메일 발송하겠끔..
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
-
-// // 🚀 server.js 맨 밑에 임시로 붙여넣으세요! (admin 계정만 처리)
-// async function makeSureAdminPassword() {
-//   try {
-//     // 1. 개발자님의 현재 Node.js 환경에서 직접 '1234'를 암호화합니다.
-//     const securePassword = await bcrypt.hash("1234", 10);
-//     console.log("[💡 치트키] 생성된 admin 전용 1234 암호문:", securePassword);
-
-//     // 2. 오직 admin 계정의 비밀번호만 강제로 업데이트합니다. (user01은 건드리지 않음)
-//     await memberRepository.update(
-//       { USER_ID: "admin" },
-//       { USER_PW: securePassword },
-//     );
-
-//     console.log(
-//       "[✅ 성공] admin 계정의 비밀번호가 진짜 '1234'로 강제 주입되었습니다!",
-//     );
-//   } catch (err) {
-//     console.error("[❌ 에러] admin 비밀번호 주입 실패:", err.message);
-//   }
-// }
-
-// // 오라클 DB 연결 성공 메시지가 출력된 이후 실행되도록 처리합니다.
-// setTimeout(makeSureAdminPassword, 2000); // 서버 켜지고 2초 뒤 실행

@@ -107,7 +107,9 @@ export const UserTable = styled.table`
     color: #5a5c69;
     font-weight: 700;
     padding: 1rem;
-    border-bottom: 2px solid #e3e6f0;
+    border-bottom: 1px solid #e3ecf0;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
   }
 
   td {

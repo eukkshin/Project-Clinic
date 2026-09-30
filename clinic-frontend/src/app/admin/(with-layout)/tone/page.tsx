@@ -1,6 +1,7 @@
 "use client";
+import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiCheck, FiMoon, FiSave, FiSun } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
@@ -13,36 +14,42 @@ export default function TonePage() {
   );
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // const [popupConfig, setPopupConfig] = useState({
-  //   isOpen: false,
-  //   title: "",
-  //   message: "",
-  //   onConfirm: undefined as (() => void) | undefined,
-  // });
-
-  // const openPopup = (
-  //   title: string,
-  //   message: string,
-  //   onConfirm?: (() => void) | undefined,
-  // ) => {
-  //   setPopupConfig({
-  //     isOpen: true,
-  //     title,
-  //     message,
-  //     onConfirm,
-  //   });
-  // };
-
-  // const closePopup = () => {
-  //   setPopupConfig((prev) => ({ ...prev, isOpen: false }));
-  // };
+  useEffect(() => {
+    const fetchTone = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/api/admin/tone",
+        );
+        if (response.data.success) {
+          const dbData = response.data.data;
+          if (dbData.PRIMARY_TONE) setIsSelectedTone(dbData.PRIMARY_TONE);
+          if (dbData.IS_DARKMODE) setIsDarkMode(dbData.IS_DARKMODE === "Y");
+        }
+      } catch (error) {
+        console.error("테마 설정 불러오기 실패: ", error);
+      }
+    };
+    fetchTone();
+  }, []);
 
   const handleSave = async () => {
-    const payload = {
-      primaryTone: selectedTone,
-      isDarkMode: isDarkMode ? "Y" : "N",
-    };
-    console.log("DB에 저장될 데이터: ", payload);
+    try {
+      const payload = {
+        primaryTone: selectedTone,
+        isDarkMode: isDarkMode ? "Y" : "N",
+      };
+      const response = await axios.put(
+        "http://localhost:4000/api/admin/tone",
+        payload,
+      );
+      if (response.data.success) {
+        setIsPopupOpen(true);
+      }
+      console.log("DB에 저장될 데이터: ", payload);
+    } catch (error) {
+      console.error("테마 설정 저장 실패: ", error);
+      alert("테마 설정 저장 실패");
+    }
   };
 
   return (

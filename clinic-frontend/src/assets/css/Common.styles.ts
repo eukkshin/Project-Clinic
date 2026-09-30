@@ -6,6 +6,12 @@ export const FlexCenter = css`
   justify-content: center;
 `;
 
+export const InlineFlexCenter = css`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const FlexBetween = css`
   display: flex;
   align-items: center;
@@ -60,6 +66,10 @@ export const LinearGradient = css`
 
 export const BoxShadow = css`
   box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+`;
+
+export const TextShadow = css`
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 `;
 
 export const TransitionAll = css`

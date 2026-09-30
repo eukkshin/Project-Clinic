@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="100%" height="100%">
+  <defs>
+    <!-- 고급스러운 로즈골드/샴페인골드 그라데이션 (성형외과의 세련되고 정교한 이미지) -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2B79A" />
+      <stop offset="50%" stop-color="#F2D1B9" />
+      <stop offset="100%" stop-color="#C59373" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#222222" />
+      <stop offset="100%" stop-color="#444444" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(30, 20)">
+    <!-- 가시성을 대폭 키운 심볼 마크 (아름다운 곡선과 신뢰감을 주는 원형의 조화) -->
+    <g transform="translate(10, 10)">
+      <!-- 바깥 정교한 투명 원형 가이드선 -->
+      <circle cx="120" cy="120" r="110" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"/>
+      <!-- 메인 메디컬/뷰티 크레스트 링 -->
+      <circle cx="120" cy="120" r="100" fill="none" stroke="url(#goldGrad)" stroke-width="5" opacity="0.9"/>
+      
+      <!-- 세련된 선으로 표현한 이니셜 'A'와 피어나는 꽃/실루엣 형상화 -->
+      <path d="M 85 170 
+               C 85 110, 100 70, 120 70 
+               C 140 70, 155 110, 155 170
+               M 92 140 
+               C 110 135, 130 135, 148 140
+               M 120 70 
+               C 120 90, 110 110, 120 130
+               C 130 110, 120 90, 120 70" 
+            fill="none" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- 정교함을 더하는 작은 포인트 스파클 (성형외과의 드라마틱한 변화 상징) -->
+      <path d="M 120 35 L 123 45 L 133 48 L 123 51 L 120 61 L 117 51 L 107 48 L 117 45 Z" fill="url(#goldGrad)"/>
+    </g>
+
+    <!-- 텍스트 영역: 가독성과 크기를 대폭 키우고 성형외과에 걸맞은 타이포그래피 적용 -->
+    <!-- 메인 브랜드 네임 'Ahn's' -->
+    <text x="290" y="135" 
+          font-family="'Helvetica Neue', 'Segoe UI', 'Noto Sans KR', sans-serif" 
+          font-size="88" 
+          font-weight="700" 
+          letter-spacing="1" 
+          fill="url(#textGrad)">Ahn's</text>
+          
+    <!-- 성형외과 직관적 인지를 위한 태그라인 'PLASTIC SURGERY' -->
+    <text x="295" y="195" 
+          font-family="'Helvetica Neue', 'Segoe UI', 'Noto Sans KR', sans-serif" 
+          font-size="28" 
+          font-weight="500" 
+          letter-spacing="9" 
+          fill="#777777">PLASTIC SURGERY</text>
+  </g>
+</svg>

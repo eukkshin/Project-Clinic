@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { FiImage, FiPlus, FiSave, FiTrash2, FiType } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
@@ -13,32 +14,60 @@ interface MenuItem {
 
 export default function NavPage() {
   const [logoType, setLogoType] = useState<"TEXT" | "IMAGE">("TEXT");
-  const [logoText, setLogoText] = useState<string>("Ahn's");
+  const [logoText, setLogoText] = useState<string>("성형외과 로고");
   const [logoFileName, setLogoFileName] = useState<string>("");
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [menus, setMenus] = useState<MenuItem[]>([]);
 
-  //시안과 똑같이 설정해야됨 (엄격하게)
-  const [menus, setMenus] = useState<MenuItem[]>([
-    { id: Date.now(), name: "병원소개", url: "/" },
-    { id: Date.now(), name: "눈성형", url: "/" },
-    { id: Date.now(), name: "코성형", url: "/" },
-    { id: Date.now(), name: "동안성형", url: "/" },
-    { id: Date.now(), name: "쁘띠시술", url: "/" },
-    { id: Date.now(), name: "커뮤니티", url: "/" },
-  ]);
-
-  //상태관리 팝업
+  // 상태관리 팝업
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  //로고 이미지 파일 선택 핸들러
+  //생명주기
+  useEffect(() => {
+    const fetchNavSettings = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/api/admin/nav");
+        if (response.data.success) {
+          const dbData = response.data.data;
+          setLogoType(dbData.LOGO_TYPE);
+          setLogoText(dbData.LOGO_TEXT);
+          setLogoFileName(dbData.LOGO_FILE);
+
+          if (dbData.MENUS && dbData.MENUS !== "[]") {
+            setMenus(JSON.parse(dbData.MENUS));
+          } else {
+            //DB에 메뉴가 비어있으면 초기 기본값 세팅
+            setMenus([
+              { id: 1, name: "병원소개", url: "/" },
+              { id: 2, name: "눈성형", url: "/" },
+              { id: 3, name: "코성형", url: "/" },
+              { id: 4, name: "동안성형", url: "/" },
+              { id: 5, name: "쁘띠시술", url: "/" },
+              { id: 6, name: "커뮤니티", url: "/" },
+            ]);
+          }
+        }
+      } catch (error) {
+        console.error("설정 로드 실패:", error);
+      }
+    };
+    fetchNavSettings();
+  }, []);
+
+  // 로고 이미지 파일 선택핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      setLogoFile(e.target.files[0]);
       setLogoFileName(e.target.files[0].name);
     }
   };
 
-  //추가 삭제 변경 핸들러
+  // 추가 삭제 변경 핸들러
   const handleAddMenu = () => {
-    setMenus([...menus, { id: Date.now(), name: "", url: "" }]);
+    // 기존 목록이 있으면 가장 큰 id 번호 + 1, 없으면 1로 시작
+    const nextId =
+      menus.length > 0 ? Math.max(...menus.map((m) => m.id)) + 1 : 1;
+    setMenus([...menus, { id: nextId, name: "", url: "" }]);
   };
 
   const handleRemoveMenu = (id: number) => {
@@ -57,17 +86,40 @@ export default function NavPage() {
     );
   };
 
-  const handleSave = () => {
-    const payload = {
-      logo: {
-        type: logoType,
-        text: logoText === "TEXT" ? logoText : null,
-        fileName: logoFileName === "IMAGE" ? logoFileName : null,
-      },
-      menus: menus,
-    };
-    console.log("DB에 저장될 데이터: ", payload);
-    setIsPopupOpen(true);
+  const handleSave = async () => {
+    let finalFileName = logoFileName;
+    try {
+      if (logoType === "IMAGE" && logoFile) {
+        const formData = new FormData();
+        formData.append("logoImage", logoFile);
+
+        const uploadRes = await axios.post(
+          "http://localhost:4000/api/admin/upload",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          },
+        );
+        if (uploadRes.data.success) {
+          finalFileName = uploadRes.data.fileName;
+        }
+      }
+
+      const payload = {
+        logo: {
+          type: logoType,
+          text: logoType === "TEXT" ? logoText : null,
+          fileName: logoType === "IMAGE" ? finalFileName : null,
+        },
+        menus: menus,
+      };
+
+      await axios.put("http://localhost:4000/api/admin/nav", payload);
+      console.log("DB에 저장될 데이터", payload, finalFileName);
+      setIsPopupOpen(true);
+    } catch (error) {
+      alert("설정 저장에 실패했습니다");
+    }
   };
 
   return (
@@ -111,7 +163,7 @@ export default function NavPage() {
                       type="text"
                       placeholder="로고 텍스트를 입력해주세요"
                       name="logoText"
-                      value={logoText}
+                      value={logoText || ""}
                       onChange={(e) => setLogoText(e.target.value)}
                     />
                   </>
@@ -162,7 +214,7 @@ export default function NavPage() {
                       placeholder="URL(예: /treatment)"
                       value={menu.url}
                       onChange={(e) =>
-                        handleMenuChange(menu.id, "name", e.target.value)
+                        handleMenuChange(menu.id, "url", e.target.value)
                       }
                     />
                     <S.SetNavDeleteButton

@@ -28,6 +28,7 @@ export const SlideImage = styled.img`
   height: 600px;
   object-fit: cover;
   display: block;
+  position: relative;
 
   @media (max-width: 768px) {
     height: 400px;

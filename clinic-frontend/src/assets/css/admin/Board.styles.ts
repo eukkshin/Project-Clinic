@@ -134,23 +134,23 @@ export const BoardSelect = styled.select`
 `;
 
 export const BoardAddButton = styled.button`
-  width: 100%;
-  background-color: #f8f9fc;
-  border: 1px dashed #1b4d3e;
-  color: #1b4d3e;
+  border: 1px dashed rgba(59, 122, 87, 0.3);
+  color: #5a5c69;
   padding: 1rem;
+  width: 100%;
   border-radius: 0.35rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 600;
+  ${TransitionAll};
+  ${FlexCenter}
   gap: 0.5rem;
-  margin-top: 1.5rem;
-  transition: all 0.2s ease;
+  background-color: #f8f9fc;
+  flex-shrink: 0;
+  white-space: nowrap;
 
   &:hover {
-    background-color: #eaecf4;
+    background-color: #fff;
+    border-color: #1b4d3e;
+    color: #1b4d3e;
   }
 `;
 
@@ -171,8 +171,9 @@ export const BoardTable = styled.table`
     color: #5a5c69;
     font-weight: 700;
     padding: 0.8rem;
-    border-bottom: 2px solid #e3e6f0;
+    border-bottom: 1px solid #e3ecf0;
     white-space: nowrap;
+    box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
   }
 
   td {

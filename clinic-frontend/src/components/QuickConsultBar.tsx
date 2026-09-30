@@ -1,26 +1,60 @@
 "use client";
+import axios from "axios";
 import React, { useState } from "react"; // ⭐ useState 추가
+import { FiX } from "react-icons/fi";
 
 import * as S from "../assets/old/QuickConsultBar.styles";
 
 export default function QuickConsultBar() {
+  const [isOpen, setIsOpen] = useState(true);
+
   // 1. 각 입력창과 체크박스의 상태(State) 정의
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [category, setCategory] = useState("");
+
+  const [department, setDepartment] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
 
-  // 2. 모든 조건이 충족되었는지 검사 (공백 제거 후 판단)
-  const isFormValid =
-    name.trim() !== "" && phone.trim() !== "" && category !== "" && isAgreed;
+  const handleSubmit = async () => {
+    if (!name.trim()) return alert("이름을 입력해주세요");
+    if (!phone.trim()) return alert("연락처를 입력해주세요");
 
+    if (phone.length < 9) return alert("연락처를 올바른 형식으로 입력해주세요");
+    //가짜번호 검사
+    if (/(\d)\1{6}/.test(phone))
+      return alert("연락처를 올바른 형식으로 입력해주세요");
+
+    if (!department) return alert("상담분야를 선택해주세요");
+    if (!isAgreed) return alert("개인정보처리방침에 동의해주세요");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/consult/quick",
+        {
+          name,
+          phone,
+          department,
+        },
+      );
+      if (response.data.success) {
+        alert("상담신청이 완료되었습니다. 빠른 시일내에 연락드리겠습니다.");
+        setName("");
+        setPhone("");
+        setDepartment("");
+        setIsAgreed(false);
+      }
+    } catch (error) {
+      console.error("빠른 상담 신청 에러:", error);
+      alert("빠른 상담 신청 중 문제가 발생했습니다. 다시 시도해 주세요");
+    }
+  };
+  if (!isOpen) return null;
   return (
     <>
       <S.BarWrapper>
         <S.BarInner>
           <S.Title>빠른 상담신청</S.Title>
 
-          {/* 이름 인풋 연결 */}
           <S.Input
             type="text"
             placeholder="이름을 작성해주세요"
@@ -28,31 +62,32 @@ export default function QuickConsultBar() {
             onChange={(e) => setName(e.target.value)}
           />
 
-          {/* 연락처 인풋 연결 */}
           <S.Input
             type="tel"
-            placeholder="연락처를 작성해주세요"
+            placeholder="연락처를 작성해주세요 (숫자만 입력)"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
+              setPhone(onlyNumbers);
+            }}
+            maxLength={11}
           />
 
-          {/* 상담분야 셀렉트 연결 */}
           <S.Select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
           >
             <option value="" disabled hidden>
               상담분야를 선택해 주세요
             </option>
-            <option value="eye">눈 성형</option>
-            <option value="nose">코 성형</option>
-            <option value="antiaging">동안 성형</option>
-            <option value="petit">쁘띠 시술</option>
+            <option value="눈 성형">눈 성형</option>
+            <option value="코 성형">코 성형</option>
+            <option value="동안 성형">동안 성형</option>
+            <option value="쁘띠 시술">쁘띠 시술</option>
           </S.Select>
 
           <S.CheckboxGroup>
             <S.CheckboxLabel>
-              {/* 체크박스 체크 상태 연결 */}
               <S.Checkbox
                 type="checkbox"
                 checked={isAgreed}
@@ -63,10 +98,16 @@ export default function QuickConsultBar() {
             <S.DetailLink>자세히</S.DetailLink>
           </S.CheckboxGroup>
 
-          {/* 3. 버튼에 조건 전달 및 비활성화 기능 추가 */}
-          <S.SubmitBtn $isActive={isFormValid} disabled={!isFormValid}>
+          <S.SubmitBtn
+            onClick={handleSubmit}
+            disabled={!isAgreed || !phone.trim() || !name.trim() || !department}
+          >
             빠른 상담신청하기
           </S.SubmitBtn>
+
+          <S.CloseBtn onClick={() => setIsOpen(false)}>
+            <FiX size={20} />
+          </S.CloseBtn>
         </S.BarInner>
       </S.BarWrapper>
     </>

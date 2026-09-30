@@ -67,6 +67,7 @@ export const SelfCard = styled.div`
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
+  background-color: #fff;
 `;
 
 export const SelfCardHeader = styled.header`

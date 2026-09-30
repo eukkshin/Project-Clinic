@@ -1,15 +1,22 @@
 "use client";
-import React from "react";
+import React from 'react';
 import {
-  FiAlertOctagon,
-  FiPhoneCall,
-  FiSearch,
-  FiUserPlus,
-} from "react-icons/fi";
+    FiAlertOctagon, FiImage, FiLayers, FiLayout, FiMessageSquare, FiPhoneCall, FiPieChart, FiSearch,
+    FiSettings, FiShield, FiTrendingUp, FiUserPlus, FiVideo
+} from 'react-icons/fi';
 
-import * as S from "@/assets/css/admin/Admin.style";
+import * as S from '@/assets/css/admin/Admin.style';
 
 export default function Root() {
+  const monthlyData = [
+    { month: "1월", value: 40 },
+    { month: "2월", value: 65 },
+    { month: "3월", value: 45 },
+    { month: "4월", value: 80 },
+    { month: "5월", value: 55 },
+    { month: "6월", value: 90 },
+    { month: "7월", value: 75 },
+  ];
   return (
     <>
       <S.DashboardContainer>
@@ -96,9 +103,160 @@ export default function Root() {
             </S.DashboardCardIconWrapper>
           </S.DashboardSummaryCard>
         </S.DashboardCardGrid>
-        <S.DashboardBottomSection>
-          상세그래프 추가 예정.
-        </S.DashboardBottomSection>
+
+        <S.DashContainer>
+          <S.ChartGrid>
+            <S.ChartCard>
+              <S.ChartHeader>
+                <S.ChartTitle>
+                  <FiTrendingUp /> 월별 상담 신청 추이
+                </S.ChartTitle>
+              </S.ChartHeader>
+              <S.ChartBody>
+                <S.BarChartContainer>
+                  {monthlyData.map((data, idx) => (
+                    <S.BarWrapper key={idx}>
+                      <S.BarValue>{data.value}</S.BarValue>
+                      <S.Bar $height={`${data.value}%`} />
+                      <S.BarLabel>{data.month}</S.BarLabel>
+                    </S.BarWrapper>
+                  ))}
+                </S.BarChartContainer>
+              </S.ChartBody>
+            </S.ChartCard>
+
+            <S.ChartCard>
+              <S.ChartHeader>
+                <S.ChartTitle>
+                  <FiPieChart /> 시술 관심도 분포
+                </S.ChartTitle>
+              </S.ChartHeader>
+              <S.ChartBody
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <S.DonutChart>
+                  <div className="inner-circle">
+                    <span>TOP 3</span>
+                  </div>
+                </S.DonutChart>
+                <S.LegendContainer>
+                  <S.LegendItem>
+                    <span
+                      className="dot"
+                      style={{ background: "#4e73df" }}
+                    ></span>
+                    눈성형 (45%)
+                  </S.LegendItem>
+                  <S.LegendItem>
+                    <span
+                      className="dot"
+                      style={{ background: "#1cc88a" }}
+                    ></span>
+                    코성형 (30%)
+                  </S.LegendItem>
+                  <S.LegendItem>
+                    <span
+                      className="dot"
+                      style={{ background: "#36b9cc" }}
+                    ></span>
+                    안티에이징 (25%)
+                  </S.LegendItem>
+                </S.LegendContainer>
+              </S.ChartBody>
+            </S.ChartCard>
+          </S.ChartGrid>
+
+          {/* 🎯 3. 시스템 운영 현황 (나머지 메뉴들 요약) */}
+          <S.SystemGrid>
+            <S.SystemCard>
+              <S.ChartHeader>
+                <S.ChartTitle>
+                  <FiSettings /> 프론트 UI / 설정 상태
+                </S.ChartTitle>
+              </S.ChartHeader>
+              <S.ChartBody>
+                <S.StatusList>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiLayout /> 톤앤매너 관리
+                    </div>
+                    <S.Badge $active={true}>정상동작</S.Badge>
+                  </S.StatusItem>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiLayers /> 내비게이션 관리
+                    </div>
+                    <S.Badge $active={true}>업데이트 완료</S.Badge>
+                  </S.StatusItem>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiLayout /> 푸터 관리
+                    </div>
+                    <S.Badge $active={true}>설정됨</S.Badge>
+                  </S.StatusItem>
+                </S.StatusList>
+              </S.ChartBody>
+            </S.SystemCard>
+
+            <S.SystemCard>
+              <S.ChartHeader>
+                <S.ChartTitle>
+                  <FiImage /> 미디어 / 마케팅 모듈
+                </S.ChartTitle>
+              </S.ChartHeader>
+              <S.ChartBody>
+                <S.StatusList>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiImage /> 팝업 관리
+                    </div>
+                    <S.Badge $active={true}>활성 2건</S.Badge>
+                  </S.StatusItem>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiMessageSquare /> 뉴스티커 관리
+                    </div>
+                    <S.Badge $active={false}>비활성</S.Badge>
+                  </S.StatusItem>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiImage /> 셀피 관리
+                    </div>
+                    <S.Badge $active={true}>신규 5건</S.Badge>
+                  </S.StatusItem>
+                </S.StatusList>
+              </S.ChartBody>
+            </S.SystemCard>
+
+            <S.SystemCard>
+              <S.ChartHeader>
+                <S.ChartTitle>
+                  <FiVideo /> 비디오 / 특수 모듈
+                </S.ChartTitle>
+              </S.ChartHeader>
+              <S.ChartBody>
+                <S.StatusList>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiVideo /> VLOG 관리
+                    </div>
+                    <S.Badge $active={true}>영상 12개</S.Badge>
+                  </S.StatusItem>
+                  <S.StatusItem>
+                    <div className="label">
+                      <FiShield /> 안전마취 관리
+                    </div>
+                    <S.Badge $active={true}>시스템 정상</S.Badge>
+                  </S.StatusItem>
+                </S.StatusList>
+              </S.ChartBody>
+            </S.SystemCard>
+          </S.SystemGrid>
+        </S.DashContainer>
       </S.DashboardContainer>
     </>
   );

@@ -2,6 +2,13 @@ require("dotenv").config();
 require("reflect-metadata");
 const { DataSource } = require("typeorm");
 const Member = require("./src/entity/Member");
+const FooterSettings = require("./src/entity/FooterSettings");
+const Consult = require("./src/entity/Consult");
+const NavSetting = require("./src/entity/NavSetting");
+const MainVisual = require("./src/entity/MainVisual");
+const ToneSetting = require("./src/entity/ToneSetting");
+const Popup = require("./src/entity/Popup");
+const PopupSetting = require("./src/entity/PopupSetting");
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -14,7 +21,16 @@ const AppDataSource = new DataSource({
   synchronize: false,
   //로깅 최적화 (운영환경이 아닐때만 true)
   logging: process.env.NODE_ENV !== "production",
-  entities: [Member],
+  entities: [
+    Member,
+    FooterSettings,
+    Consult,
+    NavSetting,
+    MainVisual,
+    ToneSetting,
+    Popup,
+    PopupSetting,
+  ],
   extra: {
     poolMin: 2,
     poolMax: 10,

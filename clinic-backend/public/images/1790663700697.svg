@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 250" width="100%" height="100%">
+  <defs>
+    <linearGradient id="roseGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0A995" />
+      <stop offset="50%" stop-color="#F3D1C4" />
+      <stop offset="100%" stop-color="#C58B73" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(20, 20)">
+    <g transform="translate(0, 0)">
+      <circle cx="105" cy="105" r="100" fill="none" stroke="url(#roseGold)" stroke-width="8"/>
+      <path d="M65,155 C75,110 90,65 105,45 C120,65 135,110 145,155" fill="none" stroke="url(#roseGold)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M75,115 C95,110 115,110 135,115" fill="none" stroke="url(#roseGold)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M140,55 L145,65 L155,68 L145,71 L140,81 L135,71 L125,68 L135,65 Z" fill="url(#roseGold)"/>
+    </g>
+
+    <text x="250" y="120" 
+          font-family="'Playfair Display', 'Didot', 'Cinzel', 'Noto Serif KR', serif" 
+          font-size="115" 
+          font-weight="700" 
+          fill="#222222" 
+          letter-spacing="2">Ahn's</text>
+          
+    <text x="255" y="185" 
+          font-family="'Montserrat', 'Helvetica', 'Noto Sans KR', sans-serif" 
+          font-size="36" 
+          font-weight="500" 
+          fill="url(#roseGold)" 
+          letter-spacing="14">PLASTIC SURGERY</text>
+  </g>
+</svg>

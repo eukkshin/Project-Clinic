@@ -61,6 +61,7 @@ export const SetNavCard = styled.div`
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
   max-height: fit-content;
+  background-color: #fff;
 `;
 
 export const SetNavCardHeader = styled.div`
@@ -219,6 +220,9 @@ export const SetNavDeleteButton = styled.button`
   padding: 0.5rem;
   ${TransitionAll};
   border-radius: 50%;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
 
   &:hover {
     background-color: #fdeaea;
@@ -230,6 +234,7 @@ export const NavAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
   color: #5a5c69;
   padding: 1rem;
+  margin-top: 1rem;
   width: 100%;
   border-radius: 0.35rem;
   font-weight: 600;

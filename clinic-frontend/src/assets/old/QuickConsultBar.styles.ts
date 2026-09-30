@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import { FlexCenter, FlexEnd, TransitionAll } from "../css/Common.styles";
+
 export const BarWrapper = styled.div`
   position: fixed;
   bottom: 0;
@@ -119,17 +121,46 @@ export const DetailLink = styled.span`
     color: #fff;
   }
 `;
-export const SubmitBtn = styled.button<{ $isActive?: boolean }>`
+export const SubmitBtn = styled.button`
   height: 44px;
-  color: ${(props) => (props.$isActive ? "#000000" : "#1d1d1d")};
-  background-color: ${(props) => (props.$isActive ? "#F7E600" : "#6a6446")};
+  color: #000000;
+  background-color: #f7e600;
   border: none;
   padding: 0 24px;
   font-size: 15px;
   font-weight: 900;
   cursor: pointer;
   transition: background-color 0.2s;
+
+  &:disabled {
+    background-color: #6a6446;
+    cursor: default;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #e0c300;
+  }
+`;
+
+export const CloseBtn = styled.button`
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  ${FlexCenter};
+  padding: 0;
+  ${TransitionAll};
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  right: 30px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  width: fit-content;
+  height: fit-content;
+
   &:hover {
-    background-color: ${(props) => (props.$isActive ? "#E0C300" : "#85805e")};
+    transform: rotate(90deg);
+    transition: transform 0.2s ease-in-out;
   }
 `;

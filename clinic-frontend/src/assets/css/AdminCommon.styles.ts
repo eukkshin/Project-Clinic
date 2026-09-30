@@ -1,18 +1,9 @@
-import styled, { css, keyframes, Keyframes } from "styled-components";
+import styled, { css, keyframes, Keyframes } from 'styled-components';
 
 import {
-  BoxShadow,
-  CircleBtn,
-  FlexBetween,
-  FlexCenter,
-  FlexColumn,
-  FlexStart,
-  FlexTopBetween,
-  FlexWrap,
-  LinearGradient,
-  TransitionAll,
-  Transparent,
-} from "./Common.styles";
+    BoxShadow, CircleBtn, FlexBetween, FlexCenter, FlexColumn, FlexStart, FlexTopBetween, FlexWrap,
+    LinearGradient, TransitionAll, Transparent
+} from './Common.styles';
 
 interface AdminSidebarProps {
   $isCollapsed: boolean;

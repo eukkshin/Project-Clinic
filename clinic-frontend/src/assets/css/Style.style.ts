@@ -1482,8 +1482,8 @@ export const SiteFooterLocationBtn = styled.button`
   white-space: nowrap;
   border-radius: 5px;
   &:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-    color: #333;
+    background-color: #fff;
+    color: #000;
   }
   @media (max-width: 1024px) {
     width: 100%;
@@ -1941,3 +1941,4 @@ export const SafetyCardDesc = styled.p`
 
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
+export * from "../old/Header.styles";

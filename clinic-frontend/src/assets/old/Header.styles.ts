@@ -1,12 +1,16 @@
 import styled from "styled-components";
 
-export const HeaderWrapper = styled.header`
+export const HeaderWrapper = styled.header<{ $isHide: boolean }>`
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #f0f0f0;
-  position: relative;
   position: fixed;
   z-index: 9999;
+
+  transition: transform 0.3s ease-in-out;
+
+  transform: ${({ $isHide }) =>
+    $isHide ? "translateY(-100%)" : "translateY(0)"};
 `;
 
 export const HeaderInner = styled.div`
@@ -106,7 +110,7 @@ export const CtaButtton = styled.button`
   height: 40px;
   background-color: #111;
   color: #fff;
-  border: none;
+  border: 1px solid #d1d5db;
   border-radius: 20px;
   padding: 0 20px;
   font-size: 14px;
@@ -207,4 +211,8 @@ export const HamburgerButton = styled.button`
       border-radius: 1px;
     }
   }
+`;
+
+export const LogoImg = styled.img`
+  min-height: 40px;
 `;

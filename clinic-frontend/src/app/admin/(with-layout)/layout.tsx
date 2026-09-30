@@ -8,6 +8,7 @@ import {
   FiClipboard,
   FiCompass,
   FiFeather,
+  FiFilm,
   FiGrid,
   FiLayers,
   FiLayout,
@@ -123,6 +124,14 @@ export default function AdminLayout({
           >
             <FiCompass size={20} />
             {!isCollapsed && <span>네비게이션관리</span>}
+          </S.AdminNavItem>
+
+          <S.AdminNavItem
+            $isCollapsed={isCollapsed}
+            onClick={() => router.push("/admin/carousel")}
+          >
+            <FiFilm size={20} />
+            {!isCollapsed && <span>슬라이드관리</span>}
           </S.AdminNavItem>
 
           <S.AdminNavItem

@@ -304,7 +304,7 @@ export const InputGroup = styled.div`
 export const Input = styled.input`
   flex: 1;
   min-width: 0;
-  //인풋에 고집을 꺽고 부모크기에 맞춰 줄어들수 있도록 강제 허용
+
   height: 36px;
   padding: 0 8px;
   font-size: 13px;
@@ -314,9 +314,6 @@ export const Input = styled.input`
 
   &::placeholder {
     color: #999;
-  }
-  &:focus {
-    border-color: #000;
   }
 `;
 export const SubmitBtn = styled.button`
@@ -411,6 +408,11 @@ export const CloseBtn = styled.button`
   color: #000;
   ${FlexCenter};
   padding: 0;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: rotate(90deg);
+  }
 `;
 
 export const FooterInner = styled.div`
@@ -1942,3 +1944,4 @@ export const SafetyCardDesc = styled.p`
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
 export * from "../old/Header.styles";
+export * from "./common/LayoutStyle";

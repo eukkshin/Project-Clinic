@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styled from "styled-components";
 
 import { FlexCenter, TextShadow } from "../Common.styles";
@@ -74,4 +75,15 @@ export const SlideCopy = styled.div`
   ${TextShadow}
   z-index: 10;
   text-align: center;
+`;
+
+export const PopupLink = styled(Link)<{ $hasLink: boolean }>`
+  display: block;
+  cursor: ${({ $hasLink }) => ($hasLink ? "pointer" : "default")};
+  text-decoration: none;
+`;
+
+export const PopupImage = styled.img`
+  width: 100%;
+  display: block;
 `;

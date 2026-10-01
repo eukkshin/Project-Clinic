@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   FiArrowDown,
   FiArrowUp,
@@ -15,58 +16,101 @@ import { Popup } from "@/components/modal/Popup";
 interface CategoryData {
   id: number;
   title: string;
-  imageUrl: string; // 실제로는 업로드된 파일의 경로 또는 미리보기 URL
+  imageUrl: string;
   link: string;
 }
 
 export default function News() {
   // 🎯 상태 관리: 등록된 카테고리 아이콘 목록
-  const [categories, setCategories] = useState<CategoryData[]>([
-    { id: 1, title: "전체", imageUrl: "", link: "/all" },
-    { id: 2, title: "눈", imageUrl: "", link: "/eye" },
-    { id: 3, title: "코", imageUrl: "", link: "/nose" },
-  ]);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
 
   // 🎯 상태 관리: 새 카테고리 등록 폼
   const [newCategory, setNewCategory] = useState({ title: "", link: "" });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
-
   const [isSavePopupOpen, setIsSavePopupOpen] = useState(false);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/api/admin/categories",
+      );
+      if (response.data.success) {
+        const formatted = response.data.data.map((c: any) => ({
+          id: c.CATEGORY_IDX,
+          title: c.TITLE,
+          imageUrl: `http://localhost:4000/images/${c.FILE_NAME}`,
+          link: c.LINK,
+        }));
+        setCategories(formatted);
+      }
+    } catch (error) {
+      console.error("카테고리 목록 조회 실패: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   // 이미지 첨부 및 썸네일 미리보기 처리
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       setFileName(file.name);
       setPreviewUrl(URL.createObjectURL(file)); // 로컬 썸네일 미리보기 생성
     }
   };
 
   // 카테고리 추가
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategory.title) {
       alert("카테고리 이름을 입력해주세요.");
       return;
     }
-    setCategories([
-      ...categories,
-      {
-        id: Date.now(),
-        title: newCategory.title,
-        imageUrl: previewUrl,
-        link: newCategory.link,
-      },
-    ]);
-    setNewCategory({ title: "", link: "" });
-    setFileName("");
-    setPreviewUrl("");
+    if (!selectedFile) {
+      alert("이미지를 선택해주세요.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("categoryImage", selectedFile);
+    formData.append("title", newCategory.title);
+    formData.append("link", newCategory.link);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/admin/categories",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
+      if (response.data.success) {
+        setNewCategory({ title: "", link: "" });
+        setSelectedFile(null);
+        setFileName("");
+        setPreviewUrl("");
+        fetchCategories();
+        alert("카테고리 추가 성공");
+      }
+    } catch (error) {
+      console.error("카테고리 추가 실패: ", error);
+    }
   };
 
   // 카테고리 삭제
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm("해당 카테고리 아이콘을 삭제하시겠습니까?")) {
-      setCategories(categories.filter((c) => c.id !== id));
+      try {
+        const response = await axios.delete(
+          `http://localhost:4000/api/admin/categories/${id}`,
+        );
+        fetchCategories();
+      } catch (error) {
+        console.error("카테고리 삭제 실패: ", error);
+      }
     }
   };
 
@@ -88,9 +132,21 @@ export default function News() {
   };
 
   // 최종 저장
-  const handleSave = () => {
-    console.log("DB에 저장될 데이터:", categories);
-    setIsSavePopupOpen(true);
+  const handleSave = async () => {
+    const orderedIds = categories.map((c) => c.id);
+    try {
+      const response = await axios.put(
+        "http://localhost:4000/api/admin/categories/order",
+        {
+          orderedIds,
+        },
+      );
+      if (response.data.success) {
+        setIsSavePopupOpen(true);
+      }
+    } catch (error) {
+      console.error("카테고리 정렬 실패: ", error);
+    }
   };
 
   return (
@@ -104,7 +160,6 @@ export default function News() {
         </S.NewsPageHeader>
 
         <S.NewsGrid>
-          {/* ⚙️ 1. 새 아이콘 등록 폼 */}
           <S.NewsLeftColumn>
             <S.NewsCard>
               <S.NewsCardHeader>
@@ -118,10 +173,7 @@ export default function News() {
                     placeholder="아이콘 아래에 표시될 텍스트"
                     value={newCategory.title}
                     onChange={(e) =>
-                      setNewCategory({
-                        ...newCategory,
-                        title: e.target.value,
-                      })
+                      setNewCategory({ ...newCategory, title: e.target.value })
                     }
                   />
                 </S.NewsFormGroup>
@@ -142,16 +194,25 @@ export default function News() {
                       {fileName || "선택된 파일 없음"}
                     </span>
                   </S.NewsFileInputWrapper>
-                  {/* 썸네일 미리보기 영역 */}
                   {previewUrl && (
                     <S.NewsPreviewCircle>
-                      <img src={previewUrl} alt="미리보기" />
+                      <img
+                        src={previewUrl}
+                        alt="미리보기"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                          marginTop: "1rem",
+                        }}
+                      />
                     </S.NewsPreviewCircle>
                   )}
                 </S.NewsFormGroup>
 
                 <S.NewsFormGroup>
-                  <S.NewsLabel>클릭 시 이동할 링크 URL</S.NewsLabel>
+                  <S.NewsLabel>클릭 시 이동할 링크 URL (선택)</S.NewsLabel>
                   <S.NewsInput
                     type="text"
                     placeholder="예: /category/eye"
@@ -169,7 +230,6 @@ export default function News() {
             </S.NewsCard>
           </S.NewsLeftColumn>
 
-          {/* 📋 2. 등록된 아이콘 리스트 */}
           <S.NewsRightColumn>
             <S.NewsCard style={{ height: "100%" }}>
               <S.NewsCardHeader>
@@ -215,7 +275,16 @@ export default function News() {
                         <td>
                           <S.NewsThumbnail>
                             {cat.imageUrl ? (
-                              <img src={cat.imageUrl} alt={cat.title} />
+                              <img
+                                src={cat.imageUrl}
+                                alt={cat.title}
+                                style={{
+                                  width: "50px",
+                                  height: "50px",
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                              />
                             ) : (
                               <span>No Img</span>
                             )}
@@ -224,7 +293,7 @@ export default function News() {
                         <td style={{ textAlign: "left" }}>
                           <strong>{cat.title}</strong>
                           <div style={{ fontSize: "0.8rem", color: "#858796" }}>
-                            {cat.link}
+                            {cat.link || "링크 없음"}
                           </div>
                         </td>
                         <td>
@@ -255,7 +324,7 @@ export default function News() {
         onClose={() => setIsSavePopupOpen(false)}
         onConfirm={() => setIsSavePopupOpen(false)}
       >
-        카테고리 설정이 성공적으로 저장되었습니다.
+        카테고리 순서가 성공적으로 저장되었습니다.
       </Popup>
     </>
   );

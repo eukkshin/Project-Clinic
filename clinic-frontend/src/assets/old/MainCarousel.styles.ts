@@ -25,7 +25,7 @@ export const EmblaSlide = styled.div`
 `;
 export const SlideImage = styled.img`
   width: 100%;
-  height: 600px;
+  height: 868px;
   object-fit: cover;
   display: block;
   position: relative;

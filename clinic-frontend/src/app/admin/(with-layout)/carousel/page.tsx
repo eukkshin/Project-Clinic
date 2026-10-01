@@ -192,12 +192,16 @@ export default function Visual() {
                         src={`http://localhost:4000/images/${slide.fileName}`}
                         alt="미리보기"
                         style={{
-                          height: "80px",
+                          width: "100%",
+                          height: "140px",
                           objectFit: "cover",
                           borderRadius: "4px",
-                          alignSelf: "flex-start",
+                          alignSelf: "flex-center",
                         }}
                       />
+                    )}
+                    {!slide.fileName && slide.tempFile && (
+                      <span style={{ color: "#ddd" }}>이미지가 없습니다</span>
                     )}
 
                     {/* 텍스트/링크 입력 영역 */}

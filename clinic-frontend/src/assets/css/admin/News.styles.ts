@@ -283,7 +283,7 @@ export const NewsActionBtn = styled.button`
 
   &:disabled {
     color: rgba(59, 122, 87, 0.3);
-    background-color: #f8f9fc;
+    background-color: none;
     cursor: default;
   }
 `;

@@ -30,17 +30,21 @@ export default function ConditionalLayout({
   // pathname변수에 현재 주소를 저장
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/find");
+  // ⭕ 백틱(`)을 사용해 문자열과 변수를 합칩니다.
+  const AdminBoardPage = /^\/board\/.+/.test(pathname);
 
   return (
     <>
       {!isAdmin && <EventPopup />}
       {/* 관리자 페이지가 아닐때만 헤더(상단메뉴를 보여줌) */}
-      {!isAdmin && <Header />}
+      {!isAdmin && !AdminBoardPage && <Header />}
 
-      <MainWrapper $isAdminProps={isAdmin}>{children}</MainWrapper>
+      <MainWrapper $isAdminProps={isAdmin || AdminBoardPage}>
+        {children}
+      </MainWrapper>
 
-      {!isAdmin && <Footer />}
-      {!isAdmin && <QuickConsultBar />}
+      {!isAdmin && !AdminBoardPage && <Footer />}
+      {!isAdmin && !AdminBoardPage && <QuickConsultBar />}
     </>
   );
 }

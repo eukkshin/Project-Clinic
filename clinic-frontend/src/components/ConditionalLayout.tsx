@@ -10,8 +10,6 @@ import Footer from "./Footer";
 import Header from "./Header";
 import QuickConsultBar from "./QuickConsultBar";
 
-// 🚀 [수정] Styled-Component를 컴포넌트 함수 외부로 이동시켰습니다.
-// 이렇게 해야 페이지가 재렌더링되어도 스타일 정의를 중복 생성하지 않아 가볍고 빠릅니다.
 const MainWrapper = styled.main<{ $isAdminProps: boolean }>`
   padding-top: ${(props) => (props.$isAdminProps ? "0px" : "90px")};
   min-height: calc(100vh - 579px);

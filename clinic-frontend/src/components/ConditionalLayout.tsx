@@ -10,16 +10,6 @@ import Footer from "./Footer";
 import Header from "./Header";
 import QuickConsultBar from "./QuickConsultBar";
 
-const MainWrapper = styled.main<{ $isAdminProps: boolean }>`
-  padding-top: ${(props) => (props.$isAdminProps ? "0px" : "90px")};
-  min-height: calc(100vh - 579px);
-
-  @media (max-width: 1024px) {
-    padding-top: ${(props) => (props.$isAdminProps ? "0px" : "60px")};
-    min-height: calc(100vh - 549px);
-  }
-`;
-
 export default function ConditionalLayout({
   children,
 }: {
@@ -37,9 +27,7 @@ export default function ConditionalLayout({
       {/* 관리자 페이지가 아닐때만 헤더(상단메뉴를 보여줌) */}
       {!isAdmin && !AdminBoardPage && <Header />}
 
-      <MainWrapper $isAdminProps={isAdmin || AdminBoardPage}>
-        {children}
-      </MainWrapper>
+      {children}
 
       {!isAdmin && !AdminBoardPage && <Footer />}
       {!isAdmin && !AdminBoardPage && <QuickConsultBar />}

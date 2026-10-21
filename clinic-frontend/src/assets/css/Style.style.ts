@@ -1943,5 +1943,5 @@ export const SafetyCardDesc = styled.p`
 
 export * from "./ChangePw.styles";
 export * from "./Popup.styles";
-export * from "../old/Header.styles";
+export * from "./components/Header.styles";
 export * from "./common/LayoutStyle";

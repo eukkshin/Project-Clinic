@@ -1,13 +1,37 @@
 "use client";
 
 import axios from "axios";
-import Link from "next/link";
-//개발후 연동
-import React, { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/components/Footer.style";
 
-//백앤드에서 받아올 데이터의 형태(타입)를 정의
+import HospitalMap from "./HospitalMap";
+
+/*
+ * Footer.tsx — AHN'S FOOTER
+ * ----------------------------------------------------------
+ * [기획]
+ * PC: 왼쪽 = 병원 정보/진료시간/연락처, 오른쪽 = 큰 지도
+ * 모바일: 병원 정보 → 지도 → 하단 정보 순서
+ *
+ * [서버 연동]
+ * 관리자 페이지에서 등록한 회사 정보/진료시간/Family 사이트를
+ * GET /api/admin/footer 하나로 받아온다. 값은 하드코딩하지 않는다.
+ *
+ * [주의]
+ * 기존 코드의 '스킨케어' 진료시간은 DB와 관계없이 모든 항목에
+ * 반복 표시되는 고정값이어서 제거했다. 실제 등록된 시간만 표시한다.
+ */
+
+interface CompanyInfo {
+  name: string;
+  address: string;
+  clinicName: string;
+  phone: string;
+  email: string;
+  locationUrl: string;
+}
+
 interface ScheduleData {
   id: number;
   departments: string;
@@ -22,182 +46,227 @@ interface FamilySiteData {
   url: string;
 }
 
+interface FooterResponse {
+  success: boolean;
+  data?: {
+    companyInfo?: Partial<CompanyInfo>;
+    schedules?: ScheduleData[];
+    familySites?: FamilySiteData[];
+  };
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const INITIAL_COMPANY: CompanyInfo = {
+  name: "",
+  address: "",
+  clinicName: "",
+  phone: "",
+  email: "",
+  locationUrl: "",
+};
+
+// DB 데이터에 사용자가 입력한 URL이 올 수 있으므로 안전한 프로토콜만 허용한다.
+function safeExternalUrl(value?: string): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:"
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function safePhoneHref(value: string) {
+  // tel 링크에는 문자나 공백이 아닌 전화번호에 필요한 기호만 남긴다.
+  const normalized = value.replace(/[^\d+]/g, "");
+  return normalized ? `tel:${normalized}` : null;
+}
+
 export default function Footer() {
-  //1.서버에서 가져온 데이터를 담아둘 빈 바구니 만들기
-  const [companyInfo, setCompanyInfo] = useState({
-    name: "",
-    address: "",
-    clinicName: "",
-    phone: "",
-    email: "",
-    locationUrl: "",
-  });
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(INITIAL_COMPANY);
   const [schedules, setSchedules] = useState<ScheduleData[]>([]);
   const [familySites, setFamilySites] = useState<FamilySiteData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 페이지가 이동/언마운트되는 경우 진행 중인 네트워크 요청 취소
+    const controller = new AbortController();
+
     const fetchFooterData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/footer",
+        const response = await axios.get<FooterResponse>(
+          `${API_URL}/api/admin/footer`,
+          {
+            signal: controller.signal,
+          },
         );
+        if (!response.data.success || !response.data.data) return;
 
-        if (response.data.success && response.data.data) {
-          const { companyInfo, schedules, familySites } = response.data.data;
-          //db에서 가져온 데이터로 빈 바구니를 채웁니다
-          if (companyInfo) setCompanyInfo(companyInfo);
-          if (schedules) setSchedules(schedules);
-          if (familySites) setFamilySites(familySites);
+        const {
+          companyInfo: info,
+          schedules: hours,
+          familySites: sites,
+        } = response.data.data;
+        if (controller.signal.aborted) return;
+
+        // 일부 필드가 빠져도 기존 값의 타입을 유지하도록 객체 병합한다.
+        if (info && typeof info === "object") {
+          setCompanyInfo((previous) => ({ ...previous, ...info }));
         }
+        if (Array.isArray(hours)) setSchedules(hours);
+        if (Array.isArray(sites)) setFamilySites(sites);
       } catch (error) {
-        console.error("클라이언트 푸터 데이터 로드 실패", error);
+        if (!controller.signal.aborted)
+          console.error("푸터 정보 조회 실패:", error);
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
-    fetchFooterData();
+
+    void fetchFooterData();
+    return () => controller.abort();
   }, []);
-  //아직 db에서 데이터를 받아오고 있다면..
-  if (isLoading) {
-    return (
-      <S.SiteFooterWrapper>
-        <S.SiteFooterInner>로딩중...</S.SiteFooterInner>
-      </S.SiteFooterWrapper>
-    );
-  }
+
+  const clinicName =
+    companyInfo.clinicName || companyInfo.name || "Ahn's Plastic Surgery";
+  const phoneHref = safePhoneHref(companyInfo.phone);
+  const locationLink = safeExternalUrl(companyInfo.locationUrl);
+  const emailHref = companyInfo.email.includes("@")
+    ? `mailto:${companyInfo.email}`
+    : null;
 
   return (
-    <>
-      <S.SiteFooterWrapper>
-        <S.SiteFooterInner>
-          {/* cs번호 진료시간 오시는길 */}
-          <S.SiteFooterTop>
-            <S.SiteFooterCs>
-              <S.SiteFooterPhone>
-                {companyInfo.phone || "02. 000. 0000"}
-              </S.SiteFooterPhone>
-              <S.SiteFooterCsTitle>CS CENTER</S.SiteFooterCsTitle>
-            </S.SiteFooterCs>
+    <S.FooterWrapper id="site-footer-contact">
+      <S.FooterInner>
+        <S.FooterTopLabel>
+          <span>AHN&apos;S PLASTIC SURGERY</span>
+          <span>CONTACT &amp; LOCATION — 06</span>
+        </S.FooterTopLabel>
 
-            <S.SiteFooterScheduleWrap>
-              {schedules.map((sch) => (
-                <Fragment key={sch.id}>
-                  <S.SiteFooterScheduleBlock>
-                    <S.SiteFooterScheduleTitle>
-                      {sch.departments}
-                    </S.SiteFooterScheduleTitle>
-                    <S.SiteFooterScheduleText>
-                      평일 : {sch.weekday}
-                    </S.SiteFooterScheduleText>
-                    {/*야간은 빈칸이면 깔끔하게 렌더링을 안함 */}
-                    {sch.night && (
-                      <S.SiteFooterScheduleText>
-                        야간 : {sch.night}
-                      </S.SiteFooterScheduleText>
+        {/* 핵심 요청: 왼쪽 병원 정보 / 오른쪽 큰 지도 */}
+        <S.MainGrid>
+          <S.InfoColumn>
+            <S.IntroSmall>WE ARE HERE FOR YOU</S.IntroSmall>
+            <S.IntroTitle>
+              Find Your
+              <br />
+              <em>Own Beauty.</em>
+            </S.IntroTitle>
+            <S.IntroDescription>
+              당신만의 아름다움을 찾아가는 여정.
+              <br />그 시작을 함께하겠습니다.
+            </S.IntroDescription>
+
+            <S.ContactGroup>
+              <S.ContactLabel>CONTACT</S.ContactLabel>
+              {phoneHref ? (
+                <S.PhoneAnchor href={phoneHref}>
+                  {companyInfo.phone}
+                </S.PhoneAnchor>
+              ) : (
+                <S.ContactPlaceholder>
+                  {loading ? "연락처를 불러오는 중..." : "전화번호 등록 예정"}
+                </S.ContactPlaceholder>
+              )}
+              {emailHref && (
+                <S.EmailAnchor href={emailHref}>
+                  {companyInfo.email}
+                </S.EmailAnchor>
+              )}
+            </S.ContactGroup>
+
+            <S.ContactGroup>
+              <S.ContactLabel>CLINIC INFORMATION</S.ContactLabel>
+              <S.ClinicTitle>{clinicName}</S.ClinicTitle>
+              <S.AddressText>
+                {companyInfo.address ||
+                  (loading ? "주소를 불러오는 중..." : "주소 등록 예정")}
+              </S.AddressText>
+              {locationLink && (
+                <S.SimpleTextLink
+                  href={locationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  오시는 길 바로가기<span aria-hidden="true">↗</span>
+                </S.SimpleTextLink>
+              )}
+            </S.ContactGroup>
+
+            {schedules.length > 0 && (
+              <S.HoursGroup>
+                <S.ContactLabel>OPENING HOURS</S.ContactLabel>
+                {schedules.map((schedule) => (
+                  <S.HoursItem key={schedule.id}>
+                    <strong>{schedule.departments}</strong>
+                    {schedule.weekday && <span>평일　{schedule.weekday}</span>}
+                    {schedule.night && <span>야간　{schedule.night}</span>}
+                    {schedule.weekend && (
+                      <span>토요일　{schedule.weekend}</span>
                     )}
-                    <S.SiteFooterScheduleText>
-                      토요일 : {sch.weekend}
-                    </S.SiteFooterScheduleText>
-                  </S.SiteFooterScheduleBlock>
+                  </S.HoursItem>
+                ))}
+              </S.HoursGroup>
+            )}
+          </S.InfoColumn>
 
-                  <S.SiteFooterScheduleBlock>
-                    <S.SiteFooterScheduleTitle>
-                      스킨케어
-                    </S.SiteFooterScheduleTitle>
-                    <S.SiteFooterScheduleText>
-                      평일 : AM 09:00 - PM 06:00
-                    </S.SiteFooterScheduleText>
-                    <S.SiteFooterScheduleText>
-                      토요일 : PM 09:00 - PM 03:00
-                    </S.SiteFooterScheduleText>
-                  </S.SiteFooterScheduleBlock>
-                </Fragment>
-              ))}
-            </S.SiteFooterScheduleWrap>
+          {/* 지도 Provider 전환 기능은 HospitalMap.tsx에 독립 구현 */}
+          <HospitalMap address={companyInfo.address} clinicName={clinicName} />
+        </S.MainGrid>
 
-            <Link href={companyInfo.locationUrl || "/"}>
-              <S.SiteFooterLocationBtn>
-                오시는길 바로가기
-              </S.SiteFooterLocationBtn>
-            </Link>
-          </S.SiteFooterTop>
+        <S.FooterBottom>
+          <S.FooterLegal>
+            <strong>{clinicName}</strong>
+            {companyInfo.address && <span>{companyInfo.address}</span>}
+            {companyInfo.phone && <span>대표전화 {companyInfo.phone}</span>}
+            {companyInfo.email && <span>{companyInfo.email}</span>}
+            <span>
+              © {new Date().getFullYear()} AHN&apos;S. ALL RIGHTS RESERVED.
+            </span>
+          </S.FooterLegal>
 
-          <S.SiteFooterBottom>
-            <S.SiteFooterCompany>
-              <S.SiteFooterCompanyName>
-                {companyInfo.name || "안과"}
-              </S.SiteFooterCompanyName>
-              <S.SiteFooterInfoText>
-                {companyInfo.address || "201호"}
-                <br />({companyInfo.address} 건물 주차장 이용)
-              </S.SiteFooterInfoText>
-
-              <S.SiteFooterInfoText>
-                의료기관 명칭 : {companyInfo.clinicName}
-                <br />
-                대표번호 {companyInfo.phone}
-                <br />
-                E-mail : {companyInfo.email}
-              </S.SiteFooterInfoText>
-            </S.SiteFooterCompany>
-
-            <S.SiteFooterBottomRight>
-              <S.SiteFooterPolicyWrap>
-                <S.SiteFooterPolicyBtn>실비보험 안내</S.SiteFooterPolicyBtn>
-                <S.SiteFooterPolicyBtn>
-                  비급여 진료비용 안내
-                </S.SiteFooterPolicyBtn>
-              </S.SiteFooterPolicyWrap>
-
-              <div>
-                <S.SiteFooterFamilyTitle>Family</S.SiteFooterFamilyTitle>
-                <S.SiteFooterFamilyLogos>
-                  {familySites.map((site) => (
-                    <a
-                      href={site.url}
+          {familySites.length > 0 && (
+            <S.FamilyArea>
+              <S.ContactLabel>FAMILY SITES</S.ContactLabel>
+              <S.FamilyList>
+                {familySites.map((site) => {
+                  const href = safeExternalUrl(site.url);
+                  return href ? (
+                    <S.FamilyLink
                       key={site.id}
+                      href={href}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <div className="logo-placeholder">{site.name}</div>
-                    </a>
-                  ))}
-                  {/* <div className="logo-placeholder">Breast Surgery Center</div>
-                  <div className="logo-placeholder">Derm</div>
-                  <div className="logo-placeholder">Lifting Center</div> */}
-                </S.SiteFooterFamilyLogos>
-              </div>
-            </S.SiteFooterBottomRight>
-          </S.SiteFooterBottom>
-        </S.SiteFooterInner>
+                      {site.name} <span aria-hidden="true">↗</span>
+                    </S.FamilyLink>
+                  ) : null;
+                })}
+              </S.FamilyList>
+            </S.FamilyArea>
+          )}
+        </S.FooterBottom>
 
-        {/* 우측 하단 플로팅 퀵 메뉴 */}
-        <S.FloatingMenuWrapper>
-          <S.FloatingMenuItem>
-            <S.FloatingMenuIcon $bgColor="#FEE500">TALK</S.FloatingMenuIcon>
-            <S.FloatingMenuText>빠른 상담</S.FloatingMenuText>
-          </S.FloatingMenuItem>
+        <S.BottomWordmark aria-hidden="true">AHN&apos;S</S.BottomWordmark>
+      </S.FooterInner>
 
-          <S.FloatingMenuItem>
-            <S.FloatingMenuIcon $bgColor="#3b82f6">
-              <svg
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.25-3.95-6.847-6.847l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
-                ></path>
-              </svg>
-            </S.FloatingMenuIcon>
-            <S.FloatingMenuText>전화상담</S.FloatingMenuText>
-          </S.FloatingMenuItem>
-        </S.FloatingMenuWrapper>
-      </S.SiteFooterWrapper>
-    </>
+      {/* 퀵 메뉴도 실제 동작이 있는 항목만 사용한다. */}
+      <S.FloatingActions aria-label="빠른 메뉴">
+        {phoneHref && (
+          <S.FloatPhone href={phoneHref} aria-label="전화 상담">
+            ☎
+          </S.FloatPhone>
+        )}
+        <S.FloatTop
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="페이지 맨 위로"
+        >
+          ↑
+        </S.FloatTop>
+      </S.FloatingActions>
+    </S.FooterWrapper>
   );
 }

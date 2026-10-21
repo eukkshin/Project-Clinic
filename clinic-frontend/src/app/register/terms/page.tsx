@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DaumPostcode from "react-daum-postcode";
 
-import * as S from "@/assets/old/Sub.styles";
+import * as S from "@/assets/css/components/Sub.styles";
 import { Popup } from "@/components/modal/Popup";
 
 export default function TermsPage() {

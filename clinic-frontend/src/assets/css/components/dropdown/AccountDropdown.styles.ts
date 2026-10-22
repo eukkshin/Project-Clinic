@@ -24,38 +24,28 @@ export const AccountTrigger = styled.button<{
 }>`
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  width: auto;
+  gap: 7px;
   min-height: 40px;
-  padding: 5px 9px 5px 6px;
-  border: 1px solid
-    ${({ $open }) => ($open ? "rgba(255,255,255,.58)" : "transparent")};
-  border-radius: 999px;
-  background: ${({ $open }) =>
-    $open ? "rgba(255,255,255,.13)" : "transparent"};
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: inherit;
   font: inherit;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease;
 
-  &:hover {
-    background: rgba(137, 167, 138, 0.16);
-  }
   &:focus-visible {
-    outline: 2px solid #77997d;
+    outline: 2px solid #69826b;
     outline-offset: 3px;
   }
+
   ${({ $mobile }) =>
     $mobile &&
     css`
       width: 100%;
-      justify-content: flex-start;
-      padding: 11px 13px;
-      border: 1px solid rgba(111, 144, 119, 0.22);
-      background: rgba(143, 170, 147, 0.1);
+      justify-content: space-between;
+      padding: 12px;
     `}
 `;
 
@@ -229,19 +219,18 @@ const menuRow = css`
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 42px;
-  padding: 0 11px;
+  min-height: 40px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 4px;
   background: transparent;
+  color: #244535;
   text-decoration: none;
   text-align: left;
-  color: #385844;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 520;
+  font-weight: 500;
   letter-spacing: -0.02em;
-  gap: 11px;
   box-sizing: border-box;
 `;
 export const MenuIcon = styled.span`
@@ -277,7 +266,6 @@ export const MenuLink = styled.a`
 export const MenuUnavailable = styled.div`
   ${menuRow}
   opacity: 1;
-  color: #244535;
   cursor: default;
 `;
 export const ComingSoon = styled.span`

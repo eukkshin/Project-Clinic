@@ -200,7 +200,16 @@ function PopupCard({
 
           {feedback && <S.FormFeedback role="alert">{feedback}</S.FormFeedback>}
 
-          <S.SubmitBtn type="submit" disabled={isSubmitting || !isAgreed}>
+          <S.SubmitBtn
+            type="submit"
+            disabled={
+              isSubmitting ||
+              !isAgreed ||
+              !name.trim() ||
+              !phone.trim() ||
+              !department
+            }
+          >
             {isSubmitting ? "신청 중..." : "빠른 상담 신청하기"}
             <FiArrowUpRight aria-hidden="true" size={17} />
           </S.SubmitBtn>

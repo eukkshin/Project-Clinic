@@ -28,11 +28,16 @@ export const CarouselSection = styled.section`
   }
 `;
 
-// EmblaViewport는 '현재 화면에 보여줄 슬라이드 영역'이다.
+// EmblaViewport는 슬라이더의 전체 사진을 담는 레이어다.
+// 이 요소만 GSAP으로 blur + fade해도 EmblaContainer의 x축 이동은 유지된다.
 export const EmblaViewport = styled.div`
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  transform-origin: center center;
+  filter: blur(0px); /* GSAP이 0 → 7px로 자연스럽게 보간할 시작값 */
 `;
 
 // flex로 슬라이드가 좌우 일렬로 놓이게 한다. 이동 제어는 Embla가 맡는다.
@@ -61,25 +66,14 @@ export const SlideLink = styled.a`
 `;
 
 /**
- * Hero의 스크롤 프레임.
- * 처음에는 이미지가 화면 전체를 채운다 (clip-path를 자르지 않음).
- * GSAP이 스크롤 진행률에 맞게 clip-path를 바꾸어 사진 주변에 여백을 만든다.
- * 아치는 쓰지 않고 작은 모서리 곡률을 가진 고급스러운 사진 프레임으로 변한다.
+ * 각 슬라이드의 이미지를 100% 가득 표시하는 뷰.
+ * GSAP clip-path를 절대 적용하지 않는다. 작은 사각형이 생기지 않게 하는 핵심.
  */
 export const VisualFrame = styled.div`
   position: absolute;
   inset: 0;
   z-index: 1;
   overflow: hidden;
-
-  /* 0%: 초기 로딩 직후 이미지가 화면 가장자리까지 가득 보인다. */
-  clip-path: inset(0% 0% 0% 0% round 0px);
-
-  @media (max-width: 768px) {
-    /* 모바일은 짧은 터치 스크롤에서 화면이 고정되는 불편함을 줄이기 위해
-       프레임 축소를 하지 않고 풀스크린 배너 그대로 사용한다. */
-    clip-path: inset(0% 0% 0% 0% round 0px);
-  }
 `;
 
 // 이미지/영상에만 미세한 확대를 적용한다. Embla 부모 요소에는 transform을 주지 않는다.
@@ -113,8 +107,8 @@ export const HeroVideo = styled.video`
   object-fit: cover;
 `;
 
-// 첫 화면은 이미지가 화면을 채우므로 글자가 묻히지 않게 왼쪽만 어둡게 만든다.
-// 이 그라데이션은 사진 프레임 안에 들어 있어 스크롤할 때 같이 축소된다.
+// 첫 화면에서 밝은 사진 위에도 흰 글자가 읽히도록 왼쪽을 어둡게 만든다.
+// Soft Focus 전환에서는 이 그라데이션도 사진과 함께 페이드된다.
 export const ImageOverlay = styled.div`
   position: absolute;
   inset: 0;
@@ -408,76 +402,146 @@ export const NavButton = styled.button`
   }
 `;
 
-/* ──────────────────────────────────────────────────────────────────
- * 스크롤 후에만 나타나는 Editorial Reveal 화면
- * 첫 화면은 무조건 사진이 꽉 찬 상태로 시작한다.
- * 이미지를 줄일 때만 뒤의 세이지 그린 배경과 문구가 드러나도록 만든다.
- * ────────────────────────────────────────────────────────────────── */
+/**
+ * Soft Focus 전환을 위한 밝은 포그 레이어.
+ * 이미지가 페이드되면 화면 전면에 아이보리빛이 차오르고
+ * 최하단은 CategoryNav와 같은 세이지(#A1AF96)로 끝난다.
+ */
+export const FocusVeil = styled.div`
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #e9eee3 0%,
+    #dce6d9 25%,
+    #c2d0be 57%,
+    ${SAGE} 100%
+  );
 
+  /*
+   * 모바일/움직임 줄이기 환경에서는 Hero를 pin하지 않으므로
+   * 사진의 맨 아래를 세이지 그린으로 자연스럽게 녹여서
+   * 바로 이어지는 CategoryNav 첫 픽셀과 색이 같도록 한다.
+   * 데스크톱 일반 모드에서는 GSAP이 opacity를 제어한다.
+   */
+  @media (max-width: 768px), (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    background: linear-gradient(
+      180deg,
+      transparent 52%,
+      rgba(161, 175, 150, 0.18) 72%,
+      rgba(161, 175, 150, 0.7) 89%,
+      ${SAGE} 100%
+    );
+  }
+`;
+
+/**
+ * [마지막 색 정렬 레이어]
+ * Soft Focus의 중간은 아이보리→그린 포그를 유지한다.
+ * 단, pin이 끝나기 직전에는 전체 화면을 순수 SAGE로 덮는다.
+ * 기존에는 Hero 화면의 바닥만 SAGE이고 위는 아이보리여서
+ * CategoryNav 진입 시 색이 갑자기 바뀌는 것처럼 보였다.
+ *
+ * 배경만 덮는 장식 요소라 z-index는 브랜드 문구(4)보다 아래(3).
+ */
+export const ColorMatchOverlay = styled.div`
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: ${SAGE};
+`;
+
+/* ──────────────────────────────────────────────────────────────────
+ * 전환 끝에서 등장하는 가운데 브랜드 메시지.
+ * 사각형 사진 옆이 아니라 화면 정중앙을 차지하는 편집형 타이포그래피.
+ * ────────────────────────────────────────────────────────────────── */
 export const RevealCopy = styled.div`
   position: absolute;
   z-index: 4;
-  top: 49%;
-  left: clamp(28px, 7vw, 140px);
-  transform: translateY(-50%);
-  width: min(33vw, 550px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(calc(100% - 64px), 960px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   color: ${DARK_TEXT};
   opacity: 0;
   visibility: hidden;
-  pointer-events: none; /* 위에 올라와도 Embla 클릭/드래그를 막지 않는다. */
+  pointer-events: none;
 
   @media (max-width: 768px) {
-    display: none; /* 모바일은 풀스크린 배너만 사용한다. */
+    display: none; /* 모바일은 사진 중심의 자연스러운 스크롤 */
   }
 `;
 
 export const RevealEyebrow = styled.p`
-  margin: 0 0 28px;
+  margin: 0 0 clamp(22px, 3.5svh, 45px);
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.26em;
-  color: #526a55;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: #547059;
 `;
 
 export const RevealTitle = styled.h2`
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 400;
-  font-size: clamp(43px, 4.5vw, 84px);
-  line-height: 1.12;
-  letter-spacing: -0.065em;
+  font-size: clamp(64px, 8.15vw, 142px);
+  line-height: 1.06;
+  letter-spacing: -0.071em;
+  color: #2f4b37;
+
+  em {
+    color: #607e64;
+    font-weight: 400;
+  }
+
+  @media (max-height: 770px) {
+    font-size: clamp(56px, 7vw, 105px);
+  }
 `;
 
 export const RevealDescription = styled.p`
-  margin: 32px 0 0;
-  font-size: clamp(14px, 1.1vw, 18px);
+  margin: clamp(20px, 3.4svh, 38px) 0 0;
+  font-family: inherit;
+  font-size: clamp(14px, 1.14vw, 18px);
   line-height: 1.9;
-  color: #485c4a;
+  letter-spacing: -0.015em;
+  color: #48634d;
 `;
 
 export const RevealRule = styled.div`
-  width: 44px;
+  width: 70px;
   height: 1px;
-  margin-top: 38px;
-  background: rgba(52, 70, 56, 0.65);
+  margin: clamp(26px, 3.2svh, 42px) 0 0;
+  background: rgba(63, 94, 68, 0.45);
 `;
 
 export const RevealTagline = styled.p`
-  margin: 16px 0 0;
+  margin: 19px 0 0;
   font-size: 10px;
-  letter-spacing: 0.2em;
-  color: #536b56;
+  letter-spacing: 0.25em;
+  color: #5c7760;
 `;
 
 export const RevealSideNote = styled.span`
   position: absolute;
   z-index: 4;
-  right: 8%;
-  bottom: 5.5%;
+  right: clamp(28px, 7vw, 140px);
+  bottom: 6%;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.2em;
-  color: ${DARK_TEXT};
+  color: #59735d;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

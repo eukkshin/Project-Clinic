@@ -204,6 +204,7 @@ export const StagePicture = styled.div`
   z-index: -2;
   inset: 0;
   animation: ${stageReveal} 800ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  display: block;
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
@@ -306,10 +307,10 @@ export const ListItem = styled.article`
 `;
 
 export const MobilePicture = styled.div`
+  position: relative;
   display: none;
 
   @media (max-width: 900px) {
-    position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 16 / 10;

@@ -174,7 +174,16 @@ export default function QuickConsultBar() {
               />
               <S.AgreeText>개인정보 수집·이용 동의</S.AgreeText>
             </S.CheckboxLabel>
-            <S.SubmitBtn type="submit" disabled={isSubmitting || !isAgreed}>
+            <S.SubmitBtn
+              type="submit"
+              disabled={
+                isSubmitting ||
+                !isAgreed ||
+                !name.trim() ||
+                !phone.trim() ||
+                !department
+              }
+            >
               {isSubmitting ? "접수 중..." : "빠른 상담 신청"}
               <FiArrowUpRight aria-hidden="true" size={17} />
             </S.SubmitBtn>

@@ -1,5 +1,5 @@
 "use client";
-
+/// <reference types="kakao.maps.d.ts" />
 import { useEffect, useRef, useState } from "react";
 
 import * as S from "@/assets/css/components/Footer.style";
@@ -71,6 +71,7 @@ interface KakaoNamespace {
     Marker: new (options: Record<string, unknown>) => {
       setMap(map: unknown): void;
     };
+
     services: {
       Status: { OK: unknown };
       Geocoder: new () => {
@@ -246,6 +247,8 @@ function SdkMap({
               zoom: 16,
               zoomControl: true,
               scrollWheel: false, // 페이지를 스크롤할 때 지도 줌이 바뀌는 문제 방지
+              maxZoom: 7,
+              minZoom: 21,
             });
             new naver.maps.Marker({ position: center, map });
             setStatus("ready");
@@ -289,8 +292,14 @@ function SdkMap({
               return;
             }
             const center = new kakao.maps.LatLng(latitude, longitude);
-            const map = new kakao.maps.Map(container, { center, level: 3 });
+            const map = new kakao.maps.Map(container, {
+              center,
+              level: 3,
+              minLevel: 1,
+              maxLevel: 3,
+            });
             const marker = new kakao.maps.Marker({ position: center });
+
             marker.setMap(map);
             setStatus("ready");
           });
@@ -311,7 +320,6 @@ function SdkMap({
     // 언마운트/탭 전환 시 이전 주소 검색 콜백이 React state를 바꾸지 못하게 차단한다.
     return () => {
       cancelled = true;
-      container.replaceChildren();
     };
   }, [address, enabled, provider, selectedKey]);
 

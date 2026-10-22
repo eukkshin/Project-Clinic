@@ -20,17 +20,19 @@ export default function ConditionalLayout({
   const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/find");
   // ⭕ 백틱(`)을 사용해 문자열과 변수를 합칩니다.
   const AdminBoardPage = /^\/board\/.+/.test(pathname);
+  const isAuthPage =
+    pathname === "/register/login" || pathname === "/register/terms";
 
   return (
     <>
       {!isAdmin && <EventPopup />}
       {/* 관리자 페이지가 아닐때만 헤더(상단메뉴를 보여줌) */}
-      {!isAdmin && !AdminBoardPage && <Header />}
+      {!isAdmin && !AdminBoardPage && !isAuthPage && <Header />}
 
       {children}
 
-      {!isAdmin && !AdminBoardPage && <Footer />}
-      {!isAdmin && !AdminBoardPage && <QuickConsultBar />}
+      {!isAdmin && !AdminBoardPage && !isAuthPage && <Footer />}
+      {!isAdmin && !AdminBoardPage && !isAuthPage && <QuickConsultBar />}
     </>
   );
 }

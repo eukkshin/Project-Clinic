@@ -21,8 +21,20 @@ export const TransitionBridge = styled.div`
   padding: 56px 24px;
   text-align: center;
   color: ${DARK};
-  background: linear-gradient(180deg, ${SAGE} 0%, #d8dfd1 55%, ${IVORY} 100%);
-  overflow: hidden;
+  overflow-x: clip;
+  /*
+   * Hero가 끝날 때 전체 화면을 #A1AF96 단색으로 정렬한다.
+   * 첫 14%도 동일한 색을 유지하다가 아이보리로 서서히 이어진다.
+   * 경계에서 서로 다른 그라데이션이 맞닿아 생기던 이질감을 줄인다.
+   */
+  background: linear-gradient(
+    180deg,
+    ${SAGE} 0%,
+    ${SAGE} 14%,
+    #bbcab5 42%,
+    #dee6da 73%,
+    ${IVORY} 100%
+  );
 `;
 
 export const BridgeInner = styled.div`
@@ -46,28 +58,18 @@ export const BridgeText = styled.p`
   font-weight: 400;
   letter-spacing: -0.06em;
   line-height: 1.12;
-  margin-bottom: 0;
-`;
 
-export const BridgeEm = styled.em`
-  display: block;
-  margin: 22px 0 26px;
-  font-family: inherit;
-  font-size: clamp(31px, 4.7vw, 74px);
-  font-weight: 400;
-  letter-spacing: -0.06em;
-  line-height: 1.12;
-  color: #69826b;
-  font-weight: 400;
-  margin: 0;
+  em {
+    color: #69826b;
+    font-weight: 400;
+  }
 `;
 
 export const BridgeLine = styled.div`
+  display: block;
   width: 68px;
   height: 1px;
-  margin-top: 22px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   background: rgba(52, 70, 56, 0.35);
 `;
 
@@ -441,4 +443,11 @@ export const PageNumber = styled.span`
     opacity: 0.55;
     font-size: 12px;
   }
+`;
+
+// 브랜드 문구에서 특정 단어를 강조하는 스타일
+export const BridgeEm = styled.em`
+  color: #69826b;
+  font-style: italic;
+  font-weight: 400;
 `;

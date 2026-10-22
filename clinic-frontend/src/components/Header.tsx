@@ -1,233 +1,350 @@
-"use Client";
+"use client";
+
 import axios from "axios";
+import gsap from "gsap";
+import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import * as S from "@/assets/css/Style.style";
+import * as S from "@/assets/css/components/Header.styles";
 
-import GlobeIcon from "./icons/GlobeIcon";
-import UserIcon from "./icons/UserIcon";
+/*
+ * Header.tsx — Premium Ahn's Navigation
+ * ----------------------------------------------------------
+ * [기존 기능 보존]
+ * - GET /api/admin/nav: 로고 종류, 로고 파일, 메뉴
+ * - GET /api/admin/tone: 강조 색상, 다크 모드
+ * - 스크롤 아래로 내리면 숨김 / 위로 올리면 등장
+ * - 모바일 전체 화면 메뉴 + GSAP 순차 등장 + ESC 닫기
+ * - 로그인 링크 / 관리자 파일 서버 이미지
+ *
+ * [개선]
+ * - Hero 위: 얇고 투명한 헤더
+ * - 일반 섹션: 크림/딥그린 반투명 배경
+ * - 가짜 언어 변경 버튼/동작하지 않는 pill 버튼은 제거
+ * - 상담 예약 CTA는 실제 연락 정보가 있는 Footer 위치로 이동
+ * - 전화번호는 임의로 하드코딩하지 않고 관리자 Footer API에서 읽음
+ */
 
 interface MenuItem {
   id: number;
   name: string;
   url: string;
 }
+interface NavSettings {
+  LOGO_TYPE?: "TEXT" | "IMAGE";
+  LOGO_TEXT?: string;
+  LOGO_FILE?: string;
+  MENUS?: string | MenuItem[];
+}
+interface ToneSettings {
+  PRIMARY_TONE?: string;
+  IS_DARKMODE?: string;
+}
+interface FooterSettings {
+  companyInfo?: { phone?: string };
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
+const DEFAULT_MENUS: MenuItem[] = [
+  { id: 1, name: "병원소개", url: "/" },
+  { id: 2, name: "눈성형", url: "/" },
+  { id: 3, name: "코성형", url: "/" },
+  { id: 4, name: "동안성형", url: "/" },
+  { id: 5, name: "쁘띠시술", url: "/" },
+  { id: 6, name: "커뮤니티", url: "/" },
+];
+
+// 관리자 메뉴 URL에 javascript: 같은 주소가 들어오는 것을 방지한다.
+function safeHref(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return "/";
+}
+function phoneHref(phone: string) {
+  const normalized = phone.replace(/[^\d+]/g, "");
+  return normalized ? `tel:${normalized}` : null;
+}
 
 export default function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   const [logoType, setLogoType] = useState<"TEXT" | "IMAGE">("TEXT");
-  const [logoText, setLogoText] = useState<string>("Ahn's");
-  const [logoFileName, setLogoFileName] = useState<string>("");
-  const [menus, setMenus] = useState<MenuItem[]>([]);
+  const [logoText, setLogoText] = useState("Ahn's");
+  const [logoFileName, setLogoFileName] = useState("");
+  const [menus, setMenus] = useState<MenuItem[]>(DEFAULT_MENUS);
+  const [accent, setAccent] = useState("#879D87");
+  const [isDark, setIsDark] = useState(false);
+  const [phone, setPhone] = useState("");
 
-  //톤앤매너
-  const [themeColor, setThemeColor] = useState<string>("#fecbec");
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const [hide, setHide] = useState(false);
-  const [pageY, setPageY] = useState(0);
+  const previousY = useRef(0);
+  const mobilePanelRef = useRef<HTMLDivElement>(null);
+  const transparent = isHome && !scrolled && !menuOpen;
+  const contactHref = isHome ? "#site-footer-contact" : "/#site-footer-contact";
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  /* [1] 관리자 설정을 네트워크에서 가져온다. 서로 독립적이므로 Promise.allSettled 사용. */
   useEffect(() => {
-    const handleScroll = () => {
-      const { scrollY } = window;
+    const controller = new AbortController();
+    const fetchSettings = async () => {
+      const results = await Promise.allSettled([
+        axios.get<{ success: boolean; data: NavSettings }>(
+          `${API_URL}/api/admin/nav`,
+          { signal: controller.signal },
+        ),
+        axios.get<{ success: boolean; data: ToneSettings }>(
+          `${API_URL}/api/admin/tone`,
+          { signal: controller.signal },
+        ),
+        axios.get<{ success: boolean; data: FooterSettings }>(
+          `${API_URL}/api/admin/footer`,
+          { signal: controller.signal },
+        ),
+      ]);
+      if (controller.signal.aborted) return;
+      const [nav, tone, footer] = results;
 
-      if (scrollY > pageY && scrollY > 50) {
-        setHide(true);
-      } else if (scrollY < pageY) {
-        setHide(false);
-      }
-
-      setPageY(scrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pageY]);
-
-  useEffect(() => {
-    const fetchNavSettings = async () => {
-      try {
-        const response = await axios.get("http://localhost:4000/api/admin/nav");
-        if (response.data.success) {
-          const dbData = response.data.data;
-          console.log("=== 백엔드가 보내준 원본 데이터 구조 ===", dbData);
-          setLogoType(dbData.LOGO_TYPE);
-          setLogoText(dbData.LOGO_TEXT || "");
-          setLogoFileName(dbData.LOGO_FILE || "");
-
-          if (dbData.MENUS && dbData.MENUS !== "[]") {
-            setMenus(JSON.parse(dbData.MENUS));
-          } else {
-            setMenus([
-              { id: 1, name: "병원소개", url: "/" },
-              { id: 2, name: "눈성형", url: "/" },
-              { id: 3, name: "코성형", url: "/" },
-              { id: 4, name: "동안성형", url: "/" },
-              { id: 5, name: "쁘띠시술", url: "/" },
-              { id: 6, name: "커뮤니티", url: "/" },
-            ]);
+      if (nav.status === "fulfilled" && nav.value.data.success) {
+        const data = nav.value.data.data;
+        setLogoType(data.LOGO_TYPE === "IMAGE" ? "IMAGE" : "TEXT");
+        setLogoText(data.LOGO_TEXT?.trim() || "Ahn's");
+        setLogoFileName(data.LOGO_FILE?.trim() || "");
+        try {
+          const parsed: unknown =
+            typeof data.MENUS === "string"
+              ? JSON.parse(data.MENUS)
+              : data.MENUS;
+          if (Array.isArray(parsed)) {
+            const valid = parsed.filter(
+              (item): item is MenuItem =>
+                item !== null &&
+                typeof item === "object" &&
+                typeof item.id === "number" &&
+                typeof item.name === "string" &&
+                typeof item.url === "string",
+            );
+            if (valid.length) setMenus(valid);
           }
-        } else {
-          setMenus([
-            { id: 1, name: "병원소개", url: "/" },
-            { id: 2, name: "눈성형", url: "/" },
-            { id: 3, name: "코성형", url: "/" },
-            { id: 4, name: "동안성형", url: "/" },
-            { id: 5, name: "쁘띠시술", url: "/" },
-            { id: 6, name: "커뮤니티", url: "/" },
-          ]);
+        } catch (error) {
+          console.error("헤더 메뉴 파싱 실패:", error);
         }
-      } catch (error) {
-        console.error("헤더 네비게이션 로드 실패: ", error);
-        setMenus([
-          { id: 1, name: "병원소개", url: "/" },
-          { id: 2, name: "눈성형", url: "/" },
-          { id: 3, name: "코성형", url: "/" },
-          { id: 4, name: "동안성형", url: "/" },
-          { id: 5, name: "쁘띠시술", url: "/" },
-          { id: 6, name: "커뮤니티", url: "/" },
-        ]);
+      }
+
+      if (tone.status === "fulfilled" && tone.value.data.success) {
+        const data = tone.value.data.data;
+        const tones: Record<string, string> = {
+          GREEN: "#879D87",
+          PINK: "#C68D9F",
+          BLUE: "#7D9FAA",
+        };
+        setAccent(tones[data.PRIMARY_TONE ?? ""] ?? "#879D87");
+        setIsDark(data.IS_DARKMODE === "Y");
+      }
+
+      if (footer.status === "fulfilled" && footer.value.data.success) {
+        setPhone(footer.value.data.data.companyInfo?.phone?.trim() || "");
       }
     };
-    fetchNavSettings();
+    void fetchSettings();
+    return () => controller.abort();
   }, []);
 
+  /* [2] 사용자의 스크롤 방향을 감지한다. 잦은 깜빡임을 막기 위해 임계값을 둔다. */
   useEffect(() => {
-    const fetchThemeSetting = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/tone",
-        );
-        if (response.data.success) {
-          const dbData = response.data.data;
-          setThemeColor(
-            dbData.PRIMARY_TONE === "PINK"
-              ? "#e83e8c"
-              : dbData.PRIMARY_TONE === "GREEN"
-                ? "#1b4d3e"
-                : "#4e73df",
-          );
-          setIsDark(dbData.IS_DARKMODE === "Y");
-        }
-      } catch (error) {
-        console.error("테마 설정 불러오기 실패: ", error);
-      }
+    previousY.current = window.scrollY;
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      const difference = currentY - previousY.current;
+      setScrolled(currentY > 45);
+      if (currentY < 120 || menuOpen) setHidden(false);
+      else if (difference > 7) setHidden(true);
+      else if (difference < -7) setHidden(false);
+      previousY.current = currentY;
     };
-    fetchThemeSetting();
-  }, []);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [menuOpen]);
 
-  const bgColor = isDark ? "#1a1a1a" : "#fff";
-  const textColor = isDark ? "#fff" : "#333";
+  /* [3] 페이지가 바뀔 때 열린 모바일 메뉴를 자동으로 닫는다. */
+  useEffect(() => {
+    // URL 이동 결과로 모바일 메뉴가 열린 채 남지 않게 정리한다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMenuOpen(false);
+  }, [pathname]);
+
+  /* [4] 모바일 메뉴를 열면 GSAP으로 메뉴가 아래에서 차례로 올라온다. */
+  useEffect(() => {
+    const panel = mobilePanelRef.current;
+    if (!panel || !menuOpen) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        "[data-mobile-item]",
+        { y: 32, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.075,
+          ease: "power3.out",
+        },
+      );
+    }, panel);
+    return () => context.revert();
+  }, [menuOpen]);
+
+  /* [5] 모바일 메뉴가 열렸을 때 배경 페이지가 뒤에서 움직이지 않도록 한다. */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = oldOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen, closeMenu]);
+
+  const isActive = (url: string) => {
+    if (!url || url === "/") return false;
+    const clean = url.replace(/\/$/, "");
+    return pathname === clean || pathname.startsWith(`${clean}/`);
+  };
+  const phoneLink = phoneHref(phone);
 
   return (
     <>
       <S.HeaderWrapper
-        $isHide={hide}
-        style={{
-          backgroundColor: bgColor,
-          color: textColor,
-          borderColor: bgColor,
-        }}
+        $hidden={hidden && !menuOpen}
+        $transparent={transparent}
+        $dark={isDark}
+        $accent={accent}
       >
         <S.HeaderInner>
-          {/* 로고 영역 */}
           <S.LogoGroup>
-            <Link href="/">
-              {logoType === "TEXT" ? (
-                <S.Logo style={{ color: textColor }}>{logoText}</S.Logo>
+            <Link href="/" onClick={closeMenu} aria-label="Ahn's 홈페이지">
+              {logoType === "IMAGE" && logoFileName ? (
+                <S.LogoImageBox>
+                  <Image
+                    src={`${API_URL}/images/${encodeURIComponent(logoFileName)}`}
+                    alt={logoText || "Ahn's"}
+                    fill
+                    sizes="(max-width: 768px) 130px, 180px"
+                    style={{ objectFit: "contain" }}
+                  />
+                </S.LogoImageBox>
               ) : (
-                <S.LogoImg
-                  src={`http://localhost:4000/images/${logoFileName}`}
-                  alt="성형외과 웹사이트 로고"
-                />
+                <S.Logo>{logoText}</S.Logo>
               )}
             </Link>
           </S.LogoGroup>
 
-          {/* 메인 네비게이션 영역 */}
-          <S.NavGroup>
-            {menus.map((menu, index) => (
-              <Link href={menu.url || "/"} key={menu.id}>
-                <S.NavItem $active={index === 1} style={{ color: textColor }}>
-                  {menu.name}
-                </S.NavItem>
-              </Link>
+          <S.NavGroup aria-label="주 메뉴">
+            {menus.map((menu) => (
+              <S.NavLink
+                as={Link}
+                key={menu.id}
+                href={safeHref(menu.url)}
+                $active={isActive(menu.url)}
+                aria-current={isActive(menu.url) ? "page" : undefined}
+              >
+                {menu.name}
+              </S.NavLink>
             ))}
           </S.NavGroup>
 
-          {/* 유틸리티 영역 */}
           <S.UtilGroup>
             <S.DesktopOnly>
-              <S.PhoneButton
-                href="tel:02-932-2222"
-                style={{
-                  backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                  color: textColor,
-                  borderColor: isDark ? "#444" : "#ddd",
-                }}
-              >
-                TEL.<span>02.932.2222</span>
-              </S.PhoneButton>
-              <S.CtaButtton
-                style={{
-                  backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                  color: textColor,
-                  borderColor: isDark ? "#444" : "#ddd",
-                }}
-              >
-                상담예약
-              </S.CtaButtton>
-              <S.IconButton
-                aria-label="Language"
-                style={{
-                  backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                  color: textColor,
-                  borderColor: isDark ? "#444" : "#ddd",
-                }}
-              >
-                <GlobeIcon />
-              </S.IconButton>
-              <S.IconButton
-                aria-label="My page"
-                style={{
-                  backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                  color: textColor,
-                  borderColor: isDark ? "#444" : "#ddd",
-                }}
-              >
-                <Link href="/register/login">
-                  <UserIcon />
-                </Link>
-              </S.IconButton>
+              {phoneLink && (
+                <S.PhoneButton href={phoneLink}>
+                  <span>CONTACT</span> {phone}
+                </S.PhoneButton>
+              )}
+              <S.CtaButton as={Link} href={contactHref}>
+                상담문의 <span aria-hidden="true">↗</span>
+              </S.CtaButton>
+              <S.IconLink as={Link} href="/register/login" aria-label="로그인">
+                LOGIN <span aria-hidden="true">↗</span>
+              </S.IconLink>
             </S.DesktopOnly>
-            {/* 모바일 화면에만 나타나는 요소들 */}
-            <S.MobilePillButton
-              style={{
-                backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                color: textColor,
-                borderColor: isDark ? "#444" : "#ddd",
-              }}
-            >
-              Men's
-            </S.MobilePillButton>
-            <S.MobilePillButton
-              style={{
-                backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                color: textColor,
-                borderColor: isDark ? "#444" : "#ddd",
-              }}
-            >
-              breast
-            </S.MobilePillButton>
 
-            <S.HamburgerButton aria-label="Mobile Menu">
-              <span style={{ backgroundColor: textColor }}></span>
-              <span style={{ backgroundColor: textColor }}></span>
-              <span style={{ backgroundColor: textColor }}></span>
+            <S.MobileContactLink
+              as={Link}
+              href={contactHref}
+              onClick={closeMenu}
+            >
+              CONTACT ↗
+            </S.MobileContactLink>
+            <S.HamburgerButton
+              type="button"
+              $open={menuOpen}
+              aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+              aria-expanded={menuOpen}
+              aria-controls="ahns-mobile-navigation"
+              onClick={() => setMenuOpen((previous) => !previous)}
+            >
+              <span />
+              <span />
             </S.HamburgerButton>
           </S.UtilGroup>
         </S.HeaderInner>
       </S.HeaderWrapper>
+
+      <S.MobileMenuOverlay
+        id="ahns-mobile-navigation"
+        ref={mobilePanelRef}
+        $open={menuOpen}
+        $dark={isDark}
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
+      >
+        <S.MobileMenuInner>
+          <S.MobileMenuCaption data-mobile-item>
+            EXPLORE AHN&apos;S
+          </S.MobileMenuCaption>
+          <S.MobileNav aria-label="모바일 주 메뉴">
+            {menus.map((menu, index) => (
+              <S.MobileNavLink
+                as={Link}
+                key={menu.id}
+                href={safeHref(menu.url)}
+                onClick={closeMenu}
+                data-mobile-item
+              >
+                <span className="number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{menu.name}</span>
+                <span className="arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </S.MobileNavLink>
+            ))}
+          </S.MobileNav>
+          <S.MobileMenuFooter data-mobile-item>
+            {phoneLink && <a href={phoneLink}>{phone}</a>}
+            <Link href="/register/login" onClick={closeMenu}>
+              LOGIN ↗
+            </Link>
+            <Link href={contactHref} onClick={closeMenu}>
+              CONTACT ↗
+            </Link>
+          </S.MobileMenuFooter>
+        </S.MobileMenuInner>
+      </S.MobileMenuOverlay>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
 
-import { FlexBetween } from "../css/Common.styles";
+import { FlexBetween } from "../Common.styles";
 
 export const Wrapper = styled.div`
   width: 100%;

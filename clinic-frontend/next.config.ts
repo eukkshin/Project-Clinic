@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
   },
+  turbopack: {
+    root: './', // 또는 실제 프로젝트 루트 경로 지정
+  },
 };
 
 export default nextConfig;

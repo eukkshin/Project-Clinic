@@ -1,83 +1,193 @@
 import styled from "styled-components";
 
-export const MAIN_COLOR = "#f2f4f6"; // 토스 특유의 연한 그레이시 배경 (클릭/활성 시)
-export const POINT_COLOR = "#3182f6"; // 토스 블루 또는 원하시는 포인트 (여기는 차분한 핑크/로즈 계열로 살짝 변형하거나 토스 블루 선택 가능. 핑크를 유지하되 세련되게!)
-export const BRAND_ROSE = "#ff4f8b"; // 촌스럽지 않은 쨍하고 트렌디한 비비드 핑크
-export const TEXT_MAIN = "#191f28"; // 토스 메인 텍스트 (진한 차콜)
-export const TEXT_SUB = "#8b95a1";  // 토스 서브 텍스트 (연한 그레이)
-export const BORDER_COLOR = "#e5e8eb";
-
-export const AccordionContainer = styled.div`
-  width: 100%;
-  background-color: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  border: 1px solid ${BORDER_COLOR};
+export const QnAShell = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(60px, 8vw, 120px) clamp(20px, 4vw, 40px);
+  color: #283c2d;
 `;
 
-export const ItemContainer = styled.div`
-  border-bottom: 1px solid ${BORDER_COLOR};
-  &:last-child {
-    border-bottom: none;
+// 상단 타이틀 영역
+export const QnAHeader = styled.div`
+  margin-bottom: 50px;
+  text-align: center;
+`;
+
+export const QnAKicker = styled.p`
+  font-size: 11px;
+  color: #6d896f;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+`;
+
+export const QnATitle = styled.h2`
+  font: 400 clamp(32px, 4vw, 48px)/1.15 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.04em;
+  color: #284b37;
+  margin: 0;
+
+  em {
+    font-style: italic;
+    font-weight: 400;
+    color: #6d896f;
   }
 `;
 
-// 아코디언 타이틀
-export const Header = styled.div<{ $isOpen: boolean }>`
-  padding: 22px 24px;
-  background-color: ${({$isOpen})=> $isOpen ? '#eee' : '#fff'};
-  color: ${TEXT_MAIN};
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: -0.3px;
+export const TabContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+`;
+
+export const TabButton = styled.button<{ $active: boolean }>`
+  min-height: 42px;
+  padding: 0 20px;
+  border-radius: 21px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  
+  border: 1px solid ${({ $active }) => ($active ? "#284b37" : "#dfe7dd")};
+  background: ${({ $active }) => ($active ? "#284b37" : "#f9faf6")};
+  color: ${({ $active }) => ($active ? "#f7f7ef" : "#566e5a")};
 
   &:hover {
-    background-color: #fafbfc;
+    border-color: #284b37;
+    background: ${({ $active }) => ($active ? "#284b37" : "#f0f4ee")};
+  }
+
+  &:focus-visible {
+    outline: 2px solid #6d896f;
+    outline-offset: 2px;
   }
 `;
 
-export const QuestionText = styled.div`
+export const AccordionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid #dfe7dd;
+  border-bottom: 1px solid #dfe7dd;
+  padding: 24px 0;
+`;
+
+export const ItemContainer = styled.div<{ $isOpen: boolean }>`
+  border: 1px solid ${({ $isOpen }) => ($isOpen ? "#8daa91" : "#e1e8de")};
+  border-radius: 12px;
+  background: ${({ $isOpen }) => ($isOpen ? "#fffefa" : "#fbfcf9")};
+  transition: all 0.25s ease;
+  overflow: hidden;
+  box-shadow: ${({ $isOpen }) => 
+    $isOpen ? "0 10px 30px rgba(40, 75, 55, 0.05)" : "none"};
+
+  &:hover {
+    border-color: #8daa91;
+  }
+`;
+
+export const AccordionHeader = styled.button<{$isOpen: boolean}>`
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: space-between;
+  padding: 22px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 16px;
 
-  .q-mark {
-    color: #ff4f8b;
-    font-weight: 700;
+  &:focus-visible {
+    outline: 2px solid #6d896f;
+    outline-offset: -2px;
   }
 `;
 
-export const ArrowIcon = styled.span<{ $isOpen: boolean }>`
-  font-size: 12px;
-  color: ${TEXT_SUB};
-  transform: ${({ $isOpen }) => ($isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+export const QuestionTitleWrapper = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
 `;
 
-// 아코디언 내용 바디
-export const Body = styled.div`
-  padding: 0 24px 24px 24px;
-  background-color: #fff;
-  color: #4e5968;
+export const QPrefix = styled.span`
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+  color: #6d896f;
+  flex-shrink: 0;
+  line-height: 1.4;
+`;
+
+export const QuestionText = styled.span`
   font-size: 15px;
-  line-height: 1.65;
-  letter-spacing: -0.2px;
-  white-space: pre-line; // 줄바꿈 적용
+  font-weight: 500;
+  color: #283c2d;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  word-break: keep-all;
+`;
+
+export const ToggleIcon = styled.span<{ $isOpen: boolean }>`
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: ${({ $isOpen }) => ($isOpen ? "#284b37" : "#edf2eb")};
+  color: ${({ $isOpen }) => ($isOpen ? "#f7f7ef" : "#566e5a")};
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, background 0.2s, color 0.2s;
+  /* transform: rotate(${({ $isOpen }) => ($isOpen ? "180deg" : "0deg")}); */
+`;
+
+export const AccordionBody = styled.div<{ $isOpen: boolean }>`
+  display: grid;
+  grid-template-rows: ${({ $isOpen }) => ($isOpen ? "1fr" : "0fr")};
+  transition: grid-template-rows 0.3s ease;
+`;
+
+export const AccordionBodyInner = styled.div`
+  overflow: hidden;
+`;
+
+export const AnswerContent = styled.div`
+  padding: 0 24px 26px 24px;
+  display: flex;
+  gap: 14px;
+  border-top: 1px solid rgba(223, 231, 221, 0.6);
+  padding-top: 20px;
+  margin: 0 24px;
+`;
+
+export const APrefix = styled.span`
+  font-family: Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 600;
+  color: #284b37;
+  flex-shrink: 0;
+  line-height: 1.6;
 `;
 
 export const AnswerText = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 30px;
-
-  .a-mark {
-    color: ${TEXT_SUB};
-    font-weight: 400;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: #526555;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+  
+  p {
+    margin: 0 0 10px;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 `;

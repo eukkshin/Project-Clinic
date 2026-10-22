@@ -10,6 +10,7 @@ import {
   FiFeather,
   FiFilm,
   FiGrid,
+  FiHelpCircle,
   FiLayers,
   FiLayout,
   FiLogOut,
@@ -106,7 +107,7 @@ export default function AdminLayout({
             $isCollapsed={isCollapsed}
             onClick={() => router.push("/admin/consultations")}
           >
-            <FiMessageSquare size={20} />
+            <FiHelpCircle size={20} />
             {!isCollapsed && <span>상담신청관리</span>}
           </S.AdminNavItem>
 
@@ -188,6 +189,14 @@ export default function AdminLayout({
           >
             <FiLayout size={20} />
             {!isCollapsed && <span>푸터관리</span>}
+          </S.AdminNavItem>
+
+          <S.AdminNavItem
+            $isCollapsed={isCollapsed}
+            onClick={() => router.push("/admin/qna")}
+          >
+            <FiMessageSquare size={20} />
+            {!isCollapsed && <span>Q&A관리</span>}
           </S.AdminNavItem>
 
           <S.SidebarTogglerWrapper>

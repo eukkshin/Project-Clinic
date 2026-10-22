@@ -12,7 +12,7 @@ interface AdminSidebarProps {
 
 export const AdminContainer = styled.div`
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
 `;
 

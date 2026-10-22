@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
-import * as S from './Accordion.style'
-import {  FiChevronDown } from "react-icons/fi";
-
+import * as S from './Accordion.style';
+import { FiChevronDown } from "react-icons/fi";
 
 interface AccordionProps {
     defaultOpenId?: string | null; // 처음에 열릴 id 지정
@@ -55,11 +54,13 @@ export const useAccordionItemContext = () => {
     return id;
 };
 
-// 아이템 = props로 id 받음
 export function Item({ id, children }: ItemProps) {
+    const { openId } = useAccordionContext();
+    const isOpen = openId === id;
+    
     return (
         <AccordionItemContext.Provider value={id}>
-            <S.ItemContainer>{children}</S.ItemContainer>
+            <S.ItemContainer $isOpen={isOpen}>{children}</S.ItemContainer>
         </AccordionItemContext.Provider>
     );
 }
@@ -68,23 +69,25 @@ interface TitleProps {
     children: React.ReactNode;
 }
 
-// 제목
 export function Title({ children }: TitleProps) {
     const id = useAccordionItemContext();
     const { openId, toggleItem } = useAccordionContext();
     const isOpen = openId === id;
 
     return (
-        <S.Header $isOpen={isOpen} onClick={() => toggleItem(id)}>
-            <S.QuestionText>
-                <span className="q-mark">Q.</span> <span>{children}</span>
-            </S.QuestionText>
-            <S.ArrowIcon $isOpen={isOpen}><FiChevronDown size={15}/></S.ArrowIcon>
-        </S.Header>
+        <S.AccordionHeader $isOpen={isOpen} onClick={() => toggleItem(id)}>
+            <S.QuestionTitleWrapper>
+                <S.QPrefix>Q.</S.QPrefix>
+                <S.QuestionText>{children}</S.QuestionText>
+            </S.QuestionTitleWrapper>
+            <S.ToggleIcon $isOpen={isOpen}>
+                {/* <FiChevronDown size={15} /> */}
+                {isOpen? "-" : "+"}
+            </S.ToggleIcon>
+        </S.AccordionHeader>
     );
 }
 
-// 내용
 interface ContentProps {
     children: React.ReactNode;
 }
@@ -94,20 +97,20 @@ export function Content({ children }: ContentProps) {
     const { openId } = useAccordionContext();
     const isOpen = openId === id;
 
-    if (!isOpen) return null;
-
     return (
-        <S.Body>
-            <S.AnswerText>
-                <span className="a-mark">A.</span>
-                <span>{children}</span>
-            </S.AnswerText>
-        </S.Body>
-    )
+        <S.AccordionBody $isOpen={isOpen}>
+            <S.AccordionBodyInner>
+                <S.AnswerContent>
+                    <S.APrefix>A.</S.APrefix>
+                    <S.AnswerText>
+                        {children}
+                    </S.AnswerText>
+                </S.AnswerContent>
+            </S.AccordionBodyInner>
+        </S.AccordionBody>
+    );
 }
 
 Accordion.Item = Item;
 Accordion.Title = Title;
 Accordion.Content = Content;
-
-

@@ -4,10 +4,13 @@ import axios from "axios";
 import gsap from "gsap";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import * as S from "@/assets/css/components/Header.styles";
+
+import AccountDropdown from "./dropdown/AccountDropdown";
+import HeaderNavDropdown from "./dropdown/HeaderNavDropdown";
 
 /*
  * Header.tsx — Premium Ahn's Navigation
@@ -31,6 +34,7 @@ interface MenuItem {
   id: number;
   name: string;
   url: string;
+  children?: { name: string; url: string }[];
 }
 interface NavSettings {
   LOGO_TYPE?: "TEXT" | "IMAGE";
@@ -71,6 +75,7 @@ function phoneHref(phone: string) {
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const isHome = pathname === "/";
 
   const [logoType, setLogoType] = useState<"TEXT" | "IMAGE">("TEXT");
@@ -84,6 +89,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // 로그인 API에서 받은 userName을 localStorage에 저장하는 기존 방식과 연결
+  const [userName, setUserName] = useState<string | null>(null);
 
   const previousY = useRef(0);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
@@ -91,6 +98,29 @@ export default function Header() {
   const contactHref = isHome ? "#site-footer-contact" : "/#site-footer-contact";
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  useEffect(() => {
+    const syncUserName = () => {
+      setUserName(window.localStorage.getItem("userName")?.trim() || null);
+    };
+    syncUserName();
+    window.addEventListener("login-success", syncUserName);
+    window.addEventListener("logout-success", syncUserName);
+    window.addEventListener("storage", syncUserName);
+    return () => {
+      window.removeEventListener("login-success", syncUserName);
+      window.removeEventListener("logout-success", syncUserName);
+      window.removeEventListener("storage", syncUserName);
+    };
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    window.localStorage.removeItem("userName");
+    setUserName(null);
+    setMenuOpen(false);
+    window.dispatchEvent(new Event("logout-success"));
+    router.push("/");
+  }, [router]);
 
   /* [1] 관리자 설정을 네트워크에서 가져온다. 서로 독립적이므로 Promise.allSettled 사용. */
   useEffect(() => {
@@ -124,14 +154,29 @@ export default function Header() {
               ? JSON.parse(data.MENUS)
               : data.MENUS;
           if (Array.isArray(parsed)) {
-            const valid = parsed.filter(
-              (item): item is MenuItem =>
-                item !== null &&
-                typeof item === "object" &&
-                typeof item.id === "number" &&
-                typeof item.name === "string" &&
-                typeof item.url === "string",
-            );
+            const valid = parsed
+              .filter(
+                (item): item is MenuItem =>
+                  item !== null &&
+                  typeof item === "object" &&
+                  typeof item.id === "number" &&
+                  typeof item.name === "string" &&
+                  typeof item.url === "string",
+              )
+              .map((item) => ({
+                id: item.id,
+                name: item.name,
+                url: item.url,
+                children: Array.isArray(item.children)
+                  ? item.children.filter(
+                      (child) =>
+                        child !== null &&
+                        typeof child === "object" &&
+                        typeof child.name === "string" &&
+                        typeof child.url === "string",
+                    )
+                  : [],
+              }));
             if (valid.length) setMenus(valid);
           }
         } catch (error) {
@@ -254,15 +299,17 @@ export default function Header() {
 
           <S.NavGroup aria-label="주 메뉴">
             {menus.map((menu) => (
-              <S.NavLink
-                as={Link}
-                key={menu.id}
-                href={safeHref(menu.url)}
-                $active={isActive(menu.url)}
-                aria-current={isActive(menu.url) ? "page" : undefined}
-              >
-                {menu.name}
-              </S.NavLink>
+              <HeaderNavDropdown
+                key={`${pathname}-${menu.id}`}
+                menu={menu}
+                active={
+                  isActive(menu.url) ||
+                  Boolean(menu.children?.some((child) => isActive(child.url)))
+                }
+                pathname={pathname}
+                transparent={transparent}
+                dark={isDark}
+              />
             ))}
           </S.NavGroup>
 
@@ -276,9 +323,17 @@ export default function Header() {
               <S.CtaButton as={Link} href={contactHref}>
                 상담문의 <span aria-hidden="true">↗</span>
               </S.CtaButton>
-              <S.IconLink as={Link} href="/register/login" aria-label="로그인">
-                LOGIN <span aria-hidden="true">↗</span>
-              </S.IconLink>
+              {userName ? (
+                <AccountDropdown userName={userName} onLogout={handleLogout} />
+              ) : (
+                <S.IconLink
+                  as={Link}
+                  href="/register/login"
+                  aria-label="로그인"
+                >
+                  LOGIN <span aria-hidden="true">↗</span>
+                </S.IconLink>
+              )}
             </S.DesktopOnly>
 
             <S.MobileContactLink
@@ -336,9 +391,19 @@ export default function Header() {
           </S.MobileNav>
           <S.MobileMenuFooter data-mobile-item>
             {phoneLink && <a href={phoneLink}>{phone}</a>}
-            <Link href="/register/login" onClick={closeMenu}>
-              LOGIN ↗
-            </Link>
+            {userName ? (
+              <AccountDropdown
+                key={menuOpen ? "mobile-menu-open" : "mobile-menu-closed"}
+                mobile
+                userName={userName}
+                onLogout={handleLogout}
+                onNavigate={closeMenu}
+              />
+            ) : (
+              <Link href="/register/login" onClick={closeMenu}>
+                LOGIN ↗
+              </Link>
+            )}
             <Link href={contactHref} onClick={closeMenu}>
               CONTACT ↗
             </Link>

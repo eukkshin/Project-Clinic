@@ -97,7 +97,9 @@ export const LogoImageBox = styled.div`
 export const NavGroup = styled.nav`
   display: flex;
   align-items: center;
+  height: 100%;
   gap: clamp(18px, 2.1vw, 38px);
+
   @media (max-width: 1200px) {
     display: none;
   }

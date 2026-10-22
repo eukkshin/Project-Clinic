@@ -7,6 +7,15 @@ import VlogSafetyFlow from "@/components/main/VlogSafetyFlow";
 import { VlogSlider } from "@/components/main/VlogSlider";
 import RollingBanner from "@/components/RollingBanner";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    template: "Ahn's | %s",
+    default: "Ahn's 성형외과",
+  },
+  description: "안전을 위한 섬세한 과정을 시작하세요.",
+};
 /**
  * 전체 메인페이지는 Server Component로 유지한다.
  *

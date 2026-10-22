@@ -157,8 +157,8 @@ export const SlideContent = styled.div<{ $withRollingBanner?: boolean }>`
       h1 {
         font-size: clamp(34px, 4.2vw, 76px);
       }
-      [data-hero-description],
-      [data-hero-explore] {
+
+      [data-hero-description] {
         display: none;
       }
     `}

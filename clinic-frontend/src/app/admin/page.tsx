@@ -90,13 +90,13 @@ export default function LoginPage() {
       <S.LoginWrapper>
         <S.LeftSection>
           <S.LoginHeader>
-            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.LeftTitle>Ahn's.</S.LeftTitle>
             <S.Divider />
             <S.LoginDescription>
-              관리자 전용 페이지입니다. <br />
+              운영을 위한 단정하고 명확한 공간. <br />
               <small>
-                허가되지 않은 접근은 제한되며, 모든 시스템 접속 및 활동 내역은
-                보안 로그에 기록됩니다.
+                관리자 계정으로 로그인하여 회원, 상담 및 사이트 콘텐츠를
+                관리하세요.
               </small>
             </S.LoginDescription>
           </S.LoginHeader>
@@ -104,46 +104,55 @@ export default function LoginPage() {
         <S.RightSection>
           <S.LoginCard>
             <S.LoginHeader>
+              <span
+                style={{
+                  color: "#7c987f",
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: ".16em",
+                }}
+              >
+                SECURE ACCESS
+              </span>
               <S.LoginTitle>관리자 로그인</S.LoginTitle>
+              <p style={{ margin: 0, color: "#809084", fontSize: 12 }}>
+                관리 시스템 이용을 위해 계정 정보를 입력해주세요.
+              </p>
             </S.LoginHeader>
             <S.LoginForm onSubmit={handleLogin}>
               <S.LoginCol>
                 <S.LoginInput
                   type="text"
                   name="userId"
+                  id="userId"
+                  autoComplete="username"
                   placeholder=""
                   value={formData.userId}
                   onChange={handleChange}
                 />
-                <label htmlFor="userId">Enter User ID...</label>
+                <label htmlFor="userId">관리자 아이디</label>
               </S.LoginCol>
               <S.LoginCol>
                 <S.LoginInput
                   type="password"
                   name="userPw"
+                  id="password"
+                  autoComplete="current-password"
                   placeholder=""
                   value={formData.userPw}
                   onChange={handleChange}
                 />
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">비밀번호</label>
               </S.LoginCol>
 
-              <S.CheckboxGroup>
-                <S.CheckboxInput type="checkbox" id="customCheck" />
-                <S.CheckboxLabel htmlFor="customCheck">
-                  Remember Me
-                </S.CheckboxLabel>
-              </S.CheckboxGroup>
-
-              <S.LoginButton type="submit">Login</S.LoginButton>
+              <S.LoginButton type="submit">관리자 로그인</S.LoginButton>
             </S.LoginForm>
 
             <S.Divider />
 
             <S.LinkGroup>
-              <S.StyledLink>Forgot Password?</S.StyledLink>
               <S.StyledLink onClick={() => router.push("/register/terms")}>
-                Create an Account!
+                일반 회원가입
               </S.StyledLink>
             </S.LinkGroup>
           </S.LoginCard>

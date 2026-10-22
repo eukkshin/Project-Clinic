@@ -130,8 +130,8 @@ export const UserTable = styled.table`
 // 상태 표시 배지 (정상: 초록색, 정지: 빨간색)
 export const UserStatusBadge = styled.span<{ $status: string }>`
   background-color: ${(props) =>
-    props.$status === "정상" ? "#1cc88a" : "#e74a3b"};
-  color: white;
+    props.$status === "정상" ? "#e2f1e5" : "#fcebe8"};
+  color: #2d6040;
   padding: 0.3rem 0.6rem;
   border-radius: 1rem;
   font-size: 0.8rem;
@@ -152,7 +152,7 @@ export const UserStatusBadge = styled.span<{ $status: string }>`
 export const UserDeleteActionBtn = styled.button`
   background: transparent;
   border: none;
-  color: #e74a3b;
+  color: #fcebe8;
   cursor: pointer;
   ${FlexCenter}
   ${TransitionAll};

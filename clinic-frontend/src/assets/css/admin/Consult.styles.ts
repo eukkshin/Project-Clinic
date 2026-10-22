@@ -199,8 +199,8 @@ interface ConsultStatusBadgeProps {
 }
 export const ConsultStatusBadge = styled.span<ConsultStatusBadgeProps>`
   background-color: ${(props) =>
-    props.$status === "대기중" ? "#b78103" : "#1a73e8"};
-  color: white;
+    props.$status === "대기중" ? "#f7ecd7" : "#e0eddf"};
+  color: #355a40;
   padding: 0.3rem 0.6rem;
   border-radius: 1rem;
   font-size: 0.8rem;

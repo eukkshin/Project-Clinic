@@ -152,21 +152,30 @@ export default function News() {
   return (
     <>
       <S.NewsContainer>
-        <S.NewsPageHeader>
-          <S.NewsPageTitle>원형 카테고리 아이콘 관리</S.NewsPageTitle>
-          <S.NewsSaveButton onClick={handleSave}>
+        <S.NewsPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / CATEGORIES</span>
+            <S.NewsPageTitle>원형 카테고리 아이콘 관리</S.NewsPageTitle>
+            <p className="admin-page-description">
+              홈페이지에 노출되는 카테고리 요소를 관리합니다.
+            </p>
+          </div>
+          <S.NewsSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.NewsSaveButton>
         </S.NewsPageHeader>
 
-        <S.NewsGrid>
-          <S.NewsLeftColumn>
-            <S.NewsCard>
-              <S.NewsCardHeader>
+        <S.NewsGrid className="admin-page-grid">
+          <S.NewsLeftColumn className="admin-editor-column">
+            <S.NewsCard className="admin-panel">
+              <S.NewsCardHeader className="admin-panel-head">
                 <S.NewsCardTitle>새 카테고리 아이콘 등록</S.NewsCardTitle>
               </S.NewsCardHeader>
-              <S.NewsCardBody>
-                <S.NewsFormGroup>
+              <S.NewsCardBody className="admin-panel-body">
+                <S.NewsFormGroup className="admin-form-field">
                   <S.NewsLabel>카테고리명 (예: 눈, 코, 가슴)</S.NewsLabel>
                   <S.NewsInput
                     type="text"
@@ -178,7 +187,7 @@ export default function News() {
                   />
                 </S.NewsFormGroup>
 
-                <S.NewsFormGroup>
+                <S.NewsFormGroup className="admin-form-field">
                   <S.NewsLabel>원형 썸네일 이미지</S.NewsLabel>
                   <S.NewsFileInputWrapper>
                     <S.NewsFileInput
@@ -211,7 +220,7 @@ export default function News() {
                   )}
                 </S.NewsFormGroup>
 
-                <S.NewsFormGroup>
+                <S.NewsFormGroup className="admin-form-field">
                   <S.NewsLabel>클릭 시 이동할 링크 URL (선택)</S.NewsLabel>
                   <S.NewsInput
                     type="text"
@@ -223,22 +232,25 @@ export default function News() {
                   />
                 </S.NewsFormGroup>
 
-                <S.NewsAddButton onClick={handleAddCategory}>
+                <S.NewsAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddCategory}
+                >
                   <FiPlus size={18} /> 리스트에 추가하기
                 </S.NewsAddButton>
               </S.NewsCardBody>
             </S.NewsCard>
           </S.NewsLeftColumn>
 
-          <S.NewsRightColumn>
-            <S.NewsCard style={{ height: "100%" }}>
-              <S.NewsCardHeader>
+          <S.NewsRightColumn className="admin-record-column">
+            <S.NewsCard className="admin-panel" style={{ height: "100%" }}>
+              <S.NewsCardHeader className="admin-panel-head">
                 <S.NewsCardTitle>
                   현재 노출중인 아이콘 (총 {categories.length}개)
                 </S.NewsCardTitle>
               </S.NewsCardHeader>
-              <S.NewsTableWrapper>
-                <S.NewsTable>
+              <S.NewsTableWrapper className="admin-table-scroll">
+                <S.NewsTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th>순서 변경</th>
@@ -259,12 +271,14 @@ export default function News() {
                             }}
                           >
                             <S.NewsActionBtn
+                              className="admin-icon-action"
                               onClick={() => moveCategory(index, "UP")}
                               disabled={index === 0}
                             >
                               <FiArrowUp size={16} />
                             </S.NewsActionBtn>
                             <S.NewsActionBtn
+                              className="admin-icon-action"
                               onClick={() => moveCategory(index, "DOWN")}
                               disabled={index === categories.length - 1}
                             >
@@ -297,7 +311,10 @@ export default function News() {
                           </div>
                         </td>
                         <td>
-                          <S.NewsDeleteBtn onClick={() => handleDelete(cat.id)}>
+                          <S.NewsDeleteBtn
+                            className="admin-delete-action"
+                            onClick={() => handleDelete(cat.id)}
+                          >
                             <FiTrash2 size={16} />
                           </S.NewsDeleteBtn>
                         </td>

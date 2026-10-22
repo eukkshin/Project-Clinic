@@ -160,23 +160,32 @@ export default function Safety() {
   return (
     <>
       <S.AdminSafetyContainer>
-        <S.AdminSafetyPageHeader>
-          <S.AdminSafetyPageTitle>안전 시스템 관리</S.AdminSafetyPageTitle>
-          <S.AdminSafetySaveButton onClick={handleSave}>
+        <S.AdminSafetyPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CONTENT / SAFETY</span>
+            <S.AdminSafetyPageTitle>안전 시스템 관리</S.AdminSafetyPageTitle>
+            <p className="admin-page-description">
+              안전·마취 관련 소개 콘텐츠를 관리합니다.
+            </p>
+          </div>
+          <S.AdminSafetySaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.AdminSafetySaveButton>
         </S.AdminSafetyPageHeader>
 
-        <S.AdminSafetyGrid>
-          <S.AdminSafetyLeftColumn>
-            <S.AdminSafetyCard>
-              <S.AdminSafetyCardHeader>
+        <S.AdminSafetyGrid className="admin-page-grid">
+          <S.AdminSafetyLeftColumn className="admin-editor-column">
+            <S.AdminSafetyCard className="admin-panel">
+              <S.AdminSafetyCardHeader className="admin-panel-head">
                 <S.AdminSafetyCardTitle>
                   새 장비/시스템 등록
                 </S.AdminSafetyCardTitle>
               </S.AdminSafetyCardHeader>
-              <S.AdminSafetyCardBody>
-                <S.AdminSafetyFormGroup>
+              <S.AdminSafetyCardBody className="admin-panel-body">
+                <S.AdminSafetyFormGroup className="admin-form-field">
                   <S.AdminSafetyLabel>
                     배경 이미지 (정방형 비율 권장)
                   </S.AdminSafetyLabel>
@@ -218,7 +227,7 @@ export default function Safety() {
                   )}
                 </S.AdminSafetyFormGroup>
 
-                <S.AdminSafetyFormGroup>
+                <S.AdminSafetyFormGroup className="admin-form-field">
                   <S.AdminSafetyLabel>
                     타이틀 (예: EtCO2 모니터링)
                   </S.AdminSafetyLabel>
@@ -232,7 +241,7 @@ export default function Safety() {
                   />
                 </S.AdminSafetyFormGroup>
 
-                <S.AdminSafetyFormGroup>
+                <S.AdminSafetyFormGroup className="admin-form-field">
                   <S.AdminSafetyLabel>
                     상세 설명 (카드 하단 노출)
                   </S.AdminSafetyLabel>
@@ -249,22 +258,28 @@ export default function Safety() {
                   />
                 </S.AdminSafetyFormGroup>
 
-                <S.AdminSafetyAddButton onClick={handleAddSafety}>
+                <S.AdminSafetyAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddSafety}
+                >
                   <FiPlus size={18} /> 리스트에 추가
                 </S.AdminSafetyAddButton>
               </S.AdminSafetyCardBody>
             </S.AdminSafetyCard>
           </S.AdminSafetyLeftColumn>
 
-          <S.AdminSafetyRightColumn>
-            <S.AdminSafetyCard style={{ height: "100%" }}>
-              <S.AdminSafetyCardHeader>
+          <S.AdminSafetyRightColumn className="admin-record-column">
+            <S.AdminSafetyCard
+              className="admin-panel"
+              style={{ height: "100%" }}
+            >
+              <S.AdminSafetyCardHeader className="admin-panel-head">
                 <S.AdminSafetyCardTitle>
                   현재 노출 순서 (총 {safetyList.length}개)
                 </S.AdminSafetyCardTitle>
               </S.AdminSafetyCardHeader>
-              <S.AdminSafetyTableWrapper>
-                <S.AdminSafetyTable>
+              <S.AdminSafetyTableWrapper className="admin-table-scroll">
+                <S.AdminSafetyTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th style={{ width: "15%" }}>순위/이동</th>
@@ -296,12 +311,14 @@ export default function Safety() {
                               }}
                             >
                               <S.AdminSafetyActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveSafety(index, "UP")}
                                 disabled={index === 0}
                               >
                                 <FiArrowUp size={14} />
                               </S.AdminSafetyActionBtn>
                               <S.AdminSafetyActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveSafety(index, "DOWN")}
                                 disabled={index === safetyList.length - 1}
                               >
@@ -361,6 +378,7 @@ export default function Safety() {
                         </td>
                         <td>
                           <S.AdminSafetyDeleteBtn
+                            className="admin-delete-action"
                             onClick={() => handleDeleteClick(item.id)}
                           >
                             <FiTrash2 size={16} />

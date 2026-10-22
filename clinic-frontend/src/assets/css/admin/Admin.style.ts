@@ -1,224 +1,203 @@
+"use client";
 import styled from "styled-components";
 
-import { FlexCenter } from "@/assets/css/Common.styles";
-
 export const LoginWrapper = styled.div`
-  background-size: cover;
-  min-height: 100vh;
-  display: flex;
-  background-image: url("/images/findetc/forest.jpg") !important;
-
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(380px, 0.93fr) minmax(470px, 1.07fr);
+  background: #f7f8f4;
+  font-family:
+    Pretendard,
+    "Noto Sans KR",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  @media (max-width: 850px) {
+    grid-template-columns: 1fr;
   }
 `;
-
 export const LeftSection = styled.div`
-  flex: 0.7; /* 부모 너비의 정확히 절반을 차지 */
-  background-image: linear-gradient(
-    135deg,
-    rgba(27, 77, 62, 0.8) 0%,
-    rgba(59, 122, 87, 0.8) 100%
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0.8;
-  ${FlexCenter}
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px clamp(30px, 7vw, 110px);
+  min-height: 100dvh;
+  background:
+    radial-gradient(
+      ellipse at 98% 0,
+      rgba(161, 190, 153, 0.21),
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 0% 100%,
+      rgba(111, 154, 113, 0.19),
+      transparent 48%
+    ),
+    linear-gradient(145deg, #1b3c2e, #102b20);
+  color: #f7f7ef;
+  overflow: hidden;
+  &:after {
+    content: "";
+    position: absolute;
+    inset: 23px;
+    pointer-events: none;
+    border: 1px solid rgba(230, 242, 225, 0.09);
+    border-radius: 22px;
+  }
+  @media (max-width: 850px) {
+    min-height: 230px;
+    padding: 48px 30px;
+  }
 `;
-
-// 3. 오른쪽 구역 (예: 로그인 폼)
 export const RightSection = styled.div`
-  flex: 1.3; /* 부모 너비의 정확히 절반을 차지 */
-  background-color: rgba(27, 77, 62, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  ${FlexCenter}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 65px clamp(22px, 6vw, 92px);
+  background: #f7f8f4;
+  @media (max-width: 850px) {
+    padding: 34px 18px 70px;
+  }
 `;
-
-// 🎯 부드러운 그림자가 들어간 화이트 카드
 export const LoginCard = styled.div`
-  background-color: #fff;
-  border: none;
-  border-radius: 0.35rem;
-  box-shadow: 0 4px 30px -4px rgba(59, 122, 87, 0.25);
-
   width: 100%;
   max-width: 450px;
-  padding: 3rem;
+  padding: clamp(30px, 3.6vw, 48px);
+  background: #fff;
+  border: 1px solid #e1e9e0;
+  border-radius: 19px;
+  box-shadow: 0 18px 55px rgba(27, 65, 40, 0.065);
 `;
-
 export const LoginHeader = styled.div`
-  text-align: center;
-  margin-bottom: 2rem;
+  text-align: left;
+  margin-bottom: 34px;
+  position: relative;
+  z-index: 1;
 `;
-
 export const LeftTitle = styled.h1`
-  font-family: "Times New Roman", serif;
-  font-size: 34px;
-  font-weight: 900;
-  color: #f4fbf7;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.1);
-  margin: 0;
+  margin: 0 0 26px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(54px, 6.2vw, 88px);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+  color: #f7f7ef;
 `;
-
 export const LoginTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #1b4d3e;
-  margin-bottom: 1.5rem;
+  margin: 0 0 12px;
+  color: #1f402e;
+  font-size: clamp(26px, 2.4vw, 32px);
+  letter-spacing: -0.055em;
+  font-weight: 770;
 `;
-
 export const LoginDescription = styled.p`
-  font-size: 16px;
-  color: #a3c6b8;
   margin: 0;
+  color: #e2eae0;
+  font-size: 15px;
+  line-height: 1.8;
+  max-width: 420px;
+  small {
+    display: inline-block;
+    margin-top: 12px;
+    color: #a8c2ad;
+    font-size: 12px;
+    line-height: 1.9;
+  }
 `;
-
 export const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 21px;
 `;
-
 export const LoginCol = styled.div`
   position: relative;
-  flex: 1;
-
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 9px;
   label {
-    position: absolute;
-    left: 1.2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #fff;
-    padding: 0 6px;
-    color: #6e707e;
-    font-size: 0.85rem;
-    font-weight: 400;
-    font-family: Arial, Helvetica, sans-serif;
-    font-style: normal;
-    font-variant: normal;
-    letter-spacing: normal;
-    text-transform: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    letter-spacing: inherit;
-    pointer-events: none;
-    transition: all 0.2s ease-in-out;
-    z-index: 1;
+    color: #506451;
+    font-size: 12px;
+    font-weight: 710;
+    letter-spacing: -0.025em;
   }
 `;
-
-// 🎯 SB Admin 시그니처: 알약(Pill) 형태의 둥근 입력창
 export const LoginInput = styled.input`
   width: 100%;
-  padding: 0.8rem 1.2rem;
-  border: 1px solid #d3d8d2;
-  border-radius: 10rem;
+  min-height: 48px;
+  padding: 12px 15px;
+  background: #fafcf9;
+  border: 1px solid #d9e4d8;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #213f30;
   outline: none;
-  background-color: #fff;
-  transition: all 0.15s ease-in-out;
-
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
   &:focus {
-    border-color: #246652;
-    box-shadow: 0 0 0 0.2rem rgba(59, 122, 87, 0.25);
+    border-color: #5d9070;
+    box-shadow: 0 0 0 3px rgba(61, 127, 79, 0.105);
+    background: #fff;
   }
-
-  &[readonly] {
-    background-color: #eaecf4;
-    cursor: default;
-    user-select: none;
-    &:focus {
-      box-shadow: none;
-    }
-  }
-
-  &:focus + label,
-  &:not(:placeholder-shown) + label {
-    top: -0.11rem;
-    left: 1.5rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #1b4d3e;
-  }
-
-  &:not(:focus):not(:placeholder-shown) + label {
-    color: #6e707e;
+  &::placeholder {
+    color: #9cae9d;
   }
 `;
-
 export const CheckboxGroup = styled.div`
   display: flex;
   align-items: center;
-  padding-left: 0.5rem;
+  gap: 9px;
 `;
-
 export const CheckboxInput = styled.input`
-  margin-right: 0.5rem;
-  accent-color: #1b4d3e;
-  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  accent-color: #2b6344;
 `;
-
 export const CheckboxLabel = styled.label`
-  font-size: 0.8rem;
-  color: #1b4d3e;
+  color: #657b69;
+  font-size: 12px;
   cursor: pointer;
-
-  &:hover {
-    color: #246652;
-  }
 `;
-
-// 🎯 알약(Pill) 형태의 메인 블루 버튼
 export const LoginButton = styled.button`
   width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 0.8rem;
-  border-radius: 10rem;
-  background-color: #1b4d3e;
-  border: 1px solid #1b4d3e;
+  height: 50px;
+  border-radius: 10px;
+  background: #28553b;
+  border: 1px solid #28553b;
   color: #fff;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 760;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-  margin-top: 10px;
-
+  transition: background-color 0.12s ease;
   &:hover {
-    background-color: #246652;
-    border-color: #246652;
+    background: #1c402d;
   }
 `;
-
 export const Divider = styled.hr`
-  margin: 1.5rem 0;
+  width: 100%;
+  margin: 22px 0;
   border: 0;
-  border-top: 1px solid #e3e6f0;
+  border-top: 1px solid rgba(170, 202, 172, 0.25);
 `;
-
 export const LinkGroup = styled.div`
-  text-align: center;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 18px;
 `;
-
 export const StyledLink = styled.a`
-  display: block;
-  width: fit-content;
-  margin: 0 auto;
-  font-size: 0.8rem;
-  color: #1b4d3e;
+  color: #647d6b;
+  font-size: 12px;
   text-decoration: none;
-
   cursor: pointer;
-
   &:hover {
+    color: #235838;
     text-decoration: underline;
-    color: #246652;
   }
 `;
 
 export * from "./Dash.styles";
-
 export * from "../AdminCommon.styles";
 export * from "./Tone.styles";
 export * from "./NavSetting.styles";

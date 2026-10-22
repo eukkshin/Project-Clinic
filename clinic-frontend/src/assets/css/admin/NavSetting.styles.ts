@@ -20,7 +20,7 @@ export const SetNavPageHeader = styled.header`
 
 export const SetNavPageTitle = styled.h2`
   font-size: 1.5rem;
-  color: #5a5c69;
+  color: #34453c;
   font-weight: 700;
   margin: 0;
 `;
@@ -30,7 +30,7 @@ export const SetNavSaveButton = styled.button`
   color: #fff;
   border: none;
   padding: 0.5rem 1.2rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   gap: 0.5rem;
@@ -56,7 +56,7 @@ export const SetNavContentGrid = styled.div`
 `;
 
 export const SetNavCard = styled.div`
-  border-radius: 0.35rem;
+  border-radius: 12px;
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
@@ -65,7 +65,7 @@ export const SetNavCard = styled.div`
 `;
 
 export const SetNavCardHeader = styled.div`
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(59, 122, 87, 0.1);
 `;
@@ -78,7 +78,7 @@ export const SetNavCardTitle = styled.h6`
 
 export const SetNavCardBody = styled.div`
   padding: 1.5rem;
-  color: #858796;
+  color: #738079;
 
   p {
     margin-top: 0;
@@ -103,7 +103,7 @@ interface SetNavRadioLabelProps {
 export const SetNavRadioLabel = styled.div<SetNavRadioLabelProps>`
   border: none;
   padding: 0.6rem 1.5rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   ${FlexCenter}
   gap: 0.5rem;
   flex-direction: column;
@@ -123,16 +123,16 @@ export const SetNavRadioLabel = styled.div<SetNavRadioLabelProps>`
 export const SetNavInputWrapper = styled.div`
   ${FlexCenter};
   gap: 1rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   padding: 1.5rem;
-  border-radius: 0.35rem;
-  border: 1px solid #e3e6f0;
+  border-radius: 12px;
+  border: 1px solid #e4eae5;
 `;
 
 export const SetNavLabel = styled.label`
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5a5c69;
+  color: #34453c;
   white-space: nowrap;
   flex-shrink: 0;
 `;
@@ -143,7 +143,7 @@ export const SetNavInput = styled.input`
   font-size: 0.9rem;
   background-color: #fff;
   border: 1px solid rgba(59, 122, 87, 0.3);
-  border-radius: 0.35rem;
+  border-radius: 12px;
   outline: none;
   ${TransitionAll}
 
@@ -158,8 +158,8 @@ export const SetNavFileInputWrapper = styled.div`
 
   .file-name {
     font-size: 0.9rem;
-    color: #858796;
-    border-bottom: 1px solid #d1d3e2;
+    color: #738079;
+    border-bottom: 1px solid #d6e0d8;
     padding-bottom: 0.5rem;
   }
 `;
@@ -170,17 +170,17 @@ export const SetNavFileInput = styled.input`
 
 export const SetNavFileLabel = styled.label`
   background-color: #fff;
-  border: 1px solid #d1d3e2;
+  border: 1px solid #d6e0d8;
   padding: 0.5rem 1rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #5a5c69;
+  color: #34453c;
   cursor: pointer;
   ${TransitionAll};
 
   &:hover {
-    background-color: #f8f9fc;
+    background-color: #f7f9f7;
   }
 `;
 
@@ -188,10 +188,10 @@ export const SetNavMenuList = styled.div`
   ${FlexCenter};
   gap: 1rem;
   flex-wrap: wrap;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   padding: 1rem;
-  border-radius: 0.35rem;
-  border: 1px solid #e3e6f0;
+  border-radius: 12px;
+  border: 1px solid #e4eae5;
 
   .menu-number {
     font-weight: 900;
@@ -203,9 +203,9 @@ export const SetNavMenuList = styled.div`
 export const SetNavMenuItem = styled.div`
   ${FlexCenter}
   gap: 1rem;
-  background-color: #f8f9fc;
-  border-radius: 0.35rem;
-  border: 1px solid #e3e6f0;
+  background-color: #f7f9f7;
+  border-radius: 12px;
+  border: 1px solid #e4eae5;
   padding: 1rem;
   box-sizing: border-box;
   ${BoxShadow}
@@ -214,7 +214,7 @@ export const SetNavMenuItem = styled.div`
 export const SetNavDeleteButton = styled.button`
   background: transparent;
   border: none;
-  color: #e74a3b;
+  color: #bf6059;
   cursor: pointer;
   ${FlexCenter}
   padding: 0.5rem;
@@ -225,23 +225,23 @@ export const SetNavDeleteButton = styled.button`
   flex-shrink: 0;
 
   &:hover {
-    background-color: #fdeaea;
+    background-color: #fff0ee;
     color: #ff4d4f;
   }
 `;
 
 export const NavAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #5a5c69;
+  color: #34453c;
   padding: 1rem;
   margin-top: 1rem;
   width: 100%;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-weight: 600;
   ${TransitionAll};
   ${FlexCenter}
   gap: 0.5rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   flex-shrink: 0;
   white-space: nowrap;
 

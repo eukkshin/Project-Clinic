@@ -135,12 +135,12 @@ export const BarValue = styled.div`
 export const Bar = styled.div<{ $height: string }>`
   width: 100%;
   height: ${(props) => props.$height};
-  background-color: #4e73df;
+  background-color: #427856;
   border-radius: 0.2rem 0.2rem 0 0;
-  transition: height 0.5s ease;
+  transition: none;
 
   &:hover {
-    background-color: #2e59d9;
+    background-color: #336247;
   }
 `;
 
@@ -155,7 +155,7 @@ export const DonutChart = styled.div`
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: conic-gradient(#4e73df 0% 45%, #1cc88a 45% 75%, #36b9cc 75% 100%);
+  background: conic-gradient(#295c3e 0% 45%, #85aa8b 45% 75%, #cfb890 75% 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -238,7 +238,7 @@ export const Badge = styled.span<{ $active: boolean }>`
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 700;
-  background-color: ${(props) => (props.$active ? "#1cc88a" : "#e74a3b")};
-  color: white;
+  background-color: ${(props) => (props.$active ? "#e6f2e8" : "#fdece9")};
+  color: #315441;
   user-select: none;
 `;

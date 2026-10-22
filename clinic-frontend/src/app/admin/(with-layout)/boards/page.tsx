@@ -126,22 +126,26 @@ export default function Board() {
   return (
     <>
       <S.BoardContainer>
-        <S.BoardPageHeader>
-          <S.BoardPageTitle>게시판 관리</S.BoardPageTitle>
-          <S.BoardSaveButton onClick={handleSave}>
+        <S.BoardPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CONTENT / COMMUNITY</span>
+            <S.BoardPageTitle>게시판 관리</S.BoardPageTitle>
+            <p className="admin-page-description">게시판을 생성하고 권한 및 목록을 관리합니다.</p>
+          </div>
+          <S.BoardSaveButton className="admin-primary-action" onClick={handleSave}>
             <FiSave size={18} /> 설정 저장하기
           </S.BoardSaveButton>
         </S.BoardPageHeader>
 
-        <S.BoardGrid>
+        <S.BoardGrid className="admin-page-grid">
           {/* ⚙️ 1. 새 게시판 생성 폼 (좌측) */}
-          <S.BoardLeftColumn>
-            <S.BoardCard>
-              <S.BoardCardHeader>
+          <S.BoardLeftColumn className="admin-editor-column">
+            <S.BoardCard className="admin-panel">
+              <S.BoardCardHeader className="admin-panel-head">
                 <S.BoardCardTitle>새 게시판 생성</S.BoardCardTitle>
               </S.BoardCardHeader>
-              <S.BoardCardBody>
-                <S.BoardFormGroup>
+              <S.BoardCardBody className="admin-panel-body">
+                <S.BoardFormGroup className="admin-form-field">
                   <S.BoardLabel>게시판 이름</S.BoardLabel>
                   <S.BoardInput
                     type="text"
@@ -153,7 +157,7 @@ export default function Board() {
                   />
                 </S.BoardFormGroup>
 
-                <S.BoardFormGroup>
+                <S.BoardFormGroup className="admin-form-field">
                   <S.BoardLabel>게시판 스킨 (타입)</S.BoardLabel>
                   <S.BoardSelect
                     value={newBoard.type}
@@ -168,7 +172,7 @@ export default function Board() {
                 </S.BoardFormGroup>
 
                 <div style={{ display: "flex", gap: "1rem" }}>
-                  <S.BoardFormGroup style={{ flex: 1 }}>
+                  <S.BoardFormGroup className="admin-form-field" style={{ flex: 1 }}>
                     <S.BoardLabel>읽기 권한</S.BoardLabel>
                     <S.BoardSelect
                       value={newBoard.readAuth}
@@ -182,7 +186,7 @@ export default function Board() {
                     </S.BoardSelect>
                   </S.BoardFormGroup>
 
-                  <S.BoardFormGroup style={{ flex: 1 }}>
+                  <S.BoardFormGroup className="admin-form-field" style={{ flex: 1 }}>
                     <S.BoardLabel>쓰기 권한</S.BoardLabel>
                     <S.BoardSelect
                       value={newBoard.writeAuth}
@@ -200,7 +204,7 @@ export default function Board() {
                   </S.BoardFormGroup>
                 </div>
 
-                <S.BoardAddButton onClick={handleAddBoard}>
+                <S.BoardAddButton className="admin-outline-action" onClick={handleAddBoard}>
                   <FiPlus size={18} /> 게시판 생성하기
                 </S.BoardAddButton>
               </S.BoardCardBody>
@@ -208,15 +212,15 @@ export default function Board() {
           </S.BoardLeftColumn>
 
           {/* 📋 2. 등록된 게시판 목록 (우측) */}
-          <S.BoardRightColumn>
-            <S.BoardCard style={{ height: "100%" }}>
-              <S.BoardCardHeader>
+          <S.BoardRightColumn className="admin-record-column">
+            <S.BoardCard className="admin-panel" style={{ height: "100%" }}>
+              <S.BoardCardHeader className="admin-panel-head">
                 <S.BoardCardTitle>
                   운영 중인 게시판 목록 (총 {boardList.length}개)
                 </S.BoardCardTitle>
               </S.BoardCardHeader>
-              <S.BoardTableWrapper>
-                <S.BoardTable>
+              <S.BoardTableWrapper className="admin-table-scroll">
+                <S.BoardTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th>게시판명</th>
@@ -271,10 +275,10 @@ export default function Board() {
                               gap: "0.5rem",
                             }}
                           >
-                            <S.BoardActionBtn title="게시판 설정">
+                            <S.BoardActionBtn className="admin-icon-action" title="게시판 설정">
                               <FiSettings size={15} />
                             </S.BoardActionBtn>
-                            <S.BoardDeleteBtn
+                            <S.BoardDeleteBtn className="admin-delete-action"
                               title="삭제"
                               onClick={() => handleDeleteClick(board.id)}
                             >

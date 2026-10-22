@@ -191,11 +191,11 @@ export const BoardTable = styled.table`
 // 스킨 타입별로 색상을 다르게 보여주는 배지
 export const BoardTypeBadge = styled.span<{ $type: string }>`
   background-color: ${(props) => {
-    if (props.$type === "갤러리형") return "#36b9cc";
-    if (props.$type === "FAQ형") return "#f6c23e";
-    return "#858796"; // 일반게시판
+    if (props.$type === "갤러리형") return "#dcece7";
+    if (props.$type === "FAQ형") return "#f7ecd6";
+    return "#e9eee9"; // 일반게시판
   }};
-  color: white;
+  color: #355a40;
   padding: 0.25rem 0.6rem;
   border-radius: 0.2rem;
   font-size: 0.75rem;

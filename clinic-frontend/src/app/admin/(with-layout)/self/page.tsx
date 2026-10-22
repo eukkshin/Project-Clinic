@@ -140,22 +140,31 @@ export default function Self() {
   return (
     <>
       <S.SelfContainer>
-        <S.SelfPageHeader>
-          <S.SelfPageTitle>셀피(Selfies) 관리</S.SelfPageTitle>
-          <S.SelfSaveButton onClick={handleSave}>
+        <S.SelfPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CONTENT / STORIES</span>
+            <S.SelfPageTitle>셀피(Selfies) 관리</S.SelfPageTitle>
+            <p className="admin-page-description">
+              셀피 콘텐츠를 등록하고 노출 순서를 관리합니다.
+            </p>
+          </div>
+          <S.SelfSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.SelfSaveButton>
         </S.SelfPageHeader>
 
-        <S.SelfGrid>
+        <S.SelfGrid className="admin-page-grid">
           {/* ⚙️ 1. 새 셀피 등록 폼 */}
-          <S.SelfLeftColumn>
-            <S.SelfCard>
-              <S.SelfCardHeader>
+          <S.SelfLeftColumn className="admin-editor-column">
+            <S.SelfCard className="admin-panel">
+              <S.SelfCardHeader className="admin-panel-head">
                 <S.SelfCardTitle>새 셀피 이미지 등록</S.SelfCardTitle>
               </S.SelfCardHeader>
-              <S.SelfCardBody>
-                <S.SelfFormGroup>
+              <S.SelfCardBody className="admin-panel-body">
+                <S.SelfFormGroup className="admin-form-field">
                   <S.SelfLabel>세로형 이미지 (권장 비율 3:4)</S.SelfLabel>
                   <S.SelfFileInputWrapper>
                     <S.SelfFileInput
@@ -196,7 +205,10 @@ export default function Self() {
                 </S.SelfFormGroup>
 
                 <div style={{ display: "flex", gap: "1rem" }}>
-                  <S.SelfFormGroup style={{ flex: 1 }}>
+                  <S.SelfFormGroup
+                    className="admin-form-field"
+                    style={{ flex: 1 }}
+                  >
                     <S.SelfLabel>
                       <FiHeart color="#e74a3b" /> 초기 좋아요 수 (선택)
                     </S.SelfLabel>
@@ -213,7 +225,10 @@ export default function Self() {
                     />
                   </S.SelfFormGroup>
 
-                  <S.SelfFormGroup style={{ flex: 1 }}>
+                  <S.SelfFormGroup
+                    className="admin-form-field"
+                    style={{ flex: 1 }}
+                  >
                     <S.SelfLabel>
                       <FiEye color="#4e73df" /> 초기 조회수 (선택)
                     </S.SelfLabel>
@@ -231,7 +246,10 @@ export default function Self() {
                   </S.SelfFormGroup>
                 </div>
 
-                <S.SelfAddButton onClick={handleAddSelfie}>
+                <S.SelfAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddSelfie}
+                >
                   <FiPlus size={18} /> 리스트에 추가하기
                 </S.SelfAddButton>
               </S.SelfCardBody>
@@ -239,15 +257,15 @@ export default function Self() {
           </S.SelfLeftColumn>
 
           {/* 📋 2. 등록된 셀피 리스트 */}
-          <S.SelfRightColumn>
-            <S.SelfCard style={{ height: "100%" }}>
-              <S.SelfCardHeader>
+          <S.SelfRightColumn className="admin-record-column">
+            <S.SelfCard className="admin-panel" style={{ height: "100%" }}>
+              <S.SelfCardHeader className="admin-panel-head">
                 <S.SelfCardTitle>
                   등록된 셀피 목록 (총 {selfies.length}개)
                 </S.SelfCardTitle>
               </S.SelfCardHeader>
-              <S.SelfTableWrapper>
-                <S.SelfTable>
+              <S.SelfTableWrapper className="admin-table-scroll">
+                <S.SelfTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th>미리보기</th>
@@ -320,6 +338,7 @@ export default function Self() {
                         </td>
                         <td>
                           <S.SelfDeleteBtn
+                            className="admin-delete-action"
                             onClick={() => handleDelete(selfie.id)}
                           >
                             <FiTrash2 size={16} />

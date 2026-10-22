@@ -122,31 +122,39 @@ export default function ConsultationsPage() {
   return (
     <>
       <S.ConsultContainer>
-        <S.ConsultPageHeader>
-          <S.ConsultPageTitle>상담신청 관리</S.ConsultPageTitle>
+        <S.ConsultPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">
+              CUSTOMERS / CONSULTATIONS
+            </span>
+            <S.ConsultPageTitle>상담신청 관리</S.ConsultPageTitle>
+            <p className="admin-page-description">
+              접수 내역을 검색하고 상담 진행 상태를 확인합니다.
+            </p>
+          </div>
         </S.ConsultPageHeader>
 
-        <S.ConsultFilterCard>
-          <S.ConsultInputGroup>
+        <S.ConsultFilterCard className="admin-filter-panel">
+          <S.ConsultInputGroup className="admin-search-row">
             <S.ConsultInput
               type="text"
               placeholder="이름 또는 연락처 검색"
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <S.ConsultSearchButton>
+            <S.ConsultSearchButton className="admin-primary-action">
               <FiSearch size={16} /> 검색
             </S.ConsultSearchButton>
           </S.ConsultInputGroup>
         </S.ConsultFilterCard>
 
-        <S.ConsultTableCard>
-          <S.ConsultCardHeader>
+        <S.ConsultTableCard className="admin-panel">
+          <S.ConsultCardHeader className="admin-panel-head">
             <S.ConsultCardTitle>빠른 상담신청 접수 내역</S.ConsultCardTitle>
           </S.ConsultCardHeader>
 
-          <S.ConsultTableWrapper>
-            <S.ConsultTable>
+          <S.ConsultTableWrapper className="admin-table-scroll">
+            <S.ConsultTable className="admin-data-table">
               <thead>
                 <tr>
                   <th>No.</th>
@@ -185,6 +193,7 @@ export default function ConsultationsPage() {
                       </td>
                       <td>
                         <S.ConsultDeleteActionBtn
+                          className="admin-delete-action"
                           onClick={() => handleDeleteClick(item.ID)}
                         >
                           <FiTrash2 size={16} />

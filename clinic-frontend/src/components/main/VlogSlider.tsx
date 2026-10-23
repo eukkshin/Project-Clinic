@@ -313,10 +313,10 @@ export function VlogSlider() {
         <S.Header data-vlog-heading>
           <S.HeaderLeft>
             <S.Eyebrow>
-              <span /> AHN'S VISUAL JOURNAL
+              <span /> 04 / AHN'S VLOG
             </S.Eyebrow>
             <S.Title id="ahns-vlog-heading">
-              Stories, <em>In Motion.</em>
+              Clinic <em>Vlog.</em>
             </S.Title>
             <S.Description>
               아름다움을 만드는 순간과 그 안에 담긴 이야기.

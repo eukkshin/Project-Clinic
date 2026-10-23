@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /** Header와 같은 높이를 차지해 패널이 Header 하단에서 시작하도록 한다. */
 export const NavRoot = styled.div`
@@ -75,7 +75,8 @@ export const NavPanel = styled.div<{
   $dark: boolean;
 }>`
   position: absolute;
-  top: 100%;
+  top: ${({ $transparent }) =>
+    $transparent ? "calc(100% + -15px)" : "calc(100% + 5px)"};
   left: 50%;
   z-index: 20;
   box-sizing: border-box;
@@ -116,7 +117,8 @@ export const NavPanel = styled.div<{
     visibility 0.34s,
     background 0.35s ease,
     border-color 0.35s ease,
-    color 0.35s ease;
+    color 0.35s ease,
+    top 0.25s ease;
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;

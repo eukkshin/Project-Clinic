@@ -1,16 +1,16 @@
 "use client";
 
-import axios from "axios";
-import gsap from "gsap";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import axios from 'axios';
+import gsap from 'gsap';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import * as S from "@/assets/css/components/Header.styles";
+import * as S from '@/assets/css/components/Header.styles';
 
-import AccountDropdown from "./dropdown/AccountDropdown";
-import HeaderNavDropdown from "./dropdown/HeaderNavDropdown";
+import AccountDropdown from './dropdown/AccountDropdown';
+import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
 
 /*
  * Header.tsx — Premium Ahn's Navigation
@@ -324,7 +324,11 @@ export default function Header() {
                 상담문의 <span aria-hidden="true">↗</span>
               </S.CtaButton>
               {userName ? (
-                <AccountDropdown userName={userName} onLogout={handleLogout} />
+                <AccountDropdown
+                  userName={userName}
+                  onLogout={handleLogout}
+                  transparent={transparent}
+                />
               ) : (
                 <S.IconLink
                   as={Link}

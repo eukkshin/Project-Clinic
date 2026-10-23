@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 
-import * as S from "@/assets/css/components/dropdown/HeaderNavDropdown.styles";
+import * as S from '@/assets/css/components/dropdown/HeaderNavDropdown.styles';
 
 export interface NavSubmenuItem {
   name: string;
@@ -44,8 +44,24 @@ export default function HeaderNavDropdown({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 메뉴 밖을 클릭하면 닫는다. (Escape는 컴포넌트 내부 키보드 핸들러에서 처리)
+  const handleMouseEnter = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => {
+      setOpen(false);
+      closeTimer.current = null;
+    }, 200);
+  };
+
   useEffect(() => {
     if (!open) return;
     const onOutside = (event: PointerEvent) => {
@@ -66,11 +82,19 @@ export default function HeaderNavDropdown({
     ...(menu.children ?? []),
   ];
 
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) {
+        clearTimeout(closeTimer.current);
+      }
+    };
+  }, []);
+
   return (
     <S.NavRoot
       ref={rootRef}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onBlurCapture={(event) => {
         if (
           !event.relatedTarget ||

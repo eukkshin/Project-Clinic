@@ -11,7 +11,7 @@ const SAGE = "#7F987F";
 export const Section = styled.section`
   position: relative;
   width: 100%;
-  padding: clamp(92px, 11vw, 170px) 0 clamp(75px, 8.5vw, 135px);
+  padding: clamp(84px, 7.8vw, 120px) 0 clamp(56px, 6vw, 94px);
   color: ${DARK};
   /*
    * [하나로 이어지는 배경]
@@ -39,7 +39,7 @@ export const Header = styled.header`
   align-items: flex-end;
   justify-content: space-between;
   gap: 36px;
-  margin-bottom: clamp(38px, 5vw, 72px);
+  margin-bottom: clamp(26px, 3.5vw, 48px);
 
   @media (max-width: 760px) {
     flex-direction: column;
@@ -71,8 +71,8 @@ export const Eyebrow = styled.p`
 
 export const Title = styled.h2`
   margin: 0;
-  font-family: inherit;
-  font-size: clamp(49px, 6vw, 112px);
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(48px, 5.4vw, 86px);
   font-weight: 400;
   line-height: 1.04;
   letter-spacing: -0.072em;
@@ -137,7 +137,7 @@ export const HeaderSignature = styled.span`
  */
 export const CinemaLayout = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1.84fr) minmax(285px, 0.76fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(290px, .85fr);
   gap: clamp(24px, 3.1vw, 54px);
   align-items: start;
 
@@ -154,8 +154,8 @@ export const MainColumn = styled.div`
 export const Stage = styled.div`
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  min-height: 330px;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
   isolation: isolate;
   overflow: hidden;
   border-radius: 3px;
@@ -227,8 +227,8 @@ export const PlayButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 12px;
-  width: clamp(90px, 11vw, 155px);
-  height: clamp(90px, 11vw, 155px);
+  width: clamp(76px, 8vw, 118px);
+  height: clamp(76px, 8vw, 118px);
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
@@ -288,9 +288,9 @@ export const StageKicker = styled.p`
 
 export const StageTitle = styled.h3`
   margin: 0 0 clamp(21px, 3vw, 46px);
-  font-family: inherit;
+  font-family: var(--ahns-display, Georgia, serif);
   font-weight: 400;
-  font-size: clamp(23px, 3vw, 56px);
+  font-size: clamp(28px, 3.1vw, 55px);
   line-height: 1.22;
   letter-spacing: -0.05em;
   overflow-wrap: anywhere;

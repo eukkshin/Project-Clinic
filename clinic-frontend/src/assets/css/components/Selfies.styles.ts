@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /**
  * 홈페이지 전반에서 쓰는 같은 색상이다.
@@ -12,54 +12,29 @@ export const Section = styled.section`
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 700px;
-  padding: clamp(100px, 12vw, 175px) 0 clamp(90px, 10vw, 150px);
+  min-height: 0;
+  padding: clamp(72px, 7vw, 112px) 0 clamp(75px, 7.5vw, 110px);
   overflow: hidden;
   color: ${DARK};
 
   /* 바로 앞의 CategoryNav가 아이보리이므로, 갑작스러운 색상 전환 없이 세이지를 살짝 섞는다. */
-  background: linear-gradient(180deg, ${IVORY} 0%, #eff0e6 55%, #e1e9df 100%);
+  background: transparent;
 
-  --moments-y: 80px;
-  --moments-opacity: 0;
-
+  /* 장식용 대형 영문. 실제 내용 텍스트는 아니라서 읽기를 방해하지 않도록 낮은 대비로 표현한다. */
   &::before {
     content: "MOMENTS";
     position: absolute;
     z-index: -1;
-    top: 125px;
+    top: -25px;
     right: -0.06em;
-
     font-family: inherit;
-    font-size: clamp(100px, 19vw, 330px);
+    font-size: clamp(100px, 18vw, 300px);
+    line-height: 1;
     font-weight: 400;
     letter-spacing: -0.085em;
-    line-height: 1;
-    white-space: nowrap;
-
-    color: #6c8b71;
-
-    /*
-     * GSAP이 변경하는 변수를 실제 스타일에 연결한다.
-     *
-     * --moments-y가 80px이면 아래로 80px 이동하고,
-     * 0px이면 원래 위치로 돌아온다.
-     */
-    transform: translateY(var(--moments-y));
-
-    /*
-     * 0은 완전히 투명,
-     * 0.07은 아주 연하게 보이는 상태다.
-     */
-    opacity: var(--moments-opacity);
-
+    color: rgba(81, 113, 83, 0.065);
     pointer-events: none;
-  }
-
-  /* 움직임 감소 설정에서는 처음부터 글씨가 보이도록 한다. */
-  @media (prefers-reduced-motion: reduce) {
-    --moments-y: 0px;
-    --moments-opacity: 0.07;
+    white-space: nowrap;
   }
 
   @media (max-width: 768px) {
@@ -75,8 +50,8 @@ export const Inner = styled.div`
 `;
 
 export const Heading = styled.div`
-  padding: 0 clamp(24px, 7vw, 140px);
-  margin-bottom: clamp(35px, 5vw, 80px);
+  padding: 0 clamp(24px, 6vw, 112px);
+  margin-bottom: clamp(22px, 3vw, 46px);
 `;
 
 export const HeadingMeta = styled.div`
@@ -84,7 +59,7 @@ export const HeadingMeta = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 24px;
+  padding-bottom: 13px;
   border-bottom: 1px solid rgba(52, 70, 56, 0.2);
 `;
 
@@ -106,7 +81,7 @@ export const HeadingRow = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-top: clamp(28px, 4vw, 62px);
+  margin-top: clamp(14px, 2vw, 30px);
 
   @media (max-width: 768px) {
     align-items: flex-end;
@@ -120,9 +95,9 @@ export const HeadingMain = styled.div`
 
 export const Title = styled.h2`
   margin: 0;
-  font-family: inherit;
+  font-family: var(--ahns-display, Georgia, serif);
   font-weight: 400;
-  font-size: clamp(41px, 5.7vw, 96px);
+  font-size: clamp(50px, 5vw, 80px);
   line-height: 1.06;
   letter-spacing: -0.066em;
   word-break: keep-all;
@@ -138,7 +113,7 @@ export const Title = styled.h2`
 `;
 
 export const Description = styled.p`
-  margin: 28px 0 0;
+  margin: 14px 0 0;
   color: #657b69;
   font-size: clamp(12px, 1vw, 14px);
   font-weight: 400;
@@ -213,9 +188,9 @@ export const ArrowButton = styled.button`
 export const GalleryViewport = styled.div`
   display: flex;
   align-items: flex-start;
-  gap: clamp(15px, 2vw, 30px);
+  gap: clamp(8px, 1vw, 16px);
   width: 100%;
-  padding: 0 clamp(24px, 7vw, 140px) 12px;
+  padding: 0 clamp(24px, 6vw, 112px) 8px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: clamp(24px, 7vw, 140px);
@@ -240,18 +215,14 @@ export const GalleryViewport = styled.div`
 // GSAP은 안쪽 CardMotion만 움직이므로 두 transform이 충돌하지 않는다.
 export const CardSlot = styled.article`
   flex: 0 0 auto;
-  width: clamp(270px, 28vw, 425px);
+  width: clamp(230px, 23vw, 390px);
   scroll-snap-align: start;
 
-  &:nth-child(even) {
-    padding-top: clamp(24px, 3vw, 55px);
-  }
+  &:nth-child(even) { padding-top: 0; }
 
   @media (max-width: 768px) {
     width: min(76vw, 370px);
-    &:nth-child(even) {
-      padding-top: 28px;
-    }
+    &:nth-child(even) { padding-top: 0; }
   }
 `;
 
@@ -278,9 +249,9 @@ export const PhotoButton = styled.button`
 export const PhotoFrame = styled.div`
   position: relative;
   width: 100%;
-  aspect-ratio: 0.79;
+  aspect-ratio: 1 / 1.12;
   overflow: hidden;
-  border-radius: 15px;
+  border-radius: 0;
   background: ${SAGE};
   isolation: isolate;
 
@@ -346,7 +317,7 @@ export const CardCaption = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 17px 3px 0;
+  padding: 12px 3px 0;
 `;
 
 export const CardCaptionTitle = styled.span`
@@ -376,7 +347,7 @@ export const GalleryFooter = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 36px clamp(24px, 7vw, 140px) 0;
+  padding: 25px clamp(24px, 6vw, 112px) 0;
 
   @media (max-width: 600px) {
     flex-direction: column;
@@ -464,47 +435,6 @@ export const ModalInner = styled.div`
   width: min(92vw, 980px);
   height: min(90vh, 840px);
   padding: 24px;
-  --moments-y: 80px;
-  --moments-opacity: 0;
-
-  &::before {
-    content: "MOMENTS";
-    position: absolute;
-    z-index: -1;
-    top: 125px;
-    right: -0.06em;
-
-    font-family: inherit;
-    font-size: clamp(100px, 19vw, 330px);
-    font-weight: 400;
-    letter-spacing: -0.085em;
-    line-height: 1;
-    white-space: nowrap;
-
-    color: #6c8b71;
-
-    /*
-     * GSAP이 변경하는 변수를 실제 스타일에 연결한다.
-     *
-     * --moments-y가 80px이면 아래로 80px 이동하고,
-     * 0px이면 원래 위치로 돌아온다.
-     */
-    transform: translateY(var(--moments-y));
-
-    /*
-     * 0은 완전히 투명,
-     * 0.07은 아주 연하게 보이는 상태다.
-     */
-    opacity: var(--moments-opacity);
-
-    pointer-events: none;
-  }
-
-  /* 움직임 감소 설정에서는 처음부터 글씨가 보이도록 한다. */
-  @media (prefers-reduced-motion: reduce) {
-    --moments-y: 0px;
-    --moments-opacity: 0.07;
-  }
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   background: #24352a;

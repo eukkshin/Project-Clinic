@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 
-import * as S from "@/assets/css/components/dropdown/AccountDropdown.styles";
+import * as S from '@/assets/css/components/dropdown/AccountDropdown.styles';
 
 interface AccountDropdownProps {
   userName: string;
   onLogout: () => void;
+  transparent?: boolean;
   /** Header 모바일 전체 메뉴 안에 표시할 때 true */
   mobile?: boolean;
   /** 메뉴 선택 후 모바일 내비게이션을 닫는 기존 함수 */
@@ -22,6 +23,7 @@ export default function AccountDropdown({
   userName,
   onLogout,
   mobile = false,
+  transparent = false,
   onNavigate,
   myPageHref,
   reservationsHref,
@@ -107,6 +109,7 @@ export default function AccountDropdown({
           role="region"
           aria-label="회원 계정 메뉴"
           $mobile={mobile}
+          $transparent={transparent}
         >
           <S.GlassShine aria-hidden="true" />
           <S.ProfileSection>

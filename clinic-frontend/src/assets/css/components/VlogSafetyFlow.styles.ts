@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /**
  * Vlog → Brand → Safety의 배경을 한 장으로 칠하는 공통 부모.
@@ -14,7 +14,14 @@ import styled from "styled-components";
  */
 export const Flow = styled.div`
   --vlog-height: 1060px;
-  --bridge-height: 760px;
+  --bridge-height: 900px;
+  /* Hydration 전 임시 색상 위치. ResizeObserver에서 실제 높이로 갱신됨. */
+  --tone-16: 1204px;
+  --tone-34: 1366px;
+  --tone-52: 1528px;
+  --tone-70: 1690px;
+  --tone-86: 1834px;
+  --tone-end: 1960px;
 
   position: relative;
   width: 100%;
@@ -23,24 +30,110 @@ export const Flow = styled.div`
   border: 0;
 
   /*
-   * 하나의 linear-gradient가 Vlog부터 Safety 끝까지 이어진다.
-   * 따라서 섹션 사이에 별개의 background가 맞닿는 경계가 없다.
-   *
-   * Vlog 끝나기 약 380px 전부터 점점 연한 세이지로 변한다.
-   * 브랜드 장면 동안 차분히 진해진 뒤 Safety 시작점은 포레스트 그린이다.
-   * 이후의 Safety는 같은 포레스트 그린을 계속 유지한다.
+   * Vlog 후반의 밝은 공간에서 천천히 톤을 낮추고,
+   * Bridge 0~100% 전체를 활용해 세이지 → 포레스트 그린으로 변화시킨다.
+   * --tone-* 변수는 브리지 실측 높이에 비례하여 TSX에서 설정한다.
+   * 고정 px값으로 Bridge 뒤쪽에 색상을 몰아넣지 않으므로 모바일도 부드럽다.
    */
-  background: linear-gradient(
-    to bottom,
-    #f7f4ea 0px,
-    #eff2ea calc(var(--vlog-height) - 380px),
-    #cbdccb calc(var(--vlog-height) - 155px),
-    #91ac97 var(--vlog-height),
-    #6f977b calc(var(--vlog-height) + 185px),
-    #3b5f4b calc(var(--vlog-height) + 420px),
-    #17352b calc(var(--vlog-height) + var(--bridge-height)),
-    #17352b 100%
-  );
+  background-image:
+    radial-gradient(
+      ellipse 42% 24% at 80% 93%,
+      rgba(161, 190, 157, 0.14),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      #f7f4ea 0px,
+      #f7f4ea calc(var(--vlog-height) - 650px),
+      #f1f1e9 calc(var(--vlog-height) - 500px),
+      #e3eade calc(var(--vlog-height) - 340px),
+      #d2dfce calc(var(--vlog-height) - 210px),
+      #c1d3bf calc(var(--vlog-height) - 80px),
+      #b3c9b1 var(--vlog-height),
+      #a2bca2 var(--tone-16),
+      #8eaa91 var(--tone-34),
+      #74957b var(--tone-52),
+      #567760 var(--tone-70),
+      #385a45 var(--tone-86),
+      #31543f var(--tone-end),
+      #294d39 calc(var(--tone-end) + 115px),
+      #244535 calc(var(--tone-end) + 240px),
+      #1b3528 calc(var(--tone-end) + 650px),
+      #1b3528 100%
+    );
+
+  background-size:
+    100% 100%,
+    100% 100%;
+  background-repeat: no-repeat;
+  background-blend-mode: normal;
+
+  /* Reverse-colour organic mist only over the dark Safety region. */
+  &::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--vlog-height) + var(--bridge-height) - 240px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      url("/images/ahns-editorial-mist.webp"),
+      radial-gradient(
+        ellipse at 6% 70%,
+        rgba(211, 225, 203, 0.1),
+        transparent 65%
+      ),
+      radial-gradient(
+        ellipse at 85% 25%,
+        rgba(173, 204, 171, 0.1),
+        transparent 58%
+      );
+    background-size:
+      1550px auto,
+      100% 100%,
+      100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat;
+    opacity: 0.65;
+    /* Safety 시작점에 텍스처가 즉시 보이지 않도록 상단에서 점진적으로 나타나게 한다.
+       마지막에는 다음 Footer의 텍스처가 자연스럽게 이어지도록 220px에 걸쳐 소멸. */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0px,
+      rgba(0, 0, 0, 0.15) 120px,
+      #000 520px,
+      #000 calc(100% - 360px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0px,
+      rgba(0, 0, 0, 0.15) 120px,
+      #000 520px,
+      #000 calc(100% - 360px),
+      transparent 100%
+    );
+  }
+
+  /* 마지막 배경의 반투명 광원까지 짙은 그린으로 정리해
+     Footer 시작점과 픽셀 색상을 맞춘다. 콘텐츠는 z-index:1로 위에 유지. */
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 220px;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(27, 53, 40, 0), #1b3528);
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   /*
    * overflow:hidden을 부모에 주면 Safety의 position:sticky가
@@ -69,17 +162,19 @@ export const Bridge = styled.section`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: clamp(570px, 84svh, 940px);
+  /* 기존 42svh보다 길게: 실제 스크롤 전환에 한 화면가량 사용한다. */
+  height: clamp(720px, 100svh, 1080px);
+  box-sizing: border-box;
   margin: 0;
-  padding: 80px 24px;
+  padding: 92px 24px;
   border: 0;
   background: transparent;
   color: #f7f6ee;
   overflow: hidden;
 
   @media (max-width: 768px) {
-    height: clamp(490px, 77svh, 720px);
-    padding: 65px 20px;
+    height: clamp(560px, 86svh, 800px);
+    padding: 76px 20px;
   }
 `;
 
@@ -92,10 +187,10 @@ export const Orbit = styled.div`
   z-index: 0;
   left: 50%;
   top: 50%;
-  width: clamp(470px, 75vw, 1260px);
+  width: clamp(380px, 64vw, 1050px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
-  border: 1px solid rgba(240, 246, 237, 0.5);
+  border: 1px solid rgba(240, 246, 237, 0.07);
   border-radius: 50%;
   pointer-events: none;
 
@@ -104,7 +199,7 @@ export const Orbit = styled.div`
     content: "";
     position: absolute;
     inset: 9%;
-    border: 1px solid rgba(240, 246, 237, 0.24);
+    border: 1px solid rgba(240, 246, 237, 0.12);
     border-radius: 50%;
   }
 
@@ -138,8 +233,8 @@ export const BrandTitle = styled.h2`
   margin: 0;
   padding: 0;
   color: #f8f7f0;
-  font-family: inherit;
-  font-size: clamp(72px, 17vw, 290px);
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(72px, 8.7vw, 145px);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.085em;
@@ -154,7 +249,7 @@ export const BrandTitle = styled.h2`
 export const Tagline = styled.p`
   margin: clamp(23px, 3.6vw, 45px) 0 0;
   color: #edf2e9;
-  font-size: clamp(10px, 1vw, 14px);
+  font-size: clamp(10px, 0.9vw, 12px);
   font-weight: 400;
   letter-spacing: 0.24em;
 `;

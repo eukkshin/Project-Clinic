@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from "styled-components";
+import styled, { css, keyframes } from 'styled-components';
 
 /* 헤더 전체의 스크롤/레이아웃은 바꾸지 않고 계정 버튼에만 적용합니다. */
 const reveal = keyframes`
@@ -22,18 +22,47 @@ export const AccountTrigger = styled.button<{
   $mobile: boolean;
   $open: boolean;
 }>`
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
+
   min-height: 40px;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 0;
+  padding: 8px 14px;
+
+  border: 1px solid transparent;
+  border-radius: 999px;
   background: transparent;
+
   color: inherit;
   font: inherit;
   cursor: pointer;
-  white-space: nowrap;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease;
+
+  &:hover,
+  &[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.16);
+
+    border-color: rgba(255, 255, 255, 0.35);
+
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+
+    box-shadow:
+      0 4px 20px rgba(36, 69, 53, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.24);
+  }
 
   &:focus-visible {
     outline: 2px solid #69826b;
@@ -86,9 +115,13 @@ export const Chevron = styled.span<{ $open: boolean }>`
   transform: rotate(${({ $open }) => ($open ? "180deg" : "0deg")});
 `;
 
-export const GlassPanel = styled.div<{ $mobile: boolean }>`
+export const GlassPanel = styled.div<{
+  $mobile: boolean;
+  $transparent: boolean;
+}>`
   position: absolute;
-  top: calc(100% + 13px);
+  top: ${({ $transparent }) =>
+    $transparent ? "calc(100% + 13px)" : "calc(100% + 30px)"};
   right: 0;
   z-index: 30;
   width: 284px;
@@ -99,6 +132,8 @@ export const GlassPanel = styled.div<{ $mobile: boolean }>`
 
   color: #244535;
   text-shadow: none;
+
+  transition: top 0.25s ease;
 
   background:
     radial-gradient(
@@ -123,7 +158,6 @@ export const GlassPanel = styled.div<{ $mobile: boolean }>`
 
   animation: ${reveal} 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
-  /* 추가: 반투명 밝기 보정 레이어 */
   &::before {
     content: "";
     position: absolute;
@@ -134,14 +168,12 @@ export const GlassPanel = styled.div<{ $mobile: boolean }>`
     background: rgba(245, 250, 245, 0.22);
   }
 
-  /* 글자와 메뉴를 보정 레이어 위에 배치 */
   & > div,
   & > button {
     position: relative;
     z-index: 1;
   }
 
-  /* 기존 모바일 스타일도 유지 */
   ${({ $mobile }) =>
     $mobile &&
     css`

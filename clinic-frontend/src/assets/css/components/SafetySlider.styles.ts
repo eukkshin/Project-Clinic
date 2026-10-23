@@ -34,14 +34,15 @@ export const Section = styled.section`
    * 여기의 isolation:isolate는 내부 이미지 합성용이며 sticky를 방해하지 않는다.
    */
   background: transparent;
-  padding: clamp(145px, 15vw, 215px) 0 38px;
+  /* Bridge가 화면 높이로 길어졌으므로 Safety 본문 진입 여백을 가볍게 정리. */
+  padding: clamp(84px, 7.5vw, 118px) 0 38px;
 
   /*
    * 중요: position: sticky가 들어 있는 Section에 overflow:hidden을 주지 않는다.
    * 스크롤 부모가 바뀌면 sticky가 작동하지 않을 수 있기 때문이다.
    */
   @media (max-width: 900px) {
-    padding-top: 130px;
+    padding-top: 112px;
   }
 `;
 
@@ -54,7 +55,7 @@ export const Inner = styled.div`
 
 export const Header = styled.div`
   position: relative;
-  margin: 0 0 clamp(70px, 8vw, 125px);
+  margin: 0 0 clamp(42px, 5vw, 75px);
   max-width: 1130px;
 `;
 
@@ -77,8 +78,8 @@ export const Kicker = styled.p`
 
 export const Title = styled.h2`
   margin: 0;
-  font-family: inherit;
-  font-size: clamp(72px, 10vw, 176px);
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(58px, 7.3vw, 120px);
   font-weight: 400;
   line-height: 0.91;
   letter-spacing: -0.09em;
@@ -100,7 +101,7 @@ export const HeaderBottom = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  margin-top: 42px;
+  margin-top: 30px;
 
   @media (max-width: 680px) {
     align-items: flex-start;
@@ -159,8 +160,8 @@ export const RetryButton = styled.button`
  */
 export const Layout = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: clamp(50px, 7.3vw, 145px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(40px, 6vw, 105px);
   align-items: start;
 
   @media (max-width: 900px) {
@@ -295,7 +296,7 @@ export const List = styled.div`
 export const ListItem = styled.article`
   position: relative;
   border-bottom: 1px solid ${LINE};
-  min-height: clamp(230px, 23vw, 370px);
+  min-height: clamp(156px, 16vw, 248px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -378,7 +379,7 @@ export const ItemBody = styled.span`
 export const ItemTitle = styled.span`
   display: block;
   font-family: inherit;
-  font-size: clamp(29px, 3.1vw, 53px);
+  font-size: clamp(24px, 2.5vw, 42px);
   font-weight: 400;
   line-height: 1.12;
   letter-spacing: -0.065em;
@@ -416,7 +417,7 @@ export const ItemArrow = styled.span`
 `;
 
 export const Endmark = styled.div`
-  padding: 75px 0 120px;
+  padding: 45px 0 78px;
   display: flex;
   align-items: center;
   gap: 17px;

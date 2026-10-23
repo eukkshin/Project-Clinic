@@ -151,7 +151,7 @@ export const ToggleIcon = styled.span<{ $isOpen: boolean }>`
 export const AccordionBody = styled.div<{ $isOpen: boolean }>`
   display: grid;
   grid-template-rows: ${({ $isOpen }) => ($isOpen ? "1fr" : "0fr")};
-  transition: grid-template-rows 0.3s ease;
+  transition: grid-template-rows 0.4s ease;
 `;
 
 export const AccordionBodyInner = styled.div`

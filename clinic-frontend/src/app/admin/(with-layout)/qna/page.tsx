@@ -65,10 +65,10 @@ export default function AdminQnA() {
         return acc;
     },{})
 
-    const categories = [...new Set(qnaList.map(item=>
-        JSON.stringify({key:item.category, name:item.categoryName})
-    ))].map(item=> JSON.parse(item))
-  
+    const categories = Array.from(new Map(qnaList.map(item=>
+    [item.category, {key: item.category , name: item.categoryName}]
+    )).values())
+
     
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value;
@@ -203,6 +203,8 @@ export default function AdminQnA() {
                     <S.QnACard>
                         <S.QnACardHeader>
                             <S.QnACardTitle>{editingId !== null ? "Q&A 수정" : "새 Q&A 등록"}</S.QnACardTitle>
+                            <S.CateAddButton style={{width:'100px'}}
+                            onClick={()=>setIsCustomCategory(true)}>새 카테고리추가</S.CateAddButton>
                         </S.QnACardHeader>
                         <S.QnACardBody>
                             <S.QnAFormGroup>
@@ -211,7 +213,8 @@ export default function AdminQnA() {
                                     <S.QnASelect
                                         value={newQnA.category}
                                         onChange={handleCategoryChange}
-                                    >
+                                    >  
+                                    <option value="" disabled>카테고리를 선택하세요</option>
                                         {categories.map((cat) => (
                                             <option key={cat.key} value={cat.key}>
                                                 {cat.name} ({cat.key})

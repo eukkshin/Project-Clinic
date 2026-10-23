@@ -33,7 +33,13 @@ const app = express();
 // 1. CORS 설정 (프론트엔드 3000번 포트의 접근만 안전하게 허용)
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+    ],
     credentials: true,
   }),
 );
@@ -1330,40 +1336,22 @@ app.post("/api/reset-password", async (req, res) => {
   }
 });
 
-
-const express = require('express');
-const mysql = require('mysql2/promise');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-
-const app = express();
-const PORT = 4000;
-
-// 미들웨어 설정
-app.use(cors());
-app.use(bodyParser.json());
-
-// MySQL 데이터베이스 연결 풀 설정 (본인의 DB 정보에 맞게 수정하세요)
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'your_password',
-    database: 'your_database',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+const qnaRepository = AppDataSource.getRepository(Qna);
 
 // ==========================================
 // 1. Q&A 목록 조회 API
 // ==========================================
 app.get('/api/admin/qnas', async (req, res) => {
     try {
-        // 정렬 순서 컬럼(예: ORDER_NUM 또는 QNA_IDX)에 맞춰 정렬하세요.
-        const [rows] = await pool.query('SELECT * FROM qna_table ORDER BY QNA_IDX ASC');
+        const qnas = await qnaRepository.find({
+            order: {
+               SORT_ORDER: "ASC",
+            },
+        });
+
         res.json({
             success: true,
-            data: rows
+            data: qnas
         });
     } catch (err) {
         console.error("Q&A 목록 조회 실패:", err);
@@ -1375,18 +1363,22 @@ app.get('/api/admin/qnas', async (req, res) => {
 // 2. 새 Q&A 등록 API
 // ==========================================
 app.post('/api/admin/qnas', async (req, res) => {
-    const { category, category_name, question, answer } = req.body;
+    const { category, categoryName, question, answer } = req.body;
 
-    if (!category || !category_name || !question || !answer) {
+    if (!category || !categoryName || !question || !answer) {
         return res.status(400).json({ success: false, message: '모든 필드를 입력해주세요.' });
     }
 
     try {
-        const query = `
-            INSERT INTO qna_table (CATEGORY, CATEGORY_NAME, QUESTION, ANSWER) 
-            VALUES (?, ?, ?, ?)
-        `;
-        await pool.query(query, [category, category_name, question, answer]);
+        const newQna = qnaRepository.create({
+            CATEGORY: category,
+            CATEGORY_NAME: categoryName,
+            QUESTION: question,
+            ANSWER: answer,
+            SORT_ORDER: 0
+        });
+
+        await memberRepository.save(newQna);
 
         res.json({ success: true, message: 'Q&A가 성공적으로 등록되었습니다.' });
     } catch (err) {
@@ -1400,15 +1392,21 @@ app.post('/api/admin/qnas', async (req, res) => {
 // ==========================================
 app.put('/api/admin/qnas/:id', async (req, res) => {
     const { id } = req.params;
-    const { category, category_name, question, answer } = req.body;
+    const { category, categoryName, question, answer } = req.body;
 
     try {
-        const query = `
-            UPDATE qna_table 
-            SET CATEGORY = ?, CATEGORY_NAME = ?, QUESTION = ?, ANSWER = ? 
-            WHERE QNA_IDX = ?
-        `;
-        await pool.query(query, [category, category_name, question, answer, id]);
+        const qna = await qnaRepository.findOneBy({ QNA_IDX: Number(id) });
+
+        if (!qna) {
+            return res.status(404).json({ success: false, message: '해당 Q&A를 찾을 수 없습니다.' });
+        }
+
+        qna.CATEGORY = category;
+        qna.CATEGORY_NAME = categoryName;
+        qna.QUESTION = question;
+        qna.ANSWER = answer;
+
+        await qnaRepository.save(qna);
 
         res.json({ success: true, message: 'Q&A가 수정되었습니다.' });
     } catch (err) {
@@ -1424,7 +1422,12 @@ app.delete('/api/admin/qnas/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        await pool.query('DELETE FROM qna_table WHERE QNA_IDX = ?', [id]);
+        const result = await qnaRepository.delete({ QNA_IDX: Number(id) });
+
+        if (result.affected === 0) {
+            return res.status(404).json({ success: false, message: '해당 Q&A를 찾을 수 없습니다.' });
+        }
+
         res.json({ success: true, message: 'Q&A가 삭제되었습니다.' });
     } catch (err) {
         console.error("Q&A 삭제 실패:", err);
@@ -1436,42 +1439,30 @@ app.delete('/api/admin/qnas/:id', async (req, res) => {
 // 5. Q&A 순서 변경 저장 API
 // ==========================================
 app.put('/api/admin/qnas/order', async (req, res) => {
-    const { orderedIds } = req.body; // 예: [3, 1, 4, 2] (QNA_IDX 배열 순서)
+    const { orderedIds } = req.body;
 
     if (!Array.isArray(orderedIds)) {
         return res.status(400).json({ success: false, message: '올바르지 않은 데이터 형식입니다.' });
     }
 
-    const connection = await pool.getConnection();
     try {
-        await connection.beginTransaction();
+        await AppDataSource.transaction(async (transactionalEntityManager) => {
+            for (let i = 0; i < orderedIds.length; i++) {
+                const id = orderedIds[i];
+                await transactionalEntityManager.update(
+                    Qna,
+                    { QNA_IDX: Number(id) },
+                    { SORT_ORDER: i + 1 }
+                );
+            }
+        });
 
-        // 배열의 인덱스를 순서 번호(ORDER_NUM 등)로 활용하여 일괄 업데이트
-        for (let i = 0; i < orderedIds.length; i++) {
-            const id = orderedIds[i];
-            // 만약 테이블에 순서를 저장하는 컬럼이 없다면 QNA_IDX를 재정렬하거나 
-            // 별도의 ORDER_NUM 컬럼을 만들어 업데이트 하시면 됩니다.
-            // 여기서는 예시로 ORDER_NUM 컬럼이 있다고 가정합니다.
-            await connection.query('UPDATE qna_table SET ORDER_NUM = ? WHERE QNA_IDX = ?', [i + 1, id]);
-        }
-
-        await connection.commit();
         res.json({ success: true, message: '순서가 저장되었습니다.' });
     } catch (err) {
-        await connection.rollback();
         console.error("순서 저장 실패:", err);
         res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    } finally {
-        connection.release();
     }
 });
-
-// 서버 실행
-app.listen(PORT, () => {
-    console.log(`🚀 Admin Q&A Server running on http://localhost:${PORT}`);
-});
-
-
 
 
 

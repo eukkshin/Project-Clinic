@@ -14,6 +14,11 @@ module.exports = new EntitySchema({
       length: 50, 
       nullable: false 
     },
+    CATEGORY_NAME: { 
+      type: "varchar2", 
+      length: 50, 
+      nullable: false 
+    },
     QUESTION: { 
       type: "varchar2", 
       length: 1000, 

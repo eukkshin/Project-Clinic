@@ -89,9 +89,40 @@ export const QnACard = styled.div`
 `;
 
 export const QnACardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #edf2eb;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #e1e8de;
+`;
+
+export const CateAddButton = styled.button`
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ border-radius: 6px;
+ cursor: pointer;
+
+ 
+ width: 100%;
+ min-width: 120px;
+ height: 40px;
+ background-color: #edf2eb;
+ border: 1px solid #8daa91;
+ color: #284b37;
+ font-weight: 600;
+ font-size: 13px;
+ transition: all 0.2s ease-in-out;
+
+ &:hover{
+  background-color: #284b37; // 클리닉 메인 다크 그린
+  color: #fbfcf9;            // 글자색을 아주 밝은 아이보리로 반전
+  border-color: #284b37;
+  transform: translateY(-1px); // 살짝 떠오르는 느낌
+  box-shadow: 0 4px 12px rgba(40, 75, 55, 0.15); // 부드러운 그림자
+ }
+
 `;
 
 export const QnACardTitle = styled.h2`

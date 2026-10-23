@@ -35,6 +35,14 @@ export const Flow = styled.div`
    * --tone-* 변수는 브리지 실측 높이에 비례하여 TSX에서 설정한다.
    * 고정 px값으로 Bridge 뒤쪽에 색상을 몰아넣지 않으므로 모바일도 부드럽다.
    */
+  /*
+   * Vlog 첫 화면은 상위 HomeCanvas에 이미 깔린 그림자 이미지를 그대로 보여준다.
+   * 이전 구현의 이중 이미지/soft-light는 HomeCanvas의 이미지 크기와 합성이
+   * 달라 Vlog만 평평하고 붕 떠 보이게 만드는 원인이었다.
+   *
+   * 여기서는 투명한 색상으로 시작하고 Vlog 후반에만 점차 불투명해진다.
+   * Brand/Safety부터는 기존 하나의 연속된 그린 그라데이션이 계속된다.
+   */
   background-image:
     radial-gradient(
       ellipse 42% 24% at 80% 93%,
@@ -43,9 +51,11 @@ export const Flow = styled.div`
     ),
     linear-gradient(
       to bottom,
-      #f7f4ea 0px,
-      #f7f4ea calc(var(--vlog-height) - 650px),
-      #f1f1e9 calc(var(--vlog-height) - 500px),
+      transparent 0px,
+      transparent calc(var(--vlog-height) - 650px),
+      rgba(247, 244, 234, 0.05) calc(var(--vlog-height) - 570px),
+      rgba(241, 241, 233, 0.42) calc(var(--vlog-height) - 500px),
+      rgba(227, 234, 222, 0.72) calc(var(--vlog-height) - 420px),
       #e3eade calc(var(--vlog-height) - 340px),
       #d2dfce calc(var(--vlog-height) - 210px),
       #c1d3bf calc(var(--vlog-height) - 80px),
@@ -61,12 +71,12 @@ export const Flow = styled.div`
       #1b3528 calc(var(--tone-end) + 650px),
       #1b3528 100%
     );
-
   background-size:
     100% 100%,
     100% 100%;
-  background-repeat: no-repeat;
-  background-blend-mode: normal;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: normal, normal;
 
   /* Reverse-colour organic mist only over the dark Safety region. */
   &::before {
@@ -234,15 +244,15 @@ export const BrandTitle = styled.h2`
   padding: 0;
   color: #f8f7f0;
   font-family: var(--ahns-display, Georgia, serif);
-  font-size: clamp(72px, 8.7vw, 145px);
-  font-weight: 400;
-  line-height: 0.9;
+  font-size: clamp(88px, 10.3vw, 174px);
+  font-weight: 500;
+  line-height: 0.86;
   letter-spacing: -0.085em;
   text-shadow: 0 10px 70px rgba(14, 47, 25, 0.12);
   white-space: nowrap;
 
   @media (max-width: 500px) {
-    font-size: clamp(62px, 18vw, 94px);
+    font-size: clamp(79px, 20vw, 112px);
   }
 `;
 
@@ -285,3 +295,46 @@ export const EdgeNote = styled.span`
  * JS에서 GSAP 애니메이션을 등록하지 않는다.
  * 일반 CSS 상태가 보이는 상태이므로 텍스트를 바로 읽을 수 있다.
  */
+
+/* Independent light rings: deliberately not attached to sticky Safety. */
+export const OrbitHalo = styled.div`
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: clamp(470px, 72vw, 1180px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px dashed rgba(238, 250, 237, 0.22);
+  box-shadow:
+    inset 0 0 100px rgba(173, 212, 173, 0.045),
+    0 0 90px rgba(179, 221, 186, 0.06);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0.22;
+  @media (max-width: 768px) {
+    width: min(145vw, 780px);
+  }
+`;
+export const BridgeTrack = styled.div`
+  position: absolute;
+  right: clamp(18px, 5.6vw, 95px);
+  top: 18%;
+  bottom: 18%;
+  width: 1px;
+  background: rgba(234, 247, 227, 0.15);
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  span {
+    display: block;
+    height: 100%;
+    width: 1px;
+    background: rgba(247, 251, 236, 0.72);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;

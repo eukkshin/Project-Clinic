@@ -322,6 +322,7 @@ export const MobilePicture = styled.div`
 `;
 
 export const ItemButton = styled.button<{ $active: boolean }>`
+  position: relative;
   width: 100%;
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 26px;
@@ -336,7 +337,25 @@ export const ItemButton = styled.button<{ $active: boolean }>`
   font: inherit;
 
   opacity: ${({ $active }) => ($active ? "1" : "0.66")};
-  transition: opacity 350ms ease;
+  transition: opacity 350ms ease, padding-left 400ms ease;
+  padding-left: ${({ $active }) => ($active ? "13px" : "0")};
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 25%;
+    bottom: 25%;
+    width: 2px;
+    background: #d2e2cc;
+    transform: scaleY(${({ $active }) => ($active ? 1 : 0)});
+    transform-origin: center;
+    transition: transform 450ms cubic-bezier(.2,.75,.2,1);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &::before { transition: none; }
+  }
 
   &:hover,
   &:focus-visible {

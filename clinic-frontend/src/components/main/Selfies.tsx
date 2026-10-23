@@ -420,6 +420,7 @@ export default function Selfies() {
                 <S.CardSlot key={item.id} data-selfie-card>
                   <S.CardMotion data-selfie-motion>
                     <S.PhotoButton
+                      data-editorial-spotlight
                       type="button"
                       onClick={() => openPhoto(item)}
                       aria-label={`${index + 1}번 이미지 크게 보기`}

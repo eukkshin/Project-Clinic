@@ -19,8 +19,7 @@ export const AdminPolish = createGlobalStyle`
     --admin-page: #f4f7f4;
     background: var(--admin-page);
     color: var(--admin-ink);
-    font-family: Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
+    font-family: var(--ahns-body);
     min-height: 100dvh;
   }
 

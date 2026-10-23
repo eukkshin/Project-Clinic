@@ -146,6 +146,22 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
           .to("[data-brand-content]", { opacity: 1, duration: 0.45 })
           .to("[data-brand-content]", { opacity: 0, y: -26, duration: 0.25 });
 
+        // 제목 획 사이가 조여지는 에디토리얼 타이포 전환.
+        gsap.fromTo("[data-brand-title]",
+          { letterSpacing: "0.05em", filter: "blur(5px)" },
+          { letterSpacing: "-0.085em", filter: "blur(0px)", ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 76%", end: "top 26%", scrub: 1.2 } }
+        );
+        gsap.fromTo("[data-brand-halo]",
+          { rotate: -28, opacity: 0.03, scale: 0.76 },
+          { rotate: 26, opacity: 0.45, scale: 1.13, ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 90%", end: "bottom 20%", scrub: 1.5 } }
+        );
+        gsap.fromTo("[data-brand-track]", { scaleY: 0 },
+          { scaleY: 1, transformOrigin: "top center", ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 65%", end: "bottom 35%", scrub: 0.9 } }
+        );
+
         // 큰 원은 글자보다 더 천천히 확대되어 공간의 깊이감을 준다.
         gsap.fromTo(
           "[data-brand-orbit]",
@@ -181,10 +197,12 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
       */}
       <S.Bridge ref={bridgeRef} aria-labelledby="ahns-bridge-title">
         <S.Orbit data-brand-orbit aria-hidden="true" />
+        <S.OrbitHalo data-brand-halo aria-hidden="true" />
+        <S.BridgeTrack aria-hidden="true"><span data-brand-track /></S.BridgeTrack>
         <S.BrandContent data-brand-content>
-          <S.Eyebrow>THE AHN'S PHILOSOPHY</S.Eyebrow>
-          <S.BrandTitle id="ahns-bridge-title">Ahn's</S.BrandTitle>
-          <S.Tagline>BEAUTY IN EVERY MOMENT.</S.Tagline>
+          <S.Eyebrow data-brand-eyebrow>THE AHN'S PHILOSOPHY</S.Eyebrow>
+          <S.BrandTitle id="ahns-bridge-title" data-brand-title>Ahn's</S.BrandTitle>
+          <S.Tagline data-brand-tagline>BEAUTY IN EVERY MOMENT.</S.Tagline>
           <S.KoreanText>
             아름다움에 대한 이야기에서
             <br />

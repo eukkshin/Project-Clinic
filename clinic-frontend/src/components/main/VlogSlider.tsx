@@ -326,7 +326,7 @@ export function VlogSlider() {
           </S.HeaderLeft>
           <S.HeaderRight>
             <S.SectionCount>04 / FILM ARCHIVE</S.SectionCount>
-            <S.HeaderRule />
+            <S.HeaderRule data-editorial-rule />
             <S.HeaderSignature>BEYOND THE FRAME — AHN'S</S.HeaderSignature>
           </S.HeaderRight>
         </S.Header>
@@ -351,7 +351,7 @@ export function VlogSlider() {
           <S.CinemaLayout>
             {/* 왼쪽: 선택된 영상 한 개를 크게 보여 준다. */}
             <S.MainColumn data-vlog-main>
-              <S.Stage ref={stageRef}>
+              <S.Stage ref={stageRef} data-editorial-spotlight>
                 {selected && (
                   <>
                     <Image

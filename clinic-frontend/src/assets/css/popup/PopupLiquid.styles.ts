@@ -153,7 +153,7 @@ export const HeaderCopy = styled.div`
 export const Eyebrow = styled.span`
   display: block;
   margin-bottom: 10px;
-  font-family: Arial, sans-serif;
+  font-family: var(--ahns-body);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.21em;

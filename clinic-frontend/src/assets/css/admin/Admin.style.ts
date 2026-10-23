@@ -6,13 +6,7 @@ export const LoginWrapper = styled.div`
   display: grid;
   grid-template-columns: minmax(380px, 0.93fr) minmax(470px, 1.07fr);
   background: #f7f8f4;
-  font-family:
-    Pretendard,
-    "Noto Sans KR",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--ahns-body);
   @media (max-width: 850px) {
     grid-template-columns: 1fr;
   }
@@ -78,7 +72,7 @@ export const LoginHeader = styled.div`
 `;
 export const LeftTitle = styled.h1`
   margin: 0 0 26px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--ahns-display);
   font-size: clamp(54px, 6.2vw, 88px);
   font-weight: 500;
   letter-spacing: -0.055em;

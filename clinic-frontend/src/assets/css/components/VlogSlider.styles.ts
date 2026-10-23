@@ -160,11 +160,15 @@ export const Stage = styled.div`
   overflow: hidden;
   border-radius: 3px;
   background: #879c8a;
+  transition: box-shadow .6s ease;
+  &:hover { box-shadow: 0 28px 68px rgba(27,53,40,.15); }
+  @media (prefers-reduced-motion: reduce) { transition: none; }
 
   /* Next/Image fill이 삽입하는 img를 배경으로 사용한다. */
   > img {
     z-index: -2;
-    transition: transform 1000ms cubic-bezier(0.2, 0.7, 0.1, 1);
+    transition: transform 1000ms cubic-bezier(0.2, 0.7, 0.1, 1),
+      filter 1000ms ease;
   }
   &:hover > img {
     transform: scale(1.025);

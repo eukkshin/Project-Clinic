@@ -471,14 +471,14 @@ export const MobileBridgeTitle = styled.div`
     line-height: 1;
     letter-spacing: -0.055em;
     span {
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--ahns-body);
       color: rgba(248, 247, 237, 0.78);
       font-size: clamp(42px, 10vw, 74px);
       font-weight: 300;
     }
     em {
       margin-top: -6px;
-      font-family: "Iowan Old Style", Baskerville, Georgia, serif;
+      font-family: var(--ahns-display);
       color: rgba(54, 85, 58, 0.75);
       font-size: clamp(42px, 10.5vw, 78px);
     }

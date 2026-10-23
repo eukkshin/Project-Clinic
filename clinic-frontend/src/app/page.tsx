@@ -1,6 +1,7 @@
 import CategoryNav from '@/components/CategoryNav';
 import CircularOverlay from '@/components/CircularOverlay';
 import Hero from '@/components/hero/Hero';
+import EditorialExperience from '@/components/main/EditorialExperience';
 import HomeAtmosphere from '@/components/main/HomeAtmosphere';
 import { SafetySlider } from '@/components/main/SafetySlider';
 import Selfies from '@/components/main/Selfies';
@@ -14,11 +15,13 @@ import RollingBanner from '@/components/RollingBanner';
  * 마지막 두 콘텐츠를 VlogSafetyFlow에 전달하는 이유:
  * VlogSlider와 SafetySlider는 기존 DB 연동을 담당한다.
  * 그 두 컴포넌트를 수정하지 않고 그 사이에만 브랜드 장면을 추가하고,
+ *
  * 세 장면의 배경을 VlogSafetyFlow 하나에서 그리기 위해서다.
  */
 export default function Home() {
   return (
     <HomeAtmosphere>
+      <EditorialExperience />
       {/* Full-Bleed Hero와 중앙 RollingBanner */}
       <Hero rollingBanner={<RollingBanner />} />
 

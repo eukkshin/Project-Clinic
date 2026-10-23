@@ -173,6 +173,9 @@ export const ContactLabel = styled.p`
   letter-spacing: 0.24em;
 `;
 export const PhoneAnchor = styled.a`
+  display: inline-block;
+  transition: color .35s ease, letter-spacing .5s ease;
+  &:hover { letter-spacing: -.035em; }
   color: ${CREAM};
   font-size: clamp(26px, 3vw, 52px);
   text-decoration: none;
@@ -208,6 +211,8 @@ export const AddressText = styled.p`
   word-break: keep-all;
 `;
 export const SimpleTextLink = styled.a`
+  transition: gap .35s ease, color .35s ease;
+  &:hover { gap: 22px; }
   display: inline-flex;
   gap: 14px;
   margin-top: 6px;
@@ -267,6 +272,7 @@ export const MicroLabel = styled.p`
 `;
 export const MapTitle = styled.h3`
   margin: 0;
+  font-family: var(--ahns-display, Georgia, serif);
   font-size: clamp(35px, 3.5vw, 61px);
   line-height: 1.05;
   font-weight: 400;
@@ -319,6 +325,11 @@ export const MapTab = styled.button<{ $selected: boolean }>`
 `;
 export const MapFrame = styled.div`
   position: relative;
+  outline: 1px solid rgba(36,69,53,.12);
+  outline-offset: 9px;
+  transition: outline-offset .65s ease, box-shadow .65s ease;
+  &:hover { outline-offset: 4px; box-shadow: 0 25px 65px rgba(36,69,53,.16); }
+  @media (prefers-reduced-motion: reduce) { transition: none; }
   isolation: isolate;
   width: 100%;
   height: clamp(480px, 47vw, 640px);

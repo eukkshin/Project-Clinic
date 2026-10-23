@@ -268,7 +268,7 @@ export default function CategoryNav() {
     <S.TransitionBridge aria-hidden="true">
       <S.BridgeInner>
         <S.BridgeEyebrow>DISCOVER YOUR OWN BEAUTY</S.BridgeEyebrow>
-        <S.BridgeLine />
+        <S.BridgeLine data-editorial-rule />
         <S.MobileBridgeTitle aria-hidden="true">
           <span>Every detail,</span>
           <em>uniquely yours.</em>
@@ -306,10 +306,10 @@ export default function CategoryNav() {
             <span>— 01 / {String(categories.length).padStart(2, "0")}</span>
           </S.Kicker>
           <S.HeadingRow>
-            <S.Title>
+            <S.Title data-editorial-reveal>
               Discover Your <em>Own Beauty.</em>
             </S.Title>
-            <S.Intro>
+            <S.Intro data-editorial-reveal>
               아름다움은 하나의 기준이 아닌, 각자의 이야기에서 시작됩니다.
               <br />
               아래로 스크롤하며 진료 분야를 만나보세요.
@@ -336,6 +336,7 @@ export default function CategoryNav() {
                   href는 기존 관리자 API의 LINK 값을 사용한다.
                 */}
                 <S.CardLink
+                  data-editorial-spotlight
                   as={Link}
                   href={category.link}
                   aria-label={`${category.name} 자세히 보기`}

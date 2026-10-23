@@ -1,7 +1,9 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef, useState } from "react";
 
 import * as S from "@/assets/css/components/Footer.style";
 
@@ -84,7 +86,35 @@ function safePhoneHref(value: string) {
   return normalized ? `tel:${normalized}` : null;
 }
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Footer() {
+  const footerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) return;
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const ctx = gsap.context(() => {
+        gsap.fromTo("[data-footer-motion]",
+          { opacity: 0, y: 42 },
+          { opacity: 1, y: 0, ease: "power3.out", duration: 1.1,
+            stagger: 0.14,
+            scrollTrigger: { trigger: "[data-footer-intro]", start: "top 82%", once: true },
+          });
+        gsap.fromTo("[data-footer-wordmark]",
+          { opacity: 0, yPercent: 25, letterSpacing: "0.02em" },
+          { opacity: 1, yPercent: 0, letterSpacing: "-0.13em", duration: 1.8,
+            ease: "power3.out",
+            scrollTrigger: { trigger: "[data-footer-wordmark]", start: "top 98%", once: true },
+          });
+      }, footer);
+      return () => ctx.revert();
+    });
+    return () => media.revert();
+  }, []);
+
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(INITIAL_COMPANY);
   const [schedules, setSchedules] = useState<ScheduleData[]>([]);
   const [familySites, setFamilySites] = useState<FamilySiteData[]>([]);
@@ -138,9 +168,9 @@ export default function Footer() {
     : null;
 
   return (
-    <S.FooterWrapper id="site-footer-contact">
+    <S.FooterWrapper ref={footerRef} id="site-footer-contact">
       <S.FooterInner>
-        <S.FooterTopLabel>
+        <S.FooterTopLabel data-footer-intro>
           <span>AHN&apos;S PLASTIC SURGERY</span>
           <span>CONTACT &amp; LOCATION — 06</span>
         </S.FooterTopLabel>
@@ -148,18 +178,18 @@ export default function Footer() {
         {/* 핵심 요청: 왼쪽 병원 정보 / 오른쪽 큰 지도 */}
         <S.MainGrid>
           <S.InfoColumn>
-            <S.IntroSmall>WE ARE HERE FOR YOU</S.IntroSmall>
-            <S.IntroTitle>
+            <S.IntroSmall data-footer-motion>WE ARE HERE FOR YOU</S.IntroSmall>
+            <S.IntroTitle data-footer-motion>
               Find Your
               <br />
               <em>Own Beauty.</em>
             </S.IntroTitle>
-            <S.IntroDescription>
+            <S.IntroDescription data-footer-motion>
               당신만의 아름다움을 찾아가는 여정.
               <br />그 시작을 함께하겠습니다.
             </S.IntroDescription>
 
-            <S.ContactGroup>
+            <S.ContactGroup data-footer-motion>
               <S.ContactLabel>CONTACT</S.ContactLabel>
               {phoneHref ? (
                 <S.PhoneAnchor href={phoneHref}>
@@ -177,7 +207,7 @@ export default function Footer() {
               )}
             </S.ContactGroup>
 
-            <S.ContactGroup>
+            <S.ContactGroup data-footer-motion>
               <S.ContactLabel>CLINIC INFORMATION</S.ContactLabel>
               <S.ClinicTitle>{clinicName}</S.ClinicTitle>
               <S.AddressText>
@@ -249,7 +279,7 @@ export default function Footer() {
           )}
         </S.FooterBottom>
 
-        <S.BottomWordmark aria-hidden="true">AHN&apos;S</S.BottomWordmark>
+        <S.BottomWordmark aria-hidden="true" data-footer-wordmark>AHN&apos;S</S.BottomWordmark>
       </S.FooterInner>
 
       {/* 퀵 메뉴도 실제 동작이 있는 항목만 사용한다. */}

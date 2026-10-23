@@ -363,6 +363,7 @@ export function SafetySlider() {
                     </S.MobilePicture>
 
                     <S.ItemButton
+                      data-editorial-spotlight
                       type="button"
                       $active={activeIndex === index}
                       onClick={() => setActiveIndex(index)}

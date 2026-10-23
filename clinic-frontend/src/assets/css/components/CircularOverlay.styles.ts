@@ -215,6 +215,18 @@ export const EventCard = styled.article<{ $featured: boolean }>`
  */
 export const ImageArea = styled.div`
   position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,.2) 50%, transparent 75%);
+    transform: translateX(-145%);
+    transition: transform 1.2s cubic-bezier(.2,.65,.2,1);
+  }
+  ${EventCard}:hover &::after { transform: translateX(145%); }
+  @media (prefers-reduced-motion: reduce) { &::after { transition: none; display: none; } }
   width: 100%;
   /* Landscape event cards, rather than oversized portrait posters. */
   aspect-ratio: 4 / 3.4;

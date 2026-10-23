@@ -248,6 +248,23 @@ export const PhotoButton = styled.button`
 
 export const PhotoFrame = styled.div`
   position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    inset: 14px;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,.0);
+    transform: scale(.97);
+    transition: border-color .55s ease, transform .65s cubic-bezier(.2,.75,.2,1);
+  }
+  ${PhotoButton}:hover &::after, ${PhotoButton}:focus-visible &::after {
+    border-color: rgba(255,255,255,.65);
+    transform: scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after { transition: none; }
+  }
   width: 100%;
   aspect-ratio: 1 / 1.12;
   overflow: hidden;

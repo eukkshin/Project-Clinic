@@ -71,6 +71,18 @@ export const SlideLink = styled.a`
  */
 export const VisualFrame = styled.div`
   position: absolute;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgba(250,255,244,.08) 48%, transparent 67%);
+    transform: translateX(-110%);
+    transition: transform 1.8s cubic-bezier(.2,.7,.1,1);
+  }
+  ${SlideLink}:hover &::after { transform: translateX(110%); }
+  @media (prefers-reduced-motion: reduce) { &::after { display: none; } }
   inset: 0;
   z-index: 1;
   overflow: hidden;

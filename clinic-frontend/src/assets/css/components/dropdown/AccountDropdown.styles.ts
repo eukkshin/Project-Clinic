@@ -88,7 +88,7 @@ export const Avatar = styled.span`
   border-radius: 50%;
   background: linear-gradient(145deg, #86a68b, #345a41);
   color: #fff;
-  font-family: Georgia, serif;
+  font-family: var(--ahns-display);
   font-size: 13px;
   font-weight: 500;
   text-shadow: none;

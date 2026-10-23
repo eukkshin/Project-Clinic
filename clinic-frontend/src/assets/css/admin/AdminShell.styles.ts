@@ -16,7 +16,7 @@ export const Shell = styled.div`
   overflow: hidden;
   background: var(--canvas);
   color: var(--ink);
-  font-family: Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--ahns-body);
 
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -84,7 +84,7 @@ export const BrandMark = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--ahns-display);
   font-size: 29px;
   line-height: 1;
   color: #f7f4e9;
@@ -92,7 +92,7 @@ export const BrandMark = styled.div`
 
 export const BrandText = styled.div`
   min-width: 0;
-  strong { display:block; font-family: Georgia, serif; font-size:20px; font-weight:600; letter-spacing:.035em; line-height:1.05; }
+  strong { display:block; font-family: var(--ahns-display); font-size:20px; font-weight:600; letter-spacing:.035em; line-height:1.05; }
   small { display:block; margin-top:7px; letter-spacing:.16em; font-size:9px; color:#acc6b0; font-weight:650; }
 `;
 

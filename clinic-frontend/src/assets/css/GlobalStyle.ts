@@ -1,15 +1,29 @@
 "use client";
 
-import styled, { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
+:root {
+  --ahns-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --ahns-body: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+body, button, input, textarea, select {
+  font-family: var(--ahns-body);
+}
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+:focus-visible { outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto !important; }
+}
+
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
 }
-//모든 요소에 테두리까지 포함해서 크기 계산
+/* 모든 요소에 테두리까지 포함해서 크기 계산 */
 *, *::before, *::after {
     box-sizing: border-box;
 }
@@ -23,7 +37,7 @@ ul, ol, li {
     margin: 0;
     padding: 0;
 }
-&::selection {
+::selection {
     background-color: #69826B;
     color: #F5F2E9;
   }

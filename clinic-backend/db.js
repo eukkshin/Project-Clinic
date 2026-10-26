@@ -16,6 +16,8 @@ const EventRanking = require("./src/entity/EventRanking");
 const Vlog = require("./src/entity/Vlog");
 const Board = require("./src/entity/Board");
 const Qna = require("./src/entity/Qna");
+const Reservation = require("./src/entity/Reservation");
+const Treatment = require("./src/entity/Treatment");
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -44,6 +46,8 @@ const AppDataSource = new DataSource({
     Vlog,
     Board,
     Qna,
+    Reservation,
+    Treatment,
   ],
   extra: {
     poolMin: 2,

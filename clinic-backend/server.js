@@ -20,6 +20,10 @@ const EventRanking = require("./src/entity/EventRanking");
 const Vlog = require("./src/entity/Vlog");
 const Board = require("./src/entity/Board");
 const Qna = require("./src/entity/Qna");
+const Reservation = require("./src/entity/Reservation");
+const Treatment = require("./src/entity/Treatment");
+
+
 
 
 const nodemailer = require("nodemailer");
@@ -127,8 +131,18 @@ app.post("/api/register", async (req, res) => {
     // DB 저장을 위한 레포지토리 가져오기
     const memberRepository = AppDataSource.getRepository(Member);
 
+    // 💡 회원가입 시점에 고유 차트번호(CHART_NO) 자동 생성
+    // 예시: 'C' + 연월일 + 랜덤숫자 또는 타임스탬프 뒷자리 조합 (예: C202610261234)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4자리 랜덤 숫자
+    const generatedChartNo = `C${year}${month}${day}-${randomNum}`;
+
     // DB 컬럼에 맞게 데이터 조립 (IS_ADMIN은 DB 기본값 0으로 자동 세팅됨)
     const newMember = {
+      CHART_NO: generatedChartNo, //chartNo 추가
       USER_NAME: userName,
       USER_ID: userId,
       USER_PW: hashedPw,
@@ -1337,8 +1351,8 @@ app.post("/api/reset-password", async (req, res) => {
   }
 });
 
-const qnaRepository = AppDataSource.getRepository(Qna);
 
+const qnaRepository = AppDataSource.getRepository(Qna);
 // ==========================================
 //  Q&A 목록 조회 API
 // ==========================================
@@ -1480,6 +1494,156 @@ app.put('/api/admin/qnas/:id', async (req, res) => {
         res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
     }
 });
+
+// ==========================================
+//  todayDashbord 대시보드  - 예약 시스템
+// ==========================================
+const memberRepo = AppDataSource.getRepository(Member);
+const reservationRepo = AppDataSource.getRepository(Reservation);
+const treatmentRepo = AppDataSource.getRepository(Treatment);
+
+app.post('/api/admin/reservation', async (req, res) => {
+    try {
+        const { 
+          chartNo, treatmentIdx, reservationDate, reservationTime, memo,
+       } = req.body;
+        
+       if (!chartNo || !reservationDate || !reservationTime) {
+            return res.status(400).json({ 
+                success: false, 
+                message: '필수 정보(차트번호, 예약일자, 예약시간)가 누락되었습니다.' 
+            });
+        }
+        //트랜잭션 
+        await AppDataSource.transaction(async (transactionalEntityManager) => {
+            
+            // 트랜잭션 내부 전용 Repository 가져오기
+            const treatmentRepo = transactionalEntityManager.getRepository(Treatment);
+            const reservationRepo = transactionalEntityManager.getRepository(Reservation);
+            const memberRepo = AppDataSource.getRepository(Member);
+
+            const existingMember = await memberRepo.findOne({ where: { CHART_NO: chartNo } });
+            if (!existingMember) {
+                throw new Error('NOT_FOUND_MEMBER');
+            }
+            if (treatmentIdx) {
+                const treatment = await treatmentRepo.findOne({
+                    where: { TREATMENT_IDX: treatmentIdx, CHART_NO: chartNo }
+                });
+
+                if (!treatment) {
+                    throw new Error('NOT_FOUND_TREATMENT'); // 에러를 던지면 자동으로 롤백됩니다.
+                }
+                if (treatment.REMAINING_COUNT <= 0) {
+                    throw new Error('OUT_OF_COUNT');
+                }
+
+                treatment.REMAINING_COUNT -= 1;
+                if (treatment.REMAINING_COUNT === 0) {
+                    treatment.STATUS = 'COMPLETED';
+                }
+                await treatmentRepo.save(treatment);
+            }
+            const newReservation = reservationRepo.create({
+                CHART_NO: chartNo,
+                TREATMENT_IDX: treatmentIdx || null,
+                RESERVATION_DATE: new Date(reservationDate),
+                RESERVATION_TIME: reservationTime,
+                STATUS: 'RESERVED',
+                MEMO: memo || null
+            });
+            await reservationRepo.save(newReservation);
+        });
+        return res.status(200).json({ 
+            success: true, 
+            message: '예약이 성공적으로 등록되었습니다.' 
+        });
+
+    } catch (error) {
+        console.error('예약 등록 중 서버 에러 발생:', error);
+
+        if (error.message === 'NOT_FOUND_MEMBER') {
+            return res.status(404).json({ success: false, message: '존재하지 않는 환자 차트번호입니다.' });
+        }
+        if (error.message === 'NOT_FOUND_TREATMENT') {
+            return res.status(404).json({ success: false, message: '유효하지 않은 시술권입니다.' });
+        }
+        if (error.message === 'OUT_OF_COUNT') {
+            return res.status(400).json({ success: false, message: '잔여 시술 횟수가 모두 소진되었습니다.' });
+        }
+        return res.status(500).json({ 
+            success: false, 
+            message: '서버 에러가 발생했습니다.',
+            error: error.message 
+        });
+    }
+});
+
+app.post('/api/admin/reservation/today', async(req, res)=>{
+  try{
+    const { chartNo, memo } = req.body;
+
+    // 시간을 "HH:MM" 형식(24시간제)으로 안전하게 생성
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`; // 14:30
+    
+    const newReservation = reservationRepo.create({
+            chartNo: chartNo,
+            reservationDate: new Date(),
+            reservationTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'WAITING', 
+            memo: memo || '빠른 현장 접수'
+        });
+    await reservationRepo.save(newReservation);
+    res.status(200).json({ success: true, message: '오늘 대기 목록에 접수되었습니다.' });
+  }catch(error){
+      console.error('오늘 접수 실패:', error);
+      res.status(500).json({ success: false, message: '서버 에러' });
+  }
+})
+
+app.get('/api/admin/today', async(req, res)=>{
+  try{
+      const todayPatients = await reservationRepository
+        .createQueryBuilder("r")
+        .innerJoin("r.member", "m") // Reservation 엔티티에 정의한 relations 이름
+        .select([
+            'm.CHART_NO AS "chartNo"',
+            'm.USER_NAME AS "name"',
+            'm.PHONE AS "phone"',
+            'SUBSTR(m.RESIDENT_NUM, 1, 6) AS "birthDate"',
+            'm.GENDER AS "gender"',
+            'r.RESERVATION_TIME AS "reservationTime"',
+            'r.STATUS AS "status"',
+            'r.MEMO AS "memo"'
+        ])
+        .where("TRUNC(r.RESERVATION_DATE) = TRUNC(SYSDATE)") // 오라클 오늘 날짜 조건
+        .orderBy(`
+            CASE r.STATUS 
+                WHEN 'TREATING' THEN 1 
+                WHEN 'WAITING' THEN 2 
+                WHEN 'RESERVED' THEN 3 
+                WHEN 'CONSULTING' THEN 4 
+                WHEN 'COMPLETED' THEN 5 
+                ELSE 6 
+            END
+        `, "ASC")
+        .getRawMany(); // SQL 결과 형태(DTO)로 바로 가져오기
+    
+        res.status(200).json({
+                success: true,
+                data: todayPatients // 프론트엔드가 원하는 구조의 배열 데이터
+            });
+  }catch(error){
+      console.error('오늘의 예약 목록 조회 실패:', error);
+      res.status(500).json({ success: false, message: '서버 에러 발생' });  
+  }
+})
+
+
+
 
 
 const PORT = process.env.PORT || 4000;

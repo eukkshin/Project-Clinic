@@ -1,10 +1,10 @@
 "use client";
 
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ReactNode, useEffect, useRef } from "react";
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ReactNode, useEffect, useRef } from 'react';
 
-import * as S from "@/assets/css/components/VlogSafetyFlow.styles";
+import * as S from '@/assets/css/components/VlogSafetyFlow.styles';
 
 // GSAP 기본 기능에는 스크롤 진행률 추적이 포함되지 않으므로 플러그인을 등록한다.
 gsap.registerPlugin(ScrollTrigger);
@@ -73,6 +73,25 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
         // 값이 px 단위여야 CSS calc()에서 덧셈이 가능하다.
         flow.style.setProperty("--vlog-height", `${vlogHeight}px`);
         flow.style.setProperty("--bridge-height", `${bridgeHeight}px`);
+
+        // 배경의 색상 단계들을 Bridge 실제 높이의 비율로 배치한다.
+        // 고정 px값을 사용하면 모바일에서 색상이 끝부분에 몰리기 때문에
+        // Vlog/Bridge 크기가 변경될 때마다 함께 다시 계산한다.
+        const positions = [
+          ["--tone-16", 0.16],
+          ["--tone-34", 0.34],
+          ["--tone-52", 0.52],
+          ["--tone-70", 0.7],
+          ["--tone-86", 0.86],
+          ["--tone-end", 1],
+        ] as const;
+
+        for (const [property, progress] of positions) {
+          flow.style.setProperty(
+            property,
+            `${vlogHeight + bridgeHeight * progress}px`,
+          );
+        }
       });
     };
 
@@ -108,9 +127,9 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: bridge,
-            start: "top 90%",
-            end: "bottom 10%",
-            scrub: 0.8,
+            start: "top 82%",
+            end: "bottom 18%",
+            scrub: 1.1,
             invalidateOnRefresh: true,
           },
         });
@@ -121,25 +140,41 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
         timeline
           .fromTo(
             "[data-brand-content]",
-            { opacity: 0, y: 48, scale: 0.96 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.35 },
+            { opacity: 0, y: 30, scale: 0.98 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.3 },
           )
-          .to("[data-brand-content]", { opacity: 1, duration: 0.35 })
-          .to("[data-brand-content]", { opacity: 0, y: -42, duration: 0.3 });
+          .to("[data-brand-content]", { opacity: 1, duration: 0.45 })
+          .to("[data-brand-content]", { opacity: 0, y: -26, duration: 0.25 });
+
+        // 제목 획 사이가 조여지는 에디토리얼 타이포 전환.
+        gsap.fromTo("[data-brand-title]",
+          { letterSpacing: "0.05em", filter: "blur(5px)" },
+          { letterSpacing: "-0.085em", filter: "blur(0px)", ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 76%", end: "top 26%", scrub: 1.2 } }
+        );
+        gsap.fromTo("[data-brand-halo]",
+          { rotate: -28, opacity: 0.03, scale: 0.76 },
+          { rotate: 26, opacity: 0.45, scale: 1.13, ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 90%", end: "bottom 20%", scrub: 1.5 } }
+        );
+        gsap.fromTo("[data-brand-track]", { scaleY: 0 },
+          { scaleY: 1, transformOrigin: "top center", ease: "none",
+            scrollTrigger: { trigger: bridge, start: "top 65%", end: "bottom 35%", scrub: 0.9 } }
+        );
 
         // 큰 원은 글자보다 더 천천히 확대되어 공간의 깊이감을 준다.
         gsap.fromTo(
           "[data-brand-orbit]",
-          { scale: 0.78, opacity: 0.12 },
+          { scale: 0.86, opacity: 0.1 },
           {
-            scale: 1.25,
-            opacity: 0.36,
+            scale: 1.16,
+            opacity: 0.28,
             ease: "none",
             scrollTrigger: {
               trigger: bridge,
-              start: "top 92%",
-              end: "bottom 8%",
-              scrub: true,
+              start: "top 85%",
+              end: "bottom 15%",
+              scrub: 1.1,
             },
           },
         );
@@ -162,10 +197,12 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
       */}
       <S.Bridge ref={bridgeRef} aria-labelledby="ahns-bridge-title">
         <S.Orbit data-brand-orbit aria-hidden="true" />
+        <S.OrbitHalo data-brand-halo aria-hidden="true" />
+        <S.BridgeTrack aria-hidden="true"><span data-brand-track /></S.BridgeTrack>
         <S.BrandContent data-brand-content>
-          <S.Eyebrow>THE AHN'S PHILOSOPHY</S.Eyebrow>
-          <S.BrandTitle id="ahns-bridge-title">Ahn's</S.BrandTitle>
-          <S.Tagline>BEAUTY IN EVERY MOMENT.</S.Tagline>
+          <S.Eyebrow data-brand-eyebrow>THE AHN'S PHILOSOPHY</S.Eyebrow>
+          <S.BrandTitle id="ahns-bridge-title" data-brand-title>Ahn's</S.BrandTitle>
+          <S.Tagline data-brand-tagline>BEAUTY IN EVERY MOMENT.</S.Tagline>
           <S.KoreanText>
             아름다움에 대한 이야기에서
             <br />

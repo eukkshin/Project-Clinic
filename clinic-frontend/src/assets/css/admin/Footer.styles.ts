@@ -19,7 +19,7 @@ export const FooterPageHeader = styled.div`
 
 export const FooterPageTitle = styled.h1`
   font-size: 1.5rem;
-  color: #5a5c69;
+  color: #34453c;
   font-weight: 700;
   margin: 0;
 `;
@@ -29,7 +29,7 @@ export const FooterSaveButton = styled.button`
   color: white;
   border: none;
   padding: 0.5rem 1.2rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   ${FlexCenter}
@@ -55,7 +55,7 @@ export const FooterGrid = styled.div`
 
 export const FooterCard = styled.div`
   background-color: #fff;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   ${BoxShadow}
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
@@ -63,8 +63,8 @@ export const FooterCard = styled.div`
 `;
 
 export const FooterCardHeader = styled.div`
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
+  background-color: #f7f9f7;
+  border-bottom: 1px solid #e4eae5;
   padding: 1rem 1.25rem;
 `;
 
@@ -76,7 +76,7 @@ export const FooterCardTitle = styled.h6`
 
 export const FooterCardBody = styled.div`
   padding: 1.5rem;
-  color: #858796;
+  color: #738079;
 `;
 
 export const FooterFormGroup = styled.div`
@@ -88,7 +88,7 @@ export const FooterLabel = styled.label`
   display: block;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5a5c69;
+  color: #34453c;
   margin-bottom: 0.5rem;
 `;
 
@@ -96,10 +96,10 @@ export const FooterInput = styled.input`
   width: 100%;
   padding: 0.6rem 1rem;
   font-size: 0.9rem;
-  color: #5a5c69;
+  color: #34453c;
   background-color: #fff;
-  border: 1px solid #d1d3e2;
-  border-radius: 0.35rem;
+  border: 1px solid #d6e0d8;
+  border-radius: 12px;
   outline: none;
   box-sizing: border-box;
 
@@ -128,7 +128,7 @@ export const FooterFamilyRow = styled.div`
 export const FooterDeleteBtn = styled.button`
   background: transparent;
   border: none;
-  color: #e74a3b;
+  color: #bf6059;
   cursor: pointer;
   ${FlexCenter}
   ${TransitionAll};
@@ -141,22 +141,22 @@ export const FooterDeleteBtn = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background-color: #fdeaea;
+    background-color: #fff0ee;
     color: #ff4d4f;
   }
 `;
 
 export const FooterAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #5a5c69;
+  color: #34453c;
   padding: 1rem;
   width: 100%;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-weight: 600;
   ${TransitionAll};
   ${FlexCenter}
   gap: 0.5rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   flex-shrink: 0;
   white-space: nowrap;
 

@@ -127,26 +127,39 @@ export default function Visual() {
   return (
     <>
       <S.SetNavContainer>
-        <S.SetNavPageHeader>
-          <S.SetNavPageTitle>메인 비주얼(캐러셀) 관리</S.SetNavPageTitle>
-          <S.SetNavSaveButton onClick={handleSave}>
+        <S.SetNavPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / HERO</span>
+            <S.SetNavPageTitle>메인 비주얼(캐러셀) 관리</S.SetNavPageTitle>
+            <p className="admin-page-description">
+              메인 화면의 이미지와 슬라이드를 관리합니다.
+            </p>
+          </div>
+          <S.SetNavSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.SetNavSaveButton>
         </S.SetNavPageHeader>
 
-        <S.SetNavContentGrid>
-          <S.SetNavCard style={{ gridColumn: "1 / -1" }}>
+        <S.SetNavContentGrid className="admin-page-grid">
+          <S.SetNavCard
+            className="admin-panel"
+            style={{ gridColumn: "1 / -1" }}
+          >
             {" "}
             {/* 가로로 꽉 차게 */}
-            <S.SetNavCardHeader>
+            <S.SetNavCardHeader className="admin-panel-head">
               <S.SetNavCardTitle>슬라이드 이미지 목록</S.SetNavCardTitle>
             </S.SetNavCardHeader>
-            <S.SetNavCardBody>
+            <S.SetNavCardBody className="admin-panel-body">
               <p>홈페이지 메인 화면에 롤링될 이미지들을 등록하세요.</p>
 
               <S.SetNavMenuList>
                 {slides.map((slide, index) => (
                   <S.SetNavMenuItem
+                    className="admin-repeat-row"
                     key={slide.id}
                     style={{
                       display: "flex",
@@ -164,6 +177,7 @@ export default function Visual() {
                     >
                       <strong>슬라이드 {index + 1}</strong>
                       <S.SetNavDeleteButton
+                        className="admin-delete-action"
                         onClick={() => handleRemoveSlide(slide.id)}
                       >
                         <FiTrash2 size={18} /> 삭제
@@ -234,6 +248,7 @@ export default function Visual() {
               </S.SetNavMenuList>
 
               <S.NavAddButton
+                className="admin-outline-action"
                 onClick={handleAddSlide}
                 style={{ marginTop: "20px" }}
               >

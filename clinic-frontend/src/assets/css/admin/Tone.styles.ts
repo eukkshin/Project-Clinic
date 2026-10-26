@@ -21,7 +21,7 @@ export const TonePageHeader = styled.div`
 
 export const TonePageTitle = styled.h2`
   font-size: 1.5rem;
-  color: #5a5c69;
+  color: #34453c;
   font-weight: 700;
   margin: 0;
 `;
@@ -31,7 +31,7 @@ export const ToneSaveButton = styled.button`
   color: #fff;
   border: none;
   padding: 0.5rem 1.2rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   gap: 0.5rem;
@@ -57,7 +57,7 @@ export const ToneCardGrid = styled.div`
 `;
 
 export const ToneSettingsCard = styled.div`
-  border-radius: 0.35rem;
+  border-radius: 12px;
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
@@ -65,7 +65,7 @@ export const ToneSettingsCard = styled.div`
 `;
 
 export const ToneCardHeader = styled.div`
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(59, 122, 87, 0.1);
 `;
@@ -78,7 +78,7 @@ export const ToneCardTitle = styled.h6`
 
 export const ToneCardBody = styled.div`
   padding: 1.5rem;
-  color: #858796;
+  color: #738079;
 
   p {
     margin-top: 0;
@@ -110,7 +110,7 @@ export const ToneColorBox = styled.div<ToneColorBoxProps>`
   box-shadow: ${(props) =>
     props.$isActive
       ? "0 0 0 0.1rem rgba(0, 0, 0, 0.5)"
-      : "0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15)"};
+      : "0 3px 18px rgba(21, 54, 37, 0.055)"};
 
   border: ${(props) =>
     props.$isActive ? "5px solid #fff" : "1px solid rgba(59, 122, 87, 0.1)"};
@@ -126,7 +126,7 @@ export const ToneColorBox = styled.div<ToneColorBoxProps>`
 
 export const ToneToggleWrapper = styled.div`
   display: flex;
-  background-color: #eaecf4;
+  background-color: #e8eeea;
   border-radius: 0.5rem;
   padding: 0.3rem;
   width: fit-content;
@@ -140,7 +140,7 @@ interface ToneModeButtonProps {
 export const ToneModeButton = styled.button<ToneModeButtonProps>`
   border: none;
   padding: 0.6rem 1.5rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -151,7 +151,7 @@ export const ToneModeButton = styled.button<ToneModeButtonProps>`
   background-color: ${(props) =>
     props.$isActive ? (props.$isDark ? "#202020" : "#fff") : "transparent"};
   color: ${(props) =>
-    props.$isActive ? (props.$isDark ? "#fff" : "#202020") : "#858796"};
+    props.$isActive ? (props.$isDark ? "#fff" : "#202020") : "#738079"};
 
   font-weight: 600;
   cursor: pointer;
@@ -159,9 +159,9 @@ export const ToneModeButton = styled.button<ToneModeButtonProps>`
 
 export const ToneSelectedText = styled.div`
   font-size: 0.9rem;
-  border-top: 1px solid #eaecf4;
+  border-top: 1px solid #e8eeea;
   padding-top: 1rem;
   strong {
-    color: #5a5c69;
+    color: #34453c;
   }
 `;

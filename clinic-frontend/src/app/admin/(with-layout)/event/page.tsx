@@ -194,22 +194,31 @@ export default function Event() {
   return (
     <>
       <S.EventAdminContainer>
-        <S.EventPageHeader>
-          <S.EventPageTitle>이벤트 랭킹 관리</S.EventPageTitle>
-          <S.EventSaveButton onClick={handleSave}>
+        <S.EventPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CONTENT / EVENTS</span>
+            <S.EventPageTitle>이벤트 랭킹 관리</S.EventPageTitle>
+            <p className="admin-page-description">
+              이벤트와 랭킹 콘텐츠의 표시 정보를 관리합니다.
+            </p>
+          </div>
+          <S.EventSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.EventSaveButton>
         </S.EventPageHeader>
 
-        <S.EventGrid>
+        <S.EventGrid className="admin-page-grid">
           {/* ⚙️ 1. 새 이벤트 랭킹 등록 폼 */}
-          <S.EventLeftColumn>
-            <S.RankEventCard>
-              <S.EventCardHeader>
+          <S.EventLeftColumn className="admin-editor-column">
+            <S.RankEventCard className="admin-panel">
+              <S.EventCardHeader className="admin-panel-head">
                 <S.EventCardTitle>새 이벤트 등록</S.EventCardTitle>
               </S.EventCardHeader>
-              <S.EventCardBody>
-                <S.EventFormGroup>
+              <S.EventCardBody className="admin-panel-body">
+                <S.EventFormGroup className="admin-form-field">
                   <S.EventLabel>
                     대표 이미지 (정방형 또는 4:5 비율 권장)
                   </S.EventLabel>
@@ -252,7 +261,10 @@ export default function Event() {
                 </S.EventFormGroup>
 
                 <div style={{ display: "flex", gap: "1rem" }}>
-                  <S.EventFormGroup style={{ flex: 1 }}>
+                  <S.EventFormGroup
+                    className="admin-form-field"
+                    style={{ flex: 1 }}
+                  >
                     <S.EventLabel>타이틀 (예: 다다고성형)</S.EventLabel>
                     <S.EventInput
                       type="text"
@@ -263,7 +275,10 @@ export default function Event() {
                     />
                   </S.EventFormGroup>
 
-                  <S.EventFormGroup style={{ flex: 1 }}>
+                  <S.EventFormGroup
+                    className="admin-form-field"
+                    style={{ flex: 1 }}
+                  >
                     <S.EventLabel>가격 텍스트 (예: 149만원)</S.EventLabel>
                     <S.EventInput
                       type="text"
@@ -275,7 +290,10 @@ export default function Event() {
                   </S.EventFormGroup>
                 </div>
 
-                <S.EventAddButton onClick={handleAddEvent}>
+                <S.EventAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddEvent}
+                >
                   <FiPlus size={18} /> 랭킹 리스트에 추가
                 </S.EventAddButton>
               </S.EventCardBody>
@@ -283,15 +301,15 @@ export default function Event() {
           </S.EventLeftColumn>
 
           {/* 📋 2. 등록된 이벤트 랭킹 리스트 */}
-          <S.EventRightColumn>
-            <S.RankEventCard style={{ height: "100%" }}>
-              <S.EventCardHeader>
+          <S.EventRightColumn className="admin-record-column">
+            <S.RankEventCard className="admin-panel" style={{ height: "100%" }}>
+              <S.EventCardHeader className="admin-panel-head">
                 <S.EventCardTitle>
                   현재 랭킹 순위 (총 {events.length}개)
                 </S.EventCardTitle>
               </S.EventCardHeader>
-              <S.EventTableWrapper>
-                <S.EventTable>
+              <S.EventTableWrapper className="admin-table-scroll">
+                <S.EventTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th>순위/이동</th>
@@ -321,12 +339,14 @@ export default function Event() {
                               }}
                             >
                               <S.EventActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveEvent(index, "UP")}
                                 disabled={index === 0}
                               >
                                 <FiArrowUp size={14} />
                               </S.EventActionBtn>
                               <S.EventActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveEvent(index, "DOWN")}
                                 disabled={index === events.length - 1}
                               >
@@ -375,6 +395,7 @@ export default function Event() {
                         </td>
                         <td>
                           <S.EventDeleteBtn
+                            className="admin-delete-action"
                             onClick={() => handleDeleteClick(evt.id)}
                           >
                             <FiTrash2 size={16} />

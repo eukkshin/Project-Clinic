@@ -373,15 +373,15 @@ export default function EventRanking() {
                 <S.SectionNumber>03 — EVENTS</S.SectionNumber>
               </S.HeadingMeta>
 
-              <S.Title id="event-section-title">
+              <S.Title id="event-section-title" data-editorial-reveal>
                 The Most
                 <br />
                 <em>Wanted.</em>
               </S.Title>
 
-              <S.TitleRule aria-hidden="true" />
+              <S.TitleRule aria-hidden="true" data-editorial-rule />
 
-              <S.Description>
+              <S.Description data-editorial-reveal>
                 지금 가장 주목받는 아름다움.
                 <br />
                 당신을 위한 특별한 이벤트를 만나보세요.

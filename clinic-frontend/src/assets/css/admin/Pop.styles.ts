@@ -21,7 +21,7 @@ export const PopPageHeader = styled.header`
 
 export const PopPageTitle = styled.h2`
   font-size: 1.5rem;
-  color: #5a5c69;
+  color: #34453c;
   font-weight: 700;
   margin: 0;
 `;
@@ -31,7 +31,7 @@ export const PopSaveButton = styled.button`
   color: #fff;
   border: none;
   padding: 0.5rem 1.2rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   gap: 0.5rem;
@@ -63,7 +63,7 @@ export const PopLeftColumn = styled.div`
 `;
 
 export const PopCard = styled.div`
-  border-radius: 0.35rem;
+  border-radius: 12px;
   ${BoxShadow};
   border: 1px solid rgba(59, 122, 87, 0.1);
   overflow: hidden;
@@ -71,7 +71,7 @@ export const PopCard = styled.div`
 `;
 
 export const PopCardHeader = styled.header`
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(59, 122, 87, 0.1);
 `;
@@ -84,7 +84,7 @@ export const PopCardTitle = styled.h6`
 
 export const PopCardBody = styled.div`
   padding: 1.5rem;
-  color: #858796;
+  color: #738079;
 `;
 
 export const PopFormGroup = styled.div`
@@ -97,7 +97,7 @@ export const PopFormGroup = styled.div`
 export const PopLabel = styled.label`
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5a5c69;
+  color: #34453c;
   white-space: nowrap;
   flex-shrink: 0;
 `;
@@ -108,7 +108,7 @@ export const PopInput = styled.input`
   font-size: 0.9rem;
   background-color: #fff;
   border: 1px solid rgba(59, 122, 87, 0.3);
-  border-radius: 0.35rem;
+  border-radius: 12px;
   outline: none;
   ${TransitionAll}
 
@@ -123,8 +123,8 @@ export const PopFileInputWrapper = styled.div`
 
   .file-name {
     font-size: 0.9rem;
-    color: #858796;
-    border-bottom: 1px solid #d1d3e2;
+    color: #738079;
+    border-bottom: 1px solid #d6e0d8;
     padding-bottom: 0.5rem;
   }
 `;
@@ -135,17 +135,17 @@ export const PopFileInput = styled.input`
 
 export const PopFileLabel = styled.label`
   background-color: #fff;
-  border: 1px solid #d1d3e2;
+  border: 1px solid #d6e0d8;
   padding: 0.5rem 1rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #5a5c69;
+  color: #34453c;
   cursor: pointer;
   ${TransitionAll};
 
   &:hover {
-    background-color: #f8f9fc;
+    background-color: #f7f9f7;
   }
 `;
 
@@ -156,22 +156,22 @@ export const PopCheckboxLabel = styled.label`
   gap: 6px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #5a5c69;
+  color: #34453c;
   accent-color: #1b4d3e;
   margin-bottom: 1.5rem;
 `;
 
 export const PopAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #5a5c69;
+  color: #34453c;
   padding: 1rem;
   width: 100%;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-weight: 600;
   ${TransitionAll};
   ${FlexCenter}
   gap: 0.5rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   flex-shrink: 0;
   white-space: nowrap;
 
@@ -208,14 +208,14 @@ export const PopTable = styled.table`
       ${TableRowBase}
       th {
         font-size: 0.9rem;
-        color: #5a5c69;
+        color: #34453c;
         font-weight: 700;
         padding: 12px 8px;
         white-space: nowrap;
         border-bottom: 1px solid #eaecf0;
         text-align: center;
         vertical-align: middle;
-        box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
+        box-shadow: 0 2px 10px rgba(21, 54, 37, 0.055);
 
         &:nth-child(1) {
           width: 20%;
@@ -254,7 +254,7 @@ export const PopTable = styled.table`
 
       td {
         font-size: 0.9rem;
-        color: #858796;
+        color: #738079;
         padding: 12px 8px;
         white-space: nowrap;
         border-bottom: 1px solid #eaecf0;
@@ -311,7 +311,7 @@ export const PopBadge = styled.span<PopBadghProps>`
 export const PopDeleteBtn = styled.button`
   background: transparent;
   border: none;
-  color: #e74a3b;
+  color: #bf6059;
   cursor: pointer;
   ${FlexCenter}
   ${TransitionAll};
@@ -322,7 +322,7 @@ export const PopDeleteBtn = styled.button`
   margin: 0 auto;
 
   &:hover {
-    background-color: #fdeaea;
+    background-color: #fff0ee;
     color: #ff4d4f;
   }
 `;

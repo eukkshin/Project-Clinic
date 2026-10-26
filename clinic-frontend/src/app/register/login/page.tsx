@@ -18,6 +18,7 @@ type PopupConfig = {
 
 type LoginResponse = {
   isAdmin?: number | string | boolean;
+  userName?: string;
   message?: string;
 };
 
@@ -84,6 +85,13 @@ export default function LoginPage() {
       }
 
       const isAdminUser = Number(result.isAdmin) === 1;
+
+      if (!isAdminUser && result.userName) {
+        localStorage.setItem("userName", result.userName);
+
+        window.dispatchEvent(new Event("login-success"));
+      }
+
       const targetPath = isAdminUser ? "/admin" : "/";
       const successMessage = isAdminUser
         ? "관리자 계정으로 로그인하셨습니다. 관리자 페이지로 이동하여 다시 로그인해주세요."

@@ -55,19 +55,28 @@ export default function TonePage() {
   return (
     <>
       <S.ToneContainer>
-        <S.TonePageHeader>
-          <S.TonePageTitle>톤앤매너 관리</S.TonePageTitle>
-          <S.ToneSaveButton onClick={handleSave}>
+        <S.TonePageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">BRAND / APPEARANCE</span>
+            <S.TonePageTitle>톤앤매너 관리</S.TonePageTitle>
+            <p className="admin-page-description">
+              사이트의 브랜드 색상과 표시 방식을 설정합니다.
+            </p>
+          </div>
+          <S.ToneSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} />
             저장하기
           </S.ToneSaveButton>
         </S.TonePageHeader>
-        <S.ToneCardGrid>
-          <S.ToneSettingsCard>
-            <S.ToneCardHeader>
+        <S.ToneCardGrid className="admin-settings-grid">
+          <S.ToneSettingsCard className="admin-panel">
+            <S.ToneCardHeader className="admin-panel-head">
               <S.ToneCardTitle>브랜드 메인 컬러(TONE)</S.ToneCardTitle>
             </S.ToneCardHeader>
-            <S.ToneCardBody>
+            <S.ToneCardBody className="admin-panel-body">
               <p>웹사이트 전체에 적용될 주요 색상을 선택하세요</p>
               <S.ToneColorOptionWrapper>
                 <S.ToneColorBox
@@ -111,11 +120,11 @@ export default function TonePage() {
             </S.ToneCardBody>
           </S.ToneSettingsCard>
           {/* Dark Mode 설정 카드 */}
-          <S.ToneSettingsCard>
-            <S.ToneCardHeader>
+          <S.ToneSettingsCard className="admin-panel">
+            <S.ToneCardHeader className="admin-panel-head">
               <S.ToneCardTitle>다크모드(Dark Mode)</S.ToneCardTitle>
             </S.ToneCardHeader>
-            <S.ToneCardBody>
+            <S.ToneCardBody className="admin-panel-body">
               <p>사용자 화면의 다크모드 기본 상태를 설정합니다.</p>
               <S.ToneToggleWrapper>
                 <S.ToneModeButton

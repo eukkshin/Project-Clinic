@@ -61,7 +61,7 @@ export const Header = styled.header`
 `;
 
 export const LeftTitle = styled.h1`
-  font-family: "Times New Roman", serif;
+  font-family: var(--ahns-display);
   font-size: 34px;
   font-weight: 900;
   color: #f4fbf7;
@@ -106,7 +106,7 @@ export const PwCol = styled.div`
     color: #6e707e;
     font-size: 0.85rem;
     font-weight: 400;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--ahns-body);
     font-style: normal;
     font-variant: normal;
     letter-spacing: normal;

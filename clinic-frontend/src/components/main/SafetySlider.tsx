@@ -260,12 +260,10 @@ export function SafetySlider() {
         <S.Header ref={headingRef}>
           <S.Kicker>
             <span aria-hidden="true" />
-            THE AHN'S SAFETY ARCHIVE
+            06 / AHN'S SAFETY SYSTEM
           </S.Kicker>
           <S.Title id="safety-archive-heading">
-            Care in
-            <br />
-            <em>Every Detail.</em>
+            Safety <em>System.</em>
           </S.Title>
           <S.HeaderBottom>
             <S.HeaderDescription>
@@ -365,6 +363,7 @@ export function SafetySlider() {
                     </S.MobilePicture>
 
                     <S.ItemButton
+                      data-editorial-spotlight
                       type="button"
                       $active={activeIndex === index}
                       onClick={() => setActiveIndex(index)}

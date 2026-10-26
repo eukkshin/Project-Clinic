@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 /*
  * Header.styles.ts — Sage/Forest editorial navigation
@@ -19,7 +19,7 @@ interface HeaderProps {
 
 export const HeaderWrapper = styled.header<HeaderProps>`
   --header-text: ${({ $transparent, $dark }) =>
-    $transparent || $dark ? "#F7F6F1" : "#2D4836"};
+    $transparent || $dark ? "#F5F2E9" : "#2D4836"};
   --header-border: ${({ $transparent, $dark }) =>
     $transparent || $dark ? "rgba(255,255,255,.3)" : "rgba(40,75,53,.23)"};
   --header-accent: ${({ $accent }) => $accent};
@@ -79,12 +79,14 @@ export const LogoGroup = styled.div`
 `;
 export const Logo = styled.h1`
   margin: 0;
-  font-family: inherit;
-  font-size: clamp(29px, 2.2vw, 40px);
-  font-weight: 400;
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(50px, 2.2vw, 40px);
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.08em;
+  text-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
 `;
+
 export const LogoImageBox = styled.div`
   position: relative;
   width: 180px;
@@ -97,7 +99,9 @@ export const LogoImageBox = styled.div`
 export const NavGroup = styled.nav`
   display: flex;
   align-items: center;
+  height: 100%;
   gap: clamp(18px, 2.1vw, 38px);
+
   @media (max-width: 1200px) {
     display: none;
   }
@@ -166,6 +170,32 @@ export const PhoneButton = styled.a`
   }
 `;
 export const CtaButton = styled.a`
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 20%,
+      rgba(182, 218, 181, 0.26) 48%,
+      transparent 78%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.9s cubic-bezier(0.2, 0.65, 0.2, 1);
+    pointer-events: none;
+    z-index: -1;
+  }
+  &:hover::before {
+    transform: translateX(120%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      display: none;
+    }
+  }
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -316,7 +346,9 @@ export const MobileNavLink = styled.a`
     margin-left: auto;
     font-size: 20px;
     opacity: 0.55;
-    transition: transform 0.3s ease;
+    transition:
+      transform 0.45s cubic-bezier(0.2, 0.75, 0.2, 1),
+      opacity 0.35s ease;
   }
   &:hover .arrow {
     transform: translate(5px, -5px);

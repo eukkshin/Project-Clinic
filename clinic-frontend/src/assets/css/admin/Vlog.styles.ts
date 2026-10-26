@@ -1,6 +1,11 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import { BoxShadow, FlexBetween, FlexCenter, TransitionAll } from '../Common.styles';
+import {
+  BoxShadow,
+  FlexBetween,
+  FlexCenter,
+  TransitionAll,
+} from "../Common.styles";
 
 // -----------------------------------------
 // 🎯 AdminVlog 관리 전용 스타일
@@ -17,7 +22,7 @@ export const AdminVlogPageHeader = styled.div`
 
 export const AdminVlogPageTitle = styled.h1`
   font-size: 1.5rem;
-  color: #5a5c69;
+  color: #34453c;
   font-weight: 700;
   margin: 0;
 `;
@@ -27,7 +32,7 @@ export const AdminVlogSaveButton = styled.button`
   color: white;
   border: none;
   padding: 0.5rem 1.2rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
   display: flex;
@@ -64,15 +69,15 @@ export const AdminVlogRightColumn = styled.div`
 
 export const AdminVlogCard = styled.div`
   background-color: #fff;
-  border-radius: 0.35rem;
-  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-  border: 1px solid #e3e6f0;
+  border-radius: 12px;
+  box-shadow: 0 3px 18px rgba(21, 54, 37, 0.055);
+  border: 1px solid #e4eae5;
   overflow: hidden;
 `;
 
 export const AdminVlogCardHeader = styled.div`
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
+  background-color: #f7f9f7;
+  border-bottom: 1px solid #e4eae5;
   padding: 1rem 1.25rem;
 `;
 
@@ -84,7 +89,7 @@ export const AdminVlogCardTitle = styled.h6`
 
 export const AdminVlogCardBody = styled.div`
   padding: 1.5rem;
-  color: #858796;
+  color: #738079;
 `;
 
 export const AdminVlogFormGroup = styled.div`
@@ -95,7 +100,7 @@ export const AdminVlogLabel = styled.label`
   display: block;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #5a5c69;
+  color: #34453c;
   margin-bottom: 0.5rem;
 `;
 
@@ -103,10 +108,10 @@ export const AdminVlogInput = styled.input`
   width: 100%;
   padding: 0.6rem 1rem;
   font-size: 0.9rem;
-  color: #5a5c69;
+  color: #34453c;
   background-color: #fff;
-  border: 1px solid #d1d3e2;
-  border-radius: 0.35rem;
+  border: 1px solid #d6e0d8;
+  border-radius: 12px;
   outline: none;
   box-sizing: border-box;
 
@@ -122,7 +127,7 @@ export const AdminVlogFileInputWrapper = styled.div`
 
   .file-name {
     font-size: 0.85rem;
-    color: #858796;
+    color: #738079;
     word-break: break-all;
   }
 `;
@@ -133,12 +138,12 @@ export const AdminVlogFileInput = styled.input`
 
 export const AdminVlogFileLabel = styled.label`
   background-color: #fff;
-  border: 1px solid #d1d3e2;
+  border: 1px solid #d6e0d8;
   padding: 0.5rem 1rem;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #5a5c69;
+  color: #34453c;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -146,7 +151,7 @@ export const AdminVlogFileLabel = styled.label`
   white-space: nowrap;
 
   &:hover {
-    background-color: #eaecf4;
+    background-color: #e8eeea;
   }
 `;
 
@@ -156,9 +161,9 @@ export const AdminVlogPreviewRect = styled.div`
   height: 90px;
   border-radius: 0.25rem;
   overflow: hidden;
-  border: 2px solid #e3e6f0;
+  border: 2px solid #e4eae5;
   margin-top: 1rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
 
   img {
     width: 100%;
@@ -169,15 +174,15 @@ export const AdminVlogPreviewRect = styled.div`
 
 export const AdminVlogAddButton = styled.button`
   border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #5a5c69;
+  color: #34453c;
   padding: 1rem;
   width: 100%;
-  border-radius: 0.35rem;
+  border-radius: 12px;
   font-weight: 600;
   ${TransitionAll};
   ${FlexCenter}
   gap: 0.5rem;
-  background-color: #f8f9fc;
+  background-color: #f7f9f7;
   flex-shrink: 0;
   white-space: nowrap;
 
@@ -198,21 +203,21 @@ export const AdminVlogTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   text-align: center;
-  color: #858796;
+  color: #738079;
   font-size: 0.9rem;
 
   th {
-    color: #5a5c69;
+    color: #34453c;
     font-weight: 700;
     padding: 0.8rem;
     border-bottom: 1px solid #eaecf0;
     white-space: nowrap;
-    box-shadow: 0 2px 6px -2px rgba(90, 92, 105, 0.12);
+    box-shadow: 0 2px 10px rgba(21, 54, 37, 0.055);
   }
 
   td {
     padding: 1rem 0.5rem;
-    border-bottom: 1px solid #eaecf4;
+    border-bottom: 1px solid #e8eeea;
     vertical-align: middle;
   }
 `;
@@ -222,12 +227,12 @@ export const AdminVlogThumbnail = styled.div`
   width: 100px;
   height: 56px;
   border-radius: 0.25rem;
-  background-color: #eaecf4;
+  background-color: #e8eeea;
   margin: 0 auto;
   overflow: hidden;
   ${FlexCenter}
   font-size: 0.7rem;
-  color: #b7b9cc;
+  color: #97a69d;
 
   img {
     width: 100%;
@@ -242,7 +247,7 @@ export const AdminVlogRankBadge = styled.div`
   border-radius: 50%;
   border: none;
   background-color: #eaf2f4;
-  color: #36b9cc;
+  color: #6b9b96;
   ${FlexCenter}
   font-size: 0.85rem;
   font-weight: 800;
@@ -270,7 +275,7 @@ export const AdminVlogActionBtn = styled.button`
 
   &:disabled {
     color: rgba(59, 122, 87, 0.3);
-    background-color: #f8f9fc;
+    background-color: #f7f9f7;
     cursor: default;
   }
 `;
@@ -278,7 +283,7 @@ export const AdminVlogActionBtn = styled.button`
 export const AdminVlogDeleteBtn = styled.button`
   background: transparent;
   border: none;
-  color: #e74a3b;
+  color: #bf6059;
   cursor: pointer;
   ${FlexCenter}
   ${TransitionAll};
@@ -291,7 +296,7 @@ export const AdminVlogDeleteBtn = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background-color: #fdeaea;
+    background-color: #fff0ee;
     color: #ff4d4f;
   }
 `;

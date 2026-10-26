@@ -313,10 +313,10 @@ export function VlogSlider() {
         <S.Header data-vlog-heading>
           <S.HeaderLeft>
             <S.Eyebrow>
-              <span /> AHN'S VISUAL JOURNAL
+              <span /> 04 / AHN'S VLOG
             </S.Eyebrow>
             <S.Title id="ahns-vlog-heading">
-              Stories, <em>In Motion.</em>
+              Clinic <em>Vlog.</em>
             </S.Title>
             <S.Description>
               아름다움을 만드는 순간과 그 안에 담긴 이야기.
@@ -326,7 +326,7 @@ export function VlogSlider() {
           </S.HeaderLeft>
           <S.HeaderRight>
             <S.SectionCount>04 / FILM ARCHIVE</S.SectionCount>
-            <S.HeaderRule />
+            <S.HeaderRule data-editorial-rule />
             <S.HeaderSignature>BEYOND THE FRAME — AHN'S</S.HeaderSignature>
           </S.HeaderRight>
         </S.Header>
@@ -351,7 +351,7 @@ export function VlogSlider() {
           <S.CinemaLayout>
             {/* 왼쪽: 선택된 영상 한 개를 크게 보여 준다. */}
             <S.MainColumn data-vlog-main>
-              <S.Stage ref={stageRef}>
+              <S.Stage ref={stageRef} data-editorial-spotlight>
                 {selected && (
                   <>
                     <Image

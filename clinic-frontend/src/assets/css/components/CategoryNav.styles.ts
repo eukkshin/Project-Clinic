@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /**
  * [홈페이지 공통 색상]
@@ -17,24 +17,24 @@ export const TransitionBridge = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: clamp(220px, 32svh, 400px);
-  padding: 56px 24px;
+  min-height: 0;
+  padding: 0;
+  box-sizing: border-box;
   text-align: center;
   color: ${DARK};
-  overflow-x: clip;
-  /*
-   * Hero가 끝날 때 전체 화면을 #A1AF96 단색으로 정렬한다.
-   * 첫 14%도 동일한 색을 유지하다가 아이보리로 서서히 이어진다.
-   * 경계에서 서로 다른 그라데이션이 맞닿아 생기던 이질감을 줄인다.
-   */
-  background: linear-gradient(
-    180deg,
-    ${SAGE} 0%,
-    ${SAGE} 14%,
-    #bbcab5 42%,
-    #dee6da 73%,
-    ${IVORY} 100%
-  );
+  background: transparent;
+  @media (min-width: 769px) { display: none; }
+
+  @media (max-width: 768px) {
+    min-height: clamp(260px, 38svh, 400px);
+    /* Hero 모바일 하단의 아이보리와 양 끝 색을 맞춰 단절을 없앤다. */
+    background: linear-gradient(
+      180deg,
+      #f7f4ea 0%,
+      #e9efe5 52%,
+      #f7f4ea 100%
+    );
+  }
 `;
 
 export const BridgeInner = styled.div`
@@ -47,8 +47,8 @@ export const BridgeEyebrow = styled.p`
   font-family: inherit;
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.2em;
-  color: #5d7560;
+  letter-spacing: 0.27em;
+  color: #607965;
 `;
 
 export const BridgeText = styled.p`
@@ -66,11 +66,10 @@ export const BridgeText = styled.p`
 `;
 
 export const BridgeLine = styled.div`
-  display: block;
   width: 68px;
   height: 1px;
-  margin: 0 auto;
-  background: rgba(52, 70, 56, 0.35);
+  margin: 24px auto 0;
+  background: rgba(52, 70, 56, 0.3);
 `;
 
 /**
@@ -85,9 +84,19 @@ export const Section = styled.section`
   justify-content: center;
   width: 100%;
   height: 100svh;
-  min-height: 0;
+  min-height: 650px;
+  padding: clamp(50px, 5.2vw, 84px) 0;
+  box-sizing: border-box;
   overflow: hidden;
-  background: ${IVORY};
+  /* Hero 마지막 프레임(#F7F4EA)에서 공통 배경(HomeCanvas)이
+     서서히 드러나도록 상단에만 매우 얇은 색상 보정층을 둔다.
+     이 레이어는 카드/GSAP pin의 위치나 크기를 바꾸지 않는다. */
+  background: linear-gradient(
+    180deg,
+    #f7f4ea 0px,
+    rgba(247, 244, 234, 0.88) 115px,
+    rgba(247, 244, 234, 0) 340px
+  );
   color: ${DARK};
 
   @media (max-width: 768px) {
@@ -108,8 +117,8 @@ export const LoadingMessage = styled.p`
 export const Heading = styled.div`
   position: relative;
   z-index: 1;
-  padding: 0 clamp(24px, 7vw, 140px);
-  margin-bottom: clamp(20px, 3svh, 42px);
+  padding: 0 clamp(24px, 6vw, 112px);
+  margin-bottom: clamp(22px, 2.55vw, 40px);
 `;
 
 export const Kicker = styled.p`
@@ -151,11 +160,11 @@ export const HeadingRow = styled.div`
 export const Title = styled.h2`
   margin: 0;
   max-width: 900px;
-  font-family: inherit;
-  font-size: clamp(40px, 5.6vw, 86px);
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(42px, 4.45vw, 72px);
   font-weight: 400;
-  line-height: 1.06;
-  letter-spacing: -0.06em;
+  line-height: 1.08;
+  letter-spacing: -0.065em;
 
   em {
     font-style: italic;
@@ -188,7 +197,11 @@ export const Viewport = styled.div`
   width: 100%;
   flex: 0 0 auto;
   overflow: hidden;
+  scroll-padding-inline: clamp(24px, 6vw, 112px);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   outline-offset: -4px;
+  &::-webkit-scrollbar{display:none;}
 
   &:focus-visible {
     outline: 2px solid #738f78;
@@ -215,8 +228,8 @@ export const Track = styled.div`
   display: flex;
   width: max-content;
   align-items: stretch;
-  gap: clamp(14px, 1.8vw, 28px);
-  padding: 0 clamp(24px, 7vw, 140px);
+  gap: clamp(9px, 1vw, 18px);
+  padding: 0 clamp(24px, 6vw, 112px);
   will-change: transform;
 
   @media (max-width: 768px) {
@@ -236,17 +249,20 @@ export const Track = styled.div`
 export const Card = styled.article<{ $index: number }>`
   position: relative;
   flex: 0 0 auto;
-  width: min(62vw, 840px);
-  height: clamp(250px, 47svh, 520px);
+  /* Three editorial photo cards are visible on wide screens.
+     Width still drives the original GSAP getDistance() pin + scrub. */
+  width: clamp(270px, 30.5vw, 535px);
+  height: clamp(345px, 48svh, 530px);
+  scroll-snap-align: start;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 0;
   isolation: isolate;
   background: ${({ $index }) =>
     ["#B8C7B3", "#869D8B", "#D2DAC9", "#708975"][$index % 4]};
 
   @media (max-width: 768px) {
-    width: 84vw;
-    height: clamp(360px, 58svh, 490px);
+    width: 80vw;
+    height: clamp(300px, 56svh, 460px);
     scroll-snap-align: center;
   }
 `;
@@ -293,12 +309,11 @@ export const ImageShade = styled.div`
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(18, 36, 26, 0.2) 0%,
-    rgba(18, 36, 26, 0.03) 40%,
-    rgba(18, 36, 26, 0.71) 100%
-  );
+  background: linear-gradient(180deg,
+    rgba(246, 246, 238, .10) 0%,
+    rgba(15, 42, 26, .01) 38%,
+    rgba(17, 39, 27, .12) 60%,
+    rgba(15, 38, 24, .68) 100%);
 `;
 
 export const CardTop = styled.div`
@@ -341,7 +356,7 @@ export const CardArrow = styled.span`
 export const CardBottom = styled.div`
   position: relative;
   z-index: 1;
-  padding: 0 clamp(22px, 3.2vw, 42px) clamp(22px, 3.2vw, 42px);
+  padding: 0 clamp(18px, 2vw, 28px) clamp(20px, 2vw, 30px);
 `;
 
 export const CardNumber = styled.span`
@@ -358,7 +373,7 @@ export const CardNumber = styled.span`
 export const CardTitle = styled.h3`
   margin: 14px 0 18px;
   font-family: inherit;
-  font-size: clamp(36px, 5.25vw, 74px);
+  font-size: clamp(29px, 2.85vw, 45px);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.05em;
@@ -390,7 +405,7 @@ export const ProgressInfo = styled.div`
   display: flex;
   align-items: center;
   gap: clamp(18px, 3vw, 48px);
-  padding: clamp(16px, 2.6svh, 30px) clamp(24px, 7vw, 140px) 0;
+  padding: 18px clamp(24px, 6vw, 112px) 0;
   color: #687f6b;
 `;
 
@@ -445,9 +460,44 @@ export const PageNumber = styled.span`
   }
 `;
 
-// 브랜드 문구에서 특정 단어를 강조하는 스타일
-export const BridgeEm = styled.em`
-  color: #69826b;
-  font-style: italic;
-  font-weight: 400;
+/** On mobile (no Hero pin), present the type as a quiet scroll-through interlude. */
+export const MobileBridgeTitle = styled.div`
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0 10px;
+    line-height: 1;
+    letter-spacing: -0.055em;
+    span {
+      font-family: var(--ahns-body);
+      color: rgba(248, 247, 237, 0.78);
+      font-size: clamp(42px, 10vw, 74px);
+      font-weight: 300;
+    }
+    em {
+      margin-top: -6px;
+      font-family: var(--ahns-display);
+      color: rgba(54, 85, 58, 0.75);
+      font-size: clamp(42px, 10.5vw, 78px);
+    }
+  }
+`;
+
+
+/* ── Ahn's editorial gallery / 2026 redesign ──────────────────────────
+   The Hero is the only pinned opening scene. Category is a light, compact
+   native carousel: no extra pin, no inter-section scroll stall.           */
+export const GalleryButtons = styled.div`
+  display:flex; align-items:center; gap:7px; margin-left:14px;
+  @media(max-width:768px){display:none;}
+`;
+export const GalleryButton = styled.button`
+  width:37px; height:37px; display:grid; place-items:center;
+  border:1px solid rgba(36,69,53,.4); border-radius:50%;
+  color:#244535; background:rgba(255,255,255,.20); cursor:pointer;
+  transition:color .2s, background .2s;
+  &:hover{color:#f7f4ea; background:#244535;}
+  &:focus-visible{outline:2px solid #244535; outline-offset:3px;}
 `;

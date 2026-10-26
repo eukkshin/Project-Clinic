@@ -212,6 +212,7 @@ app.post("/api/login", async (req, res) => {
       success: true,
       message: "로그인에 성공했습니다",
       isAdmin: user.IS_ADMIN,
+      userName: user.USER_NAME,
       //관리자면 1, 일반 회원이면 0
     });
   } catch (error) {

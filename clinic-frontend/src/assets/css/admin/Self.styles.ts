@@ -282,8 +282,8 @@ interface SelfStatusBadgeProps {
   $isActive: boolean;
 }
 export const SelfStatusBadge = styled.span<SelfStatusBadgeProps>`
-  background-color: ${(props) => (props.$isActive ? "#2e7d32" : "#d39e00")};
-  color: white;
+  background-color: ${(props) => (props.$isActive ? "#e2f1e5" : "#f7eddc")};
+  color: #315b43;
   padding: 0.3rem 0.6rem;
   border-radius: 1rem;
   font-size: 0.8rem;

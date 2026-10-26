@@ -41,7 +41,7 @@ export const AdminSidebarBrand = styled.div<AdminSidebarProps>`
 `;
 
 export const AdminLeftTitle = styled.h1`
-  font-family: "Times New Roman", serif;
+  font-family: var(--ahns-display);
   font-size: 34px;
   font-weight: 900;
   color: #f4fbf7;

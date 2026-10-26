@@ -347,28 +347,24 @@ export default function Selfies() {
     setSelected(item);
   };
 
-  useEffect(() => {}, []);
-
   return (
     <S.Section ref={sectionRef} aria-labelledby="selfies-title">
       <S.Inner>
         <S.Heading data-selfie-heading>
           <S.HeadingMeta>
-            <S.Eyebrow>AHN'S VISUAL STORY</S.Eyebrow>
-            <S.SectionNumber>02 — MOMENTS</S.SectionNumber>
+            <S.Eyebrow>02 / AHN'S MOMENTS</S.Eyebrow>
+            <S.SectionNumber>REAL MOMENTS</S.SectionNumber>
           </S.HeadingMeta>
 
           <S.HeadingRow>
             <S.HeadingMain>
               <S.Title id="selfies-title">
-                Every Face,
-                <br />
-                <em>A Different Story.</em>
+                Real <em>Stories.</em>
               </S.Title>
               <S.Description>
-                작은 순간에도 저마다의 분위기가 있어요.
+                안즈와 함께한, 더 특별해진 일상.
                 <br />
-                등록된 갤러리 사진을 새로운 시선으로 만나보세요.
+                자연스러운 순간을 만나보세요.
               </S.Description>
             </S.HeadingMain>
 
@@ -424,6 +420,7 @@ export default function Selfies() {
                 <S.CardSlot key={item.id} data-selfie-card>
                   <S.CardMotion data-selfie-motion>
                     <S.PhotoButton
+                      data-editorial-spotlight
                       type="button"
                       onClick={() => openPhoto(item)}
                       aria-label={`${index + 1}번 이미지 크게 보기`}

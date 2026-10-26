@@ -655,7 +655,7 @@ export const LogoGroup = styled.div`
 `;
 
 export const Logo = styled.h1`
-  font-family: "Times New Roman", serif;
+  font-family: var(--ahns-display);
   font-size: 34px;
   color: #3e2723;
   margin: 0;

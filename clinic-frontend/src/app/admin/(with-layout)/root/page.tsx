@@ -115,72 +115,80 @@ export default function Root() {
     <>
       <S.DashContainer>
         <S.DashHeader>
-          <S.DashTitle>대시보드 (통합 관리 현황)</S.DashTitle>
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">OVERVIEW / LIVE DATA</span>
+            <S.DashTitle>대시보드 (통합 관리 현황)</S.DashTitle>
+            <p className="admin-page-description">
+              회원·상담·콘텐츠의 현황을 한곳에서 확인합니다.
+            </p>
+          </div>
         </S.DashHeader>
 
         {/* 🎯 1. 최상단 요약 카드 (실제 DB 연동 완료) */}
-        <S.SummaryGrid>
+        <S.SummaryGrid className="admin-kpi-grid">
           {/* 상담신청관리 */}
-          <S.SummaryCard $color="#4e73df">
+          <S.SummaryCard className="admin-kpi-card" $color="#2e6543">
             <S.SummaryCardBody>
               <div>
-                <S.SummaryTitle $color="#4e73df">
+                <S.SummaryTitle className="admin-kpi-label" $color="#2e6543">
                   신규 상담 신청 (누적)
                 </S.SummaryTitle>
-                <S.SummaryValue>
+                <S.SummaryValue className="admin-kpi-value">
                   {stats.consultationsCount.toLocaleString()} 건
                 </S.SummaryValue>
               </div>
-              <S.SummaryIcon>
+              <S.SummaryIcon className="admin-kpi-icon">
                 <FiMessageSquare size={32} />
               </S.SummaryIcon>
             </S.SummaryCardBody>
           </S.SummaryCard>
 
           {/* 회원관리 */}
-          <S.SummaryCard $color="#1cc88a">
+          <S.SummaryCard className="admin-kpi-card" $color="#80a78a">
             <S.SummaryCardBody>
               <div>
-                <S.SummaryTitle $color="#1cc88a">총 가입 회원</S.SummaryTitle>
-                <S.SummaryValue>
+                <S.SummaryTitle className="admin-kpi-label" $color="#80a78a">
+                  총 가입 회원
+                </S.SummaryTitle>
+                <S.SummaryValue className="admin-kpi-value">
                   {stats.membersCount.toLocaleString()} 명
                 </S.SummaryValue>
               </div>
-              <S.SummaryIcon>
+              <S.SummaryIcon className="admin-kpi-icon">
                 <FiUsers size={32} />
               </S.SummaryIcon>
             </S.SummaryCardBody>
           </S.SummaryCard>
 
           {/* 이벤트랭킹관리 */}
-          <S.SummaryCard $color="#36b9cc">
+          <S.SummaryCard className="admin-kpi-card" $color="#bb9c6a">
             <S.SummaryCardBody>
               <div>
-                <S.SummaryTitle $color="#36b9cc">
+                <S.SummaryTitle className="admin-kpi-label" $color="#bb9c6a">
                   진행중인 이벤트
                 </S.SummaryTitle>
-                <S.SummaryValue>
+                <S.SummaryValue className="admin-kpi-value">
                   {stats.eventsCount.toLocaleString()} 개
                 </S.SummaryValue>
               </div>
-              <S.SummaryIcon>
+              <S.SummaryIcon className="admin-kpi-icon">
                 <FiStar size={32} />
               </S.SummaryIcon>
             </S.SummaryCardBody>
           </S.SummaryCard>
 
           {/* 게시판관리 */}
-          <S.SummaryCard $color="#f6c23e">
+          <S.SummaryCard className="admin-kpi-card" $color="#748d7c">
             <S.SummaryCardBody>
               <div>
-                <S.SummaryTitle $color="#f6c23e">
+                <S.SummaryTitle className="admin-kpi-label" $color="#748d7c">
                   운영 중인 게시판
                 </S.SummaryTitle>
-                <S.SummaryValue>
+                <S.SummaryValue className="admin-kpi-value">
                   {stats.boardsCount.toLocaleString()} 개
                 </S.SummaryValue>
               </div>
-              <S.SummaryIcon>
+              <S.SummaryIcon className="admin-kpi-icon">
                 <FiClipboard size={32} />
               </S.SummaryIcon>
             </S.SummaryCardBody>
@@ -188,14 +196,14 @@ export default function Root() {
         </S.SummaryGrid>
 
         {/* 🎯 2. 차트 영역 (그래프) */}
-        <S.ChartGrid>
-          <S.ChartCard>
-            <S.ChartHeader>
+        <S.ChartGrid className="admin-charts-grid">
+          <S.ChartCard className="admin-panel">
+            <S.ChartHeader className="admin-panel-head">
               <S.ChartTitle>
                 <FiTrendingUp /> 월별 상담 신청 추이
               </S.ChartTitle>
             </S.ChartHeader>
-            <S.ChartBody>
+            <S.ChartBody className="admin-panel-body">
               <S.BarChartContainer>
                 {monthlyData.map((data, idx) => (
                   <S.BarWrapper key={idx}>
@@ -208,13 +216,14 @@ export default function Root() {
             </S.ChartBody>
           </S.ChartCard>
 
-          <S.ChartCard>
-            <S.ChartHeader>
+          <S.ChartCard className="admin-panel">
+            <S.ChartHeader className="admin-panel-head">
               <S.ChartTitle>
                 <FiPieChart /> 시술 관심도 분포
               </S.ChartTitle>
             </S.ChartHeader>
             <S.ChartBody
+              className="admin-panel-body"
               style={{
                 display: "flex",
                 justifyContent: "center",
@@ -230,21 +239,21 @@ export default function Root() {
                 <S.LegendItem>
                   <span
                     className="dot"
-                    style={{ background: "#4e73df" }}
+                    style={{ background: "#2e6543" }}
                   ></span>
                   눈성형 (45%)
                 </S.LegendItem>
                 <S.LegendItem>
                   <span
                     className="dot"
-                    style={{ background: "#1cc88a" }}
+                    style={{ background: "#80a78a" }}
                   ></span>
                   코성형 (30%)
                 </S.LegendItem>
                 <S.LegendItem>
                   <span
                     className="dot"
-                    style={{ background: "#36b9cc" }}
+                    style={{ background: "#bb9c6a" }}
                   ></span>
                   안티에이징 (25%)
                 </S.LegendItem>
@@ -254,14 +263,14 @@ export default function Root() {
         </S.ChartGrid>
 
         {/* 🎯 3. 시스템 운영 현황 (실제 DB 연동 완료) */}
-        <S.SystemGrid>
-          <S.SystemCard>
-            <S.ChartHeader>
+        <S.SystemGrid className="admin-systems-grid">
+          <S.SystemCard className="admin-panel">
+            <S.ChartHeader className="admin-panel-head">
               <S.ChartTitle>
                 <FiSettings /> 프론트 UI / 설정 상태
               </S.ChartTitle>
             </S.ChartHeader>
-            <S.ChartBody>
+            <S.ChartBody className="admin-panel-body">
               <S.StatusList>
                 <S.StatusItem>
                   <div className="label">
@@ -285,13 +294,13 @@ export default function Root() {
             </S.ChartBody>
           </S.SystemCard>
 
-          <S.SystemCard>
-            <S.ChartHeader>
+          <S.SystemCard className="admin-panel">
+            <S.ChartHeader className="admin-panel-head">
               <S.ChartTitle>
                 <FiImage /> 미디어 / 마케팅 모듈
               </S.ChartTitle>
             </S.ChartHeader>
-            <S.ChartBody>
+            <S.ChartBody className="admin-panel-body">
               <S.StatusList>
                 <S.StatusItem>
                   <div className="label">
@@ -319,13 +328,13 @@ export default function Root() {
             </S.ChartBody>
           </S.SystemCard>
 
-          <S.SystemCard>
-            <S.ChartHeader>
+          <S.SystemCard className="admin-panel">
+            <S.ChartHeader className="admin-panel-head">
               <S.ChartTitle>
                 <FiVideo /> 비디오 / 특수 모듈
               </S.ChartTitle>
             </S.ChartHeader>
-            <S.ChartBody>
+            <S.ChartBody className="admin-panel-body">
               <S.StatusList>
                 <S.StatusItem>
                   <div className="label">

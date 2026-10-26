@@ -1,18 +1,18 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes } from 'styled-components';
 
 /*
  * Footer.styles.ts
  * [연결 디자인]
- * Safety Archive 마지막 배경(#17352B)과 푸터 시작 색을 동일하게 만든다.
- * 별도의 상단 border나 가상 그라데이션을 두지 않아 얇은 경계선을 방지한다.
+ * Safety의 포레스트 그린에서 아이보리로 부드럽게 돌아오는 밝은 Footer.
+ * 연락처/지도 기능은 모두 보존한다.
  * [레이아웃]
  * PC: 좌측 정보 / 우측 대형 지도 2열
  * 모바일: 정보 / 지도를 세로로 1열
  */
-const FOREST = "#17352B";
-const CREAM = "#F6F5ED";
-const MUTED = "#B9CCBC";
-const HAIRLINE = "rgba(231, 241, 227, 0.17)";
+const FOREST = "#f7f4ea";
+const CREAM = "#244535";
+const MUTED = "#647969";
+const HAIRLINE = "rgba(36,69,53,.18)";
 
 const mapFade = keyframes`
   from { opacity: 0; transform: translateY(9px); }
@@ -24,14 +24,78 @@ export const FooterWrapper = styled.footer`
   isolation: isolate;
   z-index: 1;
   width: 100%;
-  background: ${FOREST};
+
+  background-color: #f7f4ea;
+
+  background-image: linear-gradient(
+    to bottom,
+    #1b3528 0px,
+    #1b3528 80px,
+    #244535 160px,
+    #45684d 260px,
+    #87a188 390px,
+    #c8d7c4 510px,
+    #f7f4ea 620px,
+    #f7f4ea 100%
+  );
+
   color: ${CREAM};
-  padding: clamp(88px, 10vw, 160px) 0 0;
+  padding: 620px 0 0;
   font-family: inherit;
-  /* CSS grid 지도 내부가 뷰포트 밖으로 나가지 않게 한다. */
   overflow: clip;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 0;
+    height: 620px;
+    pointer-events: none;
+
+    background: url("/images/ahns-editorial-mist.webp") center top / 1550px auto
+      repeat-x;
+
+    opacity: 0.2;
+
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.2) 20%,
+      #000 50%,
+      transparent 100%
+    );
+
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.2) 20%,
+      #000 50%,
+      transparent 100%
+    );
+  }
+
+  @media (max-width: 768px) {
+    background-image: linear-gradient(
+      to bottom,
+      #1b3528 0px,
+      #1b3528 50px,
+      #45684d 130px,
+      #8fab90 220px,
+      #d9e4d5 310px,
+      #f7f4ea 380px,
+      #f7f4ea 100%
+    );
+
+    padding-top: 380px;
+
+    &::before {
+      height: 380px;
+    }
+  }
 `;
 export const FooterInner = styled.div`
+  position: relative;
+  z-index: 1;
   width: min(100%, 1860px);
   margin: 0 auto;
   padding: 0 clamp(20px, 5.5vw, 105px);
@@ -41,7 +105,7 @@ export const FooterTopLabel = styled.div`
   justify-content: space-between;
   gap: 24px;
   padding-bottom: 27px;
-  margin-bottom: clamp(65px, 7vw, 110px);
+  margin-bottom: clamp(45px, 5vw, 80px);
   border-bottom: 1px solid ${HAIRLINE};
   color: ${MUTED};
   font-size: 10px;
@@ -66,7 +130,7 @@ export const InfoColumn = styled.div`
 `;
 export const IntroSmall = styled.p`
   margin: 0 0 26px;
-  color: #b5cdba;
+  color: #627b66;
   font-size: 10px;
   letter-spacing: 0.25em;
   font-weight: 500;
@@ -74,13 +138,13 @@ export const IntroSmall = styled.p`
 export const IntroTitle = styled.h2`
   margin: 0;
   color: ${CREAM};
-  font-family: inherit;
+  font-family: var(--ahns-display, Georgia, serif);
   font-weight: 400;
-  font-size: clamp(53px, 5.6vw, 104px);
+  font-size: clamp(46px, 4.8vw, 79px);
   line-height: 0.95;
   letter-spacing: -0.078em;
   em {
-    color: #afcaaf;
+    color: #6c8a70;
     font-weight: 400;
   }
   @media (max-width: 420px) {
@@ -103,12 +167,15 @@ export const ContactGroup = styled.div`
 `;
 export const ContactLabel = styled.p`
   margin: 0 0 12px;
-  color: #a0b6a3;
+  color: #69826b;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.24em;
 `;
 export const PhoneAnchor = styled.a`
+  display: inline-block;
+  transition: color .35s ease, letter-spacing .5s ease;
+  &:hover { letter-spacing: -.035em; }
   color: ${CREAM};
   font-size: clamp(26px, 3vw, 52px);
   text-decoration: none;
@@ -116,7 +183,7 @@ export const PhoneAnchor = styled.a`
   letter-spacing: -0.055em;
   line-height: 1.2;
   &:hover {
-    color: #c9dfcb;
+    color: #6c8870;
   }
 `;
 export const ContactPlaceholder = styled.span`
@@ -144,16 +211,18 @@ export const AddressText = styled.p`
   word-break: keep-all;
 `;
 export const SimpleTextLink = styled.a`
+  transition: gap .35s ease, color .35s ease;
+  &:hover { gap: 22px; }
   display: inline-flex;
   gap: 14px;
   margin-top: 6px;
   padding-bottom: 5px;
-  border-bottom: 1px solid rgba(242, 248, 238, 0.5);
+  border-bottom: 1px solid rgba(36, 69, 53, 0.23);
   color: ${CREAM};
   text-decoration: none;
   font-size: 12px;
   &:hover {
-    color: #b9d1bc;
+    color: #3a5b40;
   }
 `;
 export const HoursGroup = styled.div`
@@ -198,11 +267,12 @@ export const MapHeading = styled.div`
 export const MicroLabel = styled.p`
   margin: 0 0 12px;
   font-size: 10px;
-  color: #abc1ae;
+  color: #56765a;
   letter-spacing: 0.22em;
 `;
 export const MapTitle = styled.h3`
   margin: 0;
+  font-family: var(--ahns-display, Georgia, serif);
   font-size: clamp(35px, 3.5vw, 61px);
   line-height: 1.05;
   font-weight: 400;
@@ -210,18 +280,18 @@ export const MapTitle = styled.h3`
   color: ${CREAM};
   em {
     font-weight: 400;
-    color: #abc6ad;
+    color: #5c795f;
   }
 `;
 export const MapTabs = styled.div`
   display: inline-flex;
   gap: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(36, 69, 53, 0.21);
 `;
 export const MapTab = styled.button<{ $selected: boolean }>`
   position: relative;
   background: transparent;
-  color: ${({ $selected }) => ($selected ? "#F6F5ED" : "#96AE9D")};
+  color: ${({ $selected }) => ($selected ? "#244535" : "#728c75")};
   border: 0;
   padding: 13px 15px 14px;
   font-family: inherit;
@@ -246,7 +316,7 @@ export const MapTab = styled.button<{ $selected: boolean }>`
     transition: transform 0.3s ease;
   }
   &:hover {
-    color: #fff;
+    color: #244535;
   }
   &:focus-visible {
     outline: 2px solid ${CREAM};
@@ -255,6 +325,11 @@ export const MapTab = styled.button<{ $selected: boolean }>`
 `;
 export const MapFrame = styled.div`
   position: relative;
+  outline: 1px solid rgba(36,69,53,.12);
+  outline-offset: 9px;
+  transition: outline-offset .65s ease, box-shadow .65s ease;
+  &:hover { outline-offset: 4px; box-shadow: 0 25px 65px rgba(36,69,53,.16); }
+  @media (prefers-reduced-motion: reduce) { transition: none; }
   isolation: isolate;
   width: 100%;
   height: clamp(480px, 47vw, 640px);
@@ -356,7 +431,7 @@ export const OutlineLink = styled.a`
   align-items: center;
   gap: 20px;
   padding: 12px 16px;
-  border: 1px solid rgba(245, 249, 243, 0.35);
+  border: 1px solid rgba(36, 69, 53, 0.35);
   color: ${CREAM};
   text-decoration: none;
   font-size: 11px;
@@ -365,7 +440,7 @@ export const OutlineLink = styled.a`
     color 0.25s ease;
   &:hover {
     background: ${CREAM};
-    color: ${FOREST};
+    color: #f7f4ea;
   }
   @media (max-width: 580px) {
     width: 100%;
@@ -391,7 +466,7 @@ export const FooterLegal = styled.div`
   display: flex;
   flex-direction: column;
   gap: 9px;
-  color: #9eb4a3;
+  color: #708773;
   font-size: 11px;
   line-height: 1.7;
   strong {
@@ -423,7 +498,7 @@ export const FamilyLink = styled.a`
   font-size: 11px;
   &:hover {
     color: ${CREAM};
-    border-color: rgba(255, 255, 255, 0.55);
+    border-color: rgba(36, 69, 53, 0.55);
   }
 `;
 export const BottomWordmark = styled.div`
@@ -433,7 +508,7 @@ export const BottomWordmark = styled.div`
   line-height: 0.65;
   letter-spacing: -0.13em;
   margin: clamp(75px, 9vw, 140px) 0 -8px -0.035em;
-  color: rgba(218, 234, 216, 0.105);
+  color: rgba(48, 79, 52, 0.075);
   white-space: nowrap;
   user-select: none;
   pointer-events: none;
@@ -476,5 +551,5 @@ export const FloatTop = styled.button`
   ${floatBase}
   border: 1px solid rgba(255,255,255,.5);
   background: #294937;
-  color: ${CREAM};
+  color: #f7f4ea;
 `;

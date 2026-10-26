@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /**
  * Selfies / CategoryNav와 공유하는 Ahn's 색상 계열.
@@ -20,14 +20,8 @@ export const Section = styled.section`
   position: relative;
   width: 100%;
   color: ${DARK};
-  background: linear-gradient(
-    180deg,
-    #e1e9df 0%,
-    #e1e9df 12%,
-    #edf0e7 43%,
-    ${IVORY} 100%
-  );
-  padding: clamp(95px, 10vw, 145px) 0 clamp(85px, 10vw, 150px);
+  background: transparent;
+  padding: clamp(70px, 7vw, 108px) 0 clamp(80px, 8vw, 125px);
 
   @media (max-width: 1024px) {
     padding: 90px 0 86px;
@@ -51,8 +45,8 @@ export const Inner = styled.div`
  */
 export const Layout = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.28fr);
-  column-gap: clamp(45px, 7vw, 140px);
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  column-gap: clamp(36px, 6vw, 116px);
   align-items: stretch;
 
   @media (max-width: 1024px) {
@@ -120,8 +114,8 @@ export const SectionNumber = styled.span`
 export const Title = styled.h2`
   margin: 0;
   color: ${DARK};
-  font-family: inherit;
-  font-size: clamp(52px, 5.2vw, 99px);
+  font-family: var(--ahns-display, Georgia, serif);
+  font-size: clamp(50px, 5vw, 90px);
   font-weight: 400;
   line-height: 1.04;
   letter-spacing: -0.075em;
@@ -193,7 +187,7 @@ export const EventGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: clamp(14px, 1.8vw, 29px);
-  row-gap: clamp(34px, 4.2vw, 65px);
+  row-gap: clamp(26px, 3.3vw, 52px);
   align-items: start;
 
   @media (max-width: 640px) {
@@ -221,10 +215,23 @@ export const EventCard = styled.article<{ $featured: boolean }>`
  */
 export const ImageArea = styled.div`
   position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,.2) 50%, transparent 75%);
+    transform: translateX(-145%);
+    transition: transform 1.2s cubic-bezier(.2,.65,.2,1);
+  }
+  ${EventCard}:hover &::after { transform: translateX(145%); }
+  @media (prefers-reduced-motion: reduce) { &::after { transition: none; display: none; } }
   width: 100%;
-  aspect-ratio: 4 / 4.8;
+  /* Landscape event cards, rather than oversized portrait posters. */
+  aspect-ratio: 4 / 3.4;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 0;
   background: #cad8c8;
 
   img {
@@ -237,7 +244,7 @@ export const ImageArea = styled.div`
   }
 
   ${EventCard}:first-child & {
-    aspect-ratio: 5 / 5.3;
+    aspect-ratio: 5 / 3.25;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -386,7 +393,7 @@ export const Bottom = styled.footer`
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: clamp(75px, 8vw, 130px);
+  margin-top: clamp(48px, 5.5vw, 86px);
   padding-top: 20px;
   border-top: 1px solid rgba(52, 70, 56, 0.15);
 

@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// 스타일 파일은 프로젝트 경로에 맞게 수정해 주세요 (예: QnA.style 또는 별도 style 파일)
-import { FiSave, FiPlus, FiTrash2, FiArrowUp, FiArrowDown, FiEdit2 } from "react-icons/fi";
-import * as S from './QnA.style'
+import { FiSave, FiPlus, FiTrash2, FiArrowUp, FiArrowDown, FiEdit2, FiEdit } from "react-icons/fi";
+import * as S from './QnA.style';
+
 interface QnAData {
     id: number;
     category: string;       
@@ -12,22 +12,22 @@ interface QnAData {
     answer: string;
 }
 
+const INITIAL_STATE = {
+    category: "",
+    categoryName: "",
+    question: "",
+    answer: "",
+};
+
 export default function AdminQnA() {
-    
     const [qnaList, setQnaList] = useState<QnAData[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
     const [isCustomCategory, setIsCustomCategory] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
-    const [newQnA, setNewQnA] = useState({
-        category: "",
-        categoryName: "",
-        question: "",
-        answer: "",
-    });
+    const [newQnA, setNewQnA] = useState(INITIAL_STATE);
 
-    // 생명주기: 마운트 시 Q&A 목록 로드
     useEffect(() => {
         fetchQnAs();
     }, []);
@@ -37,8 +37,8 @@ export default function AdminQnA() {
             const res = await axios.get('http://localhost:4000/api/admin/qnas');
             if (res.data.success) {
                 const formatted = res.data.data.map((q: any) => ({
-                    id: q.QNA_IDX,               
-                    category: q.CATEGORY,         
+                    id: q.QNA_IDX,              
+                    category: q.CATEGORY,        
                     categoryName: q.CATEGORY_NAME,
                     question: q.QUESTION,
                     answer: q.ANSWER,
@@ -51,30 +51,15 @@ export default function AdminQnA() {
         }
     };
 
-     //reduce를 이용해 카테고리별 그룹화
-    const groupedData = qnaList.reduce((acc:any, item:any)=>{
-        const catName = item.categoryName;
-        if(!acc[catName]){
-            acc[catName] = [];
-        }
-        acc[catName].push({
-            id : String(item.id),
-            question: item.question,
-            answer: item.answer,
-        })
-        return acc;
-    },{})
+    const categories = Array.from(new Map(qnaList.map(item =>
+        [item.category, { key: item.category, name: item.categoryName }]
+    )).values());
 
-    const categories = Array.from(new Map(qnaList.map(item=>
-    [item.category, {key: item.category , name: item.categoryName}]
-    )).values())
-
-    
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value;
         if (val === "ADD_NEW") {
-                setIsCustomCategory(true);
-                setNewQnA(prev => ({ ...prev, category: "", categoryName: "" }));
+            setIsCustomCategory(true);
+            setNewQnA(prev => ({ ...prev, category: "", categoryName: "" }));
         } else {
             setIsCustomCategory(false);
             const found = categories.find(c => c.key === val);
@@ -104,7 +89,7 @@ export default function AdminQnA() {
             } else {
                 const res = await axios.post('http://localhost:4000/api/admin/qnas', {
                     category: newQnA.category,
-                    categoryNname: newQnA.categoryName,
+                    categoryName: newQnA.categoryName,
                     question: newQnA.question,
                     answer: newQnA.answer,
                 });
@@ -112,7 +97,7 @@ export default function AdminQnA() {
                     alert('새 Q&A가 등록되었습니다.');
                 }
             }
-            setNewQnA({ category: categories[0]?.key || "", categoryName: categories[0]?.name || "", question: "", answer: "" });
+            setNewQnA(INITIAL_STATE);
             setIsCustomCategory(false);
             fetchQnAs();
         } catch (err) {
@@ -134,12 +119,7 @@ export default function AdminQnA() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setNewQnA({
-            category: categories[0]?.key || "",
-            categoryName: categories[0]?.name || "",
-            question: "",
-            answer: "",
-        });
+        setNewQnA(INITIAL_STATE);
         setIsCustomCategory(false);
     };
 
@@ -152,33 +132,8 @@ export default function AdminQnA() {
                 }
             } catch (err) {
                 console.error("Q&A 삭제 실패:", err);
-                alert( 'Q&A 삭제 중 문제가 발생했습니다.');
+                alert('Q&A 삭제 중 문제가 발생했습니다.');
             }
-        }
-    };
-
-    // 목록 내 순서 변경 (위/아래)
-    const moveQnA = (index: number, direction: 'UP' | 'DOWN') => {
-        const updatedList = [...qnaList];
-        if (direction === 'UP' && index > 0) {
-            [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
-        } else if (direction === 'DOWN' && index < updatedList.length - 1) {
-            [updatedList[index + 1], updatedList[index]] = [updatedList[index], updatedList[index + 1]];
-        }
-        setQnaList(updatedList);
-    };
-
-    // 최종 순서 저장
-    const handleSave = async () => {
-        const orderedIds = qnaList.map(item => item.id);
-        try {
-            const res = await axios.put('http://localhost:4000/api/admin/qnas/order', { orderedIds });
-            if (res.data.success) {
-                alert( 'Q&A 순서 변경이 저장되었습니다.');
-            }
-        } catch (err) {
-            console.error("Q&A 순서 저장 실패:", err);
-            alert('순서 저장 중 문제가 발생했습니다.');
         }
     };
 
@@ -187,8 +142,56 @@ export default function AdminQnA() {
         ? qnaList 
         : qnaList.filter(item => item.category === selectedCategory);
 
+    // 목록 내 순서 변경 (위/아래)
+    const moveQnA = (index: number, direction: 'UP' | 'DOWN') => {
+        // 전체보기("all") 상태일 때 기존 방식대로 순서 변경
+        if (selectedCategory === 'all') {
+            const updatedList = [...qnaList];
+            if (direction === 'UP' && index > 0) {
+                [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
+            } else if (direction === 'DOWN' && index < qnaList.length - 1) {
+                [updatedList[index + 1], updatedList[index]] = [updatedList[index], updatedList[index + 1]];
+            }
+            setQnaList(updatedList);
+            return;
+        }
+
+        // 특정 카테고리를 선택해서 filteredList 상태일 때
+        const targetFiltered = [...filteredList];
+        if (direction === 'UP' && index > 0) {
+            [targetFiltered[index - 1], targetFiltered[index]] = [targetFiltered[index], targetFiltered[index - 1]];
+        } else if (direction === 'DOWN' && index < targetFiltered.length - 1) {
+            [targetFiltered[index + 1], targetFiltered[index]] = [targetFiltered[index], targetFiltered[index + 1]];
+        } else {
+            return;
+        }
+
+        // 바뀐 순서의 filteredList 내용을 전체 qnaList에 반영
+        const updatedQnaList = qnaList.map(item => {
+            if (item.category === selectedCategory) {
+                return targetFiltered.shift()!;
+            }
+            return item;
+        });
+        setQnaList(updatedQnaList);
+    };
+
+    // 최종 순서 저장
+    const handleSave = async () => {
+        const orderedIds = qnaList.map(item => item.id);
+        try {
+            const res = await axios.put('http://localhost:4000/api/admin/qnas/order', { orderedIds });
+            if (res.data.success) {
+                alert('Q&A 순서 변경이 저장되었습니다.');
+            }
+        } catch (err) {
+            console.error("Q&A 순서 저장 실패:", err);
+            alert('순서 저장 중 문제가 발생했습니다.');
+        }
+    };
+
     return (
-    <S.QnAContainer>
+        <S.QnAContainer>
             <S.QnAPageHeader>
                 <S.QnAPageTitle>Q&A 관리</S.QnAPageTitle>
                 <S.QnASaveButton onClick={handleSave}>
@@ -203,8 +206,15 @@ export default function AdminQnA() {
                     <S.QnACard>
                         <S.QnACardHeader>
                             <S.QnACardTitle>{editingId !== null ? "Q&A 수정" : "새 Q&A 등록"}</S.QnACardTitle>
-                            <S.CateAddButton style={{width:'100px'}}
-                            onClick={()=>setIsCustomCategory(true)}>새 카테고리추가</S.CateAddButton>
+                            <S.CateAddButton 
+                                style={{ width: '100px' }}
+                                onClick={() => {
+                                    setIsCustomCategory(true);
+                                    setNewQnA(prev => ({ ...prev, category: '', categoryName: '' }));
+                                }}
+                            >
+                                새 카테고리추가
+                            </S.CateAddButton>
                         </S.QnACardHeader>
                         <S.QnACardBody>
                             <S.QnAFormGroup>
@@ -214,7 +224,7 @@ export default function AdminQnA() {
                                         value={newQnA.category}
                                         onChange={handleCategoryChange}
                                     >  
-                                    <option value="" disabled>카테고리를 선택하세요</option>
+                                        <option value="" disabled>카테고리를 선택하세요</option>
                                         {categories.map((cat) => (
                                             <option key={cat.key} value={cat.key}>
                                                 {cat.name} ({cat.key})
@@ -331,7 +341,7 @@ export default function AdminQnA() {
                                             <td>
                                                 <S.QnAActionGroup>
                                                     <S.QnAEditBtn onClick={() => handleEditClick(item)}>
-                                                        <FiEdit2 size={16} />
+                                                        <FiEdit size={16} />
                                                     </S.QnAEditBtn>
                                                     <S.QnADeleteBtn onClick={() => handleDelete(item.id)}>
                                                         <FiTrash2 size={16} />

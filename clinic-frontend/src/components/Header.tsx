@@ -1,16 +1,20 @@
 "use client";
 
-import axios from 'axios';
-import gsap from 'gsap';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import axios from "axios";
+import gsap from "gsap";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from "react-icons/fa6";
 
-import * as S from '@/assets/css/components/Header.styles';
+import * as SL from "@/assets/css/components/dropdown/HeaderSearchLayout.styles";
+import * as S from "@/assets/css/components/Header.styles";
 
-import AccountDropdown from './dropdown/AccountDropdown';
-import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
+import AccountDropdown from "./dropdown/AccountDropdown";
+import HeaderNavDropdown from "./dropdown/HeaderNavDropdown";
+import HeaderSearch from "./dropdown/HeaderSearch";
+import LanguageDropdown from "./dropdown/LanguageDropdown";
 
 /*
  * Header.tsx — Premium Ahn's Navigation
@@ -89,6 +93,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   // 로그인 API에서 받은 userName을 localStorage에 저장하는 기존 방식과 연결
   const [userName, setUserName] = useState<string | null>(null);
 
@@ -196,7 +201,7 @@ export default function Header() {
       }
 
       if (footer.status === "fulfilled" && footer.value.data.success) {
-        setPhone(footer.value.data.data.companyInfo?.phone?.trim() || "");
+        setPhone(footer.value.data.data?.companyInfo?.phone?.trim() || "");
       }
     };
     void fetchSettings();
@@ -210,7 +215,7 @@ export default function Header() {
       const currentY = window.scrollY;
       const difference = currentY - previousY.current;
       setScrolled(currentY > 45);
-      if (currentY < 120 || menuOpen) setHidden(false);
+      if (currentY < 120 || menuOpen || searchOpen) setHidden(false);
       else if (difference > 7) setHidden(true);
       else if (difference < -7) setHidden(false);
       previousY.current = currentY;
@@ -218,13 +223,14 @@ export default function Header() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [menuOpen]);
+  }, [menuOpen, searchOpen]);
 
   /* [3] 페이지가 바뀔 때 열린 모바일 메뉴를 자동으로 닫는다. */
   useEffect(() => {
     // URL 이동 결과로 모바일 메뉴가 열린 채 남지 않게 정리한다.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
 
   /* [4] 모바일 메뉴를 열면 GSAP으로 메뉴가 아래에서 차례로 올라온다. */
@@ -273,7 +279,7 @@ export default function Header() {
   return (
     <>
       <S.HeaderWrapper
-        $hidden={hidden && !menuOpen}
+        $hidden={hidden && !menuOpen && !searchOpen}
         $transparent={transparent}
         $dark={isDark}
         $accent={accent}
@@ -313,52 +319,122 @@ export default function Header() {
             ))}
           </S.NavGroup>
 
-          <S.UtilGroup>
+          <SL.SearchUtilGroup $searchOpen={searchOpen}>
             <S.DesktopOnly>
               {phoneLink && (
-                <S.PhoneButton href={phoneLink}>
-                  <span>CONTACT</span> {phone}
-                </S.PhoneButton>
+                <SL.CompactAction $compact={searchOpen}>
+                  <S.PhoneButton
+                    href={phoneLink}
+                    aria-label={`전화 문의 ${phone}`}
+                    title={`전화 문의 ${phone}`}
+                  >
+                    {searchOpen ? (
+                      <FaPhone size={15} aria-hidden="true" />
+                    ) : (
+                      <>
+                        <span>CONTACT</span> {phone}
+                      </>
+                    )}
+                  </S.PhoneButton>
+                </SL.CompactAction>
               )}
-              <S.CtaButton as={Link} href={contactHref}>
-                상담문의 <span aria-hidden="true">↗</span>
-              </S.CtaButton>
+
+              <SL.CompactAction $compact={searchOpen}>
+                <S.CtaButton
+                  as={Link}
+                  href={contactHref}
+                  aria-label="상담문의"
+                  title="상담문의"
+                >
+                  {searchOpen ? (
+                    <FaRegCommentDots size={17} aria-hidden="true" />
+                  ) : (
+                    <>
+                      상담문의 <span aria-hidden="true">↗</span>
+                    </>
+                  )}
+                </S.CtaButton>
+              </SL.CompactAction>
+
               {userName ? (
-                <AccountDropdown
-                  userName={userName}
-                  onLogout={handleLogout}
+                <SL.CompactAccount $compact={searchOpen}>
+                  <AccountDropdown
+                    userName={userName}
+                    onLogout={handleLogout}
+                    transparent={transparent}
+                  />
+                  {searchOpen && (
+                    <SL.CoverIcon aria-hidden="true">
+                      <FaRegUser size={16} />
+                    </SL.CoverIcon>
+                  )}
+                </SL.CompactAccount>
+              ) : (
+                <SL.CompactAction $compact={searchOpen}>
+                  <S.IconLink
+                    as={Link}
+                    href="/register/login"
+                    aria-label="로그인"
+                    title="로그인"
+                  >
+                    <FaRegUser size={16} />
+                    {!searchOpen && <span aria-hidden="true">↗</span>}
+                  </S.IconLink>
+                </SL.CompactAction>
+              )}
+
+              <SL.CompactLanguage $compact={searchOpen}>
+                <LanguageDropdown
+                  onChange={(language) => {
+                    console.log("선택한 언어:", language);
+                  }}
                   transparent={transparent}
                 />
-              ) : (
-                <S.IconLink
-                  as={Link}
-                  href="/register/login"
-                  aria-label="로그인"
-                >
-                  LOGIN <span aria-hidden="true">↗</span>
-                </S.IconLink>
-              )}
+                {searchOpen && (
+                  <SL.CoverIcon aria-hidden="true">
+                    <FaGlobe size={16} />
+                  </SL.CoverIcon>
+                )}
+              </SL.CompactLanguage>
             </S.DesktopOnly>
 
-            <S.MobileContactLink
-              as={Link}
-              href={contactHref}
-              onClick={closeMenu}
-            >
-              CONTACT ↗
-            </S.MobileContactLink>
+            <HeaderSearch
+              open={searchOpen}
+              onOpenChange={(next) => {
+                setSearchOpen(next);
+                if (next) {
+                  setHidden(false);
+                  setMenuOpen(false);
+                }
+              }}
+              menus={menus}
+              transparent={transparent}
+            />
+
+            <SL.MobileAction $searchOpen={searchOpen}>
+              <S.MobileContactLink
+                as={Link}
+                href={contactHref}
+                onClick={closeMenu}
+              >
+                CONTACT ↗
+              </S.MobileContactLink>
+            </SL.MobileAction>
             <S.HamburgerButton
               type="button"
               $open={menuOpen}
               aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
               aria-expanded={menuOpen}
               aria-controls="ahns-mobile-navigation"
-              onClick={() => setMenuOpen((previous) => !previous)}
+              onClick={() => {
+                setSearchOpen(false);
+                setMenuOpen((previous) => !previous);
+              }}
             >
               <span />
               <span />
             </S.HamburgerButton>
-          </S.UtilGroup>
+          </SL.SearchUtilGroup>
         </S.HeaderInner>
       </S.HeaderWrapper>
 
@@ -404,8 +480,13 @@ export default function Header() {
                 onNavigate={closeMenu}
               />
             ) : (
-              <Link href="/register/login" onClick={closeMenu}>
-                LOGIN ↗
+              <Link
+                href="/register/login"
+                onClick={closeMenu}
+                title="로그인"
+                aria-label="로그인"
+              >
+                <FaRegUser /> ↗
               </Link>
             )}
             <Link href={contactHref} onClick={closeMenu}>

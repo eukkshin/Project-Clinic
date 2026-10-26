@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 /** Header와 같은 높이를 차지해 패널이 Header 하단에서 시작하도록 한다. */
 export const NavRoot = styled.div`
@@ -133,6 +133,7 @@ export const NavPanelInner = styled.div`
 export const DropdownLink = styled.a<{ $active: boolean }>`
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 38px;
   padding: 10px 13px;
   border-radius: 0;
@@ -148,9 +149,25 @@ export const DropdownLink = styled.a<{ $active: boolean }>`
   overflow-wrap: break-word;
   transition: background 0.2s ease;
 
+  &::before {
+    content: "→";
+    position: absolute;
+    left: 20%;
+    transform: translateX(-4px);
+    opacity: 0;
+    transition:
+      transform 0.25s ease-out,
+      opacity 0.25s ease-out;
+  }
+
   &:hover,
   &:focus-visible {
-    background: rgba(111, 147, 113, 0.2);
+    color: #14271e;
+
+    &::before {
+      transform: translateX(4px);
+      opacity: 1;
+    }
   }
 
   &:focus-visible {

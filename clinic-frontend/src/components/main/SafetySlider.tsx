@@ -255,7 +255,11 @@ export function SafetySlider() {
   const activeItem = items[activeIndex] ?? items[0];
 
   return (
-    <S.Section ref={sectionRef} aria-labelledby="safety-archive-heading">
+    <S.Section
+      ref={sectionRef}
+      aria-labelledby="safety-archive-heading"
+      id="safety"
+    >
       <S.Inner>
         <S.Header ref={headingRef}>
           <S.Kicker>

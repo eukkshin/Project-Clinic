@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css, keyframes } from "styled-components";
 
 /* 헤더 전체의 스크롤/레이아웃은 바꾸지 않고 계정 버튼에만 적용합니다. */
 const reveal = keyframes`
@@ -27,6 +27,9 @@ export const AccountTrigger = styled.button<{
   align-items: center;
   justify-content: center;
   gap: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
 
   min-height: 40px;
   padding: 8px 14px;

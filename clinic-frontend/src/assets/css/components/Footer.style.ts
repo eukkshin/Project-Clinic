@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 /*
  * Footer.styles.ts
@@ -174,8 +174,12 @@ export const ContactLabel = styled.p`
 `;
 export const PhoneAnchor = styled.a`
   display: inline-block;
-  transition: color .35s ease, letter-spacing .5s ease;
-  &:hover { letter-spacing: -.035em; }
+  transition:
+    color 0.35s ease,
+    letter-spacing 0.5s ease;
+  &:hover {
+    letter-spacing: -0.035em;
+  }
   color: ${CREAM};
   font-size: clamp(26px, 3vw, 52px);
   text-decoration: none;
@@ -211,8 +215,12 @@ export const AddressText = styled.p`
   word-break: keep-all;
 `;
 export const SimpleTextLink = styled.a`
-  transition: gap .35s ease, color .35s ease;
-  &:hover { gap: 22px; }
+  transition:
+    gap 0.35s ease,
+    color 0.35s ease;
+  &:hover {
+    gap: 22px;
+  }
   display: inline-flex;
   gap: 14px;
   margin-top: 6px;
@@ -325,11 +333,18 @@ export const MapTab = styled.button<{ $selected: boolean }>`
 `;
 export const MapFrame = styled.div`
   position: relative;
-  outline: 1px solid rgba(36,69,53,.12);
+  outline: 1px solid rgba(36, 69, 53, 0.12);
   outline-offset: 9px;
-  transition: outline-offset .65s ease, box-shadow .65s ease;
-  &:hover { outline-offset: 4px; box-shadow: 0 25px 65px rgba(36,69,53,.16); }
-  @media (prefers-reduced-motion: reduce) { transition: none; }
+  transition:
+    outline-offset 0.65s ease,
+    box-shadow 0.65s ease;
+  &:hover {
+    outline-offset: 4px;
+    box-shadow: 0 25px 65px rgba(36, 69, 53, 0.16);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
   isolation: isolate;
   width: 100%;
   height: clamp(480px, 47vw, 640px);
@@ -517,39 +532,278 @@ export const BottomWordmark = styled.div`
     margin-bottom: -4px;
   }
 `;
-export const FloatingActions = styled.div`
+/**
+ * Floating Quick Menu — Footer 밖(형제)에 렌더링해 FooterWrapper overflow:clip의
+ * 영향 없이 모든 페이지에서 viewport 우측 하단에 고정된다.
+ * 아래 스타일만 신규/교체하며 Footer 본문 스타일은 건드리지 않는다.
+ */
+export const FloatingActions = styled.div<{ $isSafety: boolean }>`
   position: fixed;
   right: clamp(12px, 2vw, 28px);
-  bottom: clamp(16px, 3vw, 36px);
+  bottom: calc(clamp(16px, 3vw, 36px) + env(safe-area-inset-bottom, 0px));
   z-index: 9000;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 9px;
+  color: ${({ $isSafety }) => ($isSafety ? "#F7F6F1" : "#244535")};
+  transition: color 0.35s ease;
 `;
-const floatBase = `
-  width: 44px;
-  height: 44px;
-  display: flex;
+
+const liquidGlassButton = `
+  display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  font-family: inherit;
+  box-sizing: border-box;
+
+  min-width: 46px;
+  height: 46px;
+  padding: 0;
+  gap: 8px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+
+  /* 기본 상태: AccountDropdown Hover 느낌의 Liquid Glass */
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+
+  box-shadow:
+    0 4px 20px rgba(36, 69, 53, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+
+  color: inherit;
+  font: inherit;
   font-size: 20px;
   text-decoration: none;
+  white-space: nowrap;
+  text-shadow: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,.12);
-  transition: transform .2s ease;
-  &:hover { transform: translateY(-3px); }
+
+  transition:
+    width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease;
+
+  /* Hover 상태는 💬, TOP, 펼쳐진 퀵 링크에 공통 적용 */
+  &:hover,
+  &[aria-expanded="true"] {
+    transform: translateY(-2px);
+
+    background: rgba(197, 224, 199, 0.55);
+    border-color: rgba(102, 145, 109, 0.65);
+
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+
+    box-shadow:
+      0 10px 28px rgba(36, 69, 53, 0.16),
+      0 0 0 3px rgba(122, 168, 128, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+    background: rgba(176, 211, 180, 0.65);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #69826b;
+    outline-offset: 3px;
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: #edf4eb;
+    &:hover,
+    &[aria-expanded="true"] {
+      background: #d6e8d5;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+    &:hover,
+    &[aria-expanded="true"] {
+      transform: none;
+    }
+  }
 `;
-export const FloatPhone = styled.a`
-  ${floatBase}
-  border: 1px solid rgba(255,255,255,.5);
-  background: #dce9d7;
-  color: #2b4934;
+
+/** Anchor for the trigger and upward-expanding circular quick links. */
+export const QuickMessageRoot = styled.div`
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
 `;
-export const FloatTop = styled.button`
-  ${floatBase}
-  border: 1px solid rgba(255,255,255,.5);
-  background: #294937;
-  color: #f7f4ea;
+
+/** Main chat emoji toggle: matches the existing liquid glass treatment. */
+export const FloatMessage = styled.button`
+  ${liquidGlassButton}
+  position: relative;
+  z-index: 2;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 21px;
+  line-height: 1;
+`;
+
+/** No panel. Links are individual bubbles positioned above the chat icon. */
+export const QuickMenuList = styled.div<{ $open: boolean }>`
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 12px);
+  z-index: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 25px);
+  pointer-events: ${({ $open }) => ($open ? "auto" : "none")};
+`;
+
+/**
+ * 이름은 별도 툴팁이 아니라 같은 링크 버튼의 왼쪽 영역.
+ * max-width 애니메이션으로 오른쪽 아이콘은 고정하고 버튼만 왼쪽으로 확장.
+ */
+export const QuickMenuLabel = styled.span`
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding-left: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: none;
+  transform: translateX(7px);
+  transition:
+    max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    padding-left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    transform 0.32s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`;
+
+/** 아이콘은 오른쪽 끝 46px을 유지하므로 이름이 열려도 위치가 바뀌지 않는다. */
+export const QuickMenuIcon = styled.span`
+  display: inline-flex;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+`;
+
+/** The first configured item appears immediately above 💬, then the next ones climb upward. */
+export const QuickMenuEntry = styled.div<{
+  $open: boolean;
+  $index: number;
+  $total: number;
+}>`
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: flex-end;
+  opacity: ${({ $open }) => ($open ? 1 : 0)};
+  visibility: ${({ $open }) => ($open ? "visible" : "hidden")};
+  transform: translateY(${({ $open }) => ($open ? "0px" : "18px")})
+    scale(${({ $open }) => ($open ? 1 : 0.84)});
+  transform-origin: center bottom;
+  transition:
+    opacity 0.26s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.26s ease;
+  transition-delay: ${({ $open, $index, $total }) =>
+    $open ? `${$index * 68}ms` : `${($total - $index - 1) * 35}ms`};
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`;
+
+/**
+ * 원형에서 Hover/키보드 포커스 시 자신의 너비가 왼쪽으로 늘어나는 링크 버튼.
+ * 독립적인 말풍선이 아닌 하나의 Liquid Glass pill이다.
+ */
+export const QuickMenuLink = styled.a`
+  ${liquidGlassButton}
+  width: max-content;
+  min-width: 46px;
+  max-width: calc(100vw - 24px);
+  height: 46px;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 999px;
+  justify-content: flex-end;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: 18px;
+  text-decoration: none;
+  white-space: nowrap;
+  gap: 0;
+
+  &:hover ${QuickMenuLabel}, &:focus-visible ${QuickMenuLabel} {
+    max-width: min(220px, calc(100vw - 90px));
+    padding-left: 15px;
+    padding-right: 12px;
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* 터치 기기에는 Hover가 없으므로 메뉴를 열었을 때 이름도 표시 */
+  @media (hover: none) {
+    ${QuickMenuLabel} {
+      max-width: min(220px, calc(100vw - 90px));
+      padding-left: 15px;
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+`;
+
+/** TOP is gently lifted into view only once the page has been scrolled. */
+export const TopReveal = styled.div<{ $visible: boolean }>`
+  width: 46px;
+  height: ${({ $visible }) => ($visible ? "46px" : "0px")};
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transform: translateY(${({ $visible }) => ($visible ? "0px" : "22px")});
+  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
+  pointer-events: ${({ $visible }) => ($visible ? "auto" : "none")};
+  transition:
+    height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.27s ease,
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.42s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`;
+
+export const FloatTop = styled.button<{ $isSafety: boolean }>`
+  ${liquidGlassButton}
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 400;
+  color: ${({ $isSafety }) => ($isSafety ? "#F7F6F1" : "#244535")};
 `;

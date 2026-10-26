@@ -1,9 +1,11 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
+import Link from "next/link";
+import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from '@/assets/css/components/dropdown/AccountDropdown.styles';
+import * as S from "@/assets/css/components/dropdown/AccountDropdown.styles";
+
+import { Popup } from "../modal/Popup";
 
 interface AccountDropdownProps {
   userName: string;
@@ -33,6 +35,30 @@ export default function AccountDropdown({
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
+
+  const [popupConfig, setPopupConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
+  const openPopup = (
+    title: string,
+    message: string,
+    onConfirm?: (() => void) | undefined,
+  ) => {
+    setPopupConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
+
+  const closePopup = () => {
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -68,9 +94,11 @@ export default function AccountDropdown({
   };
 
   const handleLogout = () => {
-    setOpen(false);
-    onNavigate?.();
-    onLogout();
+    openPopup("로그아웃", "정말 로그아웃하시겠습니까?", () => {
+      setOpen(false);
+      onNavigate?.();
+      onLogout();
+    });
   };
   const links: { title: string; href?: string }[] = [
     { title: "마이페이지", href: myPageHref },
@@ -78,75 +106,87 @@ export default function AccountDropdown({
     { title: "내 상담 내역", href: consultationsHref },
   ];
   return (
-    <S.AccountRoot ref={rootRef} $mobile={mobile}>
-      <S.AccountTrigger
-        ref={buttonRef}
-        type="button"
-        $mobile={mobile}
-        $open={open}
-        aria-controls={open ? menuId : undefined}
-        aria-expanded={open}
-        onClick={() => setOpen((previous) => !previous)}
-      >
-        <S.TriggerName>{userName}님</S.TriggerName>
-        <S.Chevron $open={open} aria-hidden="true">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </S.Chevron>
-      </S.AccountTrigger>
-
-      {open && (
-        <S.GlassPanel
-          id={menuId}
-          role="region"
-          aria-label="회원 계정 메뉴"
+    <>
+      <S.AccountRoot ref={rootRef} $mobile={mobile}>
+        <S.AccountTrigger
+          ref={buttonRef}
+          type="button"
           $mobile={mobile}
-          $transparent={transparent}
+          $open={open}
+          aria-controls={open ? menuId : undefined}
+          aria-expanded={open}
+          onClick={() => setOpen((previous) => !previous)}
         >
-          <S.GlassShine aria-hidden="true" />
-          <S.ProfileSection>
-            <S.ProfileEyebrow>MY ACCOUNT</S.ProfileEyebrow>
-            <S.ProfileName>{userName}님, 환영합니다.</S.ProfileName>
-            <S.ProfileCaption>AHN&apos;S PERSONAL EXPERIENCE</S.ProfileCaption>
-          </S.ProfileSection>
+          <S.TriggerName>{userName}님</S.TriggerName>
+          <S.Chevron $open={open} aria-hidden="true">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </S.Chevron>
+        </S.AccountTrigger>
 
-          <S.MenuDivider />
-          <S.MenuItems>
-            {links.map(({ title, href }) =>
-              href ? (
-                <S.MenuLink
-                  as={Link}
-                  key={title}
-                  href={href}
-                  onClick={handleNavigate}
-                >
-                  <S.MenuLabel>{title}</S.MenuLabel>
-                </S.MenuLink>
-              ) : (
-                <S.MenuUnavailable key={title} aria-disabled="true">
-                  <S.MenuLabel>{title}</S.MenuLabel>
-                  <S.ComingSoon>준비 중</S.ComingSoon>
-                </S.MenuUnavailable>
-              ),
-            )}
-          </S.MenuItems>
+        {open && (
+          <S.GlassPanel
+            id={menuId}
+            role="region"
+            aria-label="회원 계정 메뉴"
+            $mobile={mobile}
+            $transparent={transparent}
+          >
+            <S.GlassShine aria-hidden="true" />
+            <S.ProfileSection>
+              <S.ProfileEyebrow>MY ACCOUNT</S.ProfileEyebrow>
+              <S.ProfileName>{userName}님, 환영합니다.</S.ProfileName>
+              <S.ProfileCaption>
+                AHN&apos;S PERSONAL EXPERIENCE
+              </S.ProfileCaption>
+            </S.ProfileSection>
 
-          <S.MenuDivider />
+            <S.MenuDivider />
+            <S.MenuItems>
+              {links.map(({ title, href }) =>
+                href ? (
+                  <S.MenuLink
+                    as={Link}
+                    key={title}
+                    href={href}
+                    onClick={handleNavigate}
+                  >
+                    <S.MenuLabel>{title}</S.MenuLabel>
+                  </S.MenuLink>
+                ) : (
+                  <S.MenuUnavailable key={title} aria-disabled="true">
+                    <S.MenuLabel>{title}</S.MenuLabel>
+                    <S.ComingSoon>준비 중</S.ComingSoon>
+                  </S.MenuUnavailable>
+                ),
+              )}
+            </S.MenuItems>
 
-          <S.LogoutButton type="button" onClick={handleLogout}>
-            <S.MenuLabel>로그아웃</S.MenuLabel>
-          </S.LogoutButton>
-          <S.GlassBottom aria-hidden="true" />
-        </S.GlassPanel>
-      )}
-    </S.AccountRoot>
+            <S.MenuDivider />
+
+            <S.LogoutButton type="button" onClick={handleLogout}>
+              <S.MenuLabel>로그아웃</S.MenuLabel>
+            </S.LogoutButton>
+            <S.GlassBottom aria-hidden="true" />
+          </S.GlassPanel>
+        )}
+      </S.AccountRoot>
+      <Popup
+        isOpen={popupConfig.isOpen}
+        title={popupConfig.title}
+        onClose={closePopup}
+        onConfirm={popupConfig.onConfirm}
+      >
+        {popupConfig.message}
+      </Popup>
+    </>
   );
 }

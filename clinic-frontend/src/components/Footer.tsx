@@ -3,7 +3,11 @@
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { BsChatFill } from "react-icons/bs";
+import { FaInstagram, FaRegCommentDots, FaYoutube } from "react-icons/fa6";
+import { HiChat } from "react-icons/hi";
+import { RiKakaoTalkLine } from "react-icons/ri";
 
 import * as S from "@/assets/css/components/Footer.style";
 
@@ -86,10 +90,128 @@ function safePhoneHref(value: string) {
   return normalized ? `tel:${normalized}` : null;
 }
 
+/**
+ * Add links here. Hovering an icon expands its own pill to the left.
+ * `icon` accepts emoji strings or React icons (e.g. <FaInstagram /> with an import).
+ * Keep empty until you decide which links to show.
+ */
+type QuickLink = {
+  id: string;
+  label: string;
+  href: string;
+  icon: ReactNode;
+  external?: boolean;
+};
+
+const QUICK_LINKS: QuickLink[] = [
+  {
+    id: "kakao",
+    label: "카카오톡 상담",
+    href: "https://example.com",
+    icon: <RiKakaoTalkLine />,
+    external: true,
+  },
+  {
+    id: "instagram",
+    label: "인스타그램",
+    href: "https://instagram.com/yourid",
+    icon: <FaInstagram />,
+    external: true,
+  },
+  {
+    id: "youtube",
+    label: "유튜브",
+    href: "https://youtube.com/yourid",
+    icon: <FaYoutube />,
+    external: true,
+  },
+];
+
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
+  const quickMenuRef = useRef<HTMLDivElement>(null);
+  const messageTriggerRef = useRef<HTMLButtonElement>(null);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const [isSafety, setIsSafety] = useState(false);
+
+  // 화면 맨 위에서는 TOP을 숨기고, 320px 이상 스크롤하면 아래에서 등장.
+  useEffect(() => {
+    const handleScroll = () => {
+      const visible = window.scrollY >= 320;
+      setShowTop((previous) => (previous === visible ? previous : visible));
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const safety = document.getElementById("safety");
+    const button = messageTriggerRef.current;
+
+    if (!safety || !button) {
+      console.warn("Safety 영역 또는 플로팅 버튼을 찾지 못했습니다.");
+      return;
+    }
+
+    let observer: IntersectionObserver | null = null;
+
+    const observe = () => {
+      observer?.disconnect();
+
+      const rect = button.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+
+      const top = Math.round(centerY);
+      const bottom = Math.max(0, Math.floor(window.innerHeight - centerY - 2));
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setIsSafety(entry.isIntersecting);
+        },
+        {
+          rootMargin: `-${top}px 0px -${bottom}px 0px`,
+          threshold: 0,
+        },
+      );
+
+      observer.observe(safety);
+    };
+
+    observe();
+
+    window.addEventListener("resize", observe);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", observe);
+    };
+  }, [showTop]);
+
+  // 문자 메뉴 외부를 클릭하거나 Escape를 누르면 닫기.
+  useEffect(() => {
+    if (!messageOpen) return;
+    const handleOutside = (event: PointerEvent) => {
+      if (!quickMenuRef.current?.contains(event.target as Node)) {
+        setMessageOpen(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMessageOpen(false);
+        messageTriggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", handleOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [messageOpen]);
 
   useEffect(() => {
     const footer = footerRef.current;
@@ -97,18 +219,38 @@ export default function Footer() {
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
-        gsap.fromTo("[data-footer-motion]",
+        gsap.fromTo(
+          "[data-footer-motion]",
           { opacity: 0, y: 42 },
-          { opacity: 1, y: 0, ease: "power3.out", duration: 1.1,
-            stagger: 0.14,
-            scrollTrigger: { trigger: "[data-footer-intro]", start: "top 82%", once: true },
-          });
-        gsap.fromTo("[data-footer-wordmark]",
-          { opacity: 0, yPercent: 25, letterSpacing: "0.02em" },
-          { opacity: 1, yPercent: 0, letterSpacing: "-0.13em", duration: 1.8,
+          {
+            opacity: 1,
+            y: 0,
             ease: "power3.out",
-            scrollTrigger: { trigger: "[data-footer-wordmark]", start: "top 98%", once: true },
-          });
+            duration: 1.1,
+            stagger: 0.14,
+            scrollTrigger: {
+              trigger: "[data-footer-intro]",
+              start: "top 82%",
+              once: true,
+            },
+          },
+        );
+        gsap.fromTo(
+          "[data-footer-wordmark]",
+          { opacity: 0, yPercent: 25, letterSpacing: "0.02em" },
+          {
+            opacity: 1,
+            yPercent: 0,
+            letterSpacing: "-0.13em",
+            duration: 1.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: "[data-footer-wordmark]",
+              start: "top 98%",
+              once: true,
+            },
+          },
+        );
       }, footer);
       return () => ctx.revert();
     });
@@ -168,135 +310,198 @@ export default function Footer() {
     : null;
 
   return (
-    <S.FooterWrapper ref={footerRef} id="site-footer-contact">
-      <S.FooterInner>
-        <S.FooterTopLabel data-footer-intro>
-          <span>AHN&apos;S PLASTIC SURGERY</span>
-          <span>CONTACT &amp; LOCATION — 06</span>
-        </S.FooterTopLabel>
+    <>
+      <S.FooterWrapper ref={footerRef} id="site-footer-contact">
+        <S.FooterInner>
+          <S.FooterTopLabel data-footer-intro>
+            <span>AHN&apos;S PLASTIC SURGERY</span>
+            <span>CONTACT &amp; LOCATION — 06</span>
+          </S.FooterTopLabel>
 
-        {/* 핵심 요청: 왼쪽 병원 정보 / 오른쪽 큰 지도 */}
-        <S.MainGrid>
-          <S.InfoColumn>
-            <S.IntroSmall data-footer-motion>WE ARE HERE FOR YOU</S.IntroSmall>
-            <S.IntroTitle data-footer-motion>
-              Find Your
-              <br />
-              <em>Own Beauty.</em>
-            </S.IntroTitle>
-            <S.IntroDescription data-footer-motion>
-              당신만의 아름다움을 찾아가는 여정.
-              <br />그 시작을 함께하겠습니다.
-            </S.IntroDescription>
+          {/* 핵심 요청: 왼쪽 병원 정보 / 오른쪽 큰 지도 */}
+          <S.MainGrid>
+            <S.InfoColumn>
+              <S.IntroSmall data-footer-motion>
+                WE ARE HERE FOR YOU
+              </S.IntroSmall>
+              <S.IntroTitle data-footer-motion>
+                Find Your
+                <br />
+                <em>Own Beauty.</em>
+              </S.IntroTitle>
+              <S.IntroDescription data-footer-motion>
+                당신만의 아름다움을 찾아가는 여정.
+                <br />그 시작을 함께하겠습니다.
+              </S.IntroDescription>
 
-            <S.ContactGroup data-footer-motion>
-              <S.ContactLabel>CONTACT</S.ContactLabel>
-              {phoneHref ? (
-                <S.PhoneAnchor href={phoneHref}>
-                  {companyInfo.phone}
-                </S.PhoneAnchor>
-              ) : (
-                <S.ContactPlaceholder>
-                  {loading ? "연락처를 불러오는 중..." : "전화번호 등록 예정"}
-                </S.ContactPlaceholder>
+              <S.ContactGroup data-footer-motion>
+                <S.ContactLabel>CONTACT</S.ContactLabel>
+                {phoneHref ? (
+                  <S.PhoneAnchor href={phoneHref}>
+                    {companyInfo.phone}
+                  </S.PhoneAnchor>
+                ) : (
+                  <S.ContactPlaceholder>
+                    {loading ? "연락처를 불러오는 중..." : "전화번호 등록 예정"}
+                  </S.ContactPlaceholder>
+                )}
+                {emailHref && (
+                  <S.EmailAnchor href={emailHref}>
+                    {companyInfo.email}
+                  </S.EmailAnchor>
+                )}
+              </S.ContactGroup>
+
+              <S.ContactGroup data-footer-motion>
+                <S.ContactLabel>CLINIC INFORMATION</S.ContactLabel>
+                <S.ClinicTitle>{clinicName}</S.ClinicTitle>
+                <S.AddressText>
+                  {companyInfo.address ||
+                    (loading ? "주소를 불러오는 중..." : "주소 등록 예정")}
+                </S.AddressText>
+                {locationLink && (
+                  <S.SimpleTextLink
+                    href={locationLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    오시는 길 바로가기<span aria-hidden="true">↗</span>
+                  </S.SimpleTextLink>
+                )}
+              </S.ContactGroup>
+
+              {schedules.length > 0 && (
+                <S.HoursGroup>
+                  <S.ContactLabel>OPENING HOURS</S.ContactLabel>
+                  {schedules.map((schedule) => (
+                    <S.HoursItem key={schedule.id}>
+                      <strong>{schedule.departments}</strong>
+                      {schedule.weekday && (
+                        <span>평일　{schedule.weekday}</span>
+                      )}
+                      {schedule.night && <span>야간　{schedule.night}</span>}
+                      {schedule.weekend && (
+                        <span>토요일　{schedule.weekend}</span>
+                      )}
+                    </S.HoursItem>
+                  ))}
+                </S.HoursGroup>
               )}
-              {emailHref && (
-                <S.EmailAnchor href={emailHref}>
-                  {companyInfo.email}
-                </S.EmailAnchor>
-              )}
-            </S.ContactGroup>
+            </S.InfoColumn>
 
-            <S.ContactGroup data-footer-motion>
-              <S.ContactLabel>CLINIC INFORMATION</S.ContactLabel>
-              <S.ClinicTitle>{clinicName}</S.ClinicTitle>
-              <S.AddressText>
-                {companyInfo.address ||
-                  (loading ? "주소를 불러오는 중..." : "주소 등록 예정")}
-              </S.AddressText>
-              {locationLink && (
-                <S.SimpleTextLink
-                  href={locationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  오시는 길 바로가기<span aria-hidden="true">↗</span>
-                </S.SimpleTextLink>
-              )}
-            </S.ContactGroup>
+            {/* 지도 Provider 전환 기능은 HospitalMap.tsx에 독립 구현 */}
+            <HospitalMap
+              address={companyInfo.address}
+              clinicName={clinicName}
+            />
+          </S.MainGrid>
 
-            {schedules.length > 0 && (
-              <S.HoursGroup>
-                <S.ContactLabel>OPENING HOURS</S.ContactLabel>
-                {schedules.map((schedule) => (
-                  <S.HoursItem key={schedule.id}>
-                    <strong>{schedule.departments}</strong>
-                    {schedule.weekday && <span>평일　{schedule.weekday}</span>}
-                    {schedule.night && <span>야간　{schedule.night}</span>}
-                    {schedule.weekend && (
-                      <span>토요일　{schedule.weekend}</span>
-                    )}
-                  </S.HoursItem>
-                ))}
-              </S.HoursGroup>
+          <S.FooterBottom>
+            <S.FooterLegal>
+              <strong>{clinicName}</strong>
+              {companyInfo.address && <span>{companyInfo.address}</span>}
+              {companyInfo.phone && <span>대표전화 {companyInfo.phone}</span>}
+              {companyInfo.email && <span>{companyInfo.email}</span>}
+              <span>
+                © {new Date().getFullYear()} AHN&apos;S. ALL RIGHTS RESERVED.
+              </span>
+            </S.FooterLegal>
+
+            {familySites.length > 0 && (
+              <S.FamilyArea>
+                <S.ContactLabel>FAMILY SITES</S.ContactLabel>
+                <S.FamilyList>
+                  {familySites.map((site) => {
+                    const href = safeExternalUrl(site.url);
+                    return href ? (
+                      <S.FamilyLink
+                        key={site.id}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {site.name} <span aria-hidden="true">↗</span>
+                      </S.FamilyLink>
+                    ) : null;
+                  })}
+                </S.FamilyList>
+              </S.FamilyArea>
             )}
-          </S.InfoColumn>
+          </S.FooterBottom>
 
-          {/* 지도 Provider 전환 기능은 HospitalMap.tsx에 독립 구현 */}
-          <HospitalMap address={companyInfo.address} clinicName={clinicName} />
-        </S.MainGrid>
+          <S.BottomWordmark aria-hidden="true" data-footer-wordmark>
+            AHN&apos;S
+          </S.BottomWordmark>
+        </S.FooterInner>
+      </S.FooterWrapper>
 
-        <S.FooterBottom>
-          <S.FooterLegal>
-            <strong>{clinicName}</strong>
-            {companyInfo.address && <span>{companyInfo.address}</span>}
-            {companyInfo.phone && <span>대표전화 {companyInfo.phone}</span>}
-            {companyInfo.email && <span>{companyInfo.email}</span>}
-            <span>
-              © {new Date().getFullYear()} AHN&apos;S. ALL RIGHTS RESERVED.
+      {/* FloatingActions만 Footer 바깥으로 이동: overflow:clip의 잘림 방지 */}
+      <S.FloatingActions aria-label="빠른 메뉴" $isSafety={isSafety}>
+        <S.QuickMessageRoot ref={quickMenuRef}>
+          <S.QuickMenuList
+            id="ahns-quick-message-menu"
+            $open={messageOpen}
+            role="group"
+            aria-label="빠른 링크 메뉴"
+            aria-hidden={!messageOpen}
+            inert={!messageOpen}
+          >
+            {QUICK_LINKS.map((link, index) => (
+              <S.QuickMenuEntry
+                key={link.id}
+                $open={messageOpen}
+                $index={index}
+                $total={QUICK_LINKS.length}
+              >
+                <S.QuickMenuLink
+                  href={link.href}
+                  aria-label={link.label}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
+                  tabIndex={messageOpen ? 0 : -1}
+                  onClick={() => setMessageOpen(false)}
+                >
+                  {/* 같은 버튼 안에서 왼쪽으로 이름이 펼쳐짐 (별도 툴팁 없음) */}
+                  <S.QuickMenuLabel aria-hidden="true">
+                    {link.label}
+                  </S.QuickMenuLabel>
+                  <S.QuickMenuIcon aria-hidden="true">
+                    {link.icon}
+                  </S.QuickMenuIcon>
+                </S.QuickMenuLink>
+              </S.QuickMenuEntry>
+            ))}
+          </S.QuickMenuList>
+
+          <S.FloatMessage
+            ref={messageTriggerRef}
+            type="button"
+            aria-label={messageOpen ? "문자 메뉴 닫기" : "문자 메뉴 열기"}
+            aria-controls="ahns-quick-message-menu"
+            aria-expanded={messageOpen}
+            onClick={() => setMessageOpen((previous) => !previous)}
+          >
+            <span aria-hidden="true">
+              <FaRegCommentDots />
             </span>
-          </S.FooterLegal>
+          </S.FloatMessage>
+        </S.QuickMessageRoot>
 
-          {familySites.length > 0 && (
-            <S.FamilyArea>
-              <S.ContactLabel>FAMILY SITES</S.ContactLabel>
-              <S.FamilyList>
-                {familySites.map((site) => {
-                  const href = safeExternalUrl(site.url);
-                  return href ? (
-                    <S.FamilyLink
-                      key={site.id}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {site.name} <span aria-hidden="true">↗</span>
-                    </S.FamilyLink>
-                  ) : null;
-                })}
-              </S.FamilyList>
-            </S.FamilyArea>
-          )}
-        </S.FooterBottom>
-
-        <S.BottomWordmark aria-hidden="true" data-footer-wordmark>AHN&apos;S</S.BottomWordmark>
-      </S.FooterInner>
-
-      {/* 퀵 메뉴도 실제 동작이 있는 항목만 사용한다. */}
-      <S.FloatingActions aria-label="빠른 메뉴">
-        {phoneHref && (
-          <S.FloatPhone href={phoneHref} aria-label="전화 상담">
-            ☎
-          </S.FloatPhone>
-        )}
-        <S.FloatTop
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="페이지 맨 위로"
-        >
-          ↑
-        </S.FloatTop>
+        <S.TopReveal $visible={showTop} aria-hidden={!showTop}>
+          <S.FloatTop
+            type="button"
+            tabIndex={showTop ? 0 : -1}
+            onClick={() => {
+              setMessageOpen(false);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            $isSafety={isSafety}
+            aria-label="페이지 맨 위로"
+          >
+            ↑
+          </S.FloatTop>
+        </S.TopReveal>
       </S.FloatingActions>
-    </S.FooterWrapper>
+    </>
   );
 }

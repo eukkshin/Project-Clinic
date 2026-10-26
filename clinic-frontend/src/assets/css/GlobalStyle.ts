@@ -23,7 +23,7 @@ html, body {
     width: 100%;
     height: 100%;
 }
-/* 모든 요소에 테두리까지 포함해서 크기 계산 */
+
 *, *::before, *::after {
     box-sizing: border-box;
 }

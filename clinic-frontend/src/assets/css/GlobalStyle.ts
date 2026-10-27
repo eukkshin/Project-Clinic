@@ -37,6 +37,14 @@ ul, ol, li {
     margin: 0;
     padding: 0;
 }
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  }
+
 ::selection {
     background-color: #69826B;
     color: #F5F2E9;

@@ -2,6 +2,7 @@
 
 import React, { useState,useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDebounce } from 'use-debounce';
 import axios from 'axios';
 import styled from 'styled-components';
 
@@ -82,6 +83,11 @@ export default function ReservationDashboardComponent() {
   const [todayPatientList, setTodayPatientList] = useState<TodayPatient[]>(DEMO_PATIENTS);
   const [filter, setFilter] = useState<TodayPatient['status']>('RESERVED');
 
+  const [treatments, setTreatments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
+
   useEffect(()=>{
     const fetchSearchUser = async()=>{
         if(!searchTerm.trim()){
@@ -89,10 +95,10 @@ export default function ReservationDashboardComponent() {
             return;
         }
         try {   
-            const res = await axios.get('http://localhost:4000/api/admin/users',{
-                params: { search: searchTerm }
+            const response = await axios.get('http://localhost:4000/api/admin/users',{
+                params: { search: debouncedSearchTerm }
             })
-            const searchUsers = res.data.data || [];
+            const searchUsers = response.data.data || [];
 
             setSearchedMemberList(searchUsers)
         }catch(error){
@@ -100,7 +106,12 @@ export default function ReservationDashboardComponent() {
         }
     }
     fetchSearchUser();
-  }, [searchTerm])
+  }, [debouncedSearchTerm])
+
+  useEffect(()=>{
+    if(!chartNo) return;
+
+  },[])
   
   
   const handleRegisterToday = (patient: TodayPatient)=>{

@@ -1,9 +1,9 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
+import Link from "next/link";
+import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from '@/assets/css/components/dropdown/HeaderNavDropdown.styles';
+import * as S from "@/assets/css/components/dropdown/HeaderNavDropdown.styles";
 
 export interface NavSubmenuItem {
   name: string;
@@ -42,7 +42,7 @@ export default function HeaderNavDropdown({
 }: Props) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLAnchorElement>(null);
   const panelId = useId();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -112,13 +112,12 @@ export default function HeaderNavDropdown({
       }}
     >
       <S.NavTrigger
+        as={Link}
         ref={triggerRef}
-        type="button"
+        href={safeHref(menu.url)}
         $active={active}
         $open={open}
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setOpen(false)}
       >
         <span>{menu.name}</span>
       </S.NavTrigger>

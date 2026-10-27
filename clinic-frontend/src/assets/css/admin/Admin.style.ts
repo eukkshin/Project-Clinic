@@ -206,3 +206,4 @@ export * from "./Vlog.styles";
 export * from "./Safety.styles";
 export * from "./Board.styles";
 export * from "../common/LayoutStyle";
+export * from "./QnA.styles";

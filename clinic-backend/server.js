@@ -25,6 +25,8 @@ const Treatment = require("./src/entity/Treatment");
 
 
 
+const { createAdminSession } = require("./src/auth/adminSession");
+const { createDetailRouters } = require("./src/routes/detail.routes");
 
 const nodemailer = require("nodemailer");
 
@@ -33,6 +35,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
+const cookieParser = require("cookie-parser");
 
 // 1. CORS 설정 (프론트엔드 3000번 포트의 접근만 안전하게 허용)
 app.use(
@@ -48,6 +51,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 const uploadDir = path.join(__dirname, "public/images");
@@ -1356,143 +1360,161 @@ const qnaRepository = AppDataSource.getRepository(Qna);
 // ==========================================
 //  Q&A 목록 조회 API
 // ==========================================
-app.get('/api/admin/qnas', async (req, res) => {
-    try {
-        const qnas = await qnaRepository.find({
-            order: {
-               SORT_ORDER: "ASC",
-               QNA_IDX: "DESC",
-            },
-        });
+app.get("/api/admin/qnas", async (req, res) => {
+  try {
+    const qnas = await qnaRepository.find({
+      order: {
+        SORT_ORDER: "ASC",
+        QNA_IDX: "DESC",
+      },
+    });
 
-        res.json({
-            success: true,
-            data: qnas
-        });
-    } catch (err) {
-        console.error("Q&A 목록 조회 실패:", err);
-        res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    }
+    res.json({
+      success: true,
+      data: qnas,
+    });
+  } catch (err) {
+    console.error("Q&A 목록 조회 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
 });
 
 // ==========================================
 //  새 Q&A 등록 API
 // ==========================================
-app.post('/api/admin/qnas', async (req, res) => {
-    const { category, categoryName, question, answer } = req.body;
+app.post("/api/admin/qnas", async (req, res) => {
+  const { category, categoryName, question, answer } = req.body;
 
-    if (!category || !categoryName || !question || !answer) {
-        return res.status(400).json({ success: false, message: '모든 필드를 입력해주세요.' });
-    }
+  if (!category || !categoryName || !question || !answer) {
+    return res
+      .status(400)
+      .json({ success: false, message: "모든 필드를 입력해주세요." });
+  }
 
-    try {
-        const maxSort = await qnaRepository
-              .createQueryBuilder("qna")
-              .select("MAX(qna.SORT_ORDER)", "max")
-              .getRawOne();
+  try {
+    const maxSort = await qnaRepository
+      .createQueryBuilder("qna")
+      .select("MAX(qna.SORT_ORDER)", "max")
+      .getRawOne();
 
-              const nextOrder = (Number(maxSort.max) || 0) + 1;
+    const nextOrder = (Number(maxSort.max) || 0) + 1;
 
-        const newQna = qnaRepository.create({
-            CATEGORY: category,
-            CATEGORY_NAME: categoryName,
-            QUESTION: question,
-            ANSWER: answer,
-            SORT_ORDER: nextOrder,
-        });
+    const newQna = qnaRepository.create({
+      CATEGORY: category,
+      CATEGORY_NAME: categoryName,
+      QUESTION: question,
+      ANSWER: answer,
+      SORT_ORDER: nextOrder,
+    });
 
-        await qnaRepository.save(newQna);
+    await qnaRepository.save(newQna);
 
-        res.json({ success: true, message: 'Q&A가 성공적으로 등록되었습니다.' });
-    } catch (err) {
-        console.error("Q&A 등록 실패:", err);
-        res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    }
+    res.json({ success: true, message: "Q&A가 성공적으로 등록되었습니다." });
+  } catch (err) {
+    console.error("Q&A 등록 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
 });
-
-
 
 // ==========================================
 // Q&A 삭제 API
 // ==========================================
-app.delete('/api/admin/qnas/:id', async (req, res) => {
-    const { id } = req.params;
+app.delete("/api/admin/qnas/:id", async (req, res) => {
+  const { id } = req.params;
 
-    try {
-        const result = await qnaRepository.delete({ QNA_IDX: Number(id) });
+  try {
+    const result = await qnaRepository.delete({ QNA_IDX: Number(id) });
 
-        if (result.affected === 0) {
-            return res.status(404).json({ success: false, message: '해당 Q&A를 찾을 수 없습니다.' });
-        }
-
-        res.json({ success: true, message: 'Q&A가 삭제되었습니다.' });
-    } catch (err) {
-        console.error("Q&A 삭제 실패:", err);
-        res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+    if (result.affected === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "해당 Q&A를 찾을 수 없습니다." });
     }
+
+    res.json({ success: true, message: "Q&A가 삭제되었습니다." });
+  } catch (err) {
+    console.error("Q&A 삭제 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
 });
 
 // ==========================================
 // Q&A 순서 변경 저장 API
 // ==========================================
-app.put('/api/admin/qnas/order', async (req, res) => {
-    const { orderedIds } = req.body;
+app.put("/api/admin/qnas/order", async (req, res) => {
+  const { orderedIds } = req.body;
 
-    if (!Array.isArray(orderedIds)) {
-        return res.status(400).json({ success: false, message: '올바르지 않은 데이터 형식입니다.' });
-    }
+  if (!Array.isArray(orderedIds)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "올바르지 않은 데이터 형식입니다." });
+  }
 
-   try {
-        await AppDataSource.transaction(async (transactionalEntityManager) => {
-          const qnaRepo = transactionalEntityManager.getRepository(Qna);
-            for (let i = 0; i < orderedIds.length; i++) {
-                const id = Number(orderedIds[i]);
+  try {
+    await AppDataSource.transaction(async (transactionalEntityManager) => {
+      const qnaRepo = transactionalEntityManager.getRepository(Qna);
+      for (let i = 0; i < orderedIds.length; i++) {
+        const id = Number(orderedIds[i]);
 
-                if (isNaN(id)) {
-                    throw new Error("유효하지 않은 ID가 포함되어 있습니다.");
-                }
+        if (isNaN(id)) {
+          throw new Error("유효하지 않은 ID가 포함되어 있습니다.");
+        }
 
-               await qnaRepo.update(id, {SORT_ORDER:  i + 1})
-            }
-        });
-        res.json({ success: true, message: '순서가 저장되었습니다.' });
-    } catch (err) {
-        console.error("순서 저장 실패:", err);
-        res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    }
+        await qnaRepo.update(id, { SORT_ORDER: i + 1 });
+      }
+    });
+    res.json({ success: true, message: "순서가 저장되었습니다." });
+  } catch (err) {
+    console.error("순서 저장 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
 });
 
 // ==========================================
 //  Q&A 수정 API
 // ==========================================
-app.put('/api/admin/qnas/:id', async (req, res) => {
-    const { id } = req.params;
-    
-    if(isNaN(id)){
-      return res.status(400).json({ success: false, message: '유효하지 않은 Q&A ID입니다.' })
+app.put("/api/admin/qnas/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "유효하지 않은 Q&A ID입니다." });
+  }
+
+  const { category, categoryName, question, answer } = req.body;
+
+  try {
+    const qna = await qnaRepository.findOneBy({ QNA_IDX: Number(id) });
+
+    if (!qna) {
+      return res
+        .status(404)
+        .json({ success: false, message: "해당 Q&A를 찾을 수 없습니다." });
     }
-    
-    const { category, categoryName, question, answer } = req.body;
-    
-    try {
-        const qna = await qnaRepository.findOneBy({ QNA_IDX: Number(id) });
 
-        if (!qna) {
-            return res.status(404).json({ success: false, message: '해당 Q&A를 찾을 수 없습니다.' });
-        }
+    qna.CATEGORY = category;
+    qna.CATEGORY_NAME = categoryName;
+    qna.QUESTION = question;
+    qna.ANSWER = answer;
 
-        qna.CATEGORY = category;
-        qna.CATEGORY_NAME = categoryName;
-        qna.QUESTION = question;
-        qna.ANSWER = answer;
+    await qnaRepository.save(qna);
 
-        await qnaRepository.save(qna);
-
-        res.json({ success: true, message: 'Q&A가 수정되었습니다.' });
-    } catch (err) {
-        console.error("Q&A 수정 실패:", err);
-        res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    }
+    res.json({ success: true, message: "Q&A가 수정되었습니다." });
+  } catch (err) {
+    console.error("Q&A 수정 실패:", err);
+    res
+      .status(500)
+      .json({ success: false, message: "서버 오류가 발생했습니다." });
+  }
 });
 
 // ==========================================
@@ -1716,6 +1738,18 @@ app.get('/api/patient/:chartNo', async(req, res)=>{
 })
 
 
+const { router: adminSessionRouter, requireAdmin } = createAdminSession({
+  dataSource: AppDataSource,
+});
+
+const { publicRouter, adminRouter } = createDetailRouters({
+  dataSource: AppDataSource,
+  requireAdmin,
+});
+
+app.use("/api/admin/session", adminSessionRouter);
+app.use("/api/details", publicRouter);
+app.use("/api/admin/detail", adminRouter);
 
 const PORT = process.env.PORT || 4000;
 //포트폴리오로 고도화 아이디 확인하고 그사람에 가입 이메일을 판단하고..거기에 맞는 이메일 발송하겠끔..

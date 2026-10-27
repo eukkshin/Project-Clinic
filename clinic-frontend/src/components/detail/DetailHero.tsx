@@ -1,77 +1,100 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import Image from 'next/image';
+import gsap from "gsap";
+import { useEffect, useRef } from "react";
 
-import * as S from '@/assets/css/components/detail/DetailHero.styles';
+import * as S from "@/assets/css/components/detail/DetailHero.styles";
+import DetailImage from "@/components/detail/DetailImage";
 
-export default function DetailHero() {
-  const heroRef = useRef<HTMLElement>(null);
+import type { DetailHeroData } from "@/types/detail";
+interface Props {
+  hero: DetailHeroData;
+}
+
+/** 풀블리드 Hero: 이미지 scale 1.12 -> 1.0, 텍스트는 위에서 내려오며 부드럽게 노출. */
+export default function DetailHero({ hero }: Props) {
+  const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
+    const root = rootRef.current;
+    if (!root) return;
 
-    const reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
+    const elements = root.querySelectorAll<HTMLElement>("[data-detail-reveal]");
+    const image = root.querySelector<HTMLElement>("[data-detail-hero-image]");
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (reduceMotion) return;
+    // 접근성 설정을 존중하고, CSS에서 숨긴 텍스트를 반드시 드러냅니다.
+    if (reducedMotion) {
+      gsap.set(elements, { autoAlpha: 1, y: 0, filter: "none" });
+      if (image) gsap.set(image, { scale: 1 });
+      return;
+    }
 
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline();
+    const context = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
 
-      // 이미지가 천천히 멀어지는 효과
-      timeline.to(
-        '[data-hero-image]',
-        {
-          scale: 1,
-          duration: 2.8,
-          ease: 'power2.out',
-        },
-        0,
-      );
+      if (image) {
+        tl.fromTo(
+          image,
+          { scale: 1.12 },
+          { scale: 1, duration: 3.1, ease: "power2.out" },
+          0,
+        );
+      }
 
-      // 글씨가 위에서 아래로 부드럽게 등장
-      timeline.fromTo(
-        '[data-hero-text]',
+      tl.fromTo(
+        elements,
+        { autoAlpha: 0, y: -32, filter: "blur(9px)" },
         {
-          y: -35,
-          autoAlpha: 0,
-        },
-        {
-          y: 0,
           autoAlpha: 1,
-          duration: 1.1,
-          stagger: 0.15,
-          ease: 'power3.out',
+          y: 0,
+          filter: "blur(0px)",
+          stagger: 0.18,
+          duration: 1.15,
+          ease: "power3.out",
         },
-        0.35,
+        0.42,
       );
-    }, hero);
+    }, root);
 
-    return () => ctx.revert();
-  }, []);
+    return () => context.revert();
+  }, [hero.imageUrl, hero.title]);
 
   return (
-    <S.Hero ref={heroRef}>
-      <S.HeroImage data-hero-image>
-        <Image
-          src="/images/detail/eyes/hero.webp"
-          alt="눈성형 소개"
-          fill
-          sizes="100vw"
-          priority
-          style={{ objectFit: 'cover' }}
-        />
+    <S.Hero ref={rootRef} aria-label={hero.title}>
+      {/* 비주얼만 확대/축소. 섹션 자체는 transform하지 않으므로 fixed SideNav가 흔들리지 않습니다. */}
+      <S.HeroImage data-detail-hero-image>
+        {hero.imageUrl && (
+          <DetailImage
+            src={hero.imageUrl}
+            alt={hero.imageAlt ?? ""}
+            fill
+            priority
+            sizes="100vw"
+            style={{
+              objectFit: "cover",
+              objectPosition: hero.imagePosition ?? "center",
+            }}
+          />
+        )}
       </S.HeroImage>
-
+      <S.HeroOverlay />
       <S.HeroContent>
-        <p data-hero-text>AHN'S PLASTIC SURGERY</p>
-        <h1 data-hero-text>자연스러운 아름다움</h1>
-        <p data-hero-text>섬세한 차이가 만드는 조화로운 변화</p>
+        {hero.eyebrow && (
+          <S.HeroEyebrow data-detail-reveal>{hero.eyebrow}</S.HeroEyebrow>
+        )}
+        <S.HeroTitle data-detail-reveal>{hero.title}</S.HeroTitle>
+        {hero.description && (
+          <S.HeroDescription data-detail-reveal>
+            {hero.description}
+          </S.HeroDescription>
+        )}
       </S.HeroContent>
+      <S.ScrollNote aria-hidden="true">
+        SCROLL TO EXPLORE <span>↓</span>
+      </S.ScrollNote>
     </S.Hero>
   );
 }

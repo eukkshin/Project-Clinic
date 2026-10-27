@@ -1,8 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { FiList, FiX } from "react-icons/fi";
 import gsap from "gsap";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { FiList, FiX } from "react-icons/fi";
 
 import * as S from "@/assets/css/components/detail/DetailSideNav.styles";
 
@@ -51,7 +57,9 @@ export default function DetailSideNav({
     const nextY = target.offsetTop;
     const nextHeight = target.offsetHeight;
     const currentY = Number(gsap.getProperty(indicator, "y")) || 0;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     gsap.killTweensOf(indicator);
     if (ripple) gsap.killTweensOf(ripple);
@@ -71,7 +79,10 @@ export default function DetailSideNav({
 
     const movingDown = nextY > currentY;
     const distance = Math.abs(nextY - currentY);
-    const travelDuration = Math.min(0.78, Math.max(0.53, 0.47 + distance / 650));
+    const travelDuration = Math.min(
+      0.78,
+      Math.max(0.53, 0.47 + distance / 650),
+    );
 
     gsap.set(indicator, {
       transformOrigin: movingDown ? "50% 18%" : "50% 82%",
@@ -82,7 +93,12 @@ export default function DetailSideNav({
     // 1. 이전 선택 배경이 다음 항목으로 흘러감
     timeline.to(
       indicator,
-      { y: nextY, height: nextHeight, duration: travelDuration, ease: "power3.inOut" },
+      {
+        y: nextY,
+        height: nextHeight,
+        duration: travelDuration,
+        ease: "power3.inOut",
+      },
       0,
     );
 
@@ -122,7 +138,8 @@ export default function DetailSideNav({
   useLayoutEffect(() => {
     if (!activeId) return;
     const shouldAnimate =
-      previousActiveRef.current !== null && previousActiveRef.current !== activeId;
+      previousActiveRef.current !== null &&
+      previousActiveRef.current !== activeId;
     moveIndicator(activeId, shouldAnimate);
     previousActiveRef.current = activeId;
   }, [activeId, moveIndicator, idsKey]);
@@ -252,9 +269,15 @@ export default function DetailSideNav({
       unlockTimerRef.current = null;
     }, 1700);
 
-    const top = element.getBoundingClientRect().top + window.scrollY - scrollOffset;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion ? "auto" : "smooth" });
+    const top =
+      element.getBoundingClientRect().top + window.scrollY - scrollOffset;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
   };
 
   if (sections.length === 0) return null;
@@ -266,7 +289,9 @@ export default function DetailSideNav({
         type="button"
         aria-expanded={mobileOpen}
         aria-controls="ahns-detail-side-navigation"
-        aria-label={mobileOpen ? "상세페이지 메뉴 닫기" : "상세페이지 메뉴 열기"}
+        aria-label={
+          mobileOpen ? "상세페이지 메뉴 닫기" : "상세페이지 메뉴 열기"
+        }
         onClick={() => setMobileOpen((prev) => !prev)}
       >
         {mobileOpen ? <FiX size={20} /> : <FiList size={20} />}
@@ -279,7 +304,11 @@ export default function DetailSideNav({
       >
         <S.NavEyebrow>{eyebrow}</S.NavEyebrow>
         <S.NavList ref={listRef}>
-          <S.LiquidIndicator ref={indicatorRef} $ready={ready} aria-hidden="true">
+          <S.LiquidIndicator
+            ref={indicatorRef}
+            $ready={ready}
+            aria-hidden="true"
+          >
             <S.LiquidRipple ref={rippleRef} />
           </S.LiquidIndicator>
 

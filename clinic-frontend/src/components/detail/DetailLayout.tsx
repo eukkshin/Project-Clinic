@@ -1,25 +1,37 @@
-import DetailSideNav from '@/components/detail/DetailSideNav';
+"use client";
 
-const sections = [
-  { id: 'intro', title: '시술 소개' },
-  { id: 'features', title: '시술 특징' },
-  { id: 'process', title: '수술 과정' },
-  { id: 'gallery', title: '전후 사진' },
-  { id: 'faq', title: '자주 묻는 질문' },
-];
+import * as S from "@/assets/css/components/detail/DetailLayout.styles";
+import DetailHero from "@/components/detail/DetailHero";
+import DetailSectionRenderer from "@/components/detail/DetailSectionRenderer";
+import DetailSideNav from "@/components/detail/DetailSideNav";
 
-export default function DetailLayout() {
+import type { DetailPageData } from "@/types/detail";
+/** Header/Footer는 기존 src/app/layout.tsx / ConditionalLayout에 맡깁니다. */
+export default function DetailLayout({ page }: { page: DetailPageData }) {
+  const visibleSections = page.sections;
+  const navSections = visibleSections.map((section) => ({
+    id: `detail-${section.id}`,
+    title: section.title,
+  }));
+
   return (
-    <>
-      <DetailSideNav sections={sections} scrollOffset={100} />
-
-      <main>
-        <section id="intro">시술 소개</section>
-        <section id="features">시술 특징</section>
-        <section id="process">수술 과정</section>
-        <section id="gallery">전후 사진</section>
-        <section id="faq">FAQ</section>
-      </main>
-    </>
+    <S.PageRoot>
+      {/* Hero/본문과 동일한 상위 레벨: fixed SideNav가 transform 조상의 영향을 받지 않음 */}
+      <DetailSideNav
+        sections={navSections}
+        scrollOffset={100}
+        eyebrow="AHN'S · DETAIL"
+      />
+      <S.Main>
+        <DetailHero hero={page.hero} />
+        {visibleSections.map((section, index) => (
+          <DetailSectionRenderer
+            key={section.id}
+            section={section}
+            index={index}
+          />
+        ))}
+      </S.Main>
+    </S.PageRoot>
   );
 }

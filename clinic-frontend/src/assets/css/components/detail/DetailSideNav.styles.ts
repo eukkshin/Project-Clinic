@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 /**
  * AHNS Detail SideNav
@@ -64,13 +64,13 @@ export const SideNav = styled.nav<{ $mobileOpen: boolean }>`
     left: 14px;
     bottom: calc(84px + env(safe-area-inset-bottom, 0px));
     transform: ${({ $mobileOpen }) =>
-      $mobileOpen ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.96)'};
+      $mobileOpen ? "translateY(0) scale(1)" : "translateY(12px) scale(0.96)"};
     transform-origin: bottom left;
     width: min(204px, calc(100vw - 28px));
     max-height: min(400px, calc(100dvh - 180px));
     opacity: ${({ $mobileOpen }) => ($mobileOpen ? 1 : 0)};
-    visibility: ${({ $mobileOpen }) => ($mobileOpen ? 'visible' : 'hidden')};
-    pointer-events: ${({ $mobileOpen }) => ($mobileOpen ? 'auto' : 'none')};
+    visibility: ${({ $mobileOpen }) => ($mobileOpen ? "visible" : "hidden")};
+    pointer-events: ${({ $mobileOpen }) => ($mobileOpen ? "auto" : "none")};
 
     background: rgba(247, 250, 244, 0.85);
     -webkit-backdrop-filter: blur(24px) saturate(165%);
@@ -116,30 +116,22 @@ export const LiquidIndicator = styled.div<{ $ready: boolean }>`
 
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.46);
-  background: linear-gradient(
-    145deg,
-    rgba(79, 132, 93, 0.95),
-    rgba(34, 79, 56, 0.97)
-  );
+  background: linear-gradient(145deg, rgba(79, 132, 93, 0.95), rgba(34, 79, 56, 0.97));
   box-shadow:
-    0 6px 22px rgba(36, 69, 53, 0.2),
+    0 6px 22px rgba(36, 69, 53, 0.20),
     inset 0 1px 0 rgba(255, 255, 255, 0.37),
     inset 0 -2px 7px rgba(10, 39, 24, 0.17);
   will-change: transform;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 3px;
     left: 14%;
     width: 72%;
     height: 36%;
     border-radius: 50%;
-    background: radial-gradient(
-      ellipse,
-      rgba(255, 255, 255, 0.29),
-      transparent 75%
-    );
+    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.29), transparent 75%);
   }
 `;
 
@@ -168,16 +160,14 @@ export const NavButton = styled.button<{ $active: boolean }>`
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: ${({ $active }) => ($active ? '#ffffff' : '#365743')};
+  color: ${({ $active }) => ($active ? "#ffffff" : "#365743")};
   text-align: left;
   font: inherit;
   font-size: 12px;
   font-weight: ${({ $active }) => ($active ? 700 : 600)};
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 
   ${({ $active }) =>
     !$active &&
@@ -194,8 +184,7 @@ export const NavButton = styled.button<{ $active: boolean }>`
 `;
 
 export const NavNumber = styled.span<{ $active: boolean }>`
-  color: ${({ $active }) =>
-    $active ? 'rgba(230, 248, 233, 0.82)' : '#799581'};
+  color: ${({ $active }) => ($active ? "rgba(230, 248, 233, 0.82)" : "#799581")};
   font-size: 10px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;

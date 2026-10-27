@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FiActivity,
   FiAward,
@@ -12,8 +12,10 @@ import {
   FiCompass,
   FiExternalLink,
   FiFeather,
+  FiFileText,
   FiFilm,
   FiGrid,
+  FiHelpCircle,
   FiLayers,
   FiLayout,
   FiLogOut,
@@ -29,13 +31,12 @@ import * as A from "@/assets/css/admin/AdminShell.styles";
 import { AdminWorkspaceTheme } from "@/assets/css/admin/AdminWorkspace.styles";
 import { Popup } from "@/components/modal/Popup";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
 const menuGroups = [
   {
     label: "OVERVIEW",
-    items: [
-      { href: "/admin/root", title: "운영 현황", icon: FiGrid },
-      { href: "/admin/dashboard", title: "통계 대시보드", icon: FiActivity },
-    ],
+    items: [{ href: "/admin/root", title: "운영 현황", icon: FiGrid }],
   },
   {
     label: "OPERATIONS",
@@ -60,7 +61,8 @@ const menuGroups = [
       { href: "/admin/event", title: "이벤트 랭킹", icon: FiAward },
       { href: "/admin/vlog", title: "VLOG 영상", icon: FiVideo },
       { href: "/admin/safety", title: "안전 시스템", icon: FiShield },
-      { href: "/admin/qna", title: "Q&A 질문", icon: FiMessageSquare },
+      { href: "/admin/qna", title: "QnA 관리", icon: FiHelpCircle },
+      { href: "/admin/details", title: "상세페이지", icon: FiFileText },
     ],
   },
   {
@@ -79,6 +81,28 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [authChecked, setAuthChecked] = useState(false);
+  useEffect(() => {
+    let active = true;
+    fetch(`${API_URL}/api/admin/session/me`, {
+      credentials: "include",
+      cache: "no-store",
+    })
+      .then((response) => {
+        if (!active) return;
+        if (!response.ok) {
+          router.replace("/admin");
+        } else {
+          setAuthChecked(true);
+        }
+      })
+      .catch(() => {
+        if (active) router.replace("/admin");
+      });
+    return () => {
+      active = false;
+    };
+  }, [router]);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [popupConfig, setPopupConfig] = useState({
@@ -97,19 +121,34 @@ export default function AdminLayout({
   );
   const closePopup = () =>
     setPopupConfig((prev) => ({ ...prev, isOpen: false }));
-  // Keep the original logout/cookie and Popup confirmation behavior.
-  const handleLogoutClick = () => {
-    document.cookie = "admin_token=; path=/; max-age=0;";
-    setPopupConfig({
-      isOpen: true,
-      title: "로그아웃",
-      message: "안전하게 로그아웃 되었습니다.",
-      onConfirm: () => {
-        router.push("/admin");
-        closePopup();
-      },
-    });
+  const handleLogoutClick = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/admin/session/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("로그아웃 실패");
+      setPopupConfig({
+        isOpen: true,
+        title: "로그아웃",
+        message: "안전하게 로그아웃 되었습니다.",
+        onConfirm: () => {
+          router.replace("/admin");
+          closePopup();
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      setPopupConfig({
+        isOpen: true,
+        title: "로그아웃 오류",
+        message: "로그아웃 요청에 실패했습니다.",
+        onConfirm: undefined,
+      });
+    }
   };
+
+  if (!authChecked) return null;
 
   return (
     <>

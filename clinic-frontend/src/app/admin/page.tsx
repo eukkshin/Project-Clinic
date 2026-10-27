@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import * as S from "@/assets/css/admin/Admin.style";
 import { Popup } from "@/components/modal/Popup";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -54,24 +56,22 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/login", {
+      const response = await fetch(`${API_URL}/api/admin/session/login`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       //분기
       if (response.ok) {
-        const targetPath = result.isAdmin === 1 ? "/admin/root" : "/";
+        const targetPath = "/admin/root";
         openPopup("로그인 성공", "로그인에 성공했습니다!", () => {
-          if (Number(result.isAdmin) === 1) {
-            //쿠키 설정
-            document.cookie = "admin_token=true; path=/; max-age=86400;";
-          }
-          router.push(targetPath);
           closePopup();
+          router.replace(targetPath);
+          router.refresh();
         });
         //관리자 라면
       } else {

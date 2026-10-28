@@ -5,7 +5,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import DaumPostcode from 'react-daum-postcode';
 
 import * as S from '@/assets/css/auth/Auth.styles';
-import { Popup } from '@/components/modal/Popup';
+import { Popup } from '@/ui/modal/Popup';
 
 import AuthBrandPanel from '../AuthBrandPanel';
 

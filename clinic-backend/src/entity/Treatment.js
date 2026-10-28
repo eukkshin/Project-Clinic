@@ -14,6 +14,11 @@ module.exports = new EntitySchema({
       length: 20,
       nullable: false,
     },
+    CATEGORY: {
+      type: "varchar2",
+      length: 30,
+      nullable: true,
+    },
     TREATMENT_NAME: {
       type: "varchar2",
       length: 100,
@@ -31,6 +36,15 @@ module.exports = new EntitySchema({
       type: "varchar2",
       length: 20,
       default: "'ACTIVE'",
+      nullable: false,
+    },
+    PRICE: {
+      type: "number",
+      nullable: false,
+    },
+    PAYMENT_METHOD: {
+      type: "varchar2",
+      length: 20,
       nullable: false,
     },
     EXPIRE_DATE: {

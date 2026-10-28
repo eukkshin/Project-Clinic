@@ -45,10 +45,10 @@ export const PopupOverlay = styled.div`
   }
 `;
 
-export const ModalPopupContainer = styled.div`
+export const ModalPopupContainer = styled.div<{$maxWidth?: string}>`
   position: relative;
   isolation: isolate;
-  width: min(100%, 446px);
+  width: min(100%, ${({$maxWidth})=> $maxWidth || '446px'});
   max-height: min(640px, calc(100dvh - 48px));
   display: flex;
   flex-direction: column;

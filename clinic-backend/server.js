@@ -1692,7 +1692,7 @@ app.patch('/api/admin/reservation/:reservationId/status', async (req, res) => {
 // ==========================================
 // 특정 환자의 정보 및 보유 시술권 목록 조회 API
 // ==========================================
-app.get('/api/patient/:chartNo', async(req, res)=>{
+app.get('/api/reservation/patient/:chartNo', async(req, res)=>{
   
   try{
  
@@ -1722,7 +1722,8 @@ app.get('/api/patient/:chartNo', async(req, res)=>{
         CHART_NO: user.CHART_NO,
         USER_NAME: user.USER_NAME || user.NAME,
         PHONE: user.PHONE,
-        STATUS: user.STATUS || '정상'
+        STATUS: user.STATUS || '정상',
+        MEMO: user.MEMO || '',
         },
         treatments,
     });

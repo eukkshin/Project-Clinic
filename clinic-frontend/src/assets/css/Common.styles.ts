@@ -113,3 +113,11 @@ export const Transparent = css`
   font-size: 0.85rem;
   font-weight: 600;
 `;
+
+
+export const NoDrag = css`
+-webkit-user-select: none; 
+-moz-user-select: none;    
+-ms-user-select: none;    
+user-select: none;        
+`;

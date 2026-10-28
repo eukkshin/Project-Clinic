@@ -29,7 +29,7 @@ import {
 
 import * as A from "@/assets/css/admin/AdminShell.styles";
 import { AdminWorkspaceTheme } from "@/assets/css/admin/AdminWorkspace.styles";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 

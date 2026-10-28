@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FiClock, FiImage, FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 interface PopupData {
   id: number;

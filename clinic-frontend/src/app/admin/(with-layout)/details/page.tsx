@@ -17,7 +17,7 @@ import {
 } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/DetailCMS.styles";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 import { detailApi, detailErrorMessage } from "@/lib/adminDetailApi";
 
 import type {

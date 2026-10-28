@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 interface QnAData {
   id: number;

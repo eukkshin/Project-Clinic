@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FiList, FiPlus, FiSave, FiSettings, FiTrash2 } from "react-icons/fi";
 
 import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 // 게시판 데이터 인터페이스
 interface BoardData {

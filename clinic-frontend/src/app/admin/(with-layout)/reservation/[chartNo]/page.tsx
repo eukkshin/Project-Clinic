@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, useRouter } from 'next/navigation'
-import { FaCheckCircle, FaFileMedicalAlt, FaRegCalendarCheck } from 'react-icons/fa';
-import styled from 'styled-components';
+import { useParams } from 'next/navigation'
+import { FaCheckCircle, FaRegCalendarCheck } from 'react-icons/fa';
 import * as S from './reservation.style'
-import { FaClipboard, FaNotesMedical } from 'react-icons/fa6';
-import { MdMedicalServices } from 'react-icons/md';
+import { AddTreatmentModal } from '../components/AddTreatmentModal';
+import * as A from "@/assets/css/admin/DetailCMS.styles";
+import { FaRegCommentDots } from 'react-icons/fa6';
 
 interface Reservation {
 id: number;              
@@ -55,11 +55,13 @@ export default function PatientBookingPage (){
     name: '',
     phone: '',
     status: '정상',
+    memo: '',
   });
 
 
   const [treatments, setTreatments] = useState<TreatmentItem[]>([]);
   const [isLoading, setIsLoading]= useState(true);
+  const [showMemoTooltip, setShowMemoTooltip] = useState(false);
 
   const [filter, setFilter] = useState<TreatmentStatus|'ALL'>('ALL');
 
@@ -67,7 +69,7 @@ export default function PatientBookingPage (){
       if(!chartNo) return;
       try {
         //chartNo로 환자 정보 및 시술권 조회 API 호출
-        const response = await axios.get(`http://localhost:4000/api/patient/${chartNo}`);
+        const response = await axios.get(`http://localhost:4000/api/reservation/patient/${chartNo}`);
 
         if (response.data.success) {
           const userData = response.data.user;
@@ -78,6 +80,7 @@ export default function PatientBookingPage (){
             name: userData.USER_NAME || userData.NAME || '고객',
             phone: userData.PHONE || '연락처 없음',
             status: userData.STATUS || '정상',
+            memo: userData.MEMO || '귀여움짱귀여움',
           });
 
           const formattedTreatments = treatData.map((t:any)=>({
@@ -158,40 +161,63 @@ export default function PatientBookingPage (){
   const count = (tab:'ACTIVE' | 'COMPLETED' | 'EXPIRED')=>{
     return treatments.filter(item=>item.status === tab).length;
   }
-  
+
   return (
+    <>
     <S.BookingContainer>
       <S.BookingHeader>
-        <S.BookingKicker>Patient Reservation</S.BookingKicker>
-        <S.BookingTitle>
-          시술 <em>예약 시스템</em>
-        </S.BookingTitle>
+        <div className="admin-page-title-block">
+        <span className="admin-page-eyebrow">PATIENT / RESERVATION</span>
+        <S.BookingTitle>시술 예약 관리</S.BookingTitle>
+        <p className="admin-page-description">
+          환자의 보유 시술권을 확인하고 새로운 예약을 관리합니다.
+        </p>
+      </div>
       </S.BookingHeader>
 
       <S.BookingContentGrid>
         {/* 왼쪽: 환자 프로필 및 보유 시술권 리스트 */}
         <S.LeftColumn>
-          <S.ProfileCard>
-            <S.ProfileHeader>
-              <S.Avatar>{patient.name?.[0] || '환'}</S.Avatar>
-              <div>
-                <S.PatientName>{patient.name} 고객님</S.PatientName>
-                <S.PatientPhone>{patient.phone || "010-0000-0000"}</S.PatientPhone>
-              </div>
+          <S.ProfileCard className="admin-panel">
+                <S.ProfileHeader className="admin-panel-head">
+                  <S.Avatar>{patient.name?.[0] || '환'}</S.Avatar>
+                  <div>
+                    <S.PatientName>{patient.name} 고객님</S.PatientName>
+                    <S.PatientNo>{chartNo}</S.PatientNo>
+                    
+                  </div>
+                  <A.Button $variant='primary'
+                    style={{marginLeft: 'auto'}}
+                    onClick={() => setShowAddTreatModal(true)}
+                  >
+                    + 시술권 추가
+                  </A.Button>
+                </S.ProfileHeader>
+                
+                <S.ProfileFooter >
+                  <S.TitleWrapper>
+                  {patient.memo && (
+                    <S.MemoContainer>
+                      <S.MemoIconButton type='button' onClick={()=> setShowMemoTooltip(prev=>!prev)}>
+                        <FaRegCommentDots title='환자메모확인'/>
+                      </S.MemoIconButton>
 
-              <S.TreatAddButton onClick={()=>setShowAddTreatModal(true)}>
-                + 시술권 추가
-              </S.TreatAddButton>
-            </S.ProfileHeader>
-            <S.ProfileFooter>
-              <span>회원 상태</span>
-              <S.GradeBadge $isActive={patient.status === '정상'}>{patient.status}</S.GradeBadge>
-            </S.ProfileFooter>
-          </S.ProfileCard>
+                      {showMemoTooltip && (
+                        <S.MemoTooltipBox>
+                          {patient.memo}
+                        </S.MemoTooltipBox>
+                      )}
+                    </S.MemoContainer>
+                  )}
+                  <span>{patient.phone || '010-0000-0000'}</span>
+                  </S.TitleWrapper>
+                  <S.GradeBadge $isActive={patient.status === '정상'}>{patient.status}</S.GradeBadge>
+                </S.ProfileFooter>
+            </S.ProfileCard>
 
           {/* 남은 시술 리스트 카드 */}
-          <S.ProcedureCard>
-            <S.CardHeader>
+          <S.ProcedureCard className="admin-panel">
+            <S.CardHeader className="admin-panel-head">
               <S.TitleWrapper>
                 <FaCheckCircle/>
                 <S.SectionTitle>보유/예정 시술 내역</S.SectionTitle>
@@ -227,7 +253,7 @@ export default function PatientBookingPage (){
 
               </S.FilterTabWrapper>
             </S.CardHeader>
-
+          <div className="admin-panel-body">
             <S.ProcedureList>
               {treatments.length === 0 ? (
                 <S.EmptyMessage>
@@ -268,14 +294,15 @@ export default function PatientBookingPage (){
               )))
             }
             </S.ProcedureList>
+          </div>
           </S.ProcedureCard>
         </S.LeftColumn>
 
         {/* 오른쪽: 예약 캘린더 및 시간 및 메모 선택 */}
         <S.RightColumn>
-          <S.BookingFormCard>
-            <div>
-              <S.HeaderTitleWrapper>
+          <S.BookingFormCard className="admin-panel">
+            <div className="admin-panel-head">
+              <S.HeaderTitleWrapper >
                 <FaRegCalendarCheck /> 
                 <S.SectionTitle>
                   {selectedTreatment ? (
@@ -289,9 +316,10 @@ export default function PatientBookingPage (){
                   :<span>시술 예약일시 선택 <S.FormNotice>시술권을 먼저 선택해주세요</S.FormNotice></span>}
                 </S.SectionTitle>
               </S.HeaderTitleWrapper>
-
+            </div>
+            <div className="admin-panel-body">
               {/* 캘린더 영역 */}
-              <S.InputGroup>
+              <S.InputGroup className="admin-form-field">
                 <S.Label>날짜 선택</S.Label>
                 <S.DateInput 
                   type="date" 
@@ -301,7 +329,7 @@ export default function PatientBookingPage (){
               </S.InputGroup>
 
               {/* 시간대별 버튼 영역 */}
-              <S.InputGroup>
+              <S.InputGroup className="admin-form-field">
                 <S.Label>예약 가능 시간</S.Label>
                 <S.TimeGrid>
                   {TIME_SLOTS.map((time) => (
@@ -315,10 +343,10 @@ export default function PatientBookingPage (){
                   ))}
                 </S.TimeGrid>
               </S.InputGroup>
-              <S.InputGroup>
+              <S.InputGroup className="admin-form-field">
                 <S.Label>예약 메모 (특이사항)</S.Label>
                 <S.MemoInput 
-                  rows={3}
+                  rows={2}
                   placeholder="고객 예약 요청사항을 입력해주세요."
                   value={memo}
                   onChange={(e:any) => setMemo(e.target.value)}
@@ -327,6 +355,7 @@ export default function PatientBookingPage (){
             </div>
 
             <S.SubmitButton 
+              className="admin-primary-action"
               onClick={handleBookingSubmit}
             >
               예약 확정하기
@@ -336,6 +365,14 @@ export default function PatientBookingPage (){
 
       </S.BookingContentGrid>
     </S.BookingContainer>
+
+    <AddTreatmentModal
+    chartNo={chartNo}
+    isOpen={showAddTreatModal}
+    onClose={() => setShowAddTreatModal(false)}
+    />
+    
+    </>
   );
 };
 

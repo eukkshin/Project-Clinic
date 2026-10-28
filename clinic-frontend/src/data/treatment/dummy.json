@@ -1,0 +1,92 @@
+
+[
+  {
+    "category": "SKIN",
+    "name": "레이저 토닝",
+    "packages": [
+      { "count": 1, "price": 50000 },
+      { "count": 3, "price": 135000 },
+      { "count": 5, "price": 200000 },
+      { "count": 10, "price": 350000 }
+    ]
+  },
+  {
+    "category": "SKIN",
+    "name": "리프팅",
+    "packages": [
+      { "count": 1, "price": 100000 },
+      { "count": 3, "price": 270000 },
+      { "count": 5, "price": 400000 },
+      { "count": 10, "price": 700000 }
+    ]
+  },
+  {
+    "category": "SKIN",
+    "name": "필링",
+    "packages": [
+      { "count": 1, "price": 40000 },
+      { "count": 3, "price": 105000 },
+      { "count": 5, "price": 160000 },
+      { "count": 10, "price": 280000 }
+    ]
+  },
+  {
+    "category": "INJECTION",
+    "name": "보톡스",
+    "packages": [
+      { "count": 1, "price": 50000 },
+      { "count": 3, "price": 135000 },
+      { "count": 5, "price": 200000 }
+    ]
+  },
+  {
+    "category": "INJECTION",
+    "name": "필러",
+    "packages": [
+      { "count": 1, "price": 150000 },
+      { "count": 3, "price": 400000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "쌍꺼풀",
+    "packages": [
+      { "count": 1, "price": 1200000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "눈매교정",
+    "packages": [
+      { "count": 1, "price": 1800000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "코 성형",
+    "packages": [
+      { "count": 1, "price": 3000000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "복부 지방흡입",
+    "packages": [
+      { "count": 1, "price": 2500000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "허벅지 지방흡입",
+    "packages": [
+      { "count": 1, "price": 3000000 }
+    ]
+  },
+  {
+    "category": "SURGERY",
+    "name": "기타 성형수술",
+    "packages": [
+      { "count": 1, "price": 2000000 }
+    ]
+  }
+]

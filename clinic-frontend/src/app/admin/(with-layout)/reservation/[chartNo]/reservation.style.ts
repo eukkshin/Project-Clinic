@@ -1,5 +1,6 @@
 import styled, { keyframes } from 'styled-components';
 import { FiLoader } from 'react-icons/fi'; // 또는 선호하시는 아이콘
+import { BoxShadow, CircleBtn, FlexBetween, FlexCenter, NoDrag } from '@/assets/css/Common.styles';
 
 // 부드럽게 회전하는 애니메이션
 const spin = keyframes`
@@ -38,16 +39,12 @@ export const LoadingText = styled.p`
 ///=================================================
 
 export const BookingContainer = styled.section`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: clamp(40px, 6vw, 80px) clamp(20px, 4vw, 40px);
-  color: #283c2d;
-  font-family: var(--ahns-body);
+  width: 100%;
 `;
 
 export const BookingHeader = styled.div`
-  margin-bottom: 40px;
-  text-align: center;
+  ${FlexBetween}
+  margin-bottom: 1.5rem;
 `;
 
 export const BookingKicker = styled.p`
@@ -131,19 +128,19 @@ export const RightColumn = styled.div`
 `;
 
 export const ProfileCard = styled.div`
-  border: 1px solid #e1e8de;
-  border-radius: 12px;
-  background: #fffefa;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(40, 75, 55, 0.04);
+background-color: #fff;
+border-radius: 12px;
+${BoxShadow}
+/* border: 1px solid rgba(59, 122, 87, 0.1); */
+&&{ overflow: visible; }
+height: fit-content;
 `;
 
 export const ProfileHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  ${FlexBetween}
   gap: 16px;
-  margin-bottom: 20px;
+  border-top-right-radius: 12px;
+  border-top-left-radius: 12px;
 `;
 
 export const Avatar = styled.div`
@@ -155,35 +152,84 @@ export const Avatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--ahns-display);
   font-weight: 600;
   font-size: 1.2rem;
 `;
 
 export const PatientName = styled.h3`
-  font-size: 16px;
-  font-weight: 700;
-  color: #284b37;
-  margin: 0 0 4px 0;
+  margin: 0;
   letter-spacing: -0.02em;
+  font-weight: 700;
+  color: #1b4d3e;
 `;
 
-export const PatientPhone = styled.p`
+export const PatientNo = styled.p`
   font-size: 13.5px;
   color: #526555;
   margin: 0;
 `;
 
 export const ProfileFooter = styled.div`
-  padding-top: 16px;
-  border-top: 1px solid rgba(225, 232, 222, 0.6);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13.5px;
-  color: #283c2d;
+  padding: 1rem;
+  color: #738079;
+  ${FlexBetween}
+`;
+export const MemoContainer = styled.div`
+position: relative;
+display: inline-flex;
+align-items: center;
 `;
 
+export const MemoIconButton = styled.button`
+display: inline-flex;
+align-items: center;
+cursor: pointer;
+
+width: 35px;
+height: 35px;
+border-radius: 20%; 
+background-color: transparent;
+${FlexCenter}
+
+&:hover {
+   background-color: #d9eee5;
+  }
+svg{
+  color: #1b4d3e;
+  font-size: 16px;
+}
+`;
+export const MemoTooltipBox = styled.div`
+position: absolute;
+left: calc(100% + 8px);
+top: 50%;
+transform: translateY(-50%);
+
+width: max-content;
+max-width: 280px;
+padding: 12px 24px;
+
+border-radius: 10px;
+font-size: 13px;
+line-height: 1.5;
+white-space: pre-wrap; 
+word-break: break-word;
+z-index: 9999;
+${NoDrag}
+
+background-color: rgba(22, 50, 41, 0.65); 
+backdrop-filter: blur(12px);             
+-webkit-backdrop-filter: blur(12px);       
+
+color: #ffffff;
+  
+border: 1px solid rgba(255, 255, 255, 0.25);
+border-top: 1px solid rgba(255, 255, 255, 0.4);
+
+box-shadow: 
+0 10px 30px rgba(0, 0, 0, 0.2),
+inset 0 1px 0 rgba(255, 255, 255, 0.15);
+`;
 export const GradeBadge = styled.span<{ $isActive: boolean }>`
   background: ${({ $isActive }) => ($isActive ? '#edf2eb' : '#fdeaea')};
   color: ${({ $isActive }) => ($isActive ? '#284b37' : '#b33939')};
@@ -199,7 +245,6 @@ export const ProcedureCard = styled.div`
   border: 1px solid #e1e8de;
   border-radius: 12px;
   background: #fffefa;
-  padding: 24px;
   box-shadow: 0 10px 30px rgba(40, 75, 55, 0.04);
 `;
 
@@ -223,8 +268,6 @@ export const TitleWrapper = styled.div`
 display: flex;
 align-items: center; 
 gap: 8px;
-
-
 svg {
   font-size: 18px;
   color: #3b7a57;
@@ -279,8 +322,6 @@ export const ProcedureList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(225, 232, 222, 0.6);
 `;
 
 export const ProcedureItem = styled.div<{ $isOpen?: boolean; $disabled?: boolean}>`
@@ -398,7 +439,6 @@ export const BookingFormCard = styled.div`
   border: 1px solid #e1e8de;
   border-radius: 12px;
   background: #fffefa;
-  padding: 24px;
   box-shadow: 0 10px 30px rgba(40, 75, 55, 0.04);
   display: flex;
   flex-direction: column;
@@ -414,7 +454,6 @@ export const HeaderTitleWrapper = styled.div`
   color: #284b37;
   font-size: 1.1rem;
   font-weight: 700;
-  padding-bottom: 20px; 
 `;
 
 export const InputGroup = styled.div`
@@ -422,6 +461,7 @@ export const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: auto;
 `;
 
 export const Label = styled.label`
@@ -454,6 +494,10 @@ export const DateInput = styled.input`
 
 export const MemoInput = styled.textarea`
   width: 100%;
+  && {
+    min-height: auto; 
+    height: auto;
+  }
   padding: 12px 16px;
   border: 1px solid #e1e8de;
   border-radius: 10px;
@@ -462,8 +506,8 @@ export const MemoInput = styled.textarea`
   color: #283c2d;
   outline: none;
   box-sizing: border-box;
-  resize: vertical;
   transition: border-color 0.2s;
+  resize: none;
 
   &:focus {
     border-color: #6d896f;
@@ -525,6 +569,11 @@ export const SubmitButton = styled.button`
   box-shadow: 0 4px 12px rgba(40, 75, 55, 0.15);
   margin-top: 12px;
   font-family: inherit;
+  &&{
+    padding: 15px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+  }
 
   &:hover {
     background: #1f3729;

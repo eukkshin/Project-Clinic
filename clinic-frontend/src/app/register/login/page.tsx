@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 import * as S from "@/assets/css/auth/Auth.styles";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 import AuthBrandPanel from "../AuthBrandPanel";
 

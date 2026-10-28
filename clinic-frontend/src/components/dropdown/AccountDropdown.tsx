@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import * as S from "@/assets/css/components/dropdown/AccountDropdown.styles";
 
-import { Popup } from "../modal/Popup";
+import { Popup } from "../../ui/modal/Popup";
 
 interface AccountDropdownProps {
   userName: string;

@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 import * as S from "@/assets/css/Style.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/ui/modal/Popup";
 
 export default function MockPassPage() {
   const router = useRouter();

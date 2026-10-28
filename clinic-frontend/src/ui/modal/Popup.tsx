@@ -12,6 +12,10 @@ interface PopupProps {
   title: string;
   onClose: () => void;
   onConfirm?: () => void;
+  maxWidth?:string;
+  eyebrow?: string;
+  confirmText?: string;
+  closeOnOverlayClick?: boolean; //배경 클릭 시 닫힘 여부 (기본값 true)
   children: ReactNode;
 }
 
@@ -20,6 +24,10 @@ export const Popup = ({
   title,
   onClose,
   onConfirm,
+  maxWidth,
+  closeOnOverlayClick = true,
+  eyebrow = "AHN'S · MESSAGE",
+  confirmText = "확인",
   children,
 }: PopupProps) => {
   // SSR/CSR에서 document.body 접근 시점이 달라지지 않도록 마운트 후 Portal을 생성합니다.
@@ -98,7 +106,6 @@ export const Popup = ({
           return;
         }
       }
-
       // 텍스트 영역 등에서 Enter를 누른 경우에도 기본 동작을 제공해 줍니다.
       event.preventDefault();
       if (onConfirm) onConfirm();
@@ -125,7 +132,7 @@ export const Popup = ({
   return createPortal(
     <S.PopupOverlay
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget && closeOnOverlayClick) onClose();
       }}
     >
       <S.ModalPopupContainer
@@ -135,11 +142,12 @@ export const Popup = ({
         aria-labelledby={titleId}
         aria-describedby={contentId}
         onMouseDown={(event) => event.stopPropagation()}
+        $maxWidth={maxWidth}
       >
         <S.GlassShine aria-hidden="true" />
         <S.PopupHeader>
           <S.HeaderCopy>
-            <S.Eyebrow>AHN'S · MESSAGE</S.Eyebrow>
+            <S.Eyebrow>{eyebrow}</S.Eyebrow>
             <S.PopupTitle id={titleId}>{title}</S.PopupTitle>
           </S.HeaderCopy>
           <S.CloseIcon type="button" onClick={onClose} aria-label="팝업 닫기">
@@ -172,7 +180,7 @@ export const Popup = ({
               type="button"
               onClick={onConfirm}
             >
-              확인 <span aria-hidden="true">↗</span>
+              {confirmText} <span aria-hidden="true">↗</span>
             </S.ConfirmButton>
           )}
         </S.PopupFooter>

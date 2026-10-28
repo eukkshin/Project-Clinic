@@ -183,6 +183,7 @@ export const AnswerText = styled.div`
   color: #526555;
   letter-spacing: -0.015em;
   word-break: keep-all;
+  overflow-wrap: break-word;
   
   p {
     margin: 0 0 10px;

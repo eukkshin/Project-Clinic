@@ -232,9 +232,10 @@ export const EditorialSection = styled.section<{
 `;
 
 export const Content = styled.div`
-  width: min(calc(100% - 80px), 1510px);
+  width: min(calc(100% - clamp(112px, 17vw, 240px)), 1260px);
   margin: 0 auto;
-  padding-left: clamp(225px, 16vw, 258px);
+  padding-left: 0;
+
   @media (max-width: 768px) {
     width: calc(100% - 40px);
     padding-left: 0;

@@ -12,6 +12,8 @@ import * as SL from '@/assets/css/components/dropdown/HeaderSearchLayout.styles'
 import * as S from '@/assets/css/components/Header.styles';
 
 import AccountDropdown from './dropdown/AccountDropdown';
+import MobileProcedureSubmenu from "./dropdown/MobileProcedureSubmenu";
+import { usePublishedProcedureMenus } from "@/lib/detail/usePublishedProcedureMenus";
 import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
 import HeaderSearch from './dropdown/HeaderSearch';
 import LanguageDropdown from './dropdown/LanguageDropdown';
@@ -86,6 +88,7 @@ export default function Header() {
   const [logoText, setLogoText] = useState("Ahn's");
   const [logoFileName, setLogoFileName] = useState("");
   const [menus, setMenus] = useState<MenuItem[]>(DEFAULT_MENUS);
+  const publishedMenus = usePublishedProcedureMenus(menus);
   const [accent, setAccent] = useState("#879D87");
   const [isDark, setIsDark] = useState(false);
   const [phone, setPhone] = useState("");
@@ -304,7 +307,7 @@ export default function Header() {
           </S.LogoGroup>
 
           <S.NavGroup aria-label="주 메뉴">
-            {menus.map((menu) => (
+            {publishedMenus.map((menu) => (
               <HeaderNavDropdown
                 key={`${pathname}-${menu.id}`}
                 menu={menu}
@@ -407,7 +410,7 @@ export default function Header() {
                   setMenuOpen(false);
                 }
               }}
-              menus={menus}
+              menus={publishedMenus}
               transparent={transparent}
             />
 
@@ -451,7 +454,8 @@ export default function Header() {
             EXPLORE AHN&apos;S
           </S.MobileMenuCaption>
           <S.MobileNav aria-label="모바일 주 메뉴">
-            {menus.map((menu, index) => (
+            {publishedMenus.map((menu, index) => (
+              <div key={menu.id}>
               <S.MobileNavLink
                 as={Link}
                 key={menu.id}
@@ -467,6 +471,10 @@ export default function Header() {
                   ↗
                 </span>
               </S.MobileNavLink>
+                {Boolean(menu.children?.length) && (
+                  <MobileProcedureSubmenu items={menu.children ?? []} onNavigate={closeMenu} />
+                )}
+              </div>
             ))}
           </S.MobileNav>
           <S.MobileMenuFooter data-mobile-item>

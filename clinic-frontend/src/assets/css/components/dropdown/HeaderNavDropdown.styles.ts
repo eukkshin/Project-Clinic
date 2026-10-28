@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /** Header와 같은 높이를 차지해 패널이 Header 하단에서 시작하도록 한다. */
 export const NavRoot = styled.div`
@@ -80,7 +80,7 @@ export const NavPanel = styled.div<{
   left: 50%;
   z-index: 20;
   box-sizing: border-box;
-  width: 140px;
+  width: 210px;
   padding: 6px 0;
   overflow: hidden;
   border: 1px solid
@@ -131,15 +131,18 @@ export const NavPanelInner = styled.div`
 `;
 
 export const DropdownLink = styled.a<{ $active: boolean }>`
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 38px;
-  padding: 10px 13px;
-  border-radius: 0;
+  padding: 10px 38px 10px 18px;
+  box-sizing: border-box;
+
   color: inherit;
   background: ${({ $active }) =>
     $active ? "rgba(111,147,113,0.16)" : "transparent"};
+
   text-decoration: none;
   text-shadow: none;
   font-size: 12px;
@@ -152,9 +155,13 @@ export const DropdownLink = styled.a<{ $active: boolean }>`
   &::before {
     content: "→";
     position: absolute;
-    left: 20%;
-    transform: translateX(-4px);
+    right: 18px;
+    top: 50%;
+    left: auto;
+
+    transform: translate(-6px, -50%);
     opacity: 0;
+
     transition:
       transform 0.25s ease-out,
       opacity 0.25s ease-out;
@@ -165,7 +172,7 @@ export const DropdownLink = styled.a<{ $active: boolean }>`
     color: #14271e;
 
     &::before {
-      transform: translateX(4px);
+      transform: translate(0, -50%);
       opacity: 1;
     }
   }

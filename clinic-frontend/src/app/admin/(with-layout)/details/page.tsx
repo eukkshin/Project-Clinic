@@ -9,6 +9,7 @@ import {
 import * as S from '@/assets/css/admin/DetailCMS.styles';
 import DetailEditorPreview from '@/components/detail/DetailEditorPreview';
 import DetailImageUpload from '@/components/detail/DetailImageUpload';
+import NosePreviewSectionImport from '@/components/detail/NosePreviewSectionImport';
 import { Popup } from '@/components/modal/Popup';
 import { detailApi, detailErrorMessage } from '@/lib/adminDetailApi';
 
@@ -845,9 +846,24 @@ export default function AdminDetailPages() {
                   <S.PanelTitle>
                     {editingSectionId !== null ? "섹션 수정" : "새 섹션 등록"}
                   </S.PanelTitle>
-                  <S.Button type="button" onClick={resetSection}>
-                    <FiPlus /> 새로 작성
-                  </S.Button>
+
+                  <S.InlineActions>
+                    <NosePreviewSectionImport
+                      page={sectionPage}
+                      disabled={busy || uploadingImage}
+                      notify={notify}
+                      onComplete={async () => {
+                        await reloadSections(sectionPage.pageId);
+                        setEditingSectionId(null);
+                        setSectionForm(emptySection());
+                        setSectionRightTab("list");
+                      }}
+                    />
+
+                    <S.Button type="button" onClick={resetSection}>
+                      <FiPlus /> 새로 작성
+                    </S.Button>
+                  </S.InlineActions>
                 </S.PanelHeadRow>
               </div>
               <S.PanelBody className="admin-panel-body">

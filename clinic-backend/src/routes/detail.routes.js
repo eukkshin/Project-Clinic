@@ -33,6 +33,7 @@ function createDetailRouters({ dataSource, requireAdmin }) {
     "/categories",
     wrap(async (_req, res) => ok(res, await service.publicCategories())),
   );
+  publicRouter.get("/navigation", wrap(async (_req, res) => ok(res, await service.publicNavigation())));
   publicRouter.get(
     "/:category/:slug",
     wrap(async (req, res) => {

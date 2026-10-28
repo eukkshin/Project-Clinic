@@ -142,6 +142,18 @@ function createDetailService(dataSource) {
     };
   }
   return {
+    async publicNavigation() {
+      const rows = await query(`SELECT C.SLUG AS CATEGORY_SLUG, P.SLUG AS PAGE_SLUG, P.TITLE AS PAGE_TITLE
+        FROM DETAIL_PAGE P JOIN DETAIL_CATEGORY C ON C.CATEGORY_ID = P.CATEGORY_ID
+        WHERE C.IS_VISIBLE = 'Y' AND P.STATUS = 'PUBLISHED'
+        ORDER BY C.SORT_ORDER, P.SORT_ORDER, P.PAGE_ID`);
+      return rows.map((r) => ({
+        category: r.CATEGORY_SLUG,
+        slug: r.PAGE_SLUG,
+        name: r.PAGE_TITLE,
+        url: `/${encodeURIComponent(r.CATEGORY_SLUG)}/${encodeURIComponent(r.PAGE_SLUG)}`,
+      }));
+    },
     async publicCategories() {
       return (
         await query(`SELECT CATEGORY_ID, SLUG, NAME, DESCRIPTION, SORT_ORDER, IS_VISIBLE

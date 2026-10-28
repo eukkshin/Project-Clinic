@@ -1,6 +1,6 @@
-import "server-only";
+import 'server-only';
 
-import { cache } from "react";
+import { cache } from 'react';
 
 import type {
   DetailPageData,

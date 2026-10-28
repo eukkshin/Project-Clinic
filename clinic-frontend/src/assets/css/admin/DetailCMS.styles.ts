@@ -1,5 +1,5 @@
 "use client";
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /* 기존 AdminWorkspaceTheme의 admin-* 클래스를 그대로 활용하는 추가 전용 스타일입니다. */
 export const Root = styled.div`

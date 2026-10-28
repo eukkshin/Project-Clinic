@@ -22,6 +22,7 @@ const Board = require("./src/entity/Board");
 const Qna = require("./src/entity/Qna");
 const { createAdminSession } = require("./src/auth/adminSession");
 const { createDetailRouters } = require("./src/routes/detail.routes");
+const { createDetailImageRouter } = require("./src/routes/detail-image.routes");
 
 const nodemailer = require("nodemailer");
 
@@ -1514,6 +1515,7 @@ const { publicRouter, adminRouter } = createDetailRouters({
 app.use("/api/admin/session", adminSessionRouter);
 app.use("/api/details", publicRouter);
 app.use("/api/admin/detail", adminRouter);
+app.use("/api/admin/detail/images", createDetailImageRouter({ requireAdmin }));
 
 const PORT = process.env.PORT || 4000;
 //포트폴리오로 고도화 아이디 확인하고 그사람에 가입 이메일을 판단하고..거기에 맞는 이메일 발송하겠끔..

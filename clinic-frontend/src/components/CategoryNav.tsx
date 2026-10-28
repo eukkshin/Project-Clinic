@@ -156,6 +156,8 @@ export default function CategoryNav() {
     const getDistance = () =>
       Math.max(0, track.scrollWidth - viewport.clientWidth);
 
+    const scrollSpeedMultiplier = 1.4;
+
     // 브라우저 화면 크기와 '움직임 줄이기' 접근성 설정에 따라 GSAP을 켜거나 끈다.
     const media = gsap.matchMedia();
 
@@ -178,20 +180,22 @@ export default function CategoryNav() {
           scrollTrigger: {
             trigger: section, // 이 섹션이 화면에 도달했는지 판단할 기준
             start: "top top", // 섹션 상단과 화면 상단이 만날 때 시작
-            end: () => `+=${Math.max(1, getDistance())}`,
+            end: () =>
+              `+=${Math.max(1, getDistance() * scrollSpeedMultiplier)}`,
 
             // 이동하는 동안 섹션을 화면에 고정한다.
             pin: true,
             pinSpacing: true, // 고정 시간만큼 다음 섹션을 아래로 밀어 겹침 방지
 
             // 사용자의 스크롤 진행률이 곧 카드의 이동 진행률이 된다.
-            scrub: true,
+            scrub: 0.8,
             anticipatePin: 1, // pin 시작 지점의 작은 화면 떨림을 줄인다.
 
             // Hero에서도 pin을 사용하므로, 위치 계산은 Hero부터 먼저 하도록 한다.
             // 기존 Hero의 refreshPriority: 10보다 낮은 0으로 둔다.
             refreshPriority: 0,
             invalidateOnRefresh: true, // 창 크기가 바뀌면 이동 거리 다시 계산
+            fastScrollEnd: true,
 
             onUpdate: (self) => {
               // self.progress는 0(시작)~1(종료) 사이 숫자다.

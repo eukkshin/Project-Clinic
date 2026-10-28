@@ -1,20 +1,20 @@
 "use client";
 
-import axios from "axios";
-import gsap from "gsap";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from "react-icons/fa6";
+import axios from 'axios';
+import gsap from 'gsap';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from 'react-icons/fa6';
 
-import * as SL from "@/assets/css/components/dropdown/HeaderSearchLayout.styles";
-import * as S from "@/assets/css/components/Header.styles";
+import * as SL from '@/assets/css/components/dropdown/HeaderSearchLayout.styles';
+import * as S from '@/assets/css/components/Header.styles';
 
-import AccountDropdown from "./dropdown/AccountDropdown";
-import HeaderNavDropdown from "./dropdown/HeaderNavDropdown";
-import HeaderSearch from "./dropdown/HeaderSearch";
-import LanguageDropdown from "./dropdown/LanguageDropdown";
+import AccountDropdown from './dropdown/AccountDropdown';
+import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
+import HeaderSearch from './dropdown/HeaderSearch';
+import LanguageDropdown from './dropdown/LanguageDropdown';
 
 /*
  * Header.tsx — Premium Ahn's Navigation

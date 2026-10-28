@@ -1,4 +1,4 @@
-import Image, { ImageProps } from "next/image";
+import Image, { ImageProps } from 'next/image';
 
 /**
  * 기존 next/image를 유지하면서 관리자가 입력한 Express 이미지 절대 URL도 지원합니다.

@@ -40,6 +40,18 @@ export interface DetailPage {
 }
 export interface DetailSectionContent {
   description?: string;
+  layout?:
+    | "image-left"
+    | "image-right"
+    | "comparison"
+    | "cards"
+    | "rows"
+    | "steps"
+    | "timeline";
+  compareLeftTitle?: string;
+  compareLeftBody?: string;
+  compareRightTitle?: string;
+  compareRightBody?: string;
   items?: string[];
   imageUrl?: string;
   imageAlt?: string;

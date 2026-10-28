@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 /** 전체 화면을 사용하고 Header/Footer 레이아웃이나 SideNav 좌표는 건드리지 않습니다. */
 export const Hero = styled.section`
@@ -20,7 +20,9 @@ export const HeroImage = styled.div`
   transform: scale(1.12);
   transform-origin: center;
   will-change: transform;
-  & > img { object-fit: cover; }
+  & > img {
+    object-fit: cover;
+  }
   @media (prefers-reduced-motion: reduce) {
     transform: scale(1);
     will-change: auto;
@@ -32,8 +34,13 @@ export const HeroOverlay = styled.div`
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(14, 38, 27, 0.57) 0%, rgba(16, 38, 27, 0.25) 42%, transparent 78%),
-    linear-gradient(0deg, rgba(20, 44, 31, .30), transparent 34%);
+    linear-gradient(
+      90deg,
+      rgba(14, 38, 27, 0.57) 0%,
+      rgba(16, 38, 27, 0.25) 42%,
+      transparent 78%
+    ),
+    linear-gradient(0deg, rgba(20, 44, 31, 0.3), transparent 34%);
   pointer-events: none;
 `;
 
@@ -68,9 +75,9 @@ export const HeroContent = styled.div`
 
 export const HeroEyebrow = styled.p`
   margin: 0 0 25px;
-  font-size: clamp(10px, .82vw, 12px);
+  font-size: clamp(10px, 0.82vw, 12px);
   font-weight: 700;
-  letter-spacing: .3em;
+  letter-spacing: 0.3em;
 `;
 
 export const HeroTitle = styled.h1`
@@ -79,14 +86,14 @@ export const HeroTitle = styled.h1`
   font-size: clamp(42px, 5.8vw, 94px);
   font-weight: 500;
   line-height: 1.12;
-  letter-spacing: -.065em;
+  letter-spacing: -0.065em;
   word-break: keep-all;
 `;
 
 export const HeroDescription = styled.p`
   max-width: 620px;
   margin: 30px 0 0;
-  color: rgba(255, 255, 255, .90);
+  color: rgba(255, 255, 255, 0.9);
   font-size: clamp(14px, 1.35vw, 19px);
   line-height: 1.95;
   font-weight: 400;
@@ -98,12 +105,18 @@ export const ScrollNote = styled.div`
   position: absolute;
   right: clamp(28px, 5vw, 90px);
   bottom: 35px;
-  color: rgba(255,255,255,.86);
+  color: rgba(255, 255, 255, 0.86);
   display: flex;
   align-items: center;
   gap: 15px;
   font-size: 10px;
-  letter-spacing: .12em;
-  span { font-size: 20px; font-weight: 300; }
-  @media (max-width: 768px) { right: 22px; bottom: 20px; }
+  letter-spacing: 0.12em;
+  span {
+    font-size: 20px;
+    font-weight: 300;
+  }
+  @media (max-width: 768px) {
+    right: 22px;
+    bottom: 20px;
+  }
 `;

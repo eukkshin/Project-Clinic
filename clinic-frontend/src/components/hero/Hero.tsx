@@ -1,21 +1,15 @@
 "use client";
 
-import axios from "axios";
-import useEmblaCarousel from "embla-carousel-react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import axios from 'axios';
+import useEmblaCarousel from 'embla-carousel-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 // 기존 프로젝트의 스타일 파일 경로를 그대로 사용한다.
-import * as S from "../../assets/css/components/Hero.styles";
+import * as S from '../../assets/css/components/Hero.styles';
 
 import type { ReactNode } from "react";
 
@@ -260,11 +254,11 @@ export default function Hero({ rollingBanner }: HeroProps) {
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: () => `+=${Math.round(window.innerHeight * 1.18)}`,
+            end: () => `+=${Math.round(window.innerHeight * 2.5)}`,
             pin: true,
             pinSpacing: true,
             refreshPriority: 10, // 아래 CategoryNav의 pin보다 먼저 위치 계산
-            scrub: true, // 스크롤 진행률과 정확히 1:1로 동기화
+            scrub: 1, // 스크롤 진행률과 정확히 1:1로 동기화
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -410,7 +404,7 @@ export default function Hero({ rollingBanner }: HeroProps) {
             trigger: section,
             start: "top top",
             end: "25% top",
-            scrub: true,
+            scrub: 1,
           },
         });
         return () => tween.kill();

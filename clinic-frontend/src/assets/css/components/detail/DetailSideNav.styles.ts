@@ -1,84 +1,73 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 /**
- * AHNS Detail SideNav
- * - PC: 왼쪽 고정, 평소 희미한 Liquid Glass / Hover 또는 Focus 시 선명
- * - Mobile: 작은 토글 버튼으로 접고 펼침
- * - GSAP은 단일 LiquidIndicator의 위치/형태를 애니메이션
+ * CSS-only, stationary capsule.
+ * 60px icon-only -> 224px text on hover/focus (NO bounce / GSAP / gooey).
+ * DOM is portaled to body, avoiding DetailPage PageRoot overflow/stacking traps.
  */
-
-export const SideNav = styled.nav<{ $mobileOpen: boolean }>`
+export const SideNav = styled.nav<{ $mobileOpen: boolean; $hidden: boolean }>`
   position: fixed;
-  z-index: 120;
+  z-index: 9500;
   top: 50%;
-  left: clamp(12px, 2.5vw, 38px);
+  left: clamp(14px, 2.5vw, 38px);
   transform: translateY(-50%);
-
-  width: 204px;
-  max-height: calc(100dvh - 130px);
-  overflow-y: auto;
   box-sizing: border-box;
-  padding: 18px 12px 14px;
-
-  border: 1px solid rgba(255, 255, 255, 0.48);
-  border-radius: 24px;
-  background: rgba(247, 250, 244, 0.36);
-  -webkit-backdrop-filter: blur(17px) saturate(150%);
-  backdrop-filter: blur(17px) saturate(150%);
-
-  box-shadow:
-    0 10px 34px rgba(28, 62, 40, 0.09),
-    inset 0 1px 0 rgba(255, 255, 255, 0.64);
-
-  /* 본문/풀스크린 Hero를 방해하지 않도록 기본 상태를 희미하게 */
-  opacity: 0.32;
-  transition:
-    opacity 0.36s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.36s ease,
-    border-color 0.36s ease,
-    box-shadow 0.36s ease,
-    backdrop-filter 0.36s ease;
-
-  &:hover,
-  &:focus-within {
-    opacity: 1;
-    background: rgba(247, 250, 244, 0.69);
-    border-color: rgba(255, 255, 255, 0.72);
-    -webkit-backdrop-filter: blur(25px) saturate(165%);
-    backdrop-filter: blur(25px) saturate(165%);
-    box-shadow:
-      0 18px 48px rgba(28, 62, 40, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  }
-
+  width: 60px;
+  max-height: calc(100dvh - 120px);
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 30px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: rgba(249, 250, 246, 0.35);
+  color: #45624f;
+  box-shadow: 0 10px 30px rgba(22, 53, 34, 0.13);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  scrollbar-width: none;
   &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(64, 105, 77, 0.22);
-    border-radius: 999px;
+    display: none;
   }
 
-  @media (max-width: 768px) {
+  opacity: ${({ $hidden }) => ($hidden ? 0 : 1)};
+  visibility: ${({ $hidden }) => ($hidden ? "hidden" : "visible")};
+  pointer-events: ${({ $hidden }) => ($hidden ? "none" : "auto")};
+  transition:
+    width 0.5s ease-in-out,
+    opacity 0.16s ease,
+    visibility 0.16s ease,
+    background 0.5s ease-in-out;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      width: 224px;
+      background: rgba(249, 250, 246, 0.88);
+    }
+  }
+  /* 마우스 클릭 후 focus가 남아 알약이 계속 펼쳐지는 현상을 방지 */
+  &:has(:focus-visible) {
+    width: 224px;
+  }
+
+  @media (max-width: 900px) {
     top: auto;
     left: 14px;
     bottom: calc(84px + env(safe-area-inset-bottom, 0px));
-    transform: ${({ $mobileOpen }) =>
-      $mobileOpen ? "translateY(0) scale(1)" : "translateY(12px) scale(0.96)"};
-    transform-origin: bottom left;
-    width: min(204px, calc(100vw - 28px));
-    max-height: min(400px, calc(100dvh - 180px));
-    opacity: ${({ $mobileOpen }) => ($mobileOpen ? 1 : 0)};
-    visibility: ${({ $mobileOpen }) => ($mobileOpen ? "visible" : "hidden")};
-    pointer-events: ${({ $mobileOpen }) => ($mobileOpen ? "auto" : "none")};
-
-    background: rgba(247, 250, 244, 0.85);
-    -webkit-backdrop-filter: blur(24px) saturate(165%);
-    backdrop-filter: blur(24px) saturate(165%);
+    transform: none;
+    width: min(224px, calc(100vw - 28px));
+    max-height: min(430px, calc(100dvh - 170px));
+    border-radius: 24px;
+    opacity: ${({ $mobileOpen, $hidden }) => ($mobileOpen && !$hidden ? 1 : 0)};
+    visibility: ${({ $mobileOpen, $hidden }) =>
+      $mobileOpen && !$hidden ? "visible" : "hidden"};
+    pointer-events: ${({ $mobileOpen, $hidden }) =>
+      $mobileOpen && !$hidden ? "auto" : "none"};
     transition:
-      transform 0.33s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.33s ease,
-      visibility 0.33s ease;
+      opacity 0.16s ease,
+      visibility 0.16s ease;
+    &:has(:focus-visible) {
+      width: min(224px, calc(100vw - 28px));
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -86,150 +75,135 @@ export const SideNav = styled.nav<{ $mobileOpen: boolean }>`
   }
 `;
 
-export const NavEyebrow = styled.div`
-  margin: 0 8px 13px;
-  color: #66806b;
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0.15em;
-  white-space: nowrap;
-`;
-
 export const NavList = styled.div`
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-`;
-
-export const LiquidIndicator = styled.div<{ $ready: boolean }>`
-  position: absolute;
-  z-index: 0;
-  top: 0;
-  left: 0;
+  gap: 3px;
   width: 100%;
-  height: 44px;
-  box-sizing: border-box;
-  pointer-events: none;
-  opacity: ${({ $ready }) => ($ready ? 1 : 0)};
-
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.46);
-  background: linear-gradient(145deg, rgba(79, 132, 93, 0.95), rgba(34, 79, 56, 0.97));
-  box-shadow:
-    0 6px 22px rgba(36, 69, 53, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.37),
-    inset 0 -2px 7px rgba(10, 39, 24, 0.17);
-  will-change: transform;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 3px;
-    left: 14%;
-    width: 72%;
-    height: 36%;
-    border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.29), transparent 75%);
-  }
-`;
-
-export const LiquidRipple = styled.span`
-  position: absolute;
-  z-index: 0;
-  inset: -4px;
-  border: 1px solid rgba(129, 191, 139, 0.72);
-  border-radius: inherit;
-  box-shadow: 0 0 21px rgba(139, 203, 153, 0.28);
-  opacity: 0;
-  pointer-events: none;
 `;
 
 export const NavButton = styled.button<{ $active: boolean }>`
-  position: relative;
-  z-index: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
   align-items: center;
-  gap: 11px;
-  width: 100%;
-  height: 44px;
-  padding: 0 14px;
   box-sizing: border-box;
-
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: ${({ $active }) => ($active ? "#ffffff" : "#365743")};
+  border-radius: 23px;
+  background: ${({ $active }) =>
+    $active ? "rgba(40, 75, 55, 0.35)" : "transparent"};
+  ${SideNav}:hover & {
+    background: ${({ $active }) =>
+      $active ? "rgba(40, 75, 55, 0.9)" : "transparent"};
+  }
+  color: ${({ $active }) => ($active ? "#fff" : "#496a55")};
   text-align: left;
-  font: inherit;
-  font-size: 12px;
-  font-weight: ${({ $active }) => ($active ? 700 : 600)};
-  white-space: nowrap;
+  font-family: inherit;
   cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition:
+    background 0.17s ease,
+    color 0.17s ease;
 
   ${({ $active }) =>
     !$active &&
     css`
       &:hover {
-        background: rgba(156, 191, 160, 0.22);
+        background: rgba(56, 97, 72, 0.09);
+        color: #284b37;
       }
     `}
-
   &:focus-visible {
-    outline: 2px solid #6f9a79;
-    outline-offset: 2px;
+    outline: 2px solid #608c6c;
+    outline-offset: -2px;
   }
 `;
 
-export const NavNumber = styled.span<{ $active: boolean }>`
-  color: ${({ $active }) => ($active ? "rgba(230, 248, 233, 0.82)" : "#799581")};
-  font-size: 10px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+export const NavIcon = styled.span`
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  svg {
+    display: block;
+  }
 `;
 
 export const NavText = styled.span`
-  overflow: hidden;
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  padding: 0 10px 0 4px;
+  color: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
   text-overflow: ellipsis;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.14s ease,
+    visibility 0.14s ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    ${SideNav}:hover & {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  ${SideNav}:has(:focus-visible) & {
+    opacity: 1;
+    visibility: visible;
+  }
+  @media (max-width: 900px) {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 `;
 
-export const NavBottomLine = styled.div`
-  width: 27px;
-  height: 2px;
-  margin: 13px 8px 0;
-  border-radius: 999px;
-  background: rgba(99, 143, 109, 0.45);
-`;
-
-export const MobileToggle = styled.button`
+export const MobileToggle = styled.button<{ $hidden: boolean }>`
   display: none;
-
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     position: fixed;
-    z-index: 121;
+    z-index: 9501;
+    left: 14px;
+    bottom: calc(23px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
     display: grid;
     place-items: center;
-    left: 14px;
-    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-    width: 46px;
-    height: 46px;
-
-    border: 1px solid rgba(255, 255, 255, 0.67);
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 50%;
-    background: rgba(244, 250, 242, 0.78);
-    color: #244535;
-    -webkit-backdrop-filter: blur(19px) saturate(160%);
-    backdrop-filter: blur(19px) saturate(160%);
-    box-shadow:
-      0 7px 25px rgba(28, 62, 40, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    background: rgba(249, 250, 246, 0.96);
+    color: #284b37;
+    box-shadow: 0 8px 26px rgba(25, 58, 38, 0.13);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     cursor: pointer;
-
+    opacity: ${({ $hidden }) => ($hidden ? 0 : 1)};
+    visibility: ${({ $hidden }) => ($hidden ? "hidden" : "visible")};
+    pointer-events: ${({ $hidden }) => ($hidden ? "none" : "auto")};
+    transition:
+      opacity 0.16s ease,
+      visibility 0.16s ease;
     &:focus-visible {
-      outline: 2px solid #6f9a79;
+      outline: 2px solid #608c6c;
       outline-offset: 3px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
   }
 `;

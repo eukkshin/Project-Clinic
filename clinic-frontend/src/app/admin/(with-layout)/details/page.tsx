@@ -1,25 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  FiArrowDown,
-  FiArrowLeft,
-  FiArrowUp,
-  FiCheck,
-  FiEdit2,
-  FiExternalLink,
-  FiLayers,
-  FiPlus,
-  FiSave,
-  FiSettings,
-  FiTrash2,
-  FiX,
-} from "react-icons/fi";
+    FiArrowDown, FiArrowLeft, FiArrowUp, FiCheck, FiEdit2, FiExternalLink, FiEye, FiLayers, FiPlus,
+    FiSave, FiSettings, FiTrash2, FiX
+} from 'react-icons/fi';
 
-import * as S from "@/assets/css/admin/DetailCMS.styles";
-import { Popup } from "@/components/modal/Popup";
-import { detailApi, detailErrorMessage } from "@/lib/adminDetailApi";
+import * as S from '@/assets/css/admin/DetailCMS.styles';
+import DetailEditorPreview from '@/components/detail/DetailEditorPreview';
+import DetailImageUpload from '@/components/detail/DetailImageUpload';
+import { Popup } from '@/components/modal/Popup';
+import { detailApi, detailErrorMessage } from '@/lib/adminDetailApi';
 
+import type { DetailSectionData } from "@/types/detail";
 import type {
   DetailCategory,
   DetailPage,
@@ -40,6 +33,28 @@ const SECTION_NAMES: Record<SectionType, string> = {
   FAQ: "자주 묻는 질문",
   TEXT: "일반 텍스트",
   CTA: "상담 유도",
+};
+const LAYOUT_OPTIONS: Partial<
+  Record<SectionType, { value: string; label: string }[]>
+> = {
+  INTRO: [
+    { value: "", label: "기존 디자인 (이미지 오른쪽)" },
+    { value: "image-left", label: "이미지 왼쪽 / 설명 오른쪽" },
+    { value: "comparison", label: "2열 비교형" },
+  ],
+  TEXT: [
+    { value: "", label: "기존 디자인 (이미지 오른쪽)" },
+    { value: "image-left", label: "이미지 왼쪽 / 설명 오른쪽" },
+    { value: "comparison", label: "2열 비교형" },
+  ],
+  FEATURES: [
+    { value: "", label: "기존 특징 카드형" },
+    { value: "rows", label: "세로 리스트형" },
+  ],
+  PROCESS: [
+    { value: "", label: "기존 단계 카드형" },
+    { value: "timeline", label: "세로 타임라인형" },
+  ],
 };
 const STATUS_NAMES: Record<DetailStatus, string> = {
   DRAFT: "임시저장",
@@ -94,6 +109,11 @@ type SectionDraft = {
   imageUrl: string;
   imageAlt: string;
   itemsText: string;
+  layout: string;
+  compareLeftTitle: string;
+  compareLeftBody: string;
+  compareRightTitle: string;
+  compareRightBody: string;
   imagesText: string;
   faqsText: string;
   buttonLabel: string;
@@ -111,6 +131,11 @@ function emptySection(sortOrder = 0): SectionDraft {
     description: "",
     imageUrl: "",
     imageAlt: "",
+    layout: "",
+    compareLeftTitle: "",
+    compareLeftBody: "",
+    compareRightTitle: "",
+    compareRightBody: "",
     itemsText: "",
     imagesText: "",
     faqsText: "",
@@ -131,6 +156,11 @@ function fromSection(section: DetailSection): SectionDraft {
     description: c.description || "",
     imageUrl: c.imageUrl || "",
     imageAlt: c.imageAlt || "",
+    layout: c.layout || "",
+    compareLeftTitle: c.compareLeftTitle || "",
+    compareLeftBody: c.compareLeftBody || "",
+    compareRightTitle: c.compareRightTitle || "",
+    compareRightBody: c.compareRightBody || "",
     itemsText: (c.items || []).join("\n"),
     imagesText: (c.images || []).map((x) => `${x.src} | ${x.alt}`).join("\n"),
     faqsText: (c.faqs || [])
@@ -143,7 +173,7 @@ function fromSection(section: DetailSection): SectionDraft {
     extras: c,
   };
 }
-function sectionPayload(draft: SectionDraft): SectionPayload {
+function sectionPayload(draft: SectionDraft, preview = false): SectionPayload {
   const base: DetailSectionContent = { ...draft.extras };
   // 종류 변경 시 이전 섹션 타입의 콘텐츠 필드는 제거하고 새 구조만 저장합니다.
   for (const key of [
@@ -155,13 +185,31 @@ function sectionPayload(draft: SectionDraft): SectionPayload {
     "faqs",
     "buttonLabel",
     "buttonHref",
+    "layout",
+    "compareLeftTitle",
+    "compareLeftBody",
+    "compareRightTitle",
+    "compareRightBody",
   ])
     delete base[key];
+  const allowedLayouts = (LAYOUT_OPTIONS[draft.type] || []).map(
+    (option) => option.value,
+  );
+  if (draft.layout && allowedLayouts.includes(draft.layout)) {
+    base.layout = draft.layout as DetailSectionContent["layout"];
+  }
+  // 설명은 모든 섹션 유형에서 방문자 화면에 표시할 수 있습니다.
+  if (draft.description.trim()) base.description = draft.description.trim();
   switch (draft.type) {
     case "INTRO":
     case "TEXT":
-      base.description = draft.description.trim();
-      if (draft.imageUrl.trim()) {
+      if (draft.layout === "comparison") {
+        base.compareLeftTitle = draft.compareLeftTitle.trim();
+        base.compareLeftBody = draft.compareLeftBody.trim();
+        base.compareRightTitle = draft.compareRightTitle.trim();
+        base.compareRightBody = draft.compareRightBody.trim();
+      }
+      if (draft.layout !== "comparison" && draft.imageUrl.trim()) {
         base.imageUrl = draft.imageUrl.trim();
         base.imageAlt = draft.imageAlt.trim();
       }
@@ -182,8 +230,11 @@ function sectionPayload(draft: SectionDraft): SectionPayload {
     case "FAQ":
       base.faqs = toLines(draft.faqsText).map((line) => {
         const i = line.indexOf("|");
-        if (i < 1 || i === line.length - 1)
+        if (i < 1 || i === line.length - 1) {
+          if (preview)
+            return { question: line.trim(), answer: "답변을 입력해 주세요." };
           throw new Error("FAQ는 각 줄을 질문 | 답변 형식으로 입력해 주세요.");
+        }
         return {
           question: line.slice(0, i).trim(),
           answer: line.slice(i + 1).trim(),
@@ -191,7 +242,6 @@ function sectionPayload(draft: SectionDraft): SectionPayload {
       });
       break;
     case "CTA":
-      base.description = draft.description.trim();
       base.buttonLabel = draft.buttonLabel.trim();
       base.buttonHref = draft.buttonHref.trim();
       break;
@@ -218,6 +268,7 @@ export default function AdminDetailPages() {
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [orderDirty, setOrderDirty] = useState(false);
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [showCategoryEditor, setShowCategoryEditor] = useState(false);
@@ -240,6 +291,10 @@ export default function AdminDetailPages() {
   const [sectionForm, setSectionForm] = useState<SectionDraft>(() =>
     emptySection(),
   );
+  const [sectionRightTab, setSectionRightTab] = useState<"list" | "preview">(
+    "preview",
+  );
+  const [pageRightTab, setPageRightTab] = useState<"list" | "preview">("list");
 
   const notify = useCallback(
     (message: string, title = "안내") =>
@@ -297,6 +352,23 @@ export default function AdminDetailPages() {
     };
   }, [refresh, notify]);
 
+  const draftPreviewSection = useMemo<DetailSectionData>(() => {
+    // 저장 payload와 동일한 매핑을 사용하되 FAQ 작성 중 미완성 행도 화면에서 보이게 합니다.
+    const content = sectionPayload(sectionForm, true).content;
+    return {
+      id: sectionForm.id.trim() || "draft-preview",
+      type: sectionForm.type,
+      title: sectionForm.title.trim() || "섹션 제목을 입력해 주세요",
+      eyebrow: sectionForm.eyebrow.trim() || "AHN'S · PREVIEW",
+      content,
+    };
+  }, [sectionForm]);
+  const draftIsLast =
+    sectionForm.type === "CTA" ||
+    (editingSectionId !== null &&
+      sections.filter((s) => s.isVisible === "Y").at(-1)?.sectionId ===
+        editingSectionId);
+
   const activeCategory = useMemo(
     () => categories.find((c) => c.categoryId === activeCategoryId) || null,
     [categories, activeCategoryId],
@@ -335,6 +407,10 @@ export default function AdminDetailPages() {
   ) => setPageForm((prev) => ({ ...prev, [key]: value }));
 
   const savePage = () => {
+    if (uploadingImage) {
+      notify("이미지 업로드가 끝난 다음 저장해 주세요.", "업로드 중");
+      return;
+    }
     if (
       !pageForm.categoryId ||
       !pageForm.title.trim() ||
@@ -466,6 +542,7 @@ export default function AdminDetailPages() {
       setEditingSectionId(null);
       setSectionOrderDirty(false);
       setSectionForm(emptySection(rows.length + 1));
+      setSectionRightTab("preview");
     });
   };
   const reloadSections = async (id: number) => {
@@ -485,10 +562,29 @@ export default function AdminDetailPages() {
     value: SectionDraft[K],
   ) => setSectionForm((prev) => ({ ...prev, [key]: value }));
   const saveSection = () => {
+    if (uploadingImage) {
+      notify("이미지 업로드가 끝난 다음 저장해 주세요.", "업로드 중");
+      return;
+    }
     if (!sectionPage) return;
     if (!isSlug(sectionForm.id) || !sectionForm.title.trim()) {
       notify(
         "섹션 키와 제목을 입력하세요. 키는 영문 소문자·숫자·하이픈만 허용합니다.",
+        "입력 확인",
+      );
+      return;
+    }
+    if (
+      sectionForm.layout === "comparison" &&
+      !(
+        sectionForm.compareLeftTitle.trim() &&
+        sectionForm.compareLeftBody.trim() &&
+        sectionForm.compareRightTitle.trim() &&
+        sectionForm.compareRightBody.trim()
+      )
+    ) {
+      notify(
+        "비교형 레이아웃은 양쪽 제목과 설명을 모두 입력해 주세요.",
         "입력 확인",
       );
       return;
@@ -760,7 +856,11 @@ export default function AdminDetailPages() {
                   <S.Select
                     value={sectionForm.type}
                     onChange={(e) =>
-                      updateSection("type", e.target.value as SectionType)
+                      setSectionForm((prev) => ({
+                        ...prev,
+                        type: e.target.value as SectionType,
+                        layout: "",
+                      }))
                     }
                   >
                     {(Object.keys(SECTION_NAMES) as SectionType[]).map(
@@ -772,6 +872,28 @@ export default function AdminDetailPages() {
                     )}
                   </S.Select>
                 </S.Field>
+                {LAYOUT_OPTIONS[sectionForm.type] && (
+                  <S.Field>
+                    섹션 레이아웃
+                    <S.Select
+                      value={sectionForm.layout}
+                      onChange={(e) => updateSection("layout", e.target.value)}
+                    >
+                      {LAYOUT_OPTIONS[sectionForm.type]?.map((option) => (
+                        <option
+                          key={option.value || "default"}
+                          value={option.value}
+                        >
+                          {option.label}
+                        </option>
+                      ))}
+                    </S.Select>
+                    <S.Hint>
+                      레이아웃 설정만 변경해도 기존 텍스트는 유지됩니다. 저장 후
+                      방문자 페이지를 새로고침해 주세요.
+                    </S.Hint>
+                  </S.Field>
+                )}
                 <S.Field>
                   섹션 키 (SideNav 앵커)
                   <S.Input
@@ -799,9 +921,17 @@ export default function AdminDetailPages() {
                     onChange={(e) => updateSection("eyebrow", e.target.value)}
                   />
                 </S.Field>
-                {(sectionForm.type === "INTRO" ||
-                  sectionForm.type === "TEXT" ||
-                  sectionForm.type === "CTA") && (
+                {(
+                  [
+                    "INTRO",
+                    "TEXT",
+                    "FEATURES",
+                    "PROCESS",
+                    "GALLERY",
+                    "FAQ",
+                    "CTA",
+                  ] as SectionType[]
+                ).includes(sectionForm.type) && (
                   <S.Field>
                     설명
                     <S.Textarea
@@ -814,29 +944,96 @@ export default function AdminDetailPages() {
                   </S.Field>
                 )}
                 {(sectionForm.type === "INTRO" ||
-                  sectionForm.type === "TEXT") && (
-                  <S.FieldGrid>
-                    <S.Field>
-                      섹션 이미지 URL
-                      <S.Input
-                        value={sectionForm.imageUrl}
-                        onChange={(e) =>
-                          updateSection("imageUrl", e.target.value)
-                        }
-                        placeholder="/images/detail/..."
-                      />
-                    </S.Field>
-                    <S.Field>
-                      이미지 대체 텍스트
-                      <S.Input
-                        value={sectionForm.imageAlt}
-                        onChange={(e) =>
-                          updateSection("imageAlt", e.target.value)
-                        }
-                      />
-                    </S.Field>
-                  </S.FieldGrid>
-                )}
+                  sectionForm.type === "TEXT") &&
+                  sectionForm.layout === "comparison" && (
+                    <>
+                      <S.FieldGrid>
+                        <S.Field>
+                          왼쪽 비교 제목
+                          <S.Input
+                            value={sectionForm.compareLeftTitle}
+                            onChange={(e) =>
+                              updateSection("compareLeftTitle", e.target.value)
+                            }
+                            placeholder="예: 항목 A"
+                          />
+                        </S.Field>
+                        <S.Field>
+                          오른쪽 비교 제목
+                          <S.Input
+                            value={sectionForm.compareRightTitle}
+                            onChange={(e) =>
+                              updateSection("compareRightTitle", e.target.value)
+                            }
+                            placeholder="예: 항목 B"
+                          />
+                        </S.Field>
+                      </S.FieldGrid>
+                      <S.FieldGrid>
+                        <S.Field>
+                          왼쪽 설명
+                          <S.Textarea
+                            rows={4}
+                            value={sectionForm.compareLeftBody}
+                            onChange={(e) =>
+                              updateSection("compareLeftBody", e.target.value)
+                            }
+                          />
+                        </S.Field>
+                        <S.Field>
+                          오른쪽 설명
+                          <S.Textarea
+                            rows={4}
+                            value={sectionForm.compareRightBody}
+                            onChange={(e) =>
+                              updateSection("compareRightBody", e.target.value)
+                            }
+                          />
+                        </S.Field>
+                      </S.FieldGrid>
+                      <S.Hint>
+                        2열 비교형은 등록된 내용만 표시합니다. 의료적 우월성이나
+                        효과를 임의로 표시하지 않습니다.
+                      </S.Hint>
+                    </>
+                  )}
+                {(sectionForm.type === "INTRO" ||
+                  sectionForm.type === "TEXT") &&
+                  sectionForm.layout !== "comparison" && (
+                    <DetailImageUpload
+                      label="본문 이미지 파일 선택"
+                      disabled={busy}
+                      onUploading={setUploadingImage}
+                      onUploaded={(images) =>
+                        updateSection("imageUrl", images[0].url)
+                      }
+                    />
+                  )}
+                {(sectionForm.type === "INTRO" ||
+                  sectionForm.type === "TEXT") &&
+                  sectionForm.layout !== "comparison" && (
+                    <S.FieldGrid>
+                      <S.Field>
+                        섹션 이미지 URL
+                        <S.Input
+                          value={sectionForm.imageUrl}
+                          onChange={(e) =>
+                            updateSection("imageUrl", e.target.value)
+                          }
+                          placeholder="/images/detail/..."
+                        />
+                      </S.Field>
+                      <S.Field>
+                        이미지 대체 텍스트
+                        <S.Input
+                          value={sectionForm.imageAlt}
+                          onChange={(e) =>
+                            updateSection("imageAlt", e.target.value)
+                          }
+                        />
+                      </S.Field>
+                    </S.FieldGrid>
+                  )}
                 {(sectionForm.type === "FEATURES" ||
                   sectionForm.type === "PROCESS") && (
                   <S.Field>
@@ -855,6 +1052,28 @@ export default function AdminDetailPages() {
                     />
                     <S.Hint>각 줄이 하나의 카드/단계로 표시됩니다.</S.Hint>
                   </S.Field>
+                )}
+                {sectionForm.type === "GALLERY" && (
+                  <DetailImageUpload
+                    label="갤러리 이미지 파일 선택 (여러 장 가능)"
+                    multiple
+                    disabled={busy}
+                    onUploading={setUploadingImage}
+                    onUploaded={(images) =>
+                      setSectionForm((prev) => ({
+                        ...prev,
+                        imagesText: [
+                          prev.imagesText.trim(),
+                          ...images.map(
+                            (image) =>
+                              `${image.url} | ${image.originalName.replace(/\.[^.]+$/, "").replace(/[|\r\n]/g, " ")}`,
+                          ),
+                        ]
+                          .filter(Boolean)
+                          .join("\n"),
+                      }))
+                    }
+                  />
                 )}
                 {sectionForm.type === "GALLERY" && (
                   <S.Field>
@@ -943,7 +1162,7 @@ export default function AdminDetailPages() {
                   <S.Button
                     $variant="primary"
                     type="button"
-                    disabled={busy}
+                    disabled={busy || uploadingImage}
                     onClick={saveSection}
                   >
                     <FiSave />{" "}
@@ -958,97 +1177,140 @@ export default function AdminDetailPages() {
             <S.Panel className="admin-record-column admin-panel">
               <div className="admin-panel-head">
                 <S.PanelHeadRow>
-                  <S.PanelTitle>등록된 섹션 ({sections.length})</S.PanelTitle>
-                  <S.Button
-                    type="button"
-                    $variant="primary"
-                    disabled={!sectionOrderDirty || busy}
-                    onClick={saveSectionOrder}
-                  >
-                    <FiSave /> 순서 저장
-                  </S.Button>
+                  <S.PanelTitle>
+                    {sectionRightTab === "preview"
+                      ? "섹션 실시간 미리보기"
+                      : `등록된 섹션 (${sections.length})`}
+                  </S.PanelTitle>
+                  <S.InlineActions>
+                    <S.Button
+                      type="button"
+                      $variant={
+                        sectionRightTab === "preview" ? "primary" : "quiet"
+                      }
+                      aria-pressed={sectionRightTab === "preview"}
+                      onClick={() => setSectionRightTab("preview")}
+                    >
+                      <FiEye /> 미리보기
+                    </S.Button>
+                    <S.Button
+                      type="button"
+                      $variant={
+                        sectionRightTab === "list" ? "primary" : "quiet"
+                      }
+                      aria-pressed={sectionRightTab === "list"}
+                      onClick={() => setSectionRightTab("list")}
+                    >
+                      <FiLayers /> 목록
+                    </S.Button>
+                    {sectionRightTab === "list" && (
+                      <S.Button
+                        type="button"
+                        $variant="primary"
+                        disabled={!sectionOrderDirty || busy}
+                        onClick={saveSectionOrder}
+                      >
+                        <FiSave /> 순서 저장
+                      </S.Button>
+                    )}
+                  </S.InlineActions>
                 </S.PanelHeadRow>
               </div>
-              <S.TableWrap className="admin-table-scroll">
-                <S.Table className="admin-data-table">
-                  <thead>
-                    <tr>
-                      <th>순서</th>
-                      <th>섹션</th>
-                      <th>종류</th>
-                      <th>노출</th>
-                      <th>관리</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sections.map((section, index) => (
-                      <tr key={section.sectionId}>
-                        <td>
-                          <S.InlineActions>
-                            <span>{index + 1}</span>
-                            <S.IconButton
-                              aria-label="위로 이동"
-                              type="button"
-                              disabled={index === 0}
-                              onClick={() => moveSection(index, -1)}
-                            >
-                              <FiArrowUp />
-                            </S.IconButton>
-                            <S.IconButton
-                              aria-label="아래로 이동"
-                              type="button"
-                              disabled={index === sections.length - 1}
-                              onClick={() => moveSection(index, 1)}
-                            >
-                              <FiArrowDown />
-                            </S.IconButton>
-                          </S.InlineActions>
-                        </td>
-                        <td>
-                          <S.NameCell>
-                            <strong>{section.title}</strong>
-                            <small>#{section.id}</small>
-                          </S.NameCell>
-                        </td>
-                        <td>{SECTION_NAMES[section.type]}</td>
-                        <td>
-                          <S.Button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => toggleSection(section)}
-                          >
-                            {section.isVisible === "Y" ? "노출" : "숨김"}
-                          </S.Button>
-                        </td>
-                        <td>
-                          <S.InlineActions>
-                            <S.IconButton
-                              type="button"
-                              aria-label="섹션 편집"
-                              onClick={() => editSection(section)}
-                            >
-                              <FiEdit2 />
-                            </S.IconButton>
-                            <S.IconButton
-                              type="button"
-                              $danger
-                              aria-label="섹션 삭제"
-                              onClick={() => deleteSection(section)}
-                            >
-                              <FiTrash2 />
-                            </S.IconButton>
-                          </S.InlineActions>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </S.Table>
-                {sections.length === 0 && (
-                  <S.Empty>
-                    아직 섹션이 없어요. 왼쪽에서 새 섹션을 등록해 주세요.
-                  </S.Empty>
-                )}
-              </S.TableWrap>
+              {sectionRightTab === "preview" ? (
+                <DetailEditorPreview
+                  mode="section"
+                  section={draftPreviewSection}
+                  index={Math.max(
+                    0,
+                    sections.findIndex((s) => s.sectionId === editingSectionId),
+                  )}
+                  isLast={draftIsLast}
+                  hidden={sectionForm.isVisible === "N"}
+                />
+              ) : (
+                <>
+                  <S.TableWrap className="admin-table-scroll">
+                    <S.Table className="admin-data-table">
+                      <thead>
+                        <tr>
+                          <th>순서</th>
+                          <th>섹션</th>
+                          <th>종류</th>
+                          <th>노출</th>
+                          <th>관리</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sections.map((section, index) => (
+                          <tr key={section.sectionId}>
+                            <td>
+                              <S.InlineActions>
+                                <span>{index + 1}</span>
+                                <S.IconButton
+                                  aria-label="위로 이동"
+                                  type="button"
+                                  disabled={index === 0}
+                                  onClick={() => moveSection(index, -1)}
+                                >
+                                  <FiArrowUp />
+                                </S.IconButton>
+                                <S.IconButton
+                                  aria-label="아래로 이동"
+                                  type="button"
+                                  disabled={index === sections.length - 1}
+                                  onClick={() => moveSection(index, 1)}
+                                >
+                                  <FiArrowDown />
+                                </S.IconButton>
+                              </S.InlineActions>
+                            </td>
+                            <td>
+                              <S.NameCell>
+                                <strong>{section.title}</strong>
+                                <small>#{section.id}</small>
+                              </S.NameCell>
+                            </td>
+                            <td>{SECTION_NAMES[section.type]}</td>
+                            <td>
+                              <S.Button
+                                type="button"
+                                disabled={busy}
+                                onClick={() => toggleSection(section)}
+                              >
+                                {section.isVisible === "Y" ? "노출" : "숨김"}
+                              </S.Button>
+                            </td>
+                            <td>
+                              <S.InlineActions>
+                                <S.IconButton
+                                  type="button"
+                                  aria-label="섹션 편집"
+                                  onClick={() => editSection(section)}
+                                >
+                                  <FiEdit2 />
+                                </S.IconButton>
+                                <S.IconButton
+                                  type="button"
+                                  $danger
+                                  aria-label="섹션 삭제"
+                                  onClick={() => deleteSection(section)}
+                                >
+                                  <FiTrash2 />
+                                </S.IconButton>
+                              </S.InlineActions>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </S.Table>
+                    {sections.length === 0 && (
+                      <S.Empty>
+                        아직 섹션이 없어요. 왼쪽에서 새 섹션을 등록해 주세요.
+                      </S.Empty>
+                    )}
+                  </S.TableWrap>
+                </>
+              )}
             </S.Panel>
           </S.WorkGrid>
         </>
@@ -1138,6 +1400,14 @@ export default function AdminDetailPages() {
                   }
                 />
               </S.Field>
+              <DetailImageUpload
+                label="Hero 이미지 파일 선택"
+                disabled={busy}
+                onUploading={setUploadingImage}
+                onUploaded={(images) =>
+                  updatePage("heroImageUrl", images[0].url)
+                }
+              />
               <S.Field>
                 Hero 이미지 URL
                 <S.Input
@@ -1150,7 +1420,8 @@ export default function AdminDetailPages() {
               {pageForm.heroImageUrl &&
                 ((pageForm.heroImageUrl.startsWith("/") &&
                   !pageForm.heroImageUrl.startsWith("//")) ||
-                  pageForm.heroImageUrl.startsWith("https://")) && (
+                  pageForm.heroImageUrl.startsWith("https://") ||
+                  pageForm.heroImageUrl.startsWith("http://")) && (
                   <S.ImagePreview
                     $url={pageForm.heroImageUrl}
                     aria-label="Hero 이미지 미리보기"
@@ -1210,7 +1481,7 @@ export default function AdminDetailPages() {
                 <S.Button
                   type="button"
                   $variant="primary"
-                  disabled={busy || !categories.length}
+                  disabled={busy || uploadingImage || !categories.length}
                   onClick={savePage}
                 >
                   <FiSave />{" "}
@@ -1230,143 +1501,177 @@ export default function AdminDetailPages() {
             <div className="admin-panel-head">
               <S.PanelHeadRow>
                 <S.PanelTitle>
-                  {activeCategory?.name || "카테고리"} 상세페이지 (
-                  {visiblePages.length})
+                  {pageRightTab === "preview"
+                    ? "Hero 실시간 미리보기"
+                    : `${activeCategory?.name || "카테고리"} 상세페이지 (${visiblePages.length})`}
                 </S.PanelTitle>
-                <S.Button
-                  type="button"
-                  $variant="primary"
-                  disabled={!orderDirty || busy}
-                  onClick={savePageOrder}
-                >
-                  <FiSave /> 순서 저장
-                </S.Button>
+                <S.InlineActions>
+                  <S.Button
+                    type="button"
+                    $variant={pageRightTab === "preview" ? "primary" : "quiet"}
+                    aria-pressed={pageRightTab === "preview"}
+                    onClick={() => setPageRightTab("preview")}
+                  >
+                    <FiEye /> 미리보기
+                  </S.Button>
+                  <S.Button
+                    type="button"
+                    $variant={pageRightTab === "list" ? "primary" : "quiet"}
+                    aria-pressed={pageRightTab === "list"}
+                    onClick={() => setPageRightTab("list")}
+                  >
+                    <FiLayers /> 목록
+                  </S.Button>
+                  {pageRightTab === "list" && (
+                    <S.Button
+                      type="button"
+                      $variant="primary"
+                      disabled={!orderDirty || busy}
+                      onClick={savePageOrder}
+                    >
+                      <FiSave /> 순서 저장
+                    </S.Button>
+                  )}
+                </S.InlineActions>
               </S.PanelHeadRow>
             </div>
-            <S.TableWrap className="admin-table-scroll">
-              <S.Table className="admin-data-table">
-                <thead>
-                  <tr>
-                    <th>순서</th>
-                    <th>페이지명 · URL</th>
-                    <th>공개 상태</th>
-                    <th>관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visiblePages.map((page, index) => (
-                    <tr key={page.pageId}>
-                      <td>
-                        <S.InlineActions>
-                          <span>{index + 1}</span>
-                          <S.IconButton
-                            type="button"
-                            aria-label="위로 이동"
-                            disabled={index === 0}
-                            onClick={() => movePage(page.pageId, -1)}
-                          >
-                            <FiArrowUp />
-                          </S.IconButton>
-                          <S.IconButton
-                            type="button"
-                            aria-label="아래로 이동"
-                            disabled={index === visiblePages.length - 1}
-                            onClick={() => movePage(page.pageId, 1)}
-                          >
-                            <FiArrowDown />
-                          </S.IconButton>
-                        </S.InlineActions>
-                      </td>
-                      <td>
-                        <S.NameCell>
-                          <strong>{page.title}</strong>
-                          <small>
-                            /{page.category}/{page.slug}
-                          </small>
-                        </S.NameCell>
-                      </td>
-                      <td>
-                        <S.InlineActions>
-                          <S.Status $status={page.status}>
-                            {STATUS_NAMES[page.status]}
-                          </S.Status>
-                          <S.Select
-                            aria-label={`${page.title} 공개 상태`}
-                            value={page.status}
-                            disabled={busy}
-                            style={{ width: 91, minHeight: 32, padding: "5px" }}
-                            onChange={(e) =>
-                              updateStatus(page, e.target.value as DetailStatus)
-                            }
-                          >
-                            <option value="DRAFT">임시저장</option>
-                            <option value="PUBLISHED">공개</option>
-                            <option value="HIDDEN">숨김</option>
-                          </S.Select>
-                        </S.InlineActions>
-                      </td>
-                      <td>
-                        <S.InlineActions>
-                          <S.IconButton
-                            type="button"
-                            title="정보 편집"
-                            aria-label="정보 편집"
-                            onClick={() => editPage(page)}
-                          >
-                            <FiEdit2 />
-                          </S.IconButton>
-                          <S.Button
-                            type="button"
-                            onClick={() => openSections(page)}
-                          >
-                            <FiLayers /> 섹션
-                          </S.Button>
-                          {page.status === "PUBLISHED" && (
-                            <S.IconButton
-                              type="button"
-                              title="방문자 페이지 열기"
-                              aria-label="방문자 페이지 열기"
-                              onClick={() =>
-                                window.open(
-                                  `/${page.category}/${page.slug}`,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                )
-                              }
-                            >
-                              <FiExternalLink />
-                            </S.IconButton>
-                          )}
-                          <S.IconButton
-                            type="button"
-                            $danger
-                            title="삭제"
-                            aria-label="삭제"
-                            onClick={() => removePage(page)}
-                          >
-                            <FiTrash2 />
-                          </S.IconButton>
-                        </S.InlineActions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </S.Table>
-              {!visiblePages.length && (
-                <S.Empty>
-                  이 카테고리에 등록된 상세페이지가 없습니다. 왼쪽에서 첫 번째
-                  페이지를 등록해 주세요.
-                </S.Empty>
-              )}
-            </S.TableWrap>
-            <div className="admin-panel-body">
-              <S.InfoRow>
-                <FiCheck />{" "}
-                {orderDirty
-                  ? "변경된 순서를 저장해 주세요."
-                  : "페이지 순서는 저장된 상태예요."}
-              </S.InfoRow>
-            </div>
+            {pageRightTab === "preview" ? (
+              <DetailEditorPreview mode="hero" page={pageForm} />
+            ) : (
+              <>
+                <S.TableWrap className="admin-table-scroll">
+                  <S.Table className="admin-data-table">
+                    <thead>
+                      <tr>
+                        <th>순서</th>
+                        <th>페이지명 · URL</th>
+                        <th>공개 상태</th>
+                        <th>관리</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visiblePages.map((page, index) => (
+                        <tr key={page.pageId}>
+                          <td>
+                            <S.InlineActions>
+                              <span>{index + 1}</span>
+                              <S.IconButton
+                                type="button"
+                                aria-label="위로 이동"
+                                disabled={index === 0}
+                                onClick={() => movePage(page.pageId, -1)}
+                              >
+                                <FiArrowUp />
+                              </S.IconButton>
+                              <S.IconButton
+                                type="button"
+                                aria-label="아래로 이동"
+                                disabled={index === visiblePages.length - 1}
+                                onClick={() => movePage(page.pageId, 1)}
+                              >
+                                <FiArrowDown />
+                              </S.IconButton>
+                            </S.InlineActions>
+                          </td>
+                          <td>
+                            <S.NameCell>
+                              <strong>{page.title}</strong>
+                              <small>
+                                /{page.category}/{page.slug}
+                              </small>
+                            </S.NameCell>
+                          </td>
+                          <td>
+                            <S.InlineActions>
+                              <S.Status $status={page.status}>
+                                {STATUS_NAMES[page.status]}
+                              </S.Status>
+                              <S.Select
+                                aria-label={`${page.title} 공개 상태`}
+                                value={page.status}
+                                disabled={busy}
+                                style={{
+                                  width: 91,
+                                  minHeight: 32,
+                                  padding: "5px",
+                                }}
+                                onChange={(e) =>
+                                  updateStatus(
+                                    page,
+                                    e.target.value as DetailStatus,
+                                  )
+                                }
+                              >
+                                <option value="DRAFT">임시저장</option>
+                                <option value="PUBLISHED">공개</option>
+                                <option value="HIDDEN">숨김</option>
+                              </S.Select>
+                            </S.InlineActions>
+                          </td>
+                          <td>
+                            <S.InlineActions>
+                              <S.IconButton
+                                type="button"
+                                title="정보 편집"
+                                aria-label="정보 편집"
+                                onClick={() => editPage(page)}
+                              >
+                                <FiEdit2 />
+                              </S.IconButton>
+                              <S.Button
+                                type="button"
+                                onClick={() => openSections(page)}
+                              >
+                                <FiLayers /> 섹션
+                              </S.Button>
+                              {page.status === "PUBLISHED" && (
+                                <S.IconButton
+                                  type="button"
+                                  title="방문자 페이지 열기"
+                                  aria-label="방문자 페이지 열기"
+                                  onClick={() =>
+                                    window.open(
+                                      `/${page.category}/${page.slug}`,
+                                      "_blank",
+                                      "noopener,noreferrer",
+                                    )
+                                  }
+                                >
+                                  <FiExternalLink />
+                                </S.IconButton>
+                              )}
+                              <S.IconButton
+                                type="button"
+                                $danger
+                                title="삭제"
+                                aria-label="삭제"
+                                onClick={() => removePage(page)}
+                              >
+                                <FiTrash2 />
+                              </S.IconButton>
+                            </S.InlineActions>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </S.Table>
+                  {!visiblePages.length && (
+                    <S.Empty>
+                      이 카테고리에 등록된 상세페이지가 없습니다. 왼쪽에서 첫
+                      번째 페이지를 등록해 주세요.
+                    </S.Empty>
+                  )}
+                </S.TableWrap>
+                <div className="admin-panel-body">
+                  <S.InfoRow>
+                    <FiCheck />{" "}
+                    {orderDirty
+                      ? "변경된 순서를 저장해 주세요."
+                      : "페이지 순서는 저장된 상태예요."}
+                  </S.InfoRow>
+                </div>
+              </>
+            )}
           </S.Panel>
         </S.WorkGrid>
       )}

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 import type {
   DetailCategory,
@@ -28,6 +28,20 @@ const del = async <T>(url: string) =>
   (await client.delete<Result<T>>(url)).data.data;
 
 export const detailApi = {
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const response = await client.post<
+      Result<{
+        url: string;
+        fileName: string;
+        width: number;
+        height: number;
+        bytes: number;
+      }>
+    >("/images", formData, { timeout: 60000 });
+    return response.data.data;
+  },
   categories: () => get<DetailCategory[]>("/categories"),
   addCategory: (p: Omit<DetailCategory, "categoryId">) =>
     post<{ categoryId: number }>("/categories", p),
@@ -61,12 +75,11 @@ export function detailErrorMessage(error: unknown): string {
       return "관리자 로그인 세션이 만료되었어요. 다시 로그인해 주세요.";
     if (status === 403)
       return "관리자 권한이 없거나 요청 출처가 허용되지 않았어요.";
-    if (status === 503) {
+    if (status === 503)
       return (
         error.response?.data?.message ??
-        "백엔드 관리자 인증 요청 중 오류가 발생했습니다."
+        "백엔드 요청 처리 중 오류가 발생했어요."
       );
-    }
     return (
       error.response?.data?.message ??
       error.message ??

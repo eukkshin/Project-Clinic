@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import * as S from "@/assets/css/popup/PopupLiquid.styles";
+import * as S from "@/components/ui/Popup.styles";
 
 import type { ReactNode } from "react";
 // 기존 Popup 사용처(login / register 등)의 props 계약을 변경하지 않습니다.

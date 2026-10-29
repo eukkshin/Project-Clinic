@@ -1,24 +1,25 @@
 "use client";
 
-import axios from 'axios';
-import gsap from 'gsap';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from 'react-icons/fa6';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
+import gsap from "gsap";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from "react-icons/fa6";
 
-import * as SL from '@/assets/css/components/dropdown/HeaderSearchLayout.styles';
-import * as S from '@/assets/css/components/Header.styles';
-import { usePublishedProcedureMenus } from '@/lib/detail/usePublishedProcedureMenus';
-import { withAboutNavigation } from '@/lib/navigation/aboutNavigation';
-import { withCommunityNavigation } from '@/lib/navigation/withCommunityNavigation';
+import * as SL from "@/components/dropdown/HeaderSearchLayout.styles";
+import * as S from "@/components/layout/Header.styles";
+import { usePublishedProcedureMenus } from "@/lib/detail/usePublishedProcedureMenus";
+import { withAboutNavigation } from "@/lib/navigation/aboutNavigation";
+import { withCommunityNavigation } from "@/lib/navigation/withCommunityNavigation";
 
-import AccountDropdown from './dropdown/AccountDropdown';
-import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
-import HeaderSearch from './dropdown/HeaderSearch';
-import LanguageDropdown from './dropdown/LanguageDropdown';
-import MobileProcedureSubmenu from './dropdown/MobileProcedureSubmenu';
+import AccountDropdown from "@/components/dropdown/AccountDropdown";
+import HeaderNavDropdown from "@/components/dropdown/HeaderNavDropdown";
+import HeaderSearch from "@/components/dropdown/HeaderSearch";
+import LanguageDropdown from "@/components/dropdown/LanguageDropdown";
+import MobileProcedureSubmenu from "@/components/dropdown/MobileProcedureSubmenu";
 
 /*
  * Header.tsx — Premium Ahn's Navigation
@@ -58,7 +59,7 @@ interface FooterSettings {
   companyInfo?: { phone?: string };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 const DEFAULT_MENUS: MenuItem[] = [
   { id: 1, name: "병원소개", url: "/" },

@@ -1,4 +1,4 @@
-import * as S from "@/assets/css/auth/Auth.styles";
+import * as S from "@/styles/auth/Auth.styles";
 
 type AuthBrandPanelProps = {
   mode: "login" | "register";

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from 'next/link';
-import styled from 'styled-components';
+import Link from "next/link";
+import styled from "styled-components";
 
 export const Shell = styled.div`
   --ink: #22382d;

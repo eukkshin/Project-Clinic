@@ -1,5 +1,5 @@
+import SafetyPage from "@/components/about/pages/SafetyPage";
 import type { Metadata } from "next";
-import SafetyPage from '@/components/about/pages/SafetyPage';
 
 export const metadata: Metadata = {
   title: "안전 시스템 | AHN'S",

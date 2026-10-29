@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import * as QA from '@/components/QuaAccordion/Accordion.style';
+import * as QA from "@/components/ui/Accordion.styles";
 
 const colors = {
   forest: "#213a30",

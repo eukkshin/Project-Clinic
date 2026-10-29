@@ -1,7 +1,7 @@
 "use client";
 
-import { AntiAgingDetailTheme } from '@/assets/css/components/detail/AntiAgingDetail.styles';
-import DetailLayout from '@/components/detail/DetailLayout';
+import { AntiAgingDetailTheme } from "@/components/procedures/AntiAgingDetail.styles";
+import DetailLayout from "@/components/procedures/DetailLayout";
 
 import type { DetailPageData } from "@/types/detail";
 

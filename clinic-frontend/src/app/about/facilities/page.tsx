@@ -1,5 +1,5 @@
+import FacilitiesPage from "@/components/about/pages/FacilitiesPage";
 import type { Metadata } from "next";
-import FacilitiesPage from '@/components/about/pages/FacillitiesPage';
 
 export const metadata: Metadata = {
   title: "진료 환경 | AHN'S",

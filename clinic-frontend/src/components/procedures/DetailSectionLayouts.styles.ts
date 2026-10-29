@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
+import * as S from "@/components/procedures/DetailPage.styles";
 
 /** 기존 DetailPage.styles.ts(사용자 Hero 위치·애니메이션 수정 포함)는 수정하지 않습니다. */
 export const IntroVariantGrid = styled(S.IntroGrid)<{ $imageLeft: boolean }>`

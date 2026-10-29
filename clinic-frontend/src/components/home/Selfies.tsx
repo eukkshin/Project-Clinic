@@ -1,5 +1,6 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -7,13 +8,13 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import * as S from "@/assets/css/components/Selfies.styles";
+import * as S from "@/components/home/Selfies.styles";
 
 // ScrollTrigger는 GSAP의 추가 기능이다.
 // 일반 gsap.to()와 달리 '스크롤 위치에 따라 애니메이션을 시작'할 때 필요하다.
 gsap.registerPlugin(ScrollTrigger);
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 /**
  * [1] Express API에서 내려오는 원본 데이터.

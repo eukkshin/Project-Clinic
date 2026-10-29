@@ -1,5 +1,5 @@
+import LocationPage from "@/components/about/pages/LocationPage";
 import type { Metadata } from "next";
-import LocationPage from '@/components/about/pages/LocationPage';
 
 export const metadata: Metadata = {
   title: "오시는 길 | AHN'S",

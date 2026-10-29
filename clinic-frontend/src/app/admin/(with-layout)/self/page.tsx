@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,8 +11,8 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Self.styles";
 
 interface SelfieData {
   id: number;
@@ -37,13 +38,11 @@ export default function Self() {
 
   const fetchSelfies = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/selfies",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/selfies`);
       if (response.data.success) {
         const formatted = response.data.data.map((s: any) => ({
           id: s.SELFIE_IDX,
-          imageUrl: `http://localhost:4000/images/${s.FILE_NAME}`,
+          imageUrl: `${API_ORIGIN}/images/${s.FILE_NAME}`,
           likes: s.LIKES,
           views: s.VIEWS,
           isActive: s.IS_ACTIVE === "Y",
@@ -79,7 +78,7 @@ export default function Self() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/selfies",
+        `${API_ORIGIN}/api/admin/selfies`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -102,7 +101,7 @@ export default function Self() {
     if (confirm("해당 셀피 게시물을 삭제하시겠습니까?")) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/selfies/${id}`,
+          `${API_ORIGIN}/api/admin/selfies/${id}`,
         );
         if (response.data.success) {
           fetchSelfies();
@@ -126,7 +125,7 @@ export default function Self() {
 
     try {
       const response = await axios.put(
-        "http://localhost:4000/api/admin/selfies/status",
+        `${API_ORIGIN}/api/admin/selfies/status`,
         { statuses },
       );
       if (response.data.success) {

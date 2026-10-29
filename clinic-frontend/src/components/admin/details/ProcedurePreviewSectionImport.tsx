@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from 'react';
-import { FiDownload } from 'react-icons/fi';
+import { useState } from "react";
+import { FiDownload } from "react-icons/fi";
 
-import * as S from '@/assets/css/admin/DetailCMS.styles';
-import { detailErrorMessage } from '@/lib/adminDetailApi';
-import { importProcedureTemplateSections } from '@/lib/detail/importProcedureTemplateSections';
-import { getProcedureSectionTemplate } from '@/lib/detail/procedureSectionTemplates';
+import { detailErrorMessage } from "@/lib/admin/detailApi";
+import { importProcedureTemplateSections } from "@/lib/detail/importProcedureTemplateSections";
+import { getProcedureSectionTemplate } from "@/lib/detail/procedureSectionTemplates";
+import * as S from "@/components/admin/details/DetailEditor.styles";
 
 import type { DetailPage } from "@/types/adminDetail";
 

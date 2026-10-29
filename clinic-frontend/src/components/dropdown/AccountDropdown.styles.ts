@@ -81,23 +81,6 @@ export const AccountTrigger = styled.button<{
     `}
 `;
 
-export const Avatar = styled.span`
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.52);
-  border-radius: 50%;
-  background: linear-gradient(145deg, #86a68b, #345a41);
-  color: #fff;
-  font-family: var(--ahns-display);
-  font-size: 13px;
-  font-weight: 500;
-  text-shadow: none;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.36);
-`;
-
 export const TriggerName = styled.span`
   display: inline-block;
   max-width: 105px;
@@ -278,10 +261,6 @@ export const MenuIcon = styled.span`
 export const MenuLabel = styled.span`
   flex: 1;
   min-width: 0;
-`;
-export const MenuArrow = styled.span`
-  font-size: 14px;
-  opacity: 0.53;
 `;
 export const MenuLink = styled.a`
   ${menuRow}

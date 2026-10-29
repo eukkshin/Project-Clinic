@@ -1,4 +1,4 @@
-import { COMMUNITY_PAGES } from '@/lib/community/config';
+import { COMMUNITY_PAGES } from "@/lib/community/config";
 
 type NavChild = {
   name: string;

@@ -1,17 +1,4 @@
 import styled, { keyframes } from "styled-components";
-
-/*
- * SafetySlider.styles.ts — Safety Archive 디자인
- *
- * 이전 섹션들의 밝은 세이지 그린과 달리, 깊이 있는 포레스트 그린을 사용한다.
- * 직전 VlogSlider의 마지막 배경색(#91AC97)과 정확히 맞춰서
- * 진한 포레스트 그린으로 서서히 이어지게 만든다.
- *
- * 서체는 모두 font-family: inherit을 사용하여 홈페이지 공통 글꼴을 물려받는다.
- */
-
-const FOREST = "#17352B";
-const FOREST_DARK = "#0F281F";
 const CREAM = "#F6F5ED";
 const SOFT = "#B9CBB9";
 const LINE = "rgba(229, 239, 226, 0.20)";
@@ -337,7 +324,9 @@ export const ItemButton = styled.button<{ $active: boolean }>`
   font: inherit;
 
   opacity: ${({ $active }) => ($active ? "1" : "0.66")};
-  transition: opacity 350ms ease, padding-left 400ms ease;
+  transition:
+    opacity 350ms ease,
+    padding-left 400ms ease;
   padding-left: ${({ $active }) => ($active ? "13px" : "0")};
   &::before {
     content: "";
@@ -349,12 +338,14 @@ export const ItemButton = styled.button<{ $active: boolean }>`
     background: #d2e2cc;
     transform: scaleY(${({ $active }) => ($active ? 1 : 0)});
     transform-origin: center;
-    transition: transform 450ms cubic-bezier(.2,.75,.2,1);
+    transition: transform 450ms cubic-bezier(0.2, 0.75, 0.2, 1);
     pointer-events: none;
   }
   @media (prefers-reduced-motion: reduce) {
     transition: none;
-    &::before { transition: none; }
+    &::before {
+      transition: none;
+    }
   }
 
   &:hover,

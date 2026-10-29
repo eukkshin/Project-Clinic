@@ -1,11 +1,4 @@
-import styled from 'styled-components';
-
-/**
- * [홈페이지 공통 색상]
- * Hero에서 사용한 세이지 그린을 그대로 이어 받아 전체 디자인을 통일한다.
- */
-const SAGE = "#A1AF96";
-const IVORY = "#F7F4EA";
+import styled from "styled-components";
 const DARK = "#344638";
 
 /**
@@ -23,17 +16,14 @@ export const TransitionBridge = styled.div`
   text-align: center;
   color: ${DARK};
   background: transparent;
-  @media (min-width: 769px) { display: none; }
+  @media (min-width: 769px) {
+    display: none;
+  }
 
   @media (max-width: 768px) {
     min-height: clamp(260px, 38svh, 400px);
     /* Hero 모바일 하단의 아이보리와 양 끝 색을 맞춰 단절을 없앤다. */
-    background: linear-gradient(
-      180deg,
-      #f7f4ea 0%,
-      #e9efe5 52%,
-      #f7f4ea 100%
-    );
+    background: linear-gradient(180deg, #f7f4ea 0%, #e9efe5 52%, #f7f4ea 100%);
   }
 `;
 
@@ -49,20 +39,6 @@ export const BridgeEyebrow = styled.p`
   font-weight: 500;
   letter-spacing: 0.27em;
   color: #607965;
-`;
-
-export const BridgeText = styled.p`
-  margin: 22px 0 26px;
-  font-family: inherit;
-  font-size: clamp(31px, 4.7vw, 74px);
-  font-weight: 400;
-  letter-spacing: -0.06em;
-  line-height: 1.12;
-
-  em {
-    color: #69826b;
-    font-weight: 400;
-  }
 `;
 
 export const BridgeLine = styled.div`
@@ -201,7 +177,9 @@ export const Viewport = styled.div`
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   outline-offset: -4px;
-  &::-webkit-scrollbar{display:none;}
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &:focus-visible {
     outline: 2px solid #738f78;
@@ -309,11 +287,13 @@ export const ImageShade = styled.div`
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg,
-    rgba(246, 246, 238, .10) 0%,
-    rgba(15, 42, 26, .01) 38%,
-    rgba(17, 39, 27, .12) 60%,
-    rgba(15, 38, 24, .68) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(246, 246, 238, 0.1) 0%,
+    rgba(15, 42, 26, 0.01) 38%,
+    rgba(17, 39, 27, 0.12) 60%,
+    rgba(15, 38, 24, 0.68) 100%
+  );
 `;
 
 export const CardTop = styled.div`
@@ -483,21 +463,4 @@ export const MobileBridgeTitle = styled.div`
       font-size: clamp(42px, 10.5vw, 78px);
     }
   }
-`;
-
-
-/* ── Ahn's editorial gallery / 2026 redesign ──────────────────────────
-   The Hero is the only pinned opening scene. Category is a light, compact
-   native carousel: no extra pin, no inter-section scroll stall.           */
-export const GalleryButtons = styled.div`
-  display:flex; align-items:center; gap:7px; margin-left:14px;
-  @media(max-width:768px){display:none;}
-`;
-export const GalleryButton = styled.button`
-  width:37px; height:37px; display:grid; place-items:center;
-  border:1px solid rgba(36,69,53,.4); border-radius:50%;
-  color:#244535; background:rgba(255,255,255,.20); cursor:pointer;
-  transition:color .2s, background .2s;
-  &:hover{color:#f7f4ea; background:#244535;}
-  &:focus-visible{outline:2px solid #244535; outline-offset:3px;}
 `;

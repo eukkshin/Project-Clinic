@@ -1,11 +1,11 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import { Cormorant_Garamond } from 'next/font/google';
+import { Cormorant_Garamond } from "next/font/google";
 
-import { GlobalStyle } from '@/assets/css/GlobalStyle';
-import ConditionalLayout from '@/components/ConditionalLayout';
-import SmoothScroll from '@/components/SmoothScroll';
-import StyledComponentsRegistry from '@/lib/registry';
+import ConditionalLayout from "@/components/layout/ConditionalLayout";
+import SmoothScroll from "@/components/layout/SmoothScroll";
+import StyledComponentsRegistry from "@/lib/registry";
+import { GlobalStyle } from "@/styles/global";
 
 // 영문 디스플레이: Next.js가 Google Font를 빌드 시 내려받아 자체 호스팅한다.
 const cormorant = Cormorant_Garamond({

@@ -1,14 +1,12 @@
 "use client";
-// 브라우저의 현재 주소(URL)을 읽어야 하므로 이 파일은 클라이언트 컴포넌트로 선언합니다.
+
 import { usePathname } from "next/navigation";
 import React from "react";
-import styled from "styled-components";
 
-// 조건부로 사라져야할 컴포넌트 불러옴
-import EventPopup from "./EventPopup";
-import Footer from "./Footer";
-import Header from "./Header";
-import QuickConsultBar from "./QuickConsultBar";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import EventPopup from "@/components/ui/EventPopup";
+import QuickConsultBar from "@/components/ui/QuickConsultBar";
 
 export default function ConditionalLayout({
   children,

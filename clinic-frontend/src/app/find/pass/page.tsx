@@ -1,11 +1,12 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 
-import * as S from "@/assets/css/Style.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import { API_ORIGIN } from "@/lib/api/config";
+import * as S from "@/styles/auth/FindPassword.styles";
 
-export default function MockPassPage() {
+function MockPassPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -57,18 +58,15 @@ export default function MockPassPage() {
 
     try {
       // 🎯 백엔드의 '이메일 발송 API'로 데이터를 쏩니다! (포트는 4000번)
-      const response = await fetch(
-        "http://127.0.0.1:4000/api/send-reset-email",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: userId,
-            userName: authData.userName,
-            phone: authData.phone, // 필요하다면 백엔드에서 폰 번호도 같이 검증하도록 추가 가능합니다
-          }),
-        },
-      );
+      const response = await fetch(`${API_ORIGIN}/api/send-reset-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userId,
+          userName: authData.userName,
+          phone: authData.phone, // 필요하다면 백엔드에서 폰 번호도 같이 검증하도록 추가 가능합니다
+        }),
+      });
 
       const result = await response.json();
 
@@ -165,5 +163,13 @@ export default function MockPassPage() {
         {popupConfig.message}
       </Popup>
     </>
+  );
+}
+
+export default function MockPassPage() {
+  return (
+    <Suspense fallback={<p role="status">페이지를 불러오는 중입니다.</p>}>
+      <MockPassPageContent />
+    </Suspense>
   );
 }

@@ -1,15 +1,21 @@
 "use client";
 
-import axios from 'axios';
-import useEmblaCarousel from 'embla-carousel-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
+import useEmblaCarousel from "embla-carousel-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
-// 기존 프로젝트의 스타일 파일 경로를 그대로 사용한다.
-import * as S from '../../assets/css/components/Hero.styles';
+import * as S from "./Hero.styles";
 
 import type { ReactNode } from "react";
 
@@ -36,7 +42,7 @@ interface VisualResponse {
 
 // API 서버 주소를 한 곳에서만 관리한다.
 // .env.local에 NEXT_PUBLIC_API_URL을 등록하지 않았다면 기존 4000 포트를 사용한다.
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 const AUTOPLAY_DELAY = 5000; // 자동 슬라이드 전환 간격: 5,000ms = 5초
 
 /** 서버에서 전달된 데이터가 실제로 슬라이드로 쓸 수 있는 형태인지 확인한다. */

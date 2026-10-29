@@ -1,13 +1,14 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import { FormEvent, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
-import * as S from "@/assets/css/components/QuickConsultBar.styles";
+import * as S from "@/components/ui/QuickConsultBar.styles";
 
 /** 실제 백엔드 주소를 환경변수로 바꾸더라도 동일하게 작동한다. */
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 /** 사용자가 선택한 상담 항목은 기존 API의 department 문자열로 전송한다. */
 const DEPARTMENTS = ["눈 성형", "코 성형", "동안 성형", "쁘띠 시술"] as const;

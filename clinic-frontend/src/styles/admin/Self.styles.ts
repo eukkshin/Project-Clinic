@@ -1,29 +1,31 @@
 import styled from "styled-components";
+import {
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminFormGroupCss,
+  adminGridCss,
+  adminNewsLeftColumnCss,
+  adminPageTitleCss,
+} from "./shared";
 
 import {
   BoxShadow,
-  FlexBetween,
   FlexCenter,
   FlexColumn,
   FlexStart,
   TransitionAll,
-} from "../Common.styles";
+} from "@/styles/mixins";
 
 export const SelfContainer = styled.div`
   width: 100%;
 `;
 
 export const SelfPageHeader = styled.header`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const SelfPageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #5a5c69;
-  font-weight: 700;
-  margin: 0;
+  ${adminPageTitleCss}
 `;
 
 export const SelfSaveButton = styled.button`
@@ -46,20 +48,11 @@ export const SelfSaveButton = styled.button`
 `;
 
 export const SelfGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
+  ${adminGridCss}
 `;
 
 export const SelfLeftColumn = styled.div`
-  ${FlexColumn}
-  gap: 1.5rem;
-  width: 100%;
+  ${adminNewsLeftColumnCss}
 `;
 
 export const SelfCard = styled.div`
@@ -77,9 +70,7 @@ export const SelfCardHeader = styled.header`
 `;
 
 export const SelfCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const SelfCardBody = styled.div`
@@ -88,10 +79,7 @@ export const SelfCardBody = styled.div`
 `;
 
 export const SelfFormGroup = styled.div`
-  ${FlexColumn}
-  width: 100%;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  ${adminFormGroupCss}
 `;
 
 export const SelfLabel = styled.label`

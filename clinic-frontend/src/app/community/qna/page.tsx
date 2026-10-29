@@ -1,4 +1,4 @@
-import CommunityExperience from '@/components/community/CommunityExperience';
+import CommunityExperience from "@/components/community/CommunityExperience";
 
 export const metadata = { title: "Q&A | AHN’S" };
 

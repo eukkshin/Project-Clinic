@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  EditorialEffects,
+  PageProgress,
+  ProgressFill,
+} from "@/components/home/EditorialExperience.styles";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { EditorialEffects, PageProgress, ProgressFill } from
-  "@/assets/css/components/EditorialExperience.styles";
+import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,7 +26,10 @@ export default function EditorialExperience() {
     const measure = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        const scrollable = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const scrollable = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight,
+        );
         line.style.transform = `scaleX(${Math.min(1, Math.max(0, window.scrollY / scrollable))})`;
       });
     };
@@ -45,21 +51,46 @@ export default function EditorialExperience() {
     const registered = new WeakSet<Element>();
     let frame = 0;
     const register = () => {
-      canvas.querySelectorAll<HTMLElement>("[data-editorial-reveal], [data-editorial-rule]").forEach((element) => {
-        if (registered.has(element)) return;
-        registered.add(element);
-        const isRule = element.hasAttribute("data-editorial-rule");
-        animations.push(gsap.fromTo(element,
-          isRule ? { scaleX: 0, transformOrigin: "left center" } : { opacity: 0, y: 23, filter: "blur(4px)" },
-          isRule ? {
-            scaleX: 1, duration: 1.25, ease: "power3.out",
-            scrollTrigger: { trigger: element, start: "top 92%", once: true },
-          } : {
-            opacity: 1, y: 0, filter: "blur(0px)", duration: 1.05, ease: "power3.out",
-            scrollTrigger: { trigger: element, start: "top 89%", once: true },
-          }
-        ));
-      });
+      canvas
+        .querySelectorAll<HTMLElement>(
+          "[data-editorial-reveal], [data-editorial-rule]",
+        )
+        .forEach((element) => {
+          if (registered.has(element)) return;
+          registered.add(element);
+          const isRule = element.hasAttribute("data-editorial-rule");
+          animations.push(
+            gsap.fromTo(
+              element,
+              isRule
+                ? { scaleX: 0, transformOrigin: "left center" }
+                : { opacity: 0, y: 23, filter: "blur(4px)" },
+              isRule
+                ? {
+                    scaleX: 1,
+                    duration: 1.25,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                      trigger: element,
+                      start: "top 92%",
+                      once: true,
+                    },
+                  }
+                : {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                    duration: 1.05,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                      trigger: element,
+                      start: "top 89%",
+                      once: true,
+                    },
+                  },
+            ),
+          );
+        });
     };
     register();
     // API-loaded content can mount after the first render. Observe child additions
@@ -77,8 +108,11 @@ export default function EditorialExperience() {
   }, []);
 
   useEffect(() => {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     const canvas = document.querySelector<HTMLElement>("[data-editorial-home]");
     if (!canvas) return;
     let frame = 0;

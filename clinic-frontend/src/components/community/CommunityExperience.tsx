@@ -1,16 +1,24 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
-import * as S from '@/assets/css/components/community/Community.styles';
+import * as S from "@/components/community/Community.styles";
 import {
-    CommunityEntry, CommunityResult, loadCommunity, submitQuickConsultation, toYoutubeEmbed
-} from '@/lib/community/client';
-import { COMMUNITY_BY_KIND, COMMUNITY_PAGES, CommunityKind } from '@/lib/community/config';
+  CommunityEntry,
+  CommunityResult,
+  loadCommunity,
+  submitQuickConsultation,
+  toYoutubeEmbed,
+} from "@/lib/community/client";
+import {
+  COMMUNITY_BY_KIND,
+  COMMUNITY_PAGES,
+  CommunityKind,
+} from "@/lib/community/config";
 
 type DataStatus = "loading" | "ready" | "error";
 

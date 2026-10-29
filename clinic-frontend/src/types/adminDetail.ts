@@ -1,13 +1,7 @@
 /** /api/admin/detail API response models (Oracle DETAIL_* tables) */
 export type DetailStatus = "DRAFT" | "PUBLISHED" | "HIDDEN";
 export type SectionType =
-  | "INTRO"
-  | "FEATURES"
-  | "PROCESS"
-  | "GALLERY"
-  | "FAQ"
-  | "TEXT"
-  | "CTA";
+  "INTRO" | "FEATURES" | "PROCESS" | "GALLERY" | "FAQ" | "TEXT" | "CTA";
 export type Visible = "Y" | "N";
 
 export interface DetailCategory {

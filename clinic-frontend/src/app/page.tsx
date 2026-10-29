@@ -1,13 +1,13 @@
-import CategoryNav from '@/components/CategoryNav';
-import CircularOverlay from '@/components/CircularOverlay';
-import Hero from '@/components/hero/Hero';
-import EditorialExperience from '@/components/main/EditorialExperience';
-import HomeAtmosphere from '@/components/main/HomeAtmosphere';
-import { SafetySlider } from '@/components/main/SafetySlider';
-import Selfies from '@/components/main/Selfies';
-import VlogSafetyFlow from '@/components/main/VlogSafetyFlow';
-import { VlogSlider } from '@/components/main/VlogSlider';
-import RollingBanner from '@/components/RollingBanner';
+import CategoryNav from "@/components/home/CategoryNav";
+import CircularOverlay from "@/components/home/CircularOverlay";
+import EditorialExperience from "@/components/home/EditorialExperience";
+import Hero from "@/components/home/Hero";
+import HomeAtmosphere from "@/components/home/HomeAtmosphere";
+import RollingBanner from "@/components/home/RollingBanner";
+import { SafetySlider } from "@/components/home/SafetySlider";
+import Selfies from "@/components/home/Selfies";
+import VlogSafetyFlow from "@/components/home/VlogSafetyFlow";
+import { VlogSlider } from "@/components/home/VlogSlider";
 
 /**
  * 전체 메인페이지는 Server Component로 유지한다.

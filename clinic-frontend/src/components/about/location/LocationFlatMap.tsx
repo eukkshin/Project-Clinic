@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import * as S from '@/assets/css/components/about/LocationFlat.styles';
-import { FLAT_LOCATION } from '@/data/about/flatLocationData';
+import * as S from "@/components/about/location/LocationFlat.styles";
+import { FLAT_LOCATION } from "@/data/about/flatLocationData";
 
 // 깊이나 입체 그림자 없이 모든 지도 형태를 HTML/SVG 벡터로 직접 구성합니다.
 const buildings: Array<[number, number, number, number]> = [

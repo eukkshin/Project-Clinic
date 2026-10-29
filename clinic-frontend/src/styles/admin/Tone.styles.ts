@@ -1,11 +1,15 @@
 import styled from "styled-components";
-
 import {
-  BoxShadow,
-  FlexBetween,
-  FlexCenter,
-  TransitionAll,
-} from "../Common.styles";
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminForestPageTitleCss,
+  adminGridCss,
+  adminRankEventCardCss,
+  adminSaveButtonCss,
+  adminSetNavCardHeaderCss,
+} from "./shared";
+
+import { FlexCenter } from "@/styles/mixins";
 
 export const ToneContainer = styled.div`
   width: 100%;
@@ -14,66 +18,31 @@ export const ToneContainer = styled.div`
 `;
 
 export const TonePageHeader = styled.div`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const TonePageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #34453c;
-  font-weight: 700;
-  margin: 0;
+  ${adminForestPageTitleCss}
 `;
 
 export const ToneSaveButton = styled.button`
-  ${FlexCenter};
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  gap: 0.5rem;
-  cursor: pointer;
-  ${BoxShadow};
-  ${TransitionAll};
-  background-color: #1b4d3e;
-
-  &:hover {
-    background-color: #246652;
-  }
+  ${adminSaveButtonCss}
 `;
 
 export const ToneCardGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
+  ${adminGridCss}
 `;
 
 export const ToneSettingsCard = styled.div`
-  border-radius: 12px;
-  ${BoxShadow};
-  border: 1px solid rgba(59, 122, 87, 0.1);
-  overflow: hidden;
-  background-color: #fff;
+  ${adminRankEventCardCss}
 `;
 
 export const ToneCardHeader = styled.div`
-  background-color: #f7f9f7;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(59, 122, 87, 0.1);
+  ${adminSetNavCardHeaderCss}
 `;
 
 export const ToneCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const ToneCardBody = styled.div`

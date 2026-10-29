@@ -1,13 +1,13 @@
 "use client";
 
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useEffect, useRef } from 'react';
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef } from "react";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
-import DetailHero from '@/components/detail/DetailHero';
-import DetailSectionRenderer from '@/components/detail/DetailSectionRenderer';
-import DetailSideNav from '@/components/detail/DetailSideNav';
+import DetailHero from "@/components/procedures/DetailHero";
+import * as S from "@/components/procedures/DetailPage.styles";
+import DetailSectionRenderer from "@/components/procedures/DetailSectionRenderer";
+import DetailSideNav from "@/components/procedures/DetailSideNav";
 
 import type { DetailPageData } from "@/types/detail";
 /** Header / Footer / QuickMenu는 원래 프로젝트의 ConditionalLayout이 렌더링합니다. */

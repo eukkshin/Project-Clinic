@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 
-import AntiAgingDetailView from '@/components/detail/AntiAgingDetailView';
-import { getAntiAgingPreviewPage } from '@/data/detail/antiAgingPreview';
-import { getPublicDetailPage } from '@/lib/detail/getPublicDetailPage';
+import AntiAgingDetailView from "@/components/procedures/AntiAgingDetailView";
+import { getAntiAgingPreviewPage } from "@/data/detail/antiAgingPreview";
+import { getPublicDetailPage } from "@/lib/detail/getPublicDetailPage";
 
 import type { DetailPageData } from "@/types/detail";
 

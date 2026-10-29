@@ -1,11 +1,14 @@
 "use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ReactNode, useEffect } from 'react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ReactNode, useEffect } from "react";
 
-import * as S from '@/assets/css/components/about/AboutPages.styles';
-import { isAboutLinkActive, useAboutNavigation } from '@/lib/navigation/aboutNavigation';
+import * as S from "@/components/about/pages/AboutPages.styles";
+import {
+  isAboutLinkActive,
+  useAboutNavigation,
+} from "@/lib/navigation/aboutNavigation";
 
 // Hooks only run inside React components. The observer never prevents static rendering.
 function AboutMotion() {

@@ -1,6 +1,7 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiClipboard,
   FiImage,
@@ -16,7 +17,7 @@ import {
   FiVideo,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
+import * as S from "@/styles/admin/Dash.styles";
 
 interface DashboardStats {
   consultationsCount: number;
@@ -55,28 +56,28 @@ export default function Root() {
           safetyRes,
         ] = await Promise.all([
           axios
-            .get("http://localhost:4000/api/admin/consult")
+            .get(`${API_ORIGIN}/api/admin/consult`)
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/users")
+            .get(`${API_ORIGIN}/api/admin/users`)
             .catch(() => ({ data: { pagination: { totalCount: 0 } } })),
           axios
-            .get("http://localhost:4000/api/admin/events")
+            .get(`${API_ORIGIN}/api/admin/events`)
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/boards")
+            .get(`${API_ORIGIN}/api/admin/boards`)
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/popups")
+            .get(`${API_ORIGIN}/api/admin/popups`)
             .catch(() => ({ data: { popups: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/selfies")
+            .get(`${API_ORIGIN}/api/admin/selfies`)
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/vlogs")
+            .get(`${API_ORIGIN}/api/admin/vlogs`)
             .catch(() => ({ data: { data: [] } })),
           axios
-            .get("http://localhost:4000/api/admin/safety")
+            .get(`${API_ORIGIN}/api/admin/safety`)
             .catch(() => ({ data: { data: [] } })),
         ]);
 

@@ -1,47 +1,32 @@
-import styled, { keyframes, Keyframes } from "styled-components";
-
+import styled from "styled-components";
 import {
-  BoxShadow,
-  FlexBetween,
-  FlexCenter,
-  FlexStart,
-  TransitionAll,
-} from "../Common.styles";
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminForestPageTitleCss,
+  adminFileInputWrapperCss,
+  adminFileLabelCss,
+  adminSaveButtonCss,
+  adminSetNavCardHeaderCss,
+  adminSetNavInputCss,
+  adminSetNavLabelCss,
+} from "./shared";
+
+import { BoxShadow, FlexCenter, TransitionAll } from "@/styles/mixins";
 
 export const SetNavContainer = styled.div`
   width: 100%;
 `;
 
 export const SetNavPageHeader = styled.header`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const SetNavPageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #34453c;
-  font-weight: 700;
-  margin: 0;
+  ${adminForestPageTitleCss}
 `;
 
 export const SetNavSaveButton = styled.button`
-  ${FlexCenter};
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  gap: 0.5rem;
-  cursor: pointer;
-  ${BoxShadow};
-  ${TransitionAll};
-  background-color: #1b4d3e;
-
-  &:hover {
-    background-color: #246652;
-  }
+  ${adminSaveButtonCss}
 `;
 
 export const SetNavContentGrid = styled.div`
@@ -65,15 +50,11 @@ export const SetNavCard = styled.div`
 `;
 
 export const SetNavCardHeader = styled.div`
-  background-color: #f7f9f7;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(59, 122, 87, 0.1);
+  ${adminSetNavCardHeaderCss}
 `;
 
 export const SetNavCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const SetNavCardBody = styled.div`
@@ -120,48 +101,16 @@ export const SetNavRadioLabel = styled.div<SetNavRadioLabelProps>`
   cursor: pointer;
 `;
 
-export const SetNavInputWrapper = styled.div`
-  ${FlexCenter};
-  gap: 1rem;
-  background-color: #f7f9f7;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e4eae5;
-`;
-
 export const SetNavLabel = styled.label`
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #34453c;
-  white-space: nowrap;
-  flex-shrink: 0;
+  ${adminSetNavLabelCss}
 `;
 
 export const SetNavInput = styled.input`
-  width: 100%;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
-  background-color: #fff;
-  border: 1px solid rgba(59, 122, 87, 0.3);
-  border-radius: 12px;
-  outline: none;
-  ${TransitionAll}
-
-  &:focus {
-    border-color: #1b4d3e;
-  }
+  ${adminSetNavInputCss}
 `;
 
 export const SetNavFileInputWrapper = styled.div`
-  gap: 1rem;
-  ${FlexStart}
-
-  .file-name {
-    font-size: 0.9rem;
-    color: #738079;
-    border-bottom: 1px solid #d6e0d8;
-    padding-bottom: 0.5rem;
-  }
+  ${adminFileInputWrapperCss}
 `;
 
 export const SetNavFileInput = styled.input`
@@ -169,19 +118,7 @@ export const SetNavFileInput = styled.input`
 `;
 
 export const SetNavFileLabel = styled.label`
-  background-color: #fff;
-  border: 1px solid #d6e0d8;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #34453c;
-  cursor: pointer;
-  ${TransitionAll};
-
-  &:hover {
-    background-color: #f7f9f7;
-  }
+  ${adminFileLabelCss}
 `;
 
 export const SetNavMenuList = styled.div`

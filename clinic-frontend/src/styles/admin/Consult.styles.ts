@@ -1,31 +1,29 @@
 import styled from "styled-components";
+import {
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminPageTitleCss,
+} from "./shared";
 
 import {
   BoxShadow,
-  FlexBetween,
   FlexCenter,
-  FlexColumn,
   FlexEnd,
   FlexStart,
   InlineFlexCenter,
   TransitionAll,
-} from "../Common.styles";
+} from "@/styles/mixins";
 
 export const ConsultContainer = styled.div`
   width: 100%;
 `;
 
 export const ConsultPageHeader = styled.header`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const ConsultPageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #5a5c69;
-  font-weight: 700;
-  margin: 0;
+  ${adminPageTitleCss}
 `;
 
 export const ConsultFilterCard = styled.div`
@@ -92,9 +90,7 @@ export const ConsultCardHeader = styled.header`
 `;
 
 export const ConsultCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const ConsultTableWrapper = styled.div`

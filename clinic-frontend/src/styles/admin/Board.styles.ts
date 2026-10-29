@@ -1,6 +1,14 @@
 import styled from "styled-components";
+import {
+  adminCardHeaderCss,
+  adminCardTitleCss,
+  adminColumnCss,
+  adminPageHeaderCss,
+  adminPageTitleCss,
+  adminTableWrapperCss,
+} from "./shared";
 
-import { FlexBetween, FlexCenter, TransitionAll } from "../Common.styles";
+import { FlexCenter, TransitionAll } from "@/styles/mixins";
 
 // -----------------------------------------
 // 🎯 게시판 관리 (Board Admin) 전용 스타일
@@ -11,15 +19,11 @@ export const BoardContainer = styled.div`
 `;
 
 export const BoardPageHeader = styled.div`
-  ${FlexBetween}
-  margin-bottom: 1.5rem;
+  ${adminPageHeaderCss}
 `;
 
 export const BoardPageTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #5a5c69;
-  font-weight: 700;
-  margin: 0;
+  ${adminPageTitleCss}
 `;
 
 export const BoardSaveButton = styled.button`
@@ -53,13 +57,11 @@ export const BoardGrid = styled.div`
 `;
 
 export const BoardLeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${adminColumnCss}
 `;
 
 export const BoardRightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${adminColumnCss}
 `;
 
 export const BoardCard = styled.div`
@@ -71,15 +73,11 @@ export const BoardCard = styled.div`
 `;
 
 export const BoardCardHeader = styled.div`
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
-  padding: 1rem 1.25rem;
+  ${adminCardHeaderCss}
 `;
 
 export const BoardCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const BoardCardBody = styled.div`
@@ -155,9 +153,7 @@ export const BoardAddButton = styled.button`
 `;
 
 export const BoardTableWrapper = styled.div`
-  width: 100%;
-  overflow-x: auto;
-  padding: 1rem;
+  ${adminTableWrapperCss}
 `;
 
 export const BoardTable = styled.table`

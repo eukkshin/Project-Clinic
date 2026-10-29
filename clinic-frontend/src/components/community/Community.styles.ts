@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 export const palette = {
   forest: "#1B3528",
@@ -295,10 +295,6 @@ export const TextLink = styled.a`
   &:hover span {
     transform: translate(4px, -3px);
   }
-`;
-export const ThinRule = styled.div`
-  height: 1px;
-  background: ${palette.line};
 `;
 export const Section = styled.section`
   padding: clamp(80px, 9vw, 150px) 0;

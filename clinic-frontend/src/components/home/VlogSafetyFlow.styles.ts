@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 /**
  * Vlog → Brand → Safety의 배경을 한 장으로 칠하는 공통 부모.

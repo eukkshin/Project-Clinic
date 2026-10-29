@@ -1,7 +1,6 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css, keyframes } from "styled-components";
 
 const GREEN = "#1B3528";
-const DARK = "#152C21";
 const PAPER = "#F7F5EF";
 const INK = "#23382B";
 const MUTED = "#728076";

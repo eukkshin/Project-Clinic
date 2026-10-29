@@ -1,12 +1,13 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 
-import * as S from "@/assets/css/auth/Auth.styles";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/auth/Auth.styles";
 
-import AuthBrandPanel from "../AuthBrandPanel";
+import AuthBrandPanel from "@/components/auth/AuthBrandPanel";
 
 type LoginForm = { userId: string; userPw: string };
 type PopupConfig = {
@@ -22,7 +23,7 @@ type LoginResponse = {
   message?: string;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:4000";
+const API_URL = API_ORIGIN;
 
 export default function LoginPage() {
   const router = useRouter();

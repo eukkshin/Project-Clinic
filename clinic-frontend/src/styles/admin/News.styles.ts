@@ -1,48 +1,41 @@
 import styled from "styled-components";
+import {
+  adminAddButtonCss,
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminForestPageTitleCss,
+  adminFileInputWrapperCss,
+  adminFileLabelCss,
+  adminFormGroupCss,
+  adminNewsLeftColumnCss,
+  adminRankEventCardCss,
+  adminSaveButtonCss,
+  adminSetNavCardHeaderCss,
+  adminSetNavInputCss,
+  adminSetNavLabelCss,
+} from "./shared";
 
 import {
-  BoxShadow,
-  FlexBetween,
   FlexCenter,
   FlexColumn,
   FlexStart,
   TransitionAll,
-} from "../Common.styles";
+} from "@/styles/mixins";
 
 export const NewsContainer = styled.div`
   width: 100%;
 `;
 
 export const NewsPageHeader = styled.header`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const NewsPageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #34453c;
-  font-weight: 700;
-  margin: 0;
+  ${adminForestPageTitleCss}
 `;
 
 export const NewsSaveButton = styled.button`
-  ${FlexCenter};
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  gap: 0.5rem;
-  cursor: pointer;
-  ${BoxShadow};
-  ${TransitionAll};
-  background-color: #1b4d3e;
-
-  &:hover {
-    background-color: #246652;
-  }
+  ${adminSaveButtonCss}
 `;
 
 export const NewsGrid = styled.div`
@@ -57,29 +50,19 @@ export const NewsGrid = styled.div`
 `;
 
 export const NewsLeftColumn = styled.div`
-  ${FlexColumn}
-  gap: 1.5rem;
-  width: 100%;
+  ${adminNewsLeftColumnCss}
 `;
 
 export const NewsCard = styled.div`
-  border-radius: 12px;
-  ${BoxShadow};
-  border: 1px solid rgba(59, 122, 87, 0.1);
-  overflow: hidden;
-  background-color: #fff;
+  ${adminRankEventCardCss}
 `;
 
 export const NewsCardHeader = styled.header`
-  background-color: #f7f9f7;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(59, 122, 87, 0.1);
+  ${adminSetNavCardHeaderCss}
 `;
 
 export const NewsCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const NewsCardBody = styled.div`
@@ -88,45 +71,19 @@ export const NewsCardBody = styled.div`
 `;
 
 export const NewsFormGroup = styled.div`
-  ${FlexColumn}
-  width: 100%;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  ${adminFormGroupCss}
 `;
 
 export const NewsLabel = styled.label`
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #34453c;
-  white-space: nowrap;
-  flex-shrink: 0;
+  ${adminSetNavLabelCss}
 `;
 
 export const NewsInput = styled.input`
-  width: 100%;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
-  background-color: #fff;
-  border: 1px solid rgba(59, 122, 87, 0.3);
-  border-radius: 12px;
-  outline: none;
-  ${TransitionAll}
-
-  &:focus {
-    border-color: #1b4d3e;
-  }
+  ${adminSetNavInputCss}
 `;
 
 export const NewsFileInputWrapper = styled.div`
-  gap: 1rem;
-  ${FlexStart}
-
-  .file-name {
-    font-size: 0.9rem;
-    color: #738079;
-    border-bottom: 1px solid #d6e0d8;
-    padding-bottom: 0.5rem;
-  }
+  ${adminFileInputWrapperCss}
 `;
 
 export const NewsFileInput = styled.input`
@@ -134,42 +91,13 @@ export const NewsFileInput = styled.input`
 `;
 
 export const NewsFileLabel = styled.label`
-  background-color: #fff;
-  border: 1px solid #d6e0d8;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #34453c;
-  cursor: pointer;
-  ${TransitionAll};
-
-  &:hover {
-    background-color: #f7f9f7;
-  }
+  ${adminFileLabelCss}
 `;
 
 export const NewsPreviewCircle = styled.div``;
 
 export const NewsAddButton = styled.button`
-  border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #34453c;
-  padding: 1rem;
-  width: 100%;
-  border-radius: 12px;
-  font-weight: 600;
-  ${TransitionAll};
-  ${FlexCenter}
-  gap: 0.5rem;
-  background-color: #f7f9f7;
-  flex-shrink: 0;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #fff;
-    border-color: #1b4d3e;
-    color: #1b4d3e;
-  }
+  ${adminAddButtonCss}
 `;
 
 export const NewsRightColumn = styled.div`

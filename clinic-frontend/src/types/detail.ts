@@ -1,12 +1,6 @@
 /** Oracle DETAIL_SECTION.SECTION_TYPE */
 export type DetailSectionType =
-  | "INTRO"
-  | "FEATURES"
-  | "PROCESS"
-  | "GALLERY"
-  | "FAQ"
-  | "TEXT"
-  | "CTA";
+  "INTRO" | "FEATURES" | "PROCESS" | "GALLERY" | "FAQ" | "TEXT" | "CTA";
 
 export interface DetailSectionContent {
   description?: string;

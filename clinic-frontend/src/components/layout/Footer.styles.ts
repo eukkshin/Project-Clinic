@@ -1,15 +1,4 @@
 import styled, { keyframes } from "styled-components";
-
-/*
- * Footer.styles.ts
- * [연결 디자인]
- * Safety의 포레스트 그린에서 아이보리로 부드럽게 돌아오는 밝은 Footer.
- * 연락처/지도 기능은 모두 보존한다.
- * [레이아웃]
- * PC: 좌측 정보 / 우측 대형 지도 2열
- * 모바일: 정보 / 지도를 세로로 1열
- */
-const FOREST = "#f7f4ea";
 const CREAM = "#244535";
 const MUTED = "#647969";
 const HAIRLINE = "rgba(36,69,53,.18)";

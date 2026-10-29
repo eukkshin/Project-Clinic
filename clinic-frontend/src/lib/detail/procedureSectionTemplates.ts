@@ -1,7 +1,7 @@
-import { getAntiAgingPreviewPage } from '@/data/detail/antiAgingPreview';
-import { getNosePreviewPage } from '@/data/detail/nosePreview';
-import { getPetitPreviewPage } from '@/data/detail/petitPreview';
-import { getPreviewDetailPage } from '@/data/detail/preview';
+import { getAntiAgingPreviewPage } from "@/data/detail/antiAgingPreview";
+import { getNosePreviewPage } from "@/data/detail/nosePreview";
+import { getPetitPreviewPage } from "@/data/detail/petitPreview";
+import { getPreviewDetailPage } from "@/data/detail/preview";
 
 import type { DetailPage } from "@/types/adminDetail";
 import type { DetailSectionData } from "@/types/detail";

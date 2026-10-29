@@ -488,11 +488,6 @@ export const CheckboxLabel = styled.label`
     margin: 2px 0 0;
   }
 `;
-export const CheckboxStack = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
 export const RadioGroup = styled.div`
   display: flex;
   flex-wrap: wrap;

@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from "styled-components";
 
 export const C = {
   green: "#1B3528",
@@ -192,12 +192,6 @@ export const Body = styled.p`
   font-weight: 350;
   word-break: keep-all;
   white-space: pre-line;
-`;
-export const ThinRule = styled.div`
-  height: 1px;
-  background: currentColor;
-  opacity: 0.18;
-  width: 100%;
 `;
 export const EditorialLink = styled.a`
   display: inline-flex;
@@ -652,76 +646,6 @@ export const SafetyNote = styled.div`
   }
 `;
 
-// Location — reuse clinic footer API and the shared Kakao/Naver SDK map
-export const LocationHero = styled.section`
-  padding: clamp(85px, 8vw, 155px) 0 clamp(60px, 7vw, 105px);
-`;
-export const LocationSplit = styled.div`
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: clamp(30px, 6vw, 120px);
-  align-items: end;
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-  }
-`;
-export const LocationInfo = styled.div`
-  border-top: 1px solid ${C.line};
-  padding: 26px 0;
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 15px;
-  span {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    opacity: 0.6;
-  }
-  strong {
-    font-size: 15px;
-    font-weight: 400;
-    line-height: 2;
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-  }
-  @media (max-width: 550px) {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-`;
-export const LocationMapSection = styled.section`
-  padding: clamp(65px, 8vw, 125px) 0;
-  background: ${C.green};
-  color: ${C.ivory};
-  /* The existing HospitalMap is shared with Footer to avoid duplicated SDK. */
-  button {
-    color: ${C.ivory};
-  }
-`;
-export const LocationDiagram = styled.div`
-  width: min(100%, 470px);
-  margin: 40px 0 0;
-  svg {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  path,
-  circle {
-    transition:
-      stroke-dashoffset 0.8s ease,
-      opacity 0.6s;
-  }
-`;
-export const LocationAdvice = styled.section`
-  padding: clamp(90px, 10vw, 170px) 0;
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
-  gap: clamp(30px, 6vw, 110px);
-  @media (max-width: 800px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 export const GallerySideIndex = styled.div`
   position: absolute;
   right: clamp(25px, 5vw, 70px);
@@ -753,26 +677,5 @@ export const SafetyFlowDiagram = styled.svg`
     transition:
       stroke 0.5s,
       fill 0.5s;
-  }
-`;
-export const LocationActions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px 30px;
-  margin-top: 32px;
-  a {
-    min-width: 180px;
-  }
-`;
-export const MapSurface = styled.div`
-  background: ${C.ivory};
-  padding: clamp(22px, 4vw, 64px);
-  color: ${C.ink};
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  & > div {
-    width: 100%;
-  }
-  @media (max-width: 600px) {
-    padding: 20px;
   }
 `;

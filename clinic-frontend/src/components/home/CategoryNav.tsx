@@ -1,13 +1,14 @@
 "use client";
 
-import axios from 'axios';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
-import * as S from '@/assets/css/components/CategoryNav.styles';
+import * as S from "@/components/home/CategoryNav.styles";
 
 /**
  * [기존 관리자 API 응답 형식]
@@ -38,7 +39,7 @@ interface CategoryApiResponse {
 }
 
 // 실제 이미지 파일은 Next.js public 폴더가 아니라 Express 서버가 제공한다.
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 // GSAP에서 ScrollTrigger 기능을 사용할 수 있도록 플러그인을 등록한다.
 gsap.registerPlugin(ScrollTrigger);

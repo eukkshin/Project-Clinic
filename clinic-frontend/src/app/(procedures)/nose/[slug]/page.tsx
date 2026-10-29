@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 
-import NoseDetailView from '@/components/detail/NoseDetailView';
-import { getNosePreviewPage } from '@/data/detail/nosePreview';
-import { getPublicDetailPage } from '@/lib/detail/getPublicDetailPage';
+import NoseDetailView from "@/components/procedures/NoseDetailView";
+import { getNosePreviewPage } from "@/data/detail/nosePreview";
+import { getPublicDetailPage } from "@/lib/detail/getPublicDetailPage";
 
 import type { DetailPageData } from "@/types/detail";
 

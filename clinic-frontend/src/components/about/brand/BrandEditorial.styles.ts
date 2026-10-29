@@ -1,9 +1,8 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 const green = "#193a32";
 const ink = "#1c322b";
 const ivory = "#f8f6f1";
-const sage = "#87988b";
 const serif = '"Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif';
 const latin =
   '"Cormorant Garamond", "Iowan Old Style", "Baskerville", Georgia, serif';

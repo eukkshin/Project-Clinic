@@ -1,13 +1,16 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import * as S from '@/assets/css/components/about/brand/BrandEditorial.styles';
-import BrandEditorialMotion from '@/components/about/brand/BrandEditorialMotion';
-import { isAboutLinkActive, useAboutNavigation } from '@/lib/navigation/aboutNavigation';
+import * as S from "@/components/about/brand/BrandEditorial.styles";
+import BrandEditorialMotion from "@/components/about/brand/BrandEditorialMotion";
+import {
+  isAboutLinkActive,
+  useAboutNavigation,
+} from "@/lib/navigation/aboutNavigation";
 
 /**
  * AHN'S BRAND / 2026 editorial redesign

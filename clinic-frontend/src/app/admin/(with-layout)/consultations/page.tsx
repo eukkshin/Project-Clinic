@@ -1,10 +1,12 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
+import * as Pagination from "@/styles/pagination";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiCheck, FiSearch, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Consult.styles";
 import { Temporal } from "@js-temporal/polyfill";
 
 //임시데이터 인터페이스
@@ -28,9 +30,7 @@ export default function ConsultationsPage() {
 
   const fetchConsults = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/consult",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/consult`);
       if (response.data.success) {
         setConsultList(response.data.data);
       }
@@ -61,9 +61,7 @@ export default function ConsultationsPage() {
 
   const toggleStatus = async (id: number) => {
     try {
-      const response = await axios.put(
-        `http://localhost:4000/api/admin/consult/${id}/status`,
-      );
+      await axios.put(`${API_ORIGIN}/api/admin/consult/${id}/status`);
       fetchConsults();
     } catch (error) {
       console.error("상담 상태 변경 에러: ", error);
@@ -82,9 +80,7 @@ export default function ConsultationsPage() {
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
     try {
-      const response = await axios.delete(
-        `http://localhost:4000/api/admin/consult/${deleteTargetId}`,
-      );
+      await axios.delete(`${API_ORIGIN}/api/admin/consult/${deleteTargetId}`);
       setIsPopupOpen(false);
       fetchConsults();
     } catch (error) {
@@ -218,19 +214,19 @@ export default function ConsultationsPage() {
             </S.ConsultTable>
           </S.ConsultTableWrapper>
           {totalPage >= 1 && (
-            <S.Pagenation>
+            <Pagination.Pagenation>
               {Array.from({ length: totalPage }, (_, i) => i + 1).map(
                 (page) => (
-                  <S.PagenationBtn
+                  <Pagination.PagenationBtn
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     $active={currentPage === page}
                   >
                     {page}
-                  </S.PagenationBtn>
+                  </Pagination.PagenationBtn>
                 ),
               )}
-            </S.Pagenation>
+            </Pagination.Pagenation>
           )}
         </S.ConsultTableCard>
       </S.ConsultContainer>

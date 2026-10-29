@@ -1,10 +1,13 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import * as S from '@/assets/css/components/about/AboutPages.styles';
-import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
+import * as S from "@/components/about/pages/AboutPages.styles";
+import {
+  AboutBottom,
+  AboutFrame,
+} from "@/components/about/shared/AboutFoundation";
 
 const beliefs = [
   {

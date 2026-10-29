@@ -1,5 +1,5 @@
-import { detailApi } from '@/lib/adminDetailApi';
-import { getProcedureSectionTemplate } from '@/lib/detail/procedureSectionTemplates';
+import { detailApi } from "@/lib/admin/detailApi";
+import { getProcedureSectionTemplate } from "@/lib/detail/procedureSectionTemplates";
 
 import type {
   DetailPage,

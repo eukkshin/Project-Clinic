@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { API_ORIGIN } from "@/lib/api/config";
+import { useEffect, useState } from "react";
 
 /**
  * Header와 브랜드 페이지 내부 메뉴의 공통 규칙.
@@ -134,7 +135,7 @@ export function useAboutNavigation(): AboutLink[] {
 
   useEffect(() => {
     const controller = new AbortController();
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+    const apiUrl = API_ORIGIN;
 
     async function load() {
       try {

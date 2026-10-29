@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 /*
  * Header.styles.ts — Sage/Forest editorial navigation
@@ -118,37 +118,6 @@ export const NavGroup = styled.nav`
 
   @media (max-width: 1200px) {
     display: none;
-  }
-`;
-export const NavLink = styled.a<{ $active: boolean }>`
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding: 12px 0;
-  white-space: nowrap;
-  color: inherit;
-  font-size: 13px;
-  font-weight: 400;
-  text-decoration: none;
-  letter-spacing: -0.015em;
-  transition: opacity 0.25s ease;
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 5px;
-    width: 100%;
-    height: 1px;
-    background: currentColor;
-    transform-origin: left;
-    transform: scaleX(${({ $active }) => ($active ? 1 : 0)});
-    transition: transform 0.3s ease;
-  }
-  &:hover::after {
-    transform: scaleX(1);
-  }
-  &:hover {
-    opacity: 0.78;
   }
 `;
 export const UtilGroup = styled.div`

@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css, keyframes } from "styled-components";
 
 // 전체 사이트에서 사용할 '밝은 세이지 그린' 기준 색상.
 // 나중에는 프로젝트 공통 theme 파일로 옮기면 색상을 한꺼번에 바꿀 수 있다.
@@ -77,12 +77,23 @@ export const VisualFrame = styled.div`
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    background: linear-gradient(110deg, transparent 30%, rgba(250,255,244,.08) 48%, transparent 67%);
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgba(250, 255, 244, 0.08) 48%,
+      transparent 67%
+    );
     transform: translateX(-110%);
-    transition: transform 1.8s cubic-bezier(.2,.7,.1,1);
+    transition: transform 1.8s cubic-bezier(0.2, 0.7, 0.1, 1);
   }
-  ${SlideLink}:hover &::after { transform: translateX(110%); }
-  @media (prefers-reduced-motion: reduce) { &::after { display: none; } }
+  ${SlideLink}:hover &::after {
+    transform: translateX(110%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
   inset: 0;
   z-index: 1;
   overflow: hidden;
@@ -128,14 +139,21 @@ export const ImageOverlay = styled.div`
   pointer-events: none;
   /* Text stays legible while the model retains photographic contrast. */
   background:
-    linear-gradient(90deg,
-      rgba(248, 247, 235, .86) 0%,
-      rgba(248, 247, 235, .70) 20%,
-      rgba(244, 246, 233, .23) 50%,
-      transparent 76%),
-    linear-gradient(0deg, rgba(241, 245, 233, .50), transparent 29%);
+    linear-gradient(
+      90deg,
+      rgba(248, 247, 235, 0.86) 0%,
+      rgba(248, 247, 235, 0.7) 20%,
+      rgba(244, 246, 233, 0.23) 50%,
+      transparent 76%
+    ),
+    linear-gradient(0deg, rgba(241, 245, 233, 0.5), transparent 29%);
   @media (max-width: 768px) {
-    background: linear-gradient(90deg, rgba(248,247,236,.90), rgba(248,247,236,.40) 70%, transparent);
+    background: linear-gradient(
+      90deg,
+      rgba(248, 247, 236, 0.9),
+      rgba(248, 247, 236, 0.4) 70%,
+      transparent
+    );
   }
 `;
 
@@ -152,10 +170,12 @@ export const SlideContent = styled.div<{ $withRollingBanner?: boolean }>`
   pointer-events: none; /* 화면 전체를 감싸는 SlideLink가 클릭을 받는다. */
 
   /* 롤링 배너가 있어도 메인 타이틀/설명/링크를 숨기지 않는다. */
-  ${({ $withRollingBanner }) => $withRollingBanner && css`
-    top: 45%;
-    width: min(49vw, 760px);
-  `}
+  ${({ $withRollingBanner }) =>
+    $withRollingBanner &&
+    css`
+      top: 45%;
+      width: min(49vw, 760px);
+    `}
 
   @media (max-width: 768px) {
     top: 47%;
@@ -176,14 +196,17 @@ export const Eyebrow = styled.div`
   color: #3f5844;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: .24em;
-  @media(max-width:768px){font-size:9px; letter-spacing:.14em;}
+  letter-spacing: 0.24em;
+  @media (max-width: 768px) {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
 `;
 
 export const EyebrowLine = styled.span`
   width: 28px;
   height: 1px;
-  background: rgba(53, 85, 58, .58);
+  background: rgba(53, 85, 58, 0.58);
 `;
 
 /** DB에 저장한 슬라이드별 문구는 브랜드 타이틀 아래에 보조 설명으로 노출한다. */
@@ -194,7 +217,7 @@ export const SlideTitle = styled.p`
   font-weight: 500;
   color: #36543d;
   line-height: 1.65;
-  letter-spacing: -.025em;
+  letter-spacing: -0.025em;
   word-break: keep-all;
 `;
 
@@ -206,21 +229,27 @@ export const HeroEditorialTitle = styled.h1`
   font-family: var(--ahns-display, Georgia, serif);
   font-weight: 400;
   font-size: clamp(64px, 7.2vw, 136px);
-  line-height: .92;
-  letter-spacing: -.058em;
+  line-height: 0.92;
+  letter-spacing: -0.058em;
   color: #254433;
   white-space: nowrap;
-  span { display: block; }
+  span {
+    display: block;
+  }
   em {
     display: block;
     margin-left: clamp(32px, 4.5vw, 82px);
-    font-size: .88em;
+    font-size: 0.88em;
     font-style: italic;
     color: #69846b;
     font-weight: 400;
   }
-  @media(max-width:900px){font-size:clamp(52px,8vw,90px);}
-  @media(max-width:768px){font-size:clamp(44px,10vw,76px);}
+  @media (max-width: 900px) {
+    font-size: clamp(52px, 8vw, 90px);
+  }
+  @media (max-width: 768px) {
+    font-size: clamp(44px, 10vw, 76px);
+  }
 `;
 
 export const SlideDescription = styled.p`
@@ -242,10 +271,15 @@ export const ExploreLink = styled.div`
   color: #254433;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: .2em;
-  transition: gap .28s ease;
-  span { font-size: 17px; font-weight: 400; }
-  ${SlideLink}:hover & { gap: 26px; }
+  letter-spacing: 0.2em;
+  transition: gap 0.28s ease;
+  span {
+    font-size: 17px;
+    font-weight: 400;
+  }
+  ${SlideLink}:hover & {
+    gap: 26px;
+  }
 `;
 
 export const BottomControls = styled.div`
@@ -405,7 +439,12 @@ export const FocusVeil = styled.div`
   inset: 0;
   opacity: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(231,239,224,.60) 0%, #e2e9dc 58%, #f7f4ea 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(231, 239, 224, 0.6) 0%,
+    #e2e9dc 58%,
+    #f7f4ea 100%
+  );
 
   /*
    * 모바일/움직임 줄이기 환경에서는 Hero를 pin하지 않으므로
@@ -447,10 +486,22 @@ export const ColorMatchOverlay = styled.div`
   /* Soft garden-shadow backdrop: the tail matches the shared ivory canvas. */
   background-image:
     url("/images/ahns-editorial-shadows.webp"),
-    radial-gradient(ellipse at 18% 24%, rgba(150, 171, 143, .35), transparent 64%),
-    radial-gradient(ellipse at 85% 78%, rgba(236, 226, 200, .55), transparent 62%),
+    radial-gradient(
+      ellipse at 18% 24%,
+      rgba(150, 171, 143, 0.35),
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse at 85% 78%,
+      rgba(236, 226, 200, 0.55),
+      transparent 62%
+    ),
     linear-gradient(180deg, #c7d2c1 0%, #e2e5d8 49%, #f7f4ea 100%);
-  background-size: min(1850px, 125vw) auto, 100% 100%, 100% 100%, 100% 100%;
+  background-size:
+    min(1850px, 125vw) auto,
+    100% 100%,
+    100% 100%,
+    100% 100%;
   background-position: center top;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
 
@@ -611,7 +662,7 @@ export const HeroRollingOverlay = styled.div`
   height: auto;
   overflow: hidden;
   pointer-events: none;
-  opacity: .38;
+  opacity: 0.38;
   color: #294734;
 
   /* RollingBanner 최상위 박스가 기존 독립 섹션의 넓은 여백/배경을
@@ -628,6 +679,6 @@ export const HeroRollingOverlay = styled.div`
     top: auto;
     bottom: 90px;
     height: auto;
-    opacity: .28;
+    opacity: 0.28;
   }
 `;

@@ -1,12 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
-    FiBookOpen, FiFileText, FiHelpCircle, FiImage, FiLayers, FiList, FiMessageCircle, FiStar, FiX
-} from 'react-icons/fi';
+  FiBookOpen,
+  FiFileText,
+  FiHelpCircle,
+  FiImage,
+  FiLayers,
+  FiList,
+  FiMessageCircle,
+  FiStar,
+  FiX,
+} from "react-icons/fi";
 
-import * as S from '@/assets/css/components/detail/DetailSideNav.styles';
+import * as S from "@/components/procedures/DetailSideNav.styles";
 
 import type { DetailSectionType } from "@/types/detail";
 

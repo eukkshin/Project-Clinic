@@ -42,6 +42,6 @@ export const ProgressFill = styled.div`
   transform: scaleX(0);
   transform-origin: left center;
   background: linear-gradient(90deg, #cad9bb, #6f9778, #244535);
-  box-shadow: 0 0 14px rgba(130, 173, 137, .5);
+  box-shadow: 0 0 14px rgba(130, 173, 137, 0.5);
   will-change: transform;
 `;

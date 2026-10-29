@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from "@/assets/css/components/dropdown/AccountDropdown.styles";
+import * as S from "@/components/dropdown/AccountDropdown.styles";
 
-import { Popup } from "../modal/Popup";
+import { Popup } from "@/components/ui/Popup";
 
 interface AccountDropdownProps {
   userName: string;

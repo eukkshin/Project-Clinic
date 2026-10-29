@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Root = styled.details`
   padding: 0 0 12px 38px;

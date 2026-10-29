@@ -1,7 +1,7 @@
 "use client";
 
-import { NoseDetailTheme } from '@/assets/css/components/detail/NoseDetail.styles';
-import DetailLayout from '@/components/detail/DetailLayout';
+import DetailLayout from "@/components/procedures/DetailLayout";
+import { NoseDetailTheme } from "@/components/procedures/NoseDetail.styles";
 
 import type { DetailPageData } from "@/types/detail";
 

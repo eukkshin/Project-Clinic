@@ -1,18 +1,14 @@
 import styled from "styled-components";
 
 import {
-  BlueButtonTheme,
-  BoxShadow,
   ButtonBasic,
-  FlexBetween,
   FlexCenter,
   FlexColumn,
   LinearGradient,
   TextCenter,
   TextLeft,
-  TextRight,
   TransitionAll,
-} from "@/assets/css/Common.styles";
+} from "@/styles/mixins";
 
 export const PwWrapper = styled.div`
   ${LinearGradient};

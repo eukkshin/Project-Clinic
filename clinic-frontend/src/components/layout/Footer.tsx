@@ -1,18 +1,17 @@
 "use client";
 
-import axios from 'axios';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { usePathname } from 'next/navigation';
-import { ReactNode, useEffect, useRef, useState } from 'react';
-import { BsChatFill } from 'react-icons/bs';
-import { FaInstagram, FaRegCommentDots, FaYoutube } from 'react-icons/fa6';
-import { HiChat } from 'react-icons/hi';
-import { RiKakaoTalkLine } from 'react-icons/ri';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePathname } from "next/navigation";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { FaInstagram, FaRegCommentDots, FaYoutube } from "react-icons/fa6";
+import { RiKakaoTalkLine } from "react-icons/ri";
 
-import * as S from '@/assets/css/components/Footer.style';
+import * as S from "@/components/layout/Footer.styles";
 
-import HospitalMap from './HospitalMap';
+import HospitalMap from "./HospitalMap";
 
 /*
  * Footer.tsx — AHN'S FOOTER
@@ -62,7 +61,7 @@ interface FooterResponse {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 const INITIAL_COMPANY: CompanyInfo = {
   name: "",
   address: "",

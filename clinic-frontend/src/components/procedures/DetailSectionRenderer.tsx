@@ -1,15 +1,24 @@
 "use client";
 
-import { useRef } from 'react';
+import { useRef } from "react";
 import {
-    FiArrowRight, FiCheckCircle, FiChevronLeft, FiChevronRight, FiCompass, FiEye, FiFeather,
-    FiHeart, FiMessageCircle, FiShield, FiUserCheck
-} from 'react-icons/fi';
+  FiArrowRight,
+  FiCheckCircle,
+  FiChevronLeft,
+  FiChevronRight,
+  FiCompass,
+  FiEye,
+  FiFeather,
+  FiHeart,
+  FiMessageCircle,
+  FiShield,
+  FiUserCheck,
+} from "react-icons/fi";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
-import * as V from '@/assets/css/components/detail/DetailSectionLayouts.styles';
-import DetailImage from '@/components/detail/DetailImage';
-import { Accordion } from '@/components/QuaAccordion/Accordion';
+import DetailImage from "@/components/procedures/DetailImage";
+import * as S from "@/components/procedures/DetailPage.styles";
+import * as V from "@/components/procedures/DetailSectionLayouts.styles";
+import { Accordion } from "@/components/ui/Accordion";
 
 import type { DetailSectionData } from "@/types/detail";
 interface Props {

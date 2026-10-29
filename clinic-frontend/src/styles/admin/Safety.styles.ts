@@ -1,6 +1,18 @@
 import styled from "styled-components";
+import {
+  adminAddButtonCss,
+  adminCardTitleCss,
+  adminDeleteBtnCss,
+  adminForestPageTitleCss,
+  adminBorderedCardHeaderCss,
+  adminInputCss,
+  adminLabelCss,
+  adminColumnCss,
+  adminPageHeaderCss,
+  adminTableWrapperCss,
+} from "./shared";
 
-import { FlexBetween, FlexCenter, TransitionAll } from "../Common.styles";
+import { FlexCenter, TransitionAll } from "@/styles/mixins";
 
 // -----------------------------------------
 // 🎯 안전시스템 관리 (AdminSafety) 전용 스타일
@@ -11,15 +23,11 @@ export const AdminSafetyContainer = styled.div`
 `;
 
 export const AdminSafetyPageHeader = styled.div`
-  ${FlexBetween}
-  margin-bottom: 1.5rem;
+  ${adminPageHeaderCss}
 `;
 
 export const AdminSafetyPageTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #34453c;
-  font-weight: 700;
-  margin: 0;
+  ${adminForestPageTitleCss}
 `;
 
 export const AdminSafetySaveButton = styled.button`
@@ -53,13 +61,11 @@ export const AdminSafetyGrid = styled.div`
 `;
 
 export const AdminSafetyLeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${adminColumnCss}
 `;
 
 export const AdminSafetyRightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${adminColumnCss}
 `;
 
 export const AdminSafetyCard = styled.div`
@@ -71,15 +77,11 @@ export const AdminSafetyCard = styled.div`
 `;
 
 export const AdminSafetyCardHeader = styled.div`
-  background-color: #f7f9f7;
-  border-bottom: 1px solid #e4eae5;
-  padding: 1rem 1.25rem;
+  ${adminBorderedCardHeaderCss}
 `;
 
 export const AdminSafetyCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const AdminSafetyCardBody = styled.div`
@@ -92,27 +94,11 @@ export const AdminSafetyFormGroup = styled.div`
 `;
 
 export const AdminSafetyLabel = styled.label`
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #34453c;
-  margin-bottom: 0.5rem;
+  ${adminLabelCss}
 `;
 
 export const AdminSafetyInput = styled.input`
-  width: 100%;
-  padding: 0.6rem 1rem;
-  font-size: 0.9rem;
-  color: #34453c;
-  background-color: #fff;
-  border: 1px solid #d6e0d8;
-  border-radius: 12px;
-  outline: none;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: #1b4d3e;
-  }
+  ${adminInputCss}
 `;
 
 // 💡 상세 설명을 위한 Textarea 컴포넌트 추가
@@ -186,30 +172,11 @@ export const AdminSafetyPreviewRect = styled.div`
 `;
 
 export const AdminSafetyAddButton = styled.button`
-  border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #34453c;
-  padding: 1rem;
-  width: 100%;
-  border-radius: 12px;
-  font-weight: 600;
-  ${TransitionAll};
-  ${FlexCenter}
-  gap: 0.5rem;
-  background-color: #f7f9f7;
-  flex-shrink: 0;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #fff;
-    border-color: #1b4d3e;
-    color: #1b4d3e;
-  }
+  ${adminAddButtonCss}
 `;
 
 export const AdminSafetyTableWrapper = styled.div`
-  width: 100%;
-  overflow-x: auto;
-  padding: 1rem;
+  ${adminTableWrapperCss}
 `;
 
 export const AdminSafetyTable = styled.table`
@@ -295,22 +262,5 @@ export const AdminSafetyActionBtn = styled.button`
 `;
 
 export const AdminSafetyDeleteBtn = styled.button`
-  background: transparent;
-  border: none;
-  color: #bf6059;
-  cursor: pointer;
-  ${FlexCenter}
-  ${TransitionAll};
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-
-  margin: 0 auto;
-  flex-shrink: 0;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #fff0ee;
-    color: #ff4d4f;
-  }
+  ${adminDeleteBtnCss}
 `;

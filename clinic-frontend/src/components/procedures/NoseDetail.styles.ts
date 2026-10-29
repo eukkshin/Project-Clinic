@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
-import * as V from '@/assets/css/components/detail/DetailSectionLayouts.styles';
+import * as S from "@/components/procedures/DetailPage.styles";
+import * as V from "@/components/procedures/DetailSectionLayouts.styles";
 
 /**
  * 코성형 전용 디자인 레이어. 기존 Hero/SideNav/섹션 구현 파일을 수정하지 않습니다.

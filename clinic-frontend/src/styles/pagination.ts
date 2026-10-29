@@ -1,7 +1,6 @@
-import Link from "next/link";
 import styled from "styled-components";
 
-import { FlexCenter, TextShadow } from "../Common.styles";
+import { FlexCenter } from "@/styles/mixins";
 
 export const Pagenation = styled.div`
   ${FlexCenter}
@@ -62,28 +61,4 @@ export const Next = styled.button`
   &:hover:not(:disabled) {
     background-color: #f5f5f5;
   }
-`;
-
-export const SlideCopy = styled.div`
-  position: absolute;
-  top: 20%;
-  left: 15%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 2.5rem;
-  font-weight: bold;
-  ${TextShadow}
-  z-index: 10;
-  text-align: center;
-`;
-
-export const PopupLink = styled(Link)<{ $hasLink: boolean }>`
-  display: block;
-  cursor: ${({ $hasLink }) => ($hasLink ? "pointer" : "default")};
-  text-decoration: none;
-`;
-
-export const PopupImage = styled.img`
-  width: 100%;
-  display: block;
 `;

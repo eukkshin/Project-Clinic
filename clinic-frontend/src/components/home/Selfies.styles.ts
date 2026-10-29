@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 /**
  * 홈페이지 전반에서 쓰는 같은 색상이다.
@@ -218,11 +218,15 @@ export const CardSlot = styled.article`
   width: clamp(230px, 23vw, 390px);
   scroll-snap-align: start;
 
-  &:nth-child(even) { padding-top: 0; }
+  &:nth-child(even) {
+    padding-top: 0;
+  }
 
   @media (max-width: 768px) {
     width: min(76vw, 370px);
-    &:nth-child(even) { padding-top: 0; }
+    &:nth-child(even) {
+      padding-top: 0;
+    }
   }
 `;
 
@@ -254,16 +258,20 @@ export const PhotoFrame = styled.div`
     z-index: 3;
     inset: 14px;
     pointer-events: none;
-    border: 1px solid rgba(255,255,255,.0);
-    transform: scale(.97);
-    transition: border-color .55s ease, transform .65s cubic-bezier(.2,.75,.2,1);
+    border: 1px solid rgba(255, 255, 255, 0);
+    transform: scale(0.97);
+    transition:
+      border-color 0.55s ease,
+      transform 0.65s cubic-bezier(0.2, 0.75, 0.2, 1);
   }
   ${PhotoButton}:hover &::after, ${PhotoButton}:focus-visible &::after {
-    border-color: rgba(255,255,255,.65);
+    border-color: rgba(255, 255, 255, 0.65);
     transform: scale(1);
   }
   @media (prefers-reduced-motion: reduce) {
-    &::after { transition: none; }
+    &::after {
+      transition: none;
+    }
   }
   width: 100%;
   aspect-ratio: 1 / 1.12;

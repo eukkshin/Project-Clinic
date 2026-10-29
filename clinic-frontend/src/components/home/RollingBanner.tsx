@@ -1,6 +1,6 @@
 "use client";
 
-import * as S from "@/assets/css/components/RollingBanner.styles";
+import * as S from "@/components/home/RollingBanner.styles";
 
 // 배너에 반복해서 표시할 브랜드 문구
 const TEXT = "Ahn's Plastic Surgery";

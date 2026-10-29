@@ -1,12 +1,10 @@
 "use client";
 
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
-import { usePathname } from 'next/navigation';
-import { ReactNode, useEffect } from 'react';
-
-import HospitalMap from './HospitalMap';
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import { usePathname } from "next/navigation";
+import { ReactNode, useEffect } from "react";
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const pathname = usePathname();

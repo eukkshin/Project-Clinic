@@ -1,13 +1,14 @@
 "use client";
 
-import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { API_ORIGIN } from "@/lib/api/config";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-import { HeaderNavMenu, mergePublishedProcedureMenus, PublicProcedureLink } from './procedureNav';
-
-const API_ORIGIN = (
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
-).replace(/\/$/, "");
+import {
+  HeaderNavMenu,
+  mergePublishedProcedureMenus,
+  PublicProcedureLink,
+} from "./procedureNav";
 
 /** 관리자 메뉴는 그대로 읽고, 공개 시술만 동적으로 덧입힌다. */
 export function usePublishedProcedureMenus<T extends HeaderNavMenu>(

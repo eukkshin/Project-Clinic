@@ -1,8 +1,8 @@
 "use client";
 /// <reference types="kakao.maps.d.ts" />
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import * as S from '@/assets/css/components/Footer.style';
+import * as S from "@/components/layout/Footer.styles";
 
 /*
  * HospitalMap.tsx

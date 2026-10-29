@@ -1,5 +1,5 @@
+import PhilosophyPage from "@/components/about/pages/PhilosophyPage";
 import type { Metadata } from "next";
-import PhilosophyPage from '@/components/about/pages/PhilosophyPage';
 
 export const metadata: Metadata = {
   title: "진료 철학 | AHN'S",

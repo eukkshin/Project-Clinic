@@ -1,4 +1,5 @@
-import axios from 'axios';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
 
 import type {
   DetailCategory,
@@ -11,7 +12,7 @@ import type {
 
 /** HttpOnly 관리자 세션 쿠키를 브라우저가 보내도록 withCredentials 사용. */
 const client = axios.create({
-  baseURL: `${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/$/, "")}/api/admin/detail`,
+  baseURL: `${API_ORIGIN}/api/admin/detail`,
   withCredentials: true,
   timeout: 15000,
 });

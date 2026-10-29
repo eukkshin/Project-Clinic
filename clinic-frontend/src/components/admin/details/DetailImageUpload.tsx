@@ -1,10 +1,10 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from 'react';
-import { FiImage, FiUploadCloud } from 'react-icons/fi';
+import { ChangeEvent, useRef, useState } from "react";
+import { FiImage, FiUploadCloud } from "react-icons/fi";
 
-import * as S from '@/assets/css/admin/DetailImageUpload.styles';
-import { detailApi, detailErrorMessage } from '@/lib/adminDetailApi';
+import { detailApi, detailErrorMessage } from "@/lib/admin/detailApi";
+import * as S from "@/components/admin/details/DetailImageUpload.styles";
 
 type Props = {
   label: string;

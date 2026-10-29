@@ -9,7 +9,7 @@ import {
   FaXmark,
 } from "react-icons/fa6";
 
-import * as S from "@/assets/css/components/dropdown/HeaderSearch.styles";
+import * as S from "@/components/dropdown/HeaderSearch.styles";
 
 interface MenuItem {
   id: number;

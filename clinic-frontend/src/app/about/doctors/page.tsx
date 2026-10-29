@@ -1,5 +1,5 @@
+import DoctorsPage from "@/components/about/pages/DoctorsPage";
 import type { Metadata } from "next";
-import DoctorsPage from '@/components/about/pages/DoctorsPage';
 
 export const metadata: Metadata = {
   title: "의료진 소개 | AHN'S",

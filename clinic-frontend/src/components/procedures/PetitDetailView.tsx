@@ -1,7 +1,7 @@
 "use client";
 
-import { PetitDetailTheme } from '@/assets/css/components/detail/PetitDetail.styles';
-import DetailLayout from '@/components/detail/DetailLayout';
+import DetailLayout from "@/components/procedures/DetailLayout";
+import { PetitDetailTheme } from "@/components/procedures/PetitDetail.styles";
 
 import type { DetailPageData } from "@/types/detail";
 

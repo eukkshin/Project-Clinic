@@ -1,5 +1,6 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -7,14 +8,14 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import * as S from "@/assets/css/components/VlogSlider.styles";
+import * as S from "@/components/home/VlogSlider.styles";
 
 // ScrollTrigger는 GSAP 기본 애니메이션과 달리 스크롤 위치를 기준으로 실행하는 플러그인이다.
 // Hero/CategoryNav에서 이미 사용하더라도 모듈별로 등록해 두면 이 파일만 보아도 의존성을 알 수 있다.
 gsap.registerPlugin(ScrollTrigger);
 
 // 기존 Express 서버를 그대로 사용한다. 환경변수를 설정하면 배포 환경에서도 재사용할 수 있다.
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 /** [1] 기존 관리자 백엔드(GET /api/admin/vlogs)의 실제 컬럼명. */
 interface VlogApiItem {

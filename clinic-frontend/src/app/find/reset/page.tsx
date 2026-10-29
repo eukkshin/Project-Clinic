@@ -1,9 +1,10 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
-import * as S from "@/assets/css/Style.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/auth/FindPassword.styles";
 
 export default function ResetPwPage() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function ResetPwPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/reset-password", {
+      const response = await fetch(`${API_ORIGIN}/api/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

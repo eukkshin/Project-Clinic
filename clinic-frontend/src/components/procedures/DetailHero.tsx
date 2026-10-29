@@ -1,11 +1,11 @@
 "use client";
 
-import gsap from 'gsap';
-import { useEffect, useRef } from 'react';
-import { FiArrowDown, FiEye, FiMessageCircle, FiShield } from 'react-icons/fi';
+import gsap from "gsap";
+import { useEffect, useRef } from "react";
+import { FiArrowDown, FiEye, FiMessageCircle, FiShield } from "react-icons/fi";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
-import DetailImage from '@/components/detail/DetailImage';
+import DetailImage from "@/components/procedures/DetailImage";
+import * as S from "@/components/procedures/DetailPage.styles";
 
 import type { DetailHeroData } from "@/types/detail";
 interface Props {

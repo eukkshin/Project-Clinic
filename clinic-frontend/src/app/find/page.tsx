@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import * as S from "@/assets/css/Style.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/auth/FindPassword.styles";
 
 export default function ChangePwPage() {
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function ChangePwPage() {
 
     // try {
     //   const response = await fetch(
-    //     "http://127.0.0.1:4000/api/change-password",
+    //     `${API_ORIGIN}/api/change-password`,
     //     {
     //       method: "POST",
     //       headers: { "Content-Type": "application/json" },

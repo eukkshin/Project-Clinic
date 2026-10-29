@@ -1,12 +1,17 @@
 "use client";
 
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
+
+import { color, motion } from "@/styles/tokens";
 
 export const GlobalStyle = createGlobalStyle`
 :root {
   --ahns-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --ahns-body: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --color-brand: ${color.brand.primary};
+  --color-ink: ${color.brand.ink};
+  --color-cream: ${color.canvas.cream};
 }
 
 html.lenis, html.lenis body {
@@ -58,8 +63,8 @@ ul, ol, li {
 }
 
 ::selection {
-    background-color: #69826B;
-    color: #F5F2E9;
+    background-color: ${color.brand.primary};
+    color: ${color.canvas.cream};
 }
   
 html {
@@ -68,7 +73,7 @@ html {
 
 html, body {
     scrollbar-width: thin;
-    scrollbar-color: #69826B #F5F2E9;
+    scrollbar-color: ${color.brand.primary} ${color.canvas.cream};
 }
 
 html::-webkit-scrollbar {
@@ -77,18 +82,18 @@ html::-webkit-scrollbar {
 }
 
 html::-webkit-scrollbar-track {
-    background-color: #F5F2E9 !important;
+    background-color: ${color.canvas.cream} !important;
 }
 
 html::-webkit-scrollbar-thumb {
-    background-color: #69826B !important;
+    background-color: ${color.brand.primary} !important;
     border-radius: 10px;
-    border: 2px solid #F5F2E9;
+    border: 2px solid ${color.canvas.cream};
     background-clip: padding-box;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color ${motion.fast};
 }
 
 html::-webkit-scrollbar-thumb:hover {
-    background-color: #244535 !important;
+    background-color: ${color.brand.ink} !important;
 }
 `;

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 
-import * as S from '@/assets/css/components/dropdown/MobileProcedureSubmenu.styles';
+import * as S from "@/components/dropdown/MobileProcedureSubmenu.styles";
 
 interface Props {
   items: { name: string; url: string }[];

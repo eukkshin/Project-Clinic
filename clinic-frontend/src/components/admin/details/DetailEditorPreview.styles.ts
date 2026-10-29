@@ -1,9 +1,9 @@
 "use client";
 
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import * as D from '@/assets/css/components/detail/DetailPage.styles';
-import * as V from '@/assets/css/components/detail/DetailSectionLayouts.styles';
+import * as D from "@/components/procedures/DetailPage.styles";
+import * as V from "@/components/procedures/DetailSectionLayouts.styles";
 
 export const Wrapper = styled.div`
   width: 100%;

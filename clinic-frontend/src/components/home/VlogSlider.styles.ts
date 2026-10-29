@@ -1,10 +1,4 @@
 import styled from "styled-components";
-
-/**
- * 영상 섹션의 색상은 이전 CircularOverlay 섹션 마지막 색인 #F7F4EA부터 시작한다.
- * 무겁고 검은색으로 화면을 전부 덮지 않고, 사진 영역만 어둡게 해서 영화 같은 대비를 준다.
- */
-const IVORY = "#F7F4EA";
 const DARK = "#344638";
 const SAGE = "#7F987F";
 
@@ -137,7 +131,7 @@ export const HeaderSignature = styled.span`
  */
 export const CinemaLayout = styled.div`
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(290px, .85fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(290px, 0.85fr);
   gap: clamp(24px, 3.1vw, 54px);
   align-items: start;
 
@@ -160,14 +154,19 @@ export const Stage = styled.div`
   overflow: hidden;
   border-radius: 3px;
   background: #879c8a;
-  transition: box-shadow .6s ease;
-  &:hover { box-shadow: 0 28px 68px rgba(27,53,40,.15); }
-  @media (prefers-reduced-motion: reduce) { transition: none; }
+  transition: box-shadow 0.6s ease;
+  &:hover {
+    box-shadow: 0 28px 68px rgba(27, 53, 40, 0.15);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   /* Next/Image fill이 삽입하는 img를 배경으로 사용한다. */
   > img {
     z-index: -2;
-    transition: transform 1000ms cubic-bezier(0.2, 0.7, 0.1, 1),
+    transition:
+      transform 1000ms cubic-bezier(0.2, 0.7, 0.1, 1),
       filter 1000ms ease;
   }
   &:hover > img {

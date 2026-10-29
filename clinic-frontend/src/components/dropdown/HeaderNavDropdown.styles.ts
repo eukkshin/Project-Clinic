@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 /** Header와 같은 높이를 차지해 패널이 Header 하단에서 시작하도록 한다. */
 export const NavRoot = styled.div`
@@ -13,17 +13,6 @@ export const NavRoot = styled.div`
   &:focus-within {
     z-index: 3;
   }
-`;
-
-export const Chevron = styled.span<{ $open: boolean }>`
-  display: inline-block;
-  margin-left: 7px;
-  font-size: 14px;
-  line-height: 1;
-  opacity: 0.65;
-  transform: translateY(-2px)
-    rotate(${({ $open }) => ($open ? "180deg" : "0deg")});
-  transition: transform 0.3s ease;
 `;
 
 export const NavTrigger = styled.button<{ $active: boolean; $open: boolean }>`

@@ -1,22 +1,23 @@
 "use client";
 import styled from "styled-components";
+import {
+  adminCardHeaderCss,
+  adminPageHeaderCss,
+  adminPageTitleCss,
+} from "./shared";
 
-import { FlexBetween } from "@/assets/css/Common.styles";
+import { FlexBetween } from "@/styles/mixins";
 
 export const DashContainer = styled.div`
   width: 100%;
 `;
 
 export const DashHeader = styled.div`
-  ${FlexBetween}
-  margin-bottom: 1.5rem;
+  ${adminPageHeaderCss}
 `;
 
 export const DashTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #5a5c69;
-  font-weight: 700;
-  margin: 0;
+  ${adminPageTitleCss}
 `;
 
 // --- 상단 4개 요약 카드 ---
@@ -87,9 +88,7 @@ export const ChartCard = styled.div`
 `;
 
 export const ChartHeader = styled.div`
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
-  padding: 1rem 1.25rem;
+  ${adminCardHeaderCss}
 `;
 
 export const ChartTitle = styled.h6`

@@ -1,13 +1,14 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
-import * as S from "@/assets/css/components/EventPopup.styles";
+import * as S from "@/components/ui/EventPopup.styles";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 /** 관리자 GET /api/admin/popups에서 내려오는 원본 DB 데이터 형식 */
 interface PopupApiItem {

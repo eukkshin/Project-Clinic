@@ -1,3 +1,4 @@
+import { API_ORIGIN } from "@/lib/api/config";
 import type { CommunityKind } from "./config";
 
 export interface CommunityEntry {
@@ -17,9 +18,7 @@ export type CommunityResult = {
   entries: CommunityEntry[];
 };
 
-const API = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
-).replace(/\/$/, "");
+const API = API_ORIGIN;
 
 /**
  * Existing endpoints confirmed from the provided frontend source.

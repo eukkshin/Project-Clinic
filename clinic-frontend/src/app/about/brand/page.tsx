@@ -1,5 +1,5 @@
+import BrandEditorial from "@/components/about/brand/BrandEditorial";
 import type { Metadata } from "next";
-import BrandEditorial from '@/components/about/brand/BrandEditorial';
 
 export const metadata: Metadata = {
   title: "브랜드 소개 | AHN'S",

@@ -1,6 +1,12 @@
 import styled from "styled-components";
+import {
+  adminCardHeaderCss,
+  adminCardTitleCss,
+  adminPageHeaderCss,
+  adminPageTitleCss,
+} from "./shared";
 
-import { FlexBetween, FlexCenter, TransitionAll } from "../Common.styles";
+import { FlexCenter, TransitionAll } from "@/styles/mixins";
 
 // -----------------------------------------
 // 🎯 회원 관리 (Users) 전용 스타일
@@ -11,15 +17,11 @@ export const UserContainer = styled.div`
 `;
 
 export const UserPageHeader = styled.div`
-  ${FlexBetween}
-  margin-bottom: 1.5rem;
+  ${adminPageHeaderCss}
 `;
 
 export const UserPageTitle = styled.h1`
-  font-size: 1.5rem;
-  color: #5a5c69;
-  font-weight: 700;
-  margin: 0;
+  ${adminPageTitleCss}
 `;
 
 export const UserFilterCard = styled.div`
@@ -79,15 +81,11 @@ export const UserTableCard = styled.div`
 `;
 
 export const UserCardHeader = styled.div`
-  background-color: #f8f9fc;
-  border-bottom: 1px solid #e3e6f0;
-  padding: 1rem 1.25rem;
+  ${adminCardHeaderCss}
 `;
 
 export const UserCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 
 export const UserTableWrapper = styled.div`

@@ -1,9 +1,9 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
+import Link from "next/link";
+import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from '@/assets/css/components/dropdown/HeaderNavDropdown.styles';
+import * as S from "@/components/dropdown/HeaderNavDropdown.styles";
 
 export interface NavSubmenuItem {
   name: string;

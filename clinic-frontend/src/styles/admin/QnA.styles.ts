@@ -5,7 +5,7 @@ import {
   FlexBetween,
   FlexCenter,
   TransitionAll,
-} from "../Common.styles";
+} from "@/styles/mixins";
 
 // VLOG 관리자와 동일한 패널 / 타이포그래피 / 폼 / 테이블 디자인입니다.
 // 기존 QnA CRUD, 카테고리, 순서 변경을 위해 필요한 컴포넌트는 별도로 유지합니다.
@@ -50,8 +50,13 @@ export const AdminQnASaveButton = styled.button`
   box-shadow: 0 0.125rem 0.25rem rgba(58, 59, 69, 0.2);
   transition: background-color 0.2s;
 
-  &:hover { background-color: #246652; }
-  &:focus-visible { outline: 2px solid #69826b; outline-offset: 3px; }
+  &:hover {
+    background-color: #246652;
+  }
+  &:focus-visible {
+    outline: 2px solid #69826b;
+    outline-offset: 3px;
+  }
 `;
 
 export const AdminQnAGrid = styled.div`
@@ -59,7 +64,9 @@ export const AdminQnAGrid = styled.div`
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
   gap: 1.5rem;
 
-  @media (max-width: 1200px) { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 `;
 
 export const AdminQnALeftColumn = styled.div`
@@ -95,7 +102,9 @@ export const AdminQnACardHeader = styled.div`
   border-bottom: 1px solid #e4eae5;
   background-color: #f7f9f7;
 
-  @media (max-width: 600px) { flex-wrap: wrap; }
+  @media (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 `;
 
 export const AdminQnACardTitle = styled.h6`
@@ -186,7 +195,10 @@ export const AdminQnACategoryAddButton = styled.button`
   cursor: pointer;
   ${TransitionAll}
 
-  &:hover { background: #e8eeea; border-color: #1b4d3e; }
+  &:hover {
+    background: #e8eeea;
+    border-color: #1b4d3e;
+  }
 `;
 
 export const AdminQnAButtonWrapper = styled.div`
@@ -195,7 +207,9 @@ export const AdminQnAButtonWrapper = styled.div`
   gap: 0.7rem;
   flex-wrap: wrap;
 
-  > button { flex: 1 1 140px; }
+  > button {
+    flex: 1 1 140px;
+  }
 `;
 
 export const AdminQnAAddButton = styled.button`
@@ -211,7 +225,11 @@ export const AdminQnAAddButton = styled.button`
   cursor: pointer;
   ${TransitionAll}
 
-  &:hover { background-color: #fff; border-color: #1b4d3e; color: #1b4d3e; }
+  &:hover {
+    background-color: #fff;
+    border-color: #1b4d3e;
+    color: #1b4d3e;
+  }
 `;
 
 export const AdminQnACancelButton = styled.button`
@@ -228,7 +246,10 @@ export const AdminQnACancelButton = styled.button`
   cursor: pointer;
   ${TransitionAll}
 
-  &:hover { background: #e8eeea; color: #34453c; }
+  &:hover {
+    background: #e8eeea;
+    color: #34453c;
+  }
 `;
 
 export const AdminQnATableHeaderSelect = styled.select`
@@ -242,7 +263,9 @@ export const AdminQnATableHeaderSelect = styled.select`
   font-size: 0.82rem;
   outline: none;
   cursor: pointer;
-  &:focus { border-color: #1b4d3e; }
+  &:focus {
+    border-color: #1b4d3e;
+  }
 `;
 
 export const AdminQnATableWrapper = styled.div`
@@ -322,8 +345,14 @@ export const AdminQnAActionBtn = styled.button`
   cursor: pointer;
   ${TransitionAll}
 
-  &:hover:not(:disabled) { background-color: #e1ede8; }
-  &:disabled { background-color: #f7f9f7; color: rgba(59, 122, 87, 0.3); cursor: default; }
+  &:hover:not(:disabled) {
+    background-color: #e1ede8;
+  }
+  &:disabled {
+    background-color: #f7f9f7;
+    color: rgba(59, 122, 87, 0.3);
+    cursor: default;
+  }
 `;
 
 export const AdminQnAEditBtn = styled(AdminQnAActionBtn)`
@@ -342,7 +371,10 @@ export const AdminQnADeleteBtn = styled.button`
   cursor: pointer;
   ${TransitionAll}
 
-  &:hover { background-color: #fff0ee; color: #ff4d4f; }
+  &:hover {
+    background-color: #fff0ee;
+    color: #ff4d4f;
+  }
 `;
 
 export const AdminQnACategoryBadge = styled.span`

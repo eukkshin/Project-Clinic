@@ -1,14 +1,14 @@
 "use client";
 
-import { FiEye, FiInfo } from 'react-icons/fi';
+import { FiEye, FiInfo } from "react-icons/fi";
 
-import * as P from '@/assets/css/admin/DetailEditorPreview.styles';
-import * as D from '@/assets/css/components/detail/DetailPage.styles';
-import DetailImage from '@/components/detail/DetailImage';
-import DetailSectionRenderer from '@/components/detail/DetailSectionRenderer';
+import DetailImage from "@/components/procedures/DetailImage";
+import * as D from "@/components/procedures/DetailPage.styles";
+import DetailSectionRenderer from "@/components/procedures/DetailSectionRenderer";
+import * as P from "@/components/admin/details/DetailEditorPreview.styles";
 
-import type { DetailSectionData } from "@/types/detail";
 import type { PagePayload } from "@/types/adminDetail";
+import type { DetailSectionData } from "@/types/detail";
 type Props =
   | {
       mode: "hero";

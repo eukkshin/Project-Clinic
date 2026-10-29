@@ -1,12 +1,13 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import * as S from "@/assets/css/components/SafetySlider.styles";
+import * as S from "@/components/home/SafetySlider.styles";
 
 /*
  * SafetySlider — AHN'S SAFETY ARCHIVE
@@ -33,7 +34,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // 서버의 미디어 파일은 Next public/에 저장하지 않는다.
 // Express가 `/images/파일명`으로 실제 이미지를 제공한다.
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 // 관리자 백엔드가 전달하는 데이터의 원본 컬럼명이다.
 interface SafetyApiItem {

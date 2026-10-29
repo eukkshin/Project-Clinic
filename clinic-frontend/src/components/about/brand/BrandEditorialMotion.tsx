@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 /**
  * 페이지 전용 경량 인터랙션: reveal + 미세 패럴랙스.

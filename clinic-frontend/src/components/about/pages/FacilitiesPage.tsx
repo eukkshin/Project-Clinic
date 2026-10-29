@@ -1,11 +1,14 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 
-import * as S from '@/assets/css/components/about/AboutPages.styles';
-import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
+import * as S from "@/components/about/pages/AboutPages.styles";
+import {
+  AboutBottom,
+  AboutFrame,
+} from "@/components/about/shared/AboutFoundation";
 
 /** 시안용 연출 사진입니다. 실제 병원 공간을 촬영한 사진으로 교체하세요. */
 const spaces = [

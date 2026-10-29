@@ -139,21 +139,6 @@ export const LoginInput = styled.input`
     color: #9cae9d;
   }
 `;
-export const CheckboxGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 9px;
-`;
-export const CheckboxInput = styled.input`
-  width: 15px;
-  height: 15px;
-  accent-color: #2b6344;
-`;
-export const CheckboxLabel = styled.label`
-  color: #657b69;
-  font-size: 12px;
-  cursor: pointer;
-`;
 export const LoginButton = styled.button`
   width: 100%;
   height: 50px;
@@ -190,20 +175,3 @@ export const StyledLink = styled.a`
     text-decoration: underline;
   }
 `;
-
-export * from "./Dash.styles";
-export * from "../AdminCommon.styles";
-export * from "./Tone.styles";
-export * from "./NavSetting.styles";
-export * from "./Consult.styles";
-export * from "./Pop.styles";
-export * from "./News.styles";
-export * from "./Self.styles";
-export * from "./Event.styles";
-export * from "./Footer.styles";
-export * from "./User.styles";
-export * from "./Vlog.styles";
-export * from "./Safety.styles";
-export * from "./Board.styles";
-export * from "../common/LayoutStyle";
-export * from "./QnA.styles";

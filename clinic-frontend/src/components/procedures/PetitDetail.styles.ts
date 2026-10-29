@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import * as S from '@/assets/css/components/detail/DetailPage.styles';
-import * as V from '@/assets/css/components/detail/DetailSectionLayouts.styles';
+import * as S from "@/components/procedures/DetailPage.styles";
+import * as V from "@/components/procedures/DetailSectionLayouts.styles";
 
 /**
  * 필러 / 쁘띠시술 전용 에디토리얼 스타일.

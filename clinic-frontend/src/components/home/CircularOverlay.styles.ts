@@ -1,11 +1,10 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 /**
  * Selfies / CategoryNav와 공유하는 Ahn's 색상 계열.
  * 글자와 이미지에 집중하도록 진한 검은색이나 분홍색은 사용하지 않는다.
  */
 const DARK = "#344638";
-const IVORY = "#F7F4EA";
 const SAGE = "#829E84";
 
 /**
@@ -221,12 +220,24 @@ export const ImageArea = styled.div`
     inset: 0;
     z-index: 2;
     pointer-events: none;
-    background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,.2) 50%, transparent 75%);
+    background: linear-gradient(
+      120deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 75%
+    );
     transform: translateX(-145%);
-    transition: transform 1.2s cubic-bezier(.2,.65,.2,1);
+    transition: transform 1.2s cubic-bezier(0.2, 0.65, 0.2, 1);
   }
-  ${EventCard}:hover &::after { transform: translateX(145%); }
-  @media (prefers-reduced-motion: reduce) { &::after { transition: none; display: none; } }
+  ${EventCard}:hover &::after {
+    transform: translateX(145%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      transition: none;
+      display: none;
+    }
+  }
   width: 100%;
   /* Landscape event cards, rather than oversized portrait posters. */
   aspect-ratio: 4 / 3.4;

@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Footer.styles";
 
 interface ScheduleData {
   id: number;
@@ -63,7 +64,7 @@ export default function FooterSetting() {
       try {
         const response =
           //백앤드를 통해 데이터를 달라고 요청
-          await axios.get("http://localhost:4000/api/admin/footer");
+          await axios.get(`${API_ORIGIN}/api/admin/footer`);
         //서버가 통신성공을 알리고 빈껍데기가 아닌 실제 데이터가 있다면
         if (response.data.success && response.data.data) {
           //서버가 보내준 데이터 덩어리에서 필요한 3가지 속성만 쏙 빼냅니다(구조 분해 할당)
@@ -134,7 +135,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
     try {
       const response =
         //백앤드 api주소로 방금 패킹한 것을 post방식으로 던져주고 기다림
-        await axios.post("http://localhost:4000/api/admin/footer", payload);
+        await axios.post(`${API_ORIGIN}/api/admin/footer`, payload);
       // 백앤드에서 DB저장에 성공했어라고 대답을 보내주면
       if (response.data.success) {
         // 성공 시 세팅

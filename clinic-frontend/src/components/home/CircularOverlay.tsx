@@ -1,12 +1,13 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import * as S from "@/assets/css/components/CircularOverlay.styles";
+import * as S from "@/components/home/CircularOverlay.styles";
 
 // GSAP 기본 패키지에는 스크롤 감지 기능이 없다.
 
@@ -14,7 +15,7 @@ import * as S from "@/assets/css/components/CircularOverlay.styles";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API_URL = "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 /** Express API가 보내 주는 실제 이벤트 필드명. 기존 DB 계약을 변경하지 않는다. */
 

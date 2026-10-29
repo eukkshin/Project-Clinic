@@ -1,28 +1,29 @@
 import styled from "styled-components";
+import {
+  adminAddButtonCss,
+  adminCardTitleCss,
+  adminFullWidthPageHeaderCss,
+  adminDeleteBtnCss,
+  adminForestPageTitleCss,
+  adminRankEventCardCss,
+} from "./shared";
 
 import {
   BoxShadow,
-  FlexBetween,
   FlexCenter,
   FlexColumn,
-  FlexStart,
   TransitionAll,
-} from "../Common.styles";
+} from "@/styles/mixins";
 
 export const EventAdminContainer = styled.div`
   width: 100%;
 `;
 export const EventPageHeader = styled.header`
-  ${FlexBetween}
-  width: 100%;
-  margin-bottom: 1.5rem;
+  ${adminFullWidthPageHeaderCss}
 `;
 
 export const EventPageTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #34453c;
-  font-weight: 700;
-  margin: 0;
+  ${adminForestPageTitleCss}
 `;
 
 export const EventSaveButton = styled.button`
@@ -65,11 +66,7 @@ export const EventRightColumn = styled.div`
 `;
 
 export const RankEventCard = styled.div`
-  border-radius: 12px;
-  ${BoxShadow};
-  border: 1px solid rgba(59, 122, 87, 0.1);
-  overflow: hidden;
-  background-color: #fff;
+  ${adminRankEventCardCss}
 `;
 
 export const EventCardHeader = styled.header`
@@ -79,9 +76,7 @@ export const EventCardHeader = styled.header`
 `;
 
 export const EventCardTitle = styled.h6`
-  margin: 0;
-  font-weight: 700;
-  color: #1b4d3e;
+  ${adminCardTitleCss}
 `;
 export const EventCardBody = styled.div`
   padding: 1.5rem;
@@ -161,24 +156,7 @@ export const EventPreviewRect = styled.div`
 `;
 
 export const EventAddButton = styled.button`
-  border: 1px dashed rgba(59, 122, 87, 0.3);
-  color: #34453c;
-  padding: 1rem;
-  width: 100%;
-  border-radius: 12px;
-  font-weight: 600;
-  ${TransitionAll};
-  ${FlexCenter}
-  gap: 0.5rem;
-  background-color: #f7f9f7;
-  flex-shrink: 0;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #fff;
-    border-color: #1b4d3e;
-    color: #1b4d3e;
-  }
+  ${adminAddButtonCss}
 `;
 export const EventTableWrapper = styled.div`
   width: 100%;
@@ -344,22 +322,5 @@ export const EventActionBtn = styled.button`
 `;
 
 export const EventDeleteBtn = styled.button`
-  background: transparent;
-  border: none;
-  color: #bf6059;
-  cursor: pointer;
-  ${FlexCenter}
-  ${TransitionAll};
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-
-  margin: 0 auto;
-  flex-shrink: 0;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: #fff0ee;
-    color: #ff4d4f;
-  }
+  ${adminDeleteBtnCss}
 `;

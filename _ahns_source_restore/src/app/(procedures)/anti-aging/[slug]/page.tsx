@@ -1,0 +1,45 @@
+import type { Metadata } from "next";
+import { notFound } from 'next/navigation';
+
+import AntiAgingDetailView from '@/components/detail/AntiAgingDetailView';
+import { getAntiAgingPreviewPage } from '@/data/detail/antiAgingPreview';
+import { getPublicDetailPage } from '@/lib/detail/getPublicDetailPage';
+
+import type { DetailPageData } from "@/types/detail";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string | string[] }>;
+};
+
+export const dynamic = "force-dynamic";
+
+async function loadDetail({
+  params,
+  searchParams,
+}: Props): Promise<DetailPageData | null> {
+  const { slug } = await params;
+  const query = await searchParams;
+  const preview =
+    process.env.NODE_ENV !== "production" &&
+    (query.preview === "1" || process.env.DETAIL_PREVIEW_MODE === "true");
+
+  return preview
+    ? getAntiAgingPreviewPage("anti-aging", slug)
+    : getPublicDetailPage("anti-aging", slug);
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const page = await loadDetail(props);
+  if (!page) return { title: "페이지를 찾을 수 없습니다" };
+  return {
+    title: page.seo?.title || page.title,
+    description: page.seo?.description || page.hero.description,
+  };
+}
+
+export default async function AntiAgingDetailPage(props: Props) {
+  const page = await loadDetail(props);
+  if (!page) notFound();
+  return <AntiAgingDetailView page={page} />;
+}

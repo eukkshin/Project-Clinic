@@ -1,8 +1,8 @@
 "use client";
 /// <reference types="kakao.maps.d.ts" />
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import * as S from "@/assets/css/components/Footer.style";
+import * as S from '@/assets/css/components/Footer.style';
 
 /*
  * HospitalMap.tsx
@@ -389,7 +389,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
   }, []);
 
   return (
-    <S.MapSection ref={sectionRef} aria-label="병원 위치">
+    <S.MapSection ref={sectionRef} aria-label="병원 위치" data-lenis-prevent>
       <S.MapHeading>
         <div>
           <S.MicroLabel>LOCATION / FIND US</S.MicroLabel>

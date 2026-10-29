@@ -10,13 +10,15 @@ import { FaGlobe, FaPhone, FaRegCommentDots, FaRegUser } from 'react-icons/fa6';
 
 import * as SL from '@/assets/css/components/dropdown/HeaderSearchLayout.styles';
 import * as S from '@/assets/css/components/Header.styles';
+import { usePublishedProcedureMenus } from '@/lib/detail/usePublishedProcedureMenus';
+import { withAboutNavigation } from '@/lib/navigation/aboutNavigation';
+import { withCommunityNavigation } from '@/lib/navigation/withCommunityNavigation';
 
 import AccountDropdown from './dropdown/AccountDropdown';
-import MobileProcedureSubmenu from "./dropdown/MobileProcedureSubmenu";
-import { usePublishedProcedureMenus } from "@/lib/detail/usePublishedProcedureMenus";
 import HeaderNavDropdown from './dropdown/HeaderNavDropdown';
 import HeaderSearch from './dropdown/HeaderSearch';
 import LanguageDropdown from './dropdown/LanguageDropdown';
+import MobileProcedureSubmenu from './dropdown/MobileProcedureSubmenu';
 
 /*
  * Header.tsx — Premium Ahn's Navigation
@@ -87,7 +89,9 @@ export default function Header() {
   const [logoType, setLogoType] = useState<"TEXT" | "IMAGE">("TEXT");
   const [logoText, setLogoText] = useState("Ahn's");
   const [logoFileName, setLogoFileName] = useState("");
-  const [menus, setMenus] = useState<MenuItem[]>(DEFAULT_MENUS);
+  const [menus, setMenus] = useState<MenuItem[]>(
+    withCommunityNavigation(withAboutNavigation(DEFAULT_MENUS)),
+  );
   const publishedMenus = usePublishedProcedureMenus(menus);
   const [accent, setAccent] = useState("#879D87");
   const [isDark, setIsDark] = useState(false);
@@ -102,7 +106,9 @@ export default function Header() {
 
   const previousY = useRef(0);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
-  const transparent = isHome && !scrolled && !menuOpen;
+  const isBrandPage = pathname === "/about/brand";
+  const transparent =
+    (isHome || isBrandPage) && !scrolled && !menuOpen && !searchOpen;
   const contactHref = isHome ? "#site-footer-contact" : "/#site-footer-contact";
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -185,7 +191,9 @@ export default function Header() {
                     )
                   : [],
               }));
-            if (valid.length) setMenus(valid);
+            if (valid.length) {
+              setMenus(withCommunityNavigation(withAboutNavigation(valid)));
+            }
           }
         } catch (error) {
           console.error("헤더 메뉴 파싱 실패:", error);
@@ -286,6 +294,7 @@ export default function Header() {
         $transparent={transparent}
         $dark={isDark}
         $accent={accent}
+        $brandLight={isBrandPage}
       >
         <S.HeaderInner>
           <S.LogoGroup>
@@ -456,23 +465,26 @@ export default function Header() {
           <S.MobileNav aria-label="모바일 주 메뉴">
             {publishedMenus.map((menu, index) => (
               <div key={menu.id}>
-              <S.MobileNavLink
-                as={Link}
-                key={menu.id}
-                href={safeHref(menu.url)}
-                onClick={closeMenu}
-                data-mobile-item
-              >
-                <span className="number">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span>{menu.name}</span>
-                <span className="arrow" aria-hidden="true">
-                  ↗
-                </span>
-              </S.MobileNavLink>
+                <S.MobileNavLink
+                  as={Link}
+                  key={menu.id}
+                  href={safeHref(menu.url)}
+                  onClick={closeMenu}
+                  data-mobile-item
+                >
+                  <span className="number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span>{menu.name}</span>
+                  <span className="arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                </S.MobileNavLink>
                 {Boolean(menu.children?.length) && (
-                  <MobileProcedureSubmenu items={menu.children ?? []} onNavigate={closeMenu} />
+                  <MobileProcedureSubmenu
+                    items={menu.children ?? []}
+                    onNavigate={closeMenu}
+                  />
                 )}
               </div>
             ))}

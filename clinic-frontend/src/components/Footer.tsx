@@ -1,17 +1,18 @@
 "use client";
 
-import axios from "axios";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { BsChatFill } from "react-icons/bs";
-import { FaInstagram, FaRegCommentDots, FaYoutube } from "react-icons/fa6";
-import { HiChat } from "react-icons/hi";
-import { RiKakaoTalkLine } from "react-icons/ri";
+import axios from 'axios';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePathname } from 'next/navigation';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { BsChatFill } from 'react-icons/bs';
+import { FaInstagram, FaRegCommentDots, FaYoutube } from 'react-icons/fa6';
+import { HiChat } from 'react-icons/hi';
+import { RiKakaoTalkLine } from 'react-icons/ri';
 
-import * as S from "@/assets/css/components/Footer.style";
+import * as S from '@/assets/css/components/Footer.style';
 
-import HospitalMap from "./HospitalMap";
+import HospitalMap from './HospitalMap';
 
 /*
  * Footer.tsx — AHN'S FOOTER
@@ -136,6 +137,7 @@ export default function Footer() {
   const [messageOpen, setMessageOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [isSafety, setIsSafety] = useState(false);
+  const pathname = usePathname();
 
   // 화면 맨 위에서는 TOP을 숨기고, 320px 이상 스크롤하면 아래에서 등장.
   useEffect(() => {
@@ -149,11 +151,11 @@ export default function Footer() {
   }, []);
 
   useEffect(() => {
+    if (pathname !== "/") return;
     const safety = document.getElementById("safety");
     const button = messageTriggerRef.current;
 
     if (!safety || !button) {
-      console.warn("Safety 영역 또는 플로팅 버튼을 찾지 못했습니다.");
       return;
     }
 

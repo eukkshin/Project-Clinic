@@ -6,6 +6,8 @@ import Lenis from 'lenis';
 import { usePathname } from 'next/navigation';
 import { ReactNode, useEffect } from 'react';
 
+import HospitalMap from './HospitalMap';
+
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 

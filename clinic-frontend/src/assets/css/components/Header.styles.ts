@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 /*
  * Header.styles.ts — Sage/Forest editorial navigation
@@ -15,13 +15,20 @@ interface HeaderProps {
   $transparent: boolean;
   $dark: boolean;
   $accent: string;
+  $brandLight: boolean;
 }
 
 export const HeaderWrapper = styled.header<HeaderProps>`
-  --header-text: ${({ $transparent, $dark }) =>
-    $transparent || $dark ? "#F7F6F1" : "#2D4836"};
+  --header-text: ${({ $transparent, $dark, $brandLight }) =>
+    $transparent && $brandLight
+      ? "#1B3528"
+      : $transparent || $dark
+        ? "#F7F6F1"
+        : "#2D4836"};
+
   --header-border: ${({ $transparent, $dark }) =>
     $transparent || $dark ? "rgba(255,255,255,.3)" : "rgba(40,75,53,.23)"};
+
   --header-accent: ${({ $accent }) => $accent};
 
   position: fixed;
@@ -29,27 +36,35 @@ export const HeaderWrapper = styled.header<HeaderProps>`
   z-index: 9999;
   width: 100%;
   color: var(--header-text);
+
   background: ${({ $transparent, $dark }) =>
     $transparent
       ? "transparent"
       : $dark
         ? "rgba(23,53,43,.94)"
         : "rgba(247,247,240,.94)"};
+
   border-bottom: 1px solid
     ${({ $transparent }) =>
       $transparent ? "transparent" : "var(--header-border)"};
+
   backdrop-filter: ${({ $transparent }) =>
     $transparent ? "none" : "blur(22px)"};
+
   -webkit-backdrop-filter: ${({ $transparent }) =>
     $transparent ? "none" : "blur(22px)"};
+
   transform: translateY(${({ $hidden }) => ($hidden ? "-101%" : "0")});
-  text-shadow: ${({ $transparent }) =>
-    $transparent ? "0 2px 20px rgba(15,35,22,.28)" : "none"};
+
+  text-shadow: ${({ $transparent, $brandLight }) =>
+    $transparent && !$brandLight ? "0 2px 20px rgba(15,35,22,.28)" : "none"};
+
   transition:
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     background 0.35s ease,
     border-color 0.35s ease,
     color 0.35s ease;
+
   @media (prefers-reduced-motion: reduce) {
     transition: none;
   }

@@ -2,10 +2,12 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import * as S from '@/assets/css/components/about/brand/BrandEditorial.styles';
 import BrandEditorialMotion from '@/components/about/brand/BrandEditorialMotion';
+import { isAboutLinkActive, useAboutNavigation } from '@/lib/navigation/aboutNavigation';
 
 /**
  * AHN'S BRAND / 2026 editorial redesign
@@ -13,14 +15,6 @@ import BrandEditorialMotion from '@/components/about/brand/BrandEditorialMotion'
  * 정보성 문구와 공간 이미지는 브랜드 디자인 시안이며, 실제 병원 정보·시설을 의미하지 않습니다.
  * 기존 Header / Footer / 관리자 / 세부 시술 컴포넌트와 독립적으로 동작합니다.
  */
-const aboutPages = [
-  { href: "/about/brand", name: "브랜드 소개" },
-  { href: "/about/philosophy", name: "진료 철학" },
-  { href: "/about/doctors", name: "의료진 소개" },
-  { href: "/about/facilities", name: "진료 환경" },
-  { href: "/about/safety", name: "안전 시스템" },
-  { href: "/about/location", name: "오시는 길" },
-] as const;
 
 const heroImages = [
   {
@@ -65,6 +59,9 @@ const values = [
 ] as const;
 
 export default function BrandEditorial() {
+  const pathname = usePathname();
+  const aboutPages = useAboutNavigation();
+
   const [slide, setSlide] = useState(0);
 
   const moveSlide = (direction: -1 | 1) => {
@@ -98,15 +95,16 @@ export default function BrandEditorial() {
             <S.NavIdentity>
               ABOUT <span>/</span>
             </S.NavIdentity>
+
             <S.NavItems>
               {aboutPages.map((page) => (
                 <S.NavItem
-                  key={page.href}
+                  key={page.url}
                   as={Link}
-                  href={page.href}
-                  $active={page.href === "/about/brand"}
+                  href={page.url}
+                  $active={isAboutLinkActive(pathname, page.url)}
                   aria-current={
-                    page.href === "/about/brand" ? "page" : undefined
+                    isAboutLinkActive(pathname, page.url) ? "page" : undefined
                   }
                 >
                   {page.name}

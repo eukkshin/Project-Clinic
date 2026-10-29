@@ -10,6 +10,7 @@ import {
   FaWandMagicSparkles,
   FaSyringe,
   FaUserDoctor,
+  FaCircleExclamation,
 } from "react-icons/fa6";
 
 interface AddTreatmentModalProps{
@@ -50,7 +51,7 @@ const formattedPrice = (price:number)=>{
 
 export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalProps)=>{
 
-    const { mutate, error, isError, isPending } = useAddTreatment(chartNo);
+    const { mutate, isError, isPending, reset:resetMutation } = useAddTreatment(chartNo);
 
      const {
         register, 
@@ -62,7 +63,6 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
       } = useForm<TreatmentFormInput>({
         resolver: zodResolver(treatmentSchema),  //스키마연결
         defaultValues:{
-          treatmentId: '',
           category: "SKIN",
           treatmentName: '',
           totalCount: 1,
@@ -107,10 +107,13 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
     setValue('price', 0);
   };
 
-  const handleTreatmentChange = (e:React.ChangeEvent<HTMLSelectElement>)=>{
-    const name = e.target.value;
+  const treatmentField = register('treatmentName');
 
-    setValue('treatmentName', name, {shouldValidate:true})
+  const handleTreatmentChange = (e:React.ChangeEvent<HTMLSelectElement>)=>{
+
+    treatmentField.onChange(e); //변경된 시술명을 React Hook Form에 전달
+
+    const name = e.target.value;
 
     const treatment = TREATMENT_CATALOG.find(item=>(
       item.category === selectedCategory && 
@@ -125,15 +128,15 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
   const onSubmit = (data:TreatmentFormInput)=>{
     mutate({...data, chartNo}, {
       onSuccess: ()=>{
-        reset(); 
         onClose()
       }
     })
   }
-  // 모달을 다시 열 때 초기값 복원
+  // 모달을 닫힐때 reset() 초기화
   useEffect(()=>{
     if(!isOpen){
-      reset()
+      reset();
+      resetMutation();
     }
   },[isOpen, reset])
 
@@ -147,8 +150,17 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
           confirmText={isPending || isSubmitting ? '등록중..':'등록'}
           maxWidth='560px'
           closeOnOverlayClick={false}
+          isDisabled={isPending || isSubmitting}
           onConfirm={handleSubmit(onSubmit)}
           >
+
+        {isError && 
+        <S.FormError>
+          <FaCircleExclamation/>
+          <span>
+            요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.
+          </span>
+        </S.FormError>}
         <S.TreatmentForm>
          <S.FormHeader>
             <S.FormDescription>
@@ -178,8 +190,8 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
                 </S.CategoryOption>
               ))}
             </S.CategoryOptions>
-            {errors.treatmentName && (
-              <S.ErrorText>{errors.treatmentName.message}</S.ErrorText>
+            {errors.category && (
+              <S.ErrorText>{errors.category.message}</S.ErrorText>
             )}
           </S.FormField>
           {/* 시술명 */}
@@ -211,7 +223,6 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
               <S.FieldLabel>
                 총 횟수<S.RequiredMark>*</S.RequiredMark>
               </S.FieldLabel>
-
               <S.CountOptions>
                 {COUNT_OPTIONS.map(item=>(
                   <S.CountOption 
@@ -219,6 +230,7 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
                   key={item}>
                     <input
                     type='radio'
+                    name='totalCount'
                     value={item}
                     checked={selectedCount===item}
                     onChange={()=>{setValue('totalCount', item, {shouldValidate:true})}}
@@ -234,7 +246,7 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
             </S.FormField>
 
             {/* 결제 금액 */}
-            <S.PriceField>
+            <S.FormField>
               <S.FieldLabel>
               결제 금액<S.RequiredMark>*</S.RequiredMark>
               </S.FieldLabel>
@@ -243,21 +255,23 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
                 <S.PriceInput
                 type='number'
                 min="0"
+                step='1000'
                 {...register("price",{ valueAsNumber: true})}
                 />
                 <S.PriceUnit>원</S.PriceUnit>
               </S.PriceBox>
-
-              {selectedPackage && (
-                <S.HelperText>
-                  {formattedPrice(selectedPackage?.price)}원
-                  <small>선택한 패키지 기본 가격</small>
-                </S.HelperText>
-              )}
+             
               {errors.price && (
               <S.ErrorText>{errors.price.message}</S.ErrorText>
                )}
-            </S.PriceField>
+            </S.FormField>
+
+             {selectedPackage && (
+                <S.HelperText>
+                  <span className='description'>선택한 패키지 기본 가격</span>
+                  <span className='price'>{formattedPrice(selectedPackage?.price)}원</span>
+                </S.HelperText>
+              )}
           </S.FormGrid>
             
             {/* 결제 수단 */}
@@ -285,7 +299,6 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
             </S.FormField>
           
         </S.TreatmentForm>
-      {isError && <S.ErrorText>{error?.message || "서버 오류가 발생했습니다."}</S.ErrorText>}
 
     </Popup>
     )

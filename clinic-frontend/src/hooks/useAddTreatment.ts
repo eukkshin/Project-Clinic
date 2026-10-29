@@ -34,11 +34,11 @@ export const useAddTreatment = (chartNo: string)=>{
           });
         return { prevTreatments } ;  //백업데이터 반환
       },
-      onError: ( _ , __, context)=>{
+      onError: ( err, _, context)=>{
         if(context?.prevTreatments){  //롤백
           queryClient.setQueryData(['treatments', chartNo], context.prevTreatments)
         }
-        alert('시술권 추가 중 오류가 발생했습니다. 다시 시도해 주세요.')
+        console.error('시술권 추가 실패:', err);
       },
       onSettled: ()=>{
         queryClient.invalidateQueries({queryKey: ['treatments', chartNo]})

@@ -218,7 +218,6 @@ export const CategoryOption = styled.label<{ $selected: boolean }>`
   border-radius: 12px;
   background: ${({ $selected }) => ($selected ? "#eff4ee" : "#fff")};
   color: ${({ $selected }) => ($selected ? "#244f39" : "#59645c")};
-  font-size: 13px;
   cursor: pointer;
   transition: 0.2s;
 
@@ -229,8 +228,8 @@ export const CategoryOption = styled.label<{ $selected: boolean }>`
     height: 1px;
   }
 
-  span:first-of-type {
-    font-size: 19px;
+  span  {
+    font-size: 14px;
     line-height: 1;
   }
 
@@ -249,6 +248,13 @@ export const CountOptions = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+
+  > label {
+    box-sizing: border-box;
+    min-height: 48px;
+  }
+
+
 `;
 
 // 횟수 선택 버튼
@@ -303,21 +309,47 @@ export const ErrorText = styled.p`
   line-height: 1.5;
 `;
 
+export const FormError= styled.p`
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+
+  color: #b42318;
+  font-size: 13px;
+  line-height: 1.5;
+
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 10px;
+
+  svg {
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+`;
 // 패키지 기본 가격 안내
 export const HelperText = styled.div`
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 8px;
-  color: #244f39;
-  font-size: 13px;
-  font-weight: 700;
-
-  small {
+  
+  .description {
     color: #829087;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
+  }
+  .price{
+    color: #244f39;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 `;
 

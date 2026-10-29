@@ -1,42 +1,6 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { FiLoader } from 'react-icons/fi'; // 또는 선호하시는 아이콘
 import { BoxShadow, CircleBtn, FlexBetween, FlexCenter, NoDrag } from '@/assets/css/Common.styles';
-
-// 부드럽게 회전하는 애니메이션
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-export const LoadingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 0;
-  gap: 12px;
-  color: #557259; 
-  width: 100%;
-`;
-
-export const LoadingSpinner = styled.div`
-  width: 28px;
-  height: 28px;
-  border: 3px solid #e1e8de;
-  border-top-color: #3b7a57; 
-  border-radius: 50%;
-  animation: ${spin} 0.8s linear infinite;
-`;
-
-export const LoadingText = styled.p`
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #6b7570;
-  letter-spacing: -0.01em;
-  margin: 0;
-`;
-
-///=================================================
 
 export const BookingContainer = styled.section`
   width: 100%;

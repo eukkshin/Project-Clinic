@@ -15,6 +15,7 @@ interface PopupProps {
   maxWidth?:string;
   eyebrow?: string;
   confirmText?: string;
+  isDisabled?: boolean;
   closeOnOverlayClick?: boolean; //배경 클릭 시 닫힘 여부 (기본값 true)
   children: ReactNode;
 }
@@ -28,6 +29,7 @@ export const Popup = ({
   closeOnOverlayClick = true,
   eyebrow = "AHN'S · MESSAGE",
   confirmText = "확인",
+  isDisabled = false,
   children,
 }: PopupProps) => {
   // SSR/CSR에서 document.body 접근 시점이 달라지지 않도록 마운트 후 Portal을 생성합니다.
@@ -108,6 +110,9 @@ export const Popup = ({
       }
       // 텍스트 영역 등에서 Enter를 누른 경우에도 기본 동작을 제공해 줍니다.
       event.preventDefault();
+
+      if(isDisabled) return;
+
       if (onConfirm) onConfirm();
       else onClose();
     };
@@ -123,7 +128,7 @@ export const Popup = ({
         previouslyFocused.focus();
       }
     };
-  }, [isOpen, mounted, onClose, onConfirm]);
+  }, [isOpen, mounted, onClose, onConfirm, isDisabled]);
 
   if (!mounted || !isOpen) return null;
 
@@ -179,6 +184,7 @@ export const Popup = ({
               ref={primaryButtonRef}
               type="button"
               onClick={onConfirm}
+              disabled={isDisabled}
             >
               {confirmText} <span aria-hidden="true">↗</span>
             </S.ConfirmButton>

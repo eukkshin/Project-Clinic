@@ -8,6 +8,9 @@ import * as S from './reservation.style'
 import { AddTreatmentModal } from '../components/AddTreatmentModal';
 import * as A from "@/assets/css/admin/DetailCMS.styles";
 import { FaRegCommentDots } from 'react-icons/fa6';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import ErrorState  from '@/ui/feedback/ErrorState';
+import LoadingState from '@/ui/feedback/LoadingState';
 
 interface Reservation {
 id: number;              
@@ -40,6 +43,18 @@ interface TreatmentItem {
   date: string;
   expire?: string;
 }
+
+interface Patient{
+  chartNo:string;
+  name: string;
+  phone: string;
+  status: string; //'정상'
+  memo: string,
+}
+interface PatientData {
+  patient: Patient;
+  treatments: TreatmentItem[];
+}
 export default function PatientBookingPage (){
   const params = useParams();
   const chartNo = params?.chartNo as string;
@@ -50,40 +65,32 @@ export default function PatientBookingPage (){
   const [memo, setMemo] = useState<string>('');
   const [showAddTreatModal,setShowAddTreatModal ]=useState(false);
 
-  const [patient, setPatient] = useState({
-    chartNo: chartNo || '',
-    name: '',
-    phone: '',
-    status: '정상',
-    memo: '',
-  });
 
 
-  const [treatments, setTreatments] = useState<TreatmentItem[]>([]);
-  const [isLoading, setIsLoading]= useState(true);
+
+  // const [treatments, setTreatments] = useState<TreatmentItem[]>([]);
+  // const [isLoading, setIsLoading]= useState(true);
   const [showMemoTooltip, setShowMemoTooltip] = useState(false);
 
   const [filter, setFilter] = useState<TreatmentStatus|'ALL'>('ALL');
 
-  const fetchPatientData = async () => {
-      if(!chartNo) return;
-      try {
-        //chartNo로 환자 정보 및 시술권 조회 API 호출
+  const fetchPatientData = async (chartNo:string) : Promise<PatientData>=> {
+        
+    //chartNo로 환자 정보 및 시술권 조회 API 호출
         const response = await axios.get(`http://localhost:4000/api/reservation/patient/${chartNo}`);
 
-        if (response.data.success) {
-          const userData = response.data.user;
-          const treatData = response.data.treatments;
-
-          setPatient({
-            chartNo: userData.CHART_NO,
-            name: userData.USER_NAME || userData.NAME || '고객',
-            phone: userData.PHONE || '연락처 없음',
-            status: userData.STATUS || '정상',
-            memo: userData.MEMO || '귀여움짱귀여움',
-          });
-
-          const formattedTreatments = treatData.map((t:any)=>({
+        const userData = response.data.user;
+        const treatData = response.data.treatments;
+        
+        return{ 
+          patient: {
+          chartNo: userData.CHART_NO,
+          name: userData.USER_NAME || userData.NAME || '고객',
+          phone: userData.PHONE || '연락처 없음',
+          status: userData.STATUS || '정상',
+          memo: userData.MEMO || '귀여움짱귀여움',
+          },
+          treatments :  treatData.map((t:any)=>({
             id: t.TREATMENT_IDX,
             name: t.TREATMENT_NAME || '일반 시술권',
             remainingCount: t.REMAINING_COUNT ?? 0,
@@ -91,23 +98,28 @@ export default function PatientBookingPage (){
             status: t.STATUS || 'ACTIVE',
             date:t.UPDATED_AT ? t.UPDATED_AT.substring(0,10) :'날짜 미상',
             expire:t.EXPIRE_DATE,
-          }))
-          setTreatments(formattedTreatments || []);
-
-        } else {
-          alert('환자 정보를 불러오지 못했습니다.');
+          })),
         }
-      } catch (error) {
-        console.error('환자 데이터 조회 에러:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    };
+    
+    const queryClient = useQueryClient();
+    
+    const { data, isLoading, isError, error, refetch, isFetching} = useQuery({
+      queryKey:  ['treatments', chartNo],
+      queryFn: ()=> fetchPatientData(chartNo),
+      enabled: !!chartNo,
+    })
+
+    const patient = data?.patient ?? {
+      chartNo,
+      name: '',
+      phone: '',
+      status: '정상',
+      memo: '',
     };
 
-  useEffect(()=>{
-    fetchPatientData();
-  },[chartNo])
-  
+    const treatments: TreatmentItem[] = data?.treatments ?? [];
+
   const handleBookingSubmit = async()=>{
     if(!selectedDate || !selectedTime){
       alert('예약 날짜와 시간을 모두 선택해 주세요.');
@@ -128,7 +140,6 @@ export default function PatientBookingPage (){
           setSelectedTime('');
           setSelectedTreatment(null);
           setMemo('');
-          fetchPatientData();
         }else{
             alert(`예약 실패: ${response.data.message ||"알 수 없는 오류가 발생했습니다." }`);
         }
@@ -149,19 +160,21 @@ export default function PatientBookingPage (){
     return item.status === filter;
   })
 
-  if (isLoading) {
-    return(
-      <S.LoadingContainer>
-        <S.LoadingSpinner />
-        <S.LoadingText> 환자 정보를 불러오는 중입니다...</S.LoadingText>
-      </S.LoadingContainer>
-    )
-  }
-
   const count = (tab:'ACTIVE' | 'COMPLETED' | 'EXPIRED')=>{
     return treatments.filter(item=>item.status === tab).length;
   }
 
+  if (isError) {
+    return (
+      <ErrorState
+        message='환자 정보를 불러오지 못했습니다'
+        onRetry={()=>refetch()}
+        isRetrying={isFetching}
+      />
+    );
+  }
+  
+  
   return (
     <>
     <S.BookingContainer>
@@ -180,18 +193,24 @@ export default function PatientBookingPage (){
         <S.LeftColumn>
           <S.ProfileCard className="admin-panel">
                 <S.ProfileHeader className="admin-panel-head">
-                  <S.Avatar>{patient.name?.[0] || '환'}</S.Avatar>
-                  <div>
-                    <S.PatientName>{patient.name} 고객님</S.PatientName>
-                    <S.PatientNo>{chartNo}</S.PatientNo>
-                    
-                  </div>
-                  <A.Button $variant='primary'
-                    style={{marginLeft: 'auto'}}
-                    onClick={() => setShowAddTreatModal(true)}
-                  >
-                    + 시술권 추가
-                  </A.Button>
+                  {isLoading ? (
+                   <LoadingState message='환자 정보를 불러오는 중입니다...'/>
+                  ): (
+                    <>
+                    <S.Avatar>{patient.name?.[0] || '환'}</S.Avatar>
+                    <div>
+                      <S.PatientName>{patient.name} 고객님</S.PatientName>
+                      <S.PatientNo>{chartNo}</S.PatientNo>
+                      
+                    </div>
+                    <A.Button $variant='primary'
+                      style={{marginLeft: 'auto'}}
+                      onClick={() => setShowAddTreatModal(true)}
+                    >
+                      + 시술권 추가
+                    </A.Button>
+                    </>
+                  )}
                 </S.ProfileHeader>
                 
                 <S.ProfileFooter >
@@ -255,44 +274,48 @@ export default function PatientBookingPage (){
             </S.CardHeader>
           <div className="admin-panel-body">
             <S.ProcedureList>
-              {treatments.length === 0 ? (
-                <S.EmptyMessage>
-                  보유 중인 시술권이 없습니다.
-                </S.EmptyMessage>
-              ):( 
-                filteredTreatmentList.map((item) => (
-                <S.ProcedureItem 
-                  key={item.id}
-                  onClick={() => {
-                    if(item.remainingCount === 0 || item.status === 'COMPLETED') return;
-                      setSelectedTreatment(item)
-                    }}
-                  $isOpen={selectedTreatment?.id === item.id}
-                  $disabled={item.remainingCount === 0 || item.status === 'COMPLETED'}
-                >
-                  <S.ProcedureInfoTop>
-                    <S.ProcedureName>{item.name ||'일반 시술권'}</S.ProcedureName>
-                    {item.totalCount > 1 && (
-                      <S.ProcedureRoundBadge>
-                        {item.totalCount - item.remainingCount}회차
-                      </S.ProcedureRoundBadge>
-                    )}                    
-                    <S.StatusBadge $status={item.status}>
-                       { STATUS_MAP[item.status] }
-                    </S.StatusBadge>
-                  </S.ProcedureInfoTop>
-                  <S.ProcedureDetails>
-                      <div>
-                      <S.ProcedureDate>마지막 이용일 : {item.date}</S.ProcedureDate> 
-                      {item.expire && <S.ProcedureDate>만료일: {item.expire}</S.ProcedureDate> }
-                      </div>
+              {isLoading ? 
+                <S.EmptyMessage>시술권을 불러오는 중입니다..</S.EmptyMessage>
+              :(
+                treatments.length === 0 ? (
+                  <S.EmptyMessage>
+                    보유 중인 시술권이 없습니다.
+                  </S.EmptyMessage>
+                ):( 
+                  filteredTreatmentList.map((item) => (
+                  <S.ProcedureItem 
+                    key={item.id}
+                    onClick={() => {
+                      if(item.remainingCount === 0 || item.status === 'COMPLETED') return;
+                        setSelectedTreatment(item)
+                      }}
+                    $isOpen={selectedTreatment?.id === item.id}
+                    $disabled={item.remainingCount === 0 || item.status === 'COMPLETED'}
+                  >
+                    <S.ProcedureInfoTop>
+                      <S.ProcedureName>{item.name ||'일반 시술권'}</S.ProcedureName>
                       {item.totalCount > 1 && (
-                        <S.CountBadge>잔여 {item.remainingCount} / {item.totalCount}회</S.CountBadge>
-                      )}
-                  </S.ProcedureDetails>
-                </S.ProcedureItem>
-              )))
-            }
+                        <S.ProcedureRoundBadge>
+                          {item.totalCount - item.remainingCount}회차
+                        </S.ProcedureRoundBadge>
+                      )}                    
+                      <S.StatusBadge $status={item.status}>
+                         { STATUS_MAP[item.status] }
+                      </S.StatusBadge>
+                    </S.ProcedureInfoTop>
+                    <S.ProcedureDetails>
+                        <div>
+                        <S.ProcedureDate>마지막 이용일 : {item.date}</S.ProcedureDate> 
+                        {item.expire && <S.ProcedureDate>만료일: {item.expire}</S.ProcedureDate> }
+                        </div>
+                        {item.totalCount > 1 && (
+                          <S.CountBadge>잔여 {item.remainingCount} / {item.totalCount}회</S.CountBadge>
+                        )}
+                    </S.ProcedureDetails>
+                  </S.ProcedureItem>
+                )))
+              )
+              }
             </S.ProcedureList>
           </div>
           </S.ProcedureCard>

@@ -2,6 +2,20 @@ import styled from 'styled-components';
 import { FiLoader } from 'react-icons/fi'; // 또는 선호하시는 아이콘
 import { BoxShadow, CircleBtn, FlexBetween, FlexCenter, NoDrag } from '@/assets/css/Common.styles';
 
+export const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  svg {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #47785a;
+    margin-bottom: 1px;
+  }
+`;
+
+
 export const BookingContainer = styled.section`
   width: 100%;
 `;
@@ -217,7 +231,6 @@ display: flex;
 justify-content: space-between;
 align-items: center;
 overflow: hidden;
-margin-bottom: 16px;
 padding-bottom: 12px;
 
 @media (max-width: 600px) {
@@ -282,10 +295,29 @@ export const EmptyMessage = styled.p`
   letter-spacing: -0.01em;
 `;
 
+export const ProcedureSection = styled.div`
+  && {
+    padding-top: 0;
+  }
+  overflow-y: auto;
+  max-height: 450px;
+`;
 export const ProcedureList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  padding: 0 15px;
+
+`;
+
+export const ProcedureErrorArea = styled.div`
+  box-sizing: border-box;
+  height: 34px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 0;
 `;
 
 export const ProcedureItem = styled.div<{ $isOpen?: boolean; $disabled?: boolean}>`
@@ -429,7 +461,15 @@ export const InputGroup = styled.div`
 `;
 
 export const Label = styled.label`
-  display: block;
+
+  &.reservation-label{
+    width: 100%;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
   font-size: 13.5px;
   font-weight: 600;
   color: #283c2d;
@@ -589,4 +629,15 @@ export const FilterTab = styled.button<{ $isActive: boolean }>`
     border-color: #3b7a57;
     background-color: ${({ $isActive }) => ($isActive ? '#284b37' : '#f0f5ee')};
   }
+`;
+
+export const ErrorText = styled.span`
+  flex: 1;
+  margin: 0;
+  color: #c45c52;
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+  text-align: right;
+  font-weight: 500;
 `;

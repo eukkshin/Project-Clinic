@@ -1525,62 +1525,114 @@ const reservationRepo = AppDataSource.getRepository(Reservation);
 const treatmentRepo = AppDataSource.getRepository(Treatment);
 
 app.post('/api/admin/reservation', async (req, res) => {
-    try {
-        const { chartNo, treatmentIdx, reservationDate, reservationTime, memo } = req.body;
-        
-        if (!chartNo || !reservationDate || !reservationTime) {
-            return res.status(400).json({ 
-                success: false, 
-                message: '필수 정보(차트번호, 예약일자, 예약시간)가 누락되었습니다.' 
-            });
-        }
-        const memberRepo = AppDataSource.getRepository(Member);
-        const treatmentRepo = AppDataSource.getRepository(Treatment);
-        const reservationRepo = AppDataSource.getRepository(Reservation);
+  try {
+    const {
+      chartNo,
+      treatmentIdx,
+      reservationDate,
+      reservationTime,
+      memo,
+    } = req.body;
 
-        //  환자 존재 여부 확인
-        const existingMember = await memberRepo.findOne({ where: { CHART_NO: chartNo } });
-        if (!existingMember) {
-            return res.status(404).json({ success: false, message: '존재하지 않는 환자 차트번호입니다.' });
-        }
-        // 시술권을 선택한 경우, 잔여 횟수가 남아있는지 검사만 수행
-        if (treatmentIdx) {
-            const treatment = await treatmentRepo.findOne({
-                where: { TREATMENT_IDX: treatmentIdx, CHART_NO: chartNo }
-            });
-
-            if (!treatment) {
-                return res.status(404).json({ success: false, message: '유효하지 않은 시술권입니다.' });
-            }
-            
-            if (treatment.REMAINING_COUNT <= 0) {
-                return res.status(400).json({ success: false, message: '잔여 시술 횟수가 모두 소진되었습니다.' });
-            }
-        }
-        const newReservation = reservationRepo.create({
-            CHART_NO: chartNo,
-            TREATMENT_IDX: treatmentIdx || null,
-            RESERVATION_DATE: new Date(reservationDate),
-            RESERVATION_TIME: reservationTime,
-            STATUS: 'RESERVED',
-            MEMO: memo || null
-        });
-        
-        await reservationRepo.save(newReservation);
-
-        return res.status(200).json({ 
-            success: true, 
-            message: '예약이 성공적으로 등록되었습니다.' 
-        });
-
-    } catch (error) {
-        console.error('예약 등록 중 서버 에러 발생:', error);
-        return res.status(500).json({ 
-            success: false, 
-            message: '서버 에러가 발생했습니다.',
-            error: error.message 
-        });
+    // 1. 필수 정보 확인
+    if (!chartNo || !reservationDate || !reservationTime) {
+      return res.status(400).json({
+        success: false,
+        message: '필수 정보(차트번호, 예약일자, 예약시간)가 누락되었습니다.',
+      });
     }
+
+    const memberRepo = AppDataSource.getRepository(Member);
+    const treatmentRepo = AppDataSource.getRepository(Treatment);
+    const reservationRepo = AppDataSource.getRepository(Reservation);
+
+    // 2. 환자 존재 여부 확인
+    const existingMember = await memberRepo.findOne({
+      where: { CHART_NO: chartNo },
+    });
+
+    if (!existingMember) {
+      return res.status(404).json({
+        success: false,
+        message: '존재하지 않는 환자 차트번호입니다.',
+      });
+    }
+
+    // 3. 시술권을 선택한 경우 유효성 및 중복 예약 확인
+    if (treatmentIdx) {
+      const treatment = await treatmentRepo.findOne({
+        where: {
+          TREATMENT_IDX: treatmentIdx,
+          CHART_NO: chartNo,
+        },
+      });
+
+      if (!treatment) {
+        return res.status(404).json({
+          success: false,
+          message: '유효하지 않은 시술권입니다.',
+        });
+      }
+
+      // 잔여 시술 횟수 확인
+      if (treatment.REMAINING_COUNT <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: '잔여 시술 횟수가 모두 소진되었습니다.',
+        });
+      }
+
+      // 진행 중인 예약이 이미 있는지 확인
+      const existingReservation = await reservationRepo
+        .createQueryBuilder('reservation')
+        .where('reservation.CHART_NO = :chartNo', { chartNo })
+        .andWhere('reservation.TREATMENT_IDX = :treatmentIdx', {
+          treatmentIdx,
+        })
+        .andWhere(`
+          reservation.STATUS IN (
+            'RESERVED',
+            'WAITING',
+            'TREATING',
+            'CONSULTING'
+          )
+        `)
+        .getOne();
+
+      // 이미 예약이 있다면 새 예약 생성 중단
+      if (existingReservation) {
+        return res.status(409).json({
+          success: false,
+          message: '해당 시술은 이미 예약이 있습니다. 기존 예약을 변경해 주세요.',
+        });
+      }
+    }
+
+    // 4. 중복 예약이 없으면 새 예약 생성
+    const newReservation = reservationRepo.create({
+      CHART_NO: chartNo,
+      TREATMENT_IDX: treatmentIdx || null,
+      RESERVATION_DATE: new Date(reservationDate),
+      RESERVATION_TIME: reservationTime,
+      STATUS: 'RESERVED',
+      MEMO: memo || null,
+    });
+
+    await reservationRepo.save(newReservation);
+
+    return res.status(200).json({
+      success: true,
+      message: '예약이 성공적으로 등록되었습니다.',
+    });
+  } catch (error) {
+    console.error('예약 등록 중 서버 에러 발생:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: '서버 에러가 발생했습니다.',
+      error: error.message,
+    });
+  }
 });
 
 app.post('/api/admin/reservation/today', async(req, res)=>{
@@ -1700,6 +1752,7 @@ app.get('/api/reservation/patient/:chartNo', async(req, res)=>{
 
     const memberRepo = AppDataSource.getRepository(Member);
     const treatmentRepo = AppDataSource.getRepository(Treatment);
+    const reservationRepo = AppDataSource.getRepository(Reservation);
 
     const user = await memberRepo.findOne({
       where: { CHART_NO: chartNo }
@@ -1712,10 +1765,28 @@ app.get('/api/reservation/patient/:chartNo', async(req, res)=>{
       });
     }
     const treatments = await treatmentRepo.find({
-          where: { CHART_NO: chartNo },
-          order: { CREATED_AT: 'DESC' } 
+        where: { CHART_NO: chartNo },
+        order: { CREATED_AT: 'DESC' } 
       });
     
+    const reservations = await reservationRepo
+      .createQueryBuilder('reservation')
+      .where('reservation.CHART_NO = :chartNo', { chartNo })
+      .andWhere(`
+        reservation.STATUS IN (
+          'RESERVED',
+          'WAITING',
+          'TREATING',
+          'CONSULTING'
+        )
+      `)
+      .andWhere('reservation.RESERVATION_DATE >= TRUNC(SYSDATE)')
+      .orderBy('reservation.RESERVATION_DATE', 'ASC')
+      .addOrderBy('reservation.RESERVATION_TIME', 'ASC')
+      .getMany();
+      
+    
+
     return res.status(200).json({
         success: true,
         user: {
@@ -1726,6 +1797,7 @@ app.get('/api/reservation/patient/:chartNo', async(req, res)=>{
         MEMO: user.MEMO || '',
         },
         treatments,
+        reservations,
     });
   }catch(error){
     console.error('환자 정보 및 시술권 조회 에러:', error);
@@ -1736,6 +1808,90 @@ app.get('/api/reservation/patient/:chartNo', async(req, res)=>{
         });
   }
 
+})
+
+app.post('/api/treatment', async(req,res)=>{
+
+  try{
+    const {
+      chartNo,
+      category,
+      treatmentName,
+      totalCount,
+      price,
+      paymentMethod,
+    } = req.body;
+
+    if (
+      !chartNo ||
+      !treatmentName ||
+      totalCount == null ||
+      price == null ||
+      !paymentMethod
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: '필수 입력값이 누락되었습니다.',
+      });
+    }
+    //숫자검증
+    const count = Number(totalCount);
+    const treatmentPrice = Number(price);
+
+    if(
+      !Number.isInteger(count) ||
+      count <= 0 ||
+      !Number.isFinite(treatmentPrice) ||
+      treatmentPrice < 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: '시술 횟수 또는 가격이 올바르지 않습니다.',
+      });
+    }
+
+    const memberRepo = AppDataSource.getRepository(Member);
+    const treatmentRepo = AppDataSource.getRepository(Treatment);
+
+    //환자 존재 여부 확인
+    const user = await memberRepo.findOne({
+      where: { CHART_NO: chartNo },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: '존재하지 않는 환자 차트번호입니다.',
+      });
+    }
+
+    const newTreatment = treatmentRepo.create({
+      CHART_NO: chartNo,
+      CATEGORY: category || null,
+      TREATMENT_NAME: treatmentName,
+      TOTAL_COUNT: count,
+      REMAINING_COUNT: count,
+      STATUS: 'ACTIVE',
+      PRICE: treatmentPrice,
+      PAYMENT_METHOD: paymentMethod,
+    });
+
+    await treatmentRepo.save(newTreatment);
+
+    return res.status(201).json({
+      success: true,
+      message: '시술권이 등록되었습니다.',
+    });
+
+  }catch(err){
+    console.error('시술권 등록 에러:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: '시술권 등록 중 서버 에러가 발생했습니다.',
+      error: error.message,
+    });
+  }
 })
 
 

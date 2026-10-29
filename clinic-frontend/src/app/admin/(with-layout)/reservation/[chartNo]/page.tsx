@@ -3,18 +3,20 @@
 import React, {useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation'
-import { FaCheckCircle, FaRegCalendarCheck } from 'react-icons/fa';
+import { FaCheckCircle, FaRegCalendar, FaRegCalendarAlt, FaRegCalendarCheck, FaRegCalendarTimes } from 'react-icons/fa';
 import * as S from './reservation.style'
 import { AddTreatmentModal } from '../components/AddTreatmentModal';
 import * as A from "@/assets/css/admin/DetailCMS.styles";
-import { FaRegCommentDots } from 'react-icons/fa6';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FaRegCalendarDays, FaRegCalendarMinus, FaRegCalendarPlus, FaRegCalendarXmark, FaRegClock, FaRegCommentDots } from 'react-icons/fa6';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ErrorState  from '@/ui/feedback/ErrorState';
 import LoadingState from '@/ui/feedback/LoadingState';
+import { error } from 'console';
 
-interface Reservation {
-id: number;              
-chartNo: string;           
+interface ReservationItem {
+reservationIdx: number;
+chartNo: string; 
+treatmentIdx: number;          
 reservationDate: string; 
 reservationTime: string;   
 status: 'RESERVED' | 'WAITING' | 'TREATING' | 'COMPLETED' | 'CANCELLED' | 'CONSULTING';
@@ -54,6 +56,7 @@ interface Patient{
 interface PatientData {
   patient: Patient;
   treatments: TreatmentItem[];
+  reservations: ReservationItem[];
 }
 export default function PatientBookingPage (){
   const params = useParams();
@@ -63,96 +66,163 @@ export default function PatientBookingPage (){
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedTreatment, setSelectedTreatment] = useState<TreatmentItem | null>(null);
   const [memo, setMemo] = useState<string>('');
+  const [editingReservationIdx, setEditingReservationIdx] =useState<number | null>(null);
+
   const [showAddTreatModal,setShowAddTreatModal ]=useState(false);
-
-
-
-
-  // const [treatments, setTreatments] = useState<TreatmentItem[]>([]);
-  // const [isLoading, setIsLoading]= useState(true);
   const [showMemoTooltip, setShowMemoTooltip] = useState(false);
 
   const [filter, setFilter] = useState<TreatmentStatus|'ALL'>('ALL');
 
+  const [errorMessage, setErrorMessage]=useState({
+    treatment:'',
+    date: '',
+    time: '',
+  })
+
+  const queryClient = useQueryClient();
+  
+  const { data, isLoading, isError, refetch, isFetching} = useQuery({
+    queryKey:  ['patientReservation', chartNo],
+    queryFn: ()=> fetchPatientData(chartNo),
+    enabled: !!chartNo,
+  })
+
+  const patient = data?.patient ?? {
+  chartNo,
+  name: '',
+  phone: '',
+  status: '정상',
+  memo: '',
+  };
+
+  const treatments: TreatmentItem[] = data?.treatments ?? [];
+
+  const reservations = data?.reservations ?? [];
+
+  const getNextReservation = (treatmentId: number)=>{
+    return reservations
+    .filter(r =>
+        Number(r.treatmentIdx) === treatmentId &&
+        ['RESERVED', 'WAITING', 'TREATING', 'CONSULTING'].includes(
+          r.status
+        )
+    )
+    .sort((a, b) => {
+      const dateA = a.reservationDate.slice(0, 10);
+      const dateB = b.reservationDate.slice(0, 10);
+
+      return (
+        dateA.localeCompare(dateB) ||
+        a.reservationTime.localeCompare(b.reservationTime)
+      );
+    })[0];
+  }
   const fetchPatientData = async (chartNo:string) : Promise<PatientData>=> {
         
     //chartNo로 환자 정보 및 시술권 조회 API 호출
-        const response = await axios.get(`http://localhost:4000/api/reservation/patient/${chartNo}`);
+    const response = await axios.get(`http://localhost:4000/api/reservation/patient/${chartNo}`);
 
-        const userData = response.data.user;
-        const treatData = response.data.treatments;
-        
-        return{ 
-          patient: {
-          chartNo: userData.CHART_NO,
-          name: userData.USER_NAME || userData.NAME || '고객',
-          phone: userData.PHONE || '연락처 없음',
-          status: userData.STATUS || '정상',
-          memo: userData.MEMO || '귀여움짱귀여움',
-          },
-          treatments :  treatData.map((t:any)=>({
-            id: t.TREATMENT_IDX,
-            name: t.TREATMENT_NAME || '일반 시술권',
-            remainingCount: t.REMAINING_COUNT ?? 0,
-            totalCount: t.TOTAL_COUNT ?? 0,
-            status: t.STATUS || 'ACTIVE',
-            date:t.UPDATED_AT ? t.UPDATED_AT.substring(0,10) :'날짜 미상',
-            expire:t.EXPIRE_DATE,
-          })),
+    const userData = response?.data?.user;
+    const treatData = response?.data?.treatments;
+    const bookingData = response?.data?.reservations;
+    
+    return{ 
+      patient: {
+      chartNo: userData.CHART_NO,
+      name: userData.USER_NAME || userData.NAME || '고객',
+      phone: userData.PHONE || '연락처 없음',
+      status: userData.STATUS || '정상',
+      memo: userData.MEMO || '귀여움짱귀여움',
+      },
+      treatments :  (treatData ?? []).map((t:any)=>({
+        id: t.TREATMENT_IDX,
+        name: t.TREATMENT_NAME || '일반 시술권',
+        remainingCount: t.REMAINING_COUNT ?? 0,
+        totalCount: t.TOTAL_COUNT ?? 0,
+        status: t.STATUS || 'ACTIVE',
+        date:t.UPDATED_AT ? t.UPDATED_AT.substring(0,10) :'날짜 미상',
+        expire:t.EXPIRE_DATE,
+      })),
+
+      reservations: (bookingData ?? []).map((r:any)=>({
+        reservationIdx: r.RESERVATION_IDX,
+        chartNo: r.CHART_NO,
+        treatmentIdx: r.TREATMENT_IDX,
+        reservationDate: r.RESERVATION_DATE,
+        reservationTime: r.RESERVATION_TIME,
+        status: r.STATUS,
+        memo: r.MEMO,
+      }))
+    }
+    };
+    
+    const { mutate, isPending } = useMutation({
+      mutationFn: async(data)=>{
+        const response = await axios.post('http://localhost:4000/api/admin/reservation',data)
+
+        if(!response.data.success){
+          throw new Error(response.data.message || '예약등록에 실패했습니다')
         }
-    };
-    
-    const queryClient = useQueryClient();
-    
-    const { data, isLoading, isError, error, refetch, isFetching} = useQuery({
-      queryKey:  ['treatments', chartNo],
-      queryFn: ()=> fetchPatientData(chartNo),
-      enabled: !!chartNo,
+        return response.data;
+      },
+      onSuccess:()=>{
+        alert('예약이 성공적으로 완료되었습니다!')
+        setSelectedDate('');
+        setSelectedTime('');
+        setSelectedTreatment(null);
+        setMemo('');
+        queryClient.invalidateQueries({queryKey: ['patientReservation', chartNo]});
+      },
+      onError:(error)=>{
+        const serverMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message
+        : undefined;
+        alert(serverMessage || error.message || '서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+      }
     })
-
-    const patient = data?.patient ?? {
-      chartNo,
-      name: '',
-      phone: '',
-      status: '정상',
-      memo: '',
-    };
-
-    const treatments: TreatmentItem[] = data?.treatments ?? [];
-
+  
   const handleBookingSubmit = async()=>{
-    if(!selectedDate || !selectedTime){
-      alert('예약 날짜와 시간을 모두 선택해 주세요.');
+
+    //시술권
+    if (!selectedTreatment) {
+      setErrorMessage(prev=>({...prev, treatment:'시술권을 먼저 선택해 주세요.'}));
+    return;
+    }
+    //날짜
+    if(!selectedDate){
+      setErrorMessage(prev=>({...prev, date:'예약 날짜를 선택해 주세요.'}));
       return;
     }
-    try{
-        const response = await axios.post('http://localhost:4000/api/admin/reservation',{
-            chartNo: patient.chartNo,
-            treatmentIdx: selectedTreatment ? selectedTreatment.id : null,
-            reservationDate: selectedDate,
-            reservationTime: selectedTime,
-            memo: memo || '',
-        })
 
-        if(response.data.success){
-          alert('예약이 성공적으로 완료되었습니다!');
-          setSelectedDate('');
-          setSelectedTime('');
-          setSelectedTreatment(null);
-          setMemo('');
-        }else{
-            alert(`예약 실패: ${response.data.message ||"알 수 없는 오류가 발생했습니다." }`);
-        }
-    }catch(error:any){
-        console.error('예약 요청 중 에러:', error);
+    const now = new Date();
+    const today =
+    `${now.getFullYear()}-`+
+    `${String(now.getMonth()+1).padStart(2,'0')}-`+
+    `${String(now.getDate()).padStart(2,'0')}`
 
-        const serverMessage = error.response?.data?.message;
-        if(serverMessage){
-            alert(`예약실패: ${serverMessage}`)
-        }else{
-            alert("서버 통신 중 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-        }
+    if(selectedDate < today){
+      setErrorMessage(prev=>({...prev, date:'오늘 이전 날짜는 예약할 수 없습니다.'}));
+      return;
     }
+
+    //시간 선택 확인
+    if (!selectedTime) {
+      setErrorMessage(prev=>({...prev, time:'예약 시간을 선택해 주세요.'}));
+      return;
+    }
+
+    //중복제출방지
+    if(isPending) return;
+
+    const data:ReservationItem = {
+      chartNo: patient.chartNo,
+      treatmentIdx:selectedTreatment.id,
+      reservationDate: selectedDate,
+      reservationTime: selectedTime,
+      status: 'RESERVED',
+      memo: memo || '',
+    }
+    mutate(data);
   }
 
   const filteredTreatmentList = treatments.filter(item=>{
@@ -164,6 +234,13 @@ export default function PatientBookingPage (){
     return treatments.filter(item=>item.status === tab).length;
   }
 
+  const clearError = (field: 'treatment'|'date'|'time')=>{
+    setErrorMessage(prev=>({
+      ...prev,
+      [field]:'',
+    }))
+  }
+  
   if (isError) {
     return (
       <ErrorState
@@ -173,7 +250,6 @@ export default function PatientBookingPage (){
       />
     );
   }
-  
   
   return (
     <>
@@ -272,52 +348,94 @@ export default function PatientBookingPage (){
 
               </S.FilterTabWrapper>
             </S.CardHeader>
-          <div className="admin-panel-body">
-            <S.ProcedureList>
-              {isLoading ? 
-                <S.EmptyMessage>시술권을 불러오는 중입니다..</S.EmptyMessage>
-              :(
-                treatments.length === 0 ? (
-                  <S.EmptyMessage>
-                    보유 중인 시술권이 없습니다.
-                  </S.EmptyMessage>
-                ):( 
-                  filteredTreatmentList.map((item) => (
-                  <S.ProcedureItem 
-                    key={item.id}
-                    onClick={() => {
-                      if(item.remainingCount === 0 || item.status === 'COMPLETED') return;
-                        setSelectedTreatment(item)
-                      }}
-                    $isOpen={selectedTreatment?.id === item.id}
-                    $disabled={item.remainingCount === 0 || item.status === 'COMPLETED'}
-                  >
-                    <S.ProcedureInfoTop>
-                      <S.ProcedureName>{item.name ||'일반 시술권'}</S.ProcedureName>
-                      {item.totalCount > 1 && (
-                        <S.ProcedureRoundBadge>
-                          {item.totalCount - item.remainingCount}회차
-                        </S.ProcedureRoundBadge>
-                      )}                    
-                      <S.StatusBadge $status={item.status}>
-                         { STATUS_MAP[item.status] }
-                      </S.StatusBadge>
-                    </S.ProcedureInfoTop>
-                    <S.ProcedureDetails>
-                        <div>
-                        <S.ProcedureDate>마지막 이용일 : {item.date}</S.ProcedureDate> 
-                        {item.expire && <S.ProcedureDate>만료일: {item.expire}</S.ProcedureDate> }
-                        </div>
+            <S.ProcedureSection className="admin-panel-body reservation-body">
+              <S.ProcedureErrorArea>
+              {errorMessage.treatment && 
+                <S.ErrorText>{errorMessage.treatment}</S.ErrorText>}
+              </S.ProcedureErrorArea>
+              <S.ProcedureList>
+                {isLoading ? 
+                  <S.EmptyMessage>시술권을 불러오는 중입니다..</S.EmptyMessage>
+                :(
+                  treatments.length === 0 ? (
+                    <S.EmptyMessage>
+                      보유 중인 시술권이 없습니다.
+                    </S.EmptyMessage>
+                  ):( 
+                    filteredTreatmentList.map((item) => (
+                    <S.ProcedureItem 
+                      key={item.id}
+                      onClick={() => {
+                        if(item.remainingCount === 0 || item.status === 'COMPLETED') return;
+                          setSelectedTreatment(item)
+                          clearError('treatment');
+
+                          const existingReservation = getNextReservation(item.id);
+                          if(existingReservation){
+                             // 기존 예약이 있으면 수정 모드
+                              setEditingReservationIdx(existingReservation.reservationIdx);
+
+                              // 기존 예약 날짜와 시간을 입력창에 표시
+                              setSelectedDate(
+                                existingReservation.reservationDate.slice(0, 10)
+                              );
+                              setSelectedTime(existingReservation.reservationTime);
+
+                              // 기존 예약 메모 표시
+                              setMemo(existingReservation.memo ?? '');
+                            } else {
+                              // 예약이 없으면 신규 예약 모드
+                              setEditingReservationIdx(null);
+                              setSelectedDate('');
+                              setSelectedTime('');
+                              setMemo('');
+                            }
+                        }}
+                      $isOpen={selectedTreatment?.id === item.id}
+                      $disabled={item.remainingCount === 0 || item.status === 'COMPLETED'}
+                    >
+                      <S.ProcedureInfoTop>
+                        <S.ProcedureName>{item.name ||'일반 시술권'}</S.ProcedureName>
                         {item.totalCount > 1 && (
-                          <S.CountBadge>잔여 {item.remainingCount} / {item.totalCount}회</S.CountBadge>
-                        )}
-                    </S.ProcedureDetails>
-                  </S.ProcedureItem>
-                )))
-              )
-              }
-            </S.ProcedureList>
-          </div>
+                          <S.ProcedureRoundBadge>
+                            {item.totalCount - item.remainingCount}회차
+                          </S.ProcedureRoundBadge>
+                        )}                    
+                        <S.StatusBadge $status={item.status}>
+                          { STATUS_MAP[item.status] }
+                        </S.StatusBadge>
+                      </S.ProcedureInfoTop>
+                      <S.ProcedureDetails>
+                          <div>
+                          {(()=>{
+                            const nextReservation= getNextReservation(item.id);
+                            return(
+                                  <S.IconWrapper>
+                                    <FaRegClock/>
+                                    <S.ProcedureDate>
+                                      다음 예약일:{" "}
+                                      {nextReservation 
+                                      ? `${nextReservation.reservationDate.slice(0,10)} > ${nextReservation.reservationTime}` 
+                                      : "예약 없음"}
+                                    </S.ProcedureDate> 
+                                  </S.IconWrapper>
+                            )
+                          })()}
+                          {item.expire && <S.ProcedureDate>만료일: {item.expire}</S.ProcedureDate> }
+                          </div>
+                          {item.totalCount > 1 && (
+                            <S.CountBadge>잔여 {item.remainingCount} / {item.totalCount}회</S.CountBadge>
+                          )}
+                          {item.totalCount ===1 && (
+                            <S.CountBadge> {item.totalCount}회</S.CountBadge>
+                          )}
+                      </S.ProcedureDetails>
+                    </S.ProcedureItem>
+                  )))
+                )
+                }
+              </S.ProcedureList>
+            </S.ProcedureSection>
           </S.ProcedureCard>
         </S.LeftColumn>
 
@@ -343,17 +461,25 @@ export default function PatientBookingPage (){
             <div className="admin-panel-body">
               {/* 캘린더 영역 */}
               <S.InputGroup className="admin-form-field">
-                <S.Label>날짜 선택</S.Label>
+                
+                <S.Label className="reservation-label">
+                  <span>날짜 선택</span>
+                  {errorMessage.date && <S.ErrorText>{errorMessage.date}</S.ErrorText>}
+                </S.Label>
+
                 <S.DateInput 
                   type="date" 
                   value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
+                  onChange={(e) => {setSelectedDate(e.target.value); clearError('date')}}
                 />
               </S.InputGroup>
 
               {/* 시간대별 버튼 영역 */}
               <S.InputGroup className="admin-form-field">
-                <S.Label>예약 가능 시간</S.Label>
+                 <S.Label className="reservation-label">
+                  <span>예약 가능 시간</span>
+                  {errorMessage.time && <S.ErrorText>{errorMessage.time}</S.ErrorText>}
+                </S.Label>
                 <S.TimeGrid>
                   {TIME_SLOTS.map((time) => (
                     <S.TimeButton
@@ -379,9 +505,10 @@ export default function PatientBookingPage (){
 
             <S.SubmitButton 
               className="admin-primary-action"
+              disabled={isPending}
               onClick={handleBookingSubmit}
             >
-              예약 확정하기
+              {isPending? '예약 등록중' :'예약 확정하기'}
             </S.SubmitButton>
           </S.BookingFormCard>
         </S.RightColumn>

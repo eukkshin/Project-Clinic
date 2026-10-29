@@ -10,6 +10,7 @@ interface AddTreatmentPayload extends TreatmentFormInput{
 export const useAddTreatment = (chartNo: string)=>{
 
     const queryClient = useQueryClient();
+    const queryKey = ['patientReservation', chartNo];
 
     return useMutation({
       mutationFn: async(newTreatment: AddTreatmentPayload)=>{
@@ -17,11 +18,14 @@ export const useAddTreatment = (chartNo: string)=>{
           return res.data;
       },
       onMutate: async(newTreatment)=>{
-          await queryClient.cancelQueries({queryKey: ['treatments', chartNo]});
+          await queryClient.cancelQueries({queryKey});
           
-          const prevTreatments = queryClient.getQueryData(['treatments', chartNo]);
+          const prevData = queryClient.getQueryData(queryKey);
           
-          queryClient.setQueryData(['treatments', chartNo],(oldData:any)=>{
+          queryClient.setQueryData(queryKey,(oldData:any)=>{
+            
+            if (!oldData) return oldData;
+
             const optimisticItem={
               id: `temp-${Date.now()}`,
               treatmentName: newTreatment.treatmentName,
@@ -30,18 +34,21 @@ export const useAddTreatment = (chartNo: string)=>{
               status: 'ACTIVE',
               createdAt: new Date().toISOString(),
             };
-            return oldData ? [optimisticItem, ...oldData] : [optimisticItem]
+            return {
+              ...oldData, 
+              treatments: [optimisticItem, ...oldData.treatments] ,
+              }
           });
-        return { prevTreatments } ;  //백업데이터 반환
+        return { prevData } ;  //백업데이터 반환
       },
       onError: ( err, _, context)=>{
-        if(context?.prevTreatments){  //롤백
-          queryClient.setQueryData(['treatments', chartNo], context.prevTreatments)
+        if(context?.prevData){  //롤백
+          queryClient.setQueryData(queryKey, context.prevData)
         }
         console.error('시술권 추가 실패:', err);
       },
       onSettled: ()=>{
-        queryClient.invalidateQueries({queryKey: ['treatments', chartNo]})
+        queryClient.invalidateQueries({queryKey})
       }
     })
 }

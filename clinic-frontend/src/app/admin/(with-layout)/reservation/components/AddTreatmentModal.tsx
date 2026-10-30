@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAddTreatment } from '@/hooks/useAddTreatment';
+import { useAddTreatment } from '../hooks/useAddTreatment'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { treatmentSchema, TreatmentFormInput } from '@/schema/treatmentSchema'

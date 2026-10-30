@@ -177,37 +177,42 @@ svg{
   font-size: 16px;
 }
 `;
+
+
 export const MemoTooltipBox = styled.div`
-position: absolute;
-left: calc(100% + 8px);
-top: 50%;
-transform: translateY(-50%);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
 
-width: max-content;
-max-width: 280px;
-padding: 12px 24px;
+  width: max-content;
+  max-width: 280px;
+  padding: 12px 24px;
 
-border-radius: 10px;
-font-size: 13px;
-line-height: 1.5;
-white-space: pre-wrap; 
-word-break: break-word;
-z-index: 9999;
-${NoDrag}
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  z-index: 9999;
 
-background-color: rgba(22, 50, 41, 0.65); 
-backdrop-filter: blur(12px);             
--webkit-backdrop-filter: blur(12px);       
+  ${NoDrag}
 
-color: #ffffff;
-  
-border: 1px solid rgba(255, 255, 255, 0.25);
-border-top: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(235, 245, 238, 0.16);
 
-box-shadow: 
-0 10px 30px rgba(0, 0, 0, 0.2),
-inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  color: #244f39;
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  box-shadow:
+    0 8px 32px rgba(31, 55, 40, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.25);
 `;
+
 export const GradeBadge = styled.span<{ $isActive: boolean }>`
   background: ${({ $isActive }) => ($isActive ? '#edf2eb' : '#fdeaea')};
   color: ${({ $isActive }) => ($isActive ? '#284b37' : '#b33939')};

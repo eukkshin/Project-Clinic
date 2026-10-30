@@ -1,17 +1,25 @@
 'use client';
 
-import React, {useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation'
-import { FaCheckCircle, FaRegCalendar, FaRegCalendarAlt, FaRegCalendarCheck, FaRegCalendarTimes } from 'react-icons/fa';
+import { FaCheckCircle,FaRegCalendarCheck } from 'react-icons/fa';
 import * as S from './reservation.style'
 import { AddTreatmentModal } from '../components/AddTreatmentModal';
 import * as A from "@/assets/css/admin/DetailCMS.styles";
-import { FaRegCalendarDays, FaRegCalendarMinus, FaRegCalendarPlus, FaRegCalendarXmark, FaRegClock, FaRegCommentDots } from 'react-icons/fa6';
+import { FaRegClock, FaRegCommentDots } from 'react-icons/fa6';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ErrorState  from '@/ui/feedback/ErrorState';
 import LoadingState from '@/ui/feedback/LoadingState';
-import { error } from 'console';
+import { useToastContext } from '@/ui/feedback/toast/ToastContext';
+
+type ReservationStatus =
+  | 'RESERVED'
+  | 'WAITING'
+  | 'TREATING'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'CONSULTING';
 
 interface ReservationItem {
 reservationIdx: number;
@@ -19,9 +27,11 @@ chartNo: string;
 treatmentIdx: number;          
 reservationDate: string; 
 reservationTime: string;   
-status: 'RESERVED' | 'WAITING' | 'TREATING' | 'COMPLETED' | 'CANCELLED' | 'CONSULTING';
+status: ReservationStatus
 memo?: string;         
 }
+
+type CreateReservationItem = Omit<ReservationItem, 'reservationIdx'>
 
 const TIME_SLOTS = [
   '10:00', '10:30', '11:00', '11:30', 
@@ -59,6 +69,8 @@ interface PatientData {
   reservations: ReservationItem[];
 }
 export default function PatientBookingPage (){
+
+  const { showToast } = useToastContext();
   const params = useParams();
   const chartNo = params?.chartNo as string;
     
@@ -100,8 +112,7 @@ export default function PatientBookingPage (){
   const reservations = data?.reservations ?? [];
 
   const getNextReservation = (treatmentId: number)=>{
-    return reservations
-    .filter(r =>
+    return reservations.filter(r =>
         Number(r.treatmentIdx) === treatmentId &&
         ['RESERVED', 'WAITING', 'TREATING', 'CONSULTING'].includes(
           r.status
@@ -132,7 +143,7 @@ export default function PatientBookingPage (){
       name: userData.USER_NAME || userData.NAME || '고객',
       phone: userData.PHONE || '연락처 없음',
       status: userData.STATUS || '정상',
-      memo: userData.MEMO || '귀여움짱귀여움',
+      memo: userData.MEMO || 'test',
       },
       treatments :  (treatData ?? []).map((t:any)=>({
         id: t.TREATMENT_IDX,
@@ -151,33 +162,42 @@ export default function PatientBookingPage (){
         reservationDate: r.RESERVATION_DATE,
         reservationTime: r.RESERVATION_TIME,
         status: r.STATUS,
-        memo: r.MEMO,
+        memo: r.MEMO ?? '',
       }))
     }
     };
     
     const { mutate, isPending } = useMutation({
-      mutationFn: async(data)=>{
+      mutationFn: async(data: CreateReservationItem)=>{
+        if(editingReservationIdx !== null){
+          const response = await axios.patch( `http://localhost:4000/api/admin/reservation/${editingReservationIdx}`,{
+            reservationDate: data.reservationDate,
+            reservationTime: data.reservationTime,
+            memo: data.memo,
+          })
+          if(!response.data.success){
+            throw new Error(response.data.message || '예약수정에 실패했습니다')
+          }
+          return response.data;
+        }
         const response = await axios.post('http://localhost:4000/api/admin/reservation',data)
-
         if(!response.data.success){
           throw new Error(response.data.message || '예약등록에 실패했습니다')
         }
         return response.data;
+        
       },
       onSuccess:()=>{
-        alert('예약이 성공적으로 완료되었습니다!')
+        showToast('예약이 성공적으로 처리되었습니다.', 'success')
         setSelectedDate('');
         setSelectedTime('');
         setSelectedTreatment(null);
+        setEditingReservationIdx(null);
         setMemo('');
         queryClient.invalidateQueries({queryKey: ['patientReservation', chartNo]});
       },
-      onError:(error)=>{
-        const serverMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message
-        : undefined;
-        alert(serverMessage || error.message || '서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+      onError:(error: Error)=>{
+        showToast('서버 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', 'error')
       }
     })
   
@@ -205,7 +225,6 @@ export default function PatientBookingPage (){
       return;
     }
 
-    //시간 선택 확인
     if (!selectedTime) {
       setErrorMessage(prev=>({...prev, time:'예약 시간을 선택해 주세요.'}));
       return;
@@ -214,7 +233,7 @@ export default function PatientBookingPage (){
     //중복제출방지
     if(isPending) return;
 
-    const data:ReservationItem = {
+    const data:CreateReservationItem = {
       chartNo: patient.chartNo,
       treatmentIdx:selectedTreatment.id,
       reservationDate: selectedDate,
@@ -222,7 +241,7 @@ export default function PatientBookingPage (){
       status: 'RESERVED',
       memo: memo || '',
     }
-    mutate(data);
+    mutate(data); //전송
   }
 
   const filteredTreatmentList = treatments.filter(item=>{
@@ -372,7 +391,6 @@ export default function PatientBookingPage (){
 
                           const existingReservation = getNextReservation(item.id);
                           if(existingReservation){
-                             // 기존 예약이 있으면 수정 모드
                               setEditingReservationIdx(existingReservation.reservationIdx);
 
                               // 기존 예약 날짜와 시간을 입력창에 표시
@@ -484,7 +502,10 @@ export default function PatientBookingPage (){
                   {TIME_SLOTS.map((time) => (
                     <S.TimeButton
                       key={time}
-                      onClick={() => setSelectedTime(time)}
+                      onClick={() => {
+                        setSelectedTime(time);
+                        clearError('time');
+                      }}
                       $active={selectedTime === time}
                     >
                       {time}
@@ -508,7 +529,14 @@ export default function PatientBookingPage (){
               disabled={isPending}
               onClick={handleBookingSubmit}
             >
-              {isPending? '예약 등록중' :'예약 확정하기'}
+              {isPending
+              ? (editingReservationIdx !==null)
+                ? '예약 수정중...'
+                : '예약 등록중...'
+              : (editingReservationIdx !== null)
+                ? '예약 수정하기'
+                : '예약 등록하기'
+              }
             </S.SubmitButton>
           </S.BookingFormCard>
         </S.RightColumn>
@@ -521,7 +549,6 @@ export default function PatientBookingPage (){
     isOpen={showAddTreatModal}
     onClose={() => setShowAddTreatModal(false)}
     />
-    
     </>
   );
 };

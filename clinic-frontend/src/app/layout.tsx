@@ -5,6 +5,7 @@ import { GlobalStyle } from "@/assets/css/GlobalStyle";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import StyledComponentsRegistry from "@/lib/registry";
 import QueryProvider from "@/components/provider/QueryProvider";
+import { ToastProvider } from "@/ui/feedback/toast/ToastContext";
 
 // 영문 디스플레이: Next.js가 Google Font를 빌드 시 내려받아 자체 호스팅한다.
 const cormorant = Cormorant_Garamond({
@@ -34,7 +35,9 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <GlobalStyle />
           <QueryProvider>
-            <ConditionalLayout>{children}</ConditionalLayout>
+            <ToastProvider>
+              <ConditionalLayout>{children}</ConditionalLayout>
+            </ToastProvider>
           </QueryProvider>
         </StyledComponentsRegistry>
       </body>

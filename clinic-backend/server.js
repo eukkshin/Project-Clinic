@@ -1524,6 +1524,7 @@ const memberRepo = AppDataSource.getRepository(Member);
 const reservationRepo = AppDataSource.getRepository(Reservation);
 const treatmentRepo = AppDataSource.getRepository(Treatment);
 
+//예약등록
 app.post('/api/admin/reservation', async (req, res) => {
   try {
     const {
@@ -1634,6 +1635,113 @@ app.post('/api/admin/reservation', async (req, res) => {
     });
   }
 });
+
+//기존 예약 수정 patch
+
+app.patch('/api/admin/reservation/:reservationIdx', async(req,res)=>{
+  try{
+    const reservationIdx = Number(req.params.reservationIdx);
+
+    if(!Number.isInteger(reservationIdx) || reservationIdx <=0 ){
+      return res.status(400).json({
+        success: false,
+        message: '올바르지 않은 예약 번호입니다.',
+      });
+    }
+
+    const { reservationDate, reservationTime, memo } = req.body;
+    
+    if (!reservationDate || !reservationTime) {
+      return res.status(400).json({
+        success: false,
+        message: '예약 날짜와 시간은 필수입니다.',
+      });
+    }
+
+    // 날짜 형식 확인 (YYYY-MM-DD)
+    if (
+      typeof reservationDate !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(reservationDate)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: '올바른 예약 날짜 형식이 아닙니다.',
+      });
+    }
+
+    const parsedDate = new Date(reservationDate);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: '유효하지 않은 예약 날짜입니다.',
+      });
+    }
+
+    if (
+      typeof reservationTime !== 'string' ||
+      reservationTime.trim() === '' ||
+      reservationTime.length > 10
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: '올바른 예약 시간을 입력해 주세요.',
+      });
+    }
+
+     // 3. 예약 데이터 조회
+    const reservationRepo = AppDataSource.getRepository(Reservation);
+
+    const existingReservation = await reservationRepo.findOne({
+      where: {
+        RESERVATION_IDX: reservationIdx,
+      },
+    });
+
+    if (!existingReservation) {
+      return res.status(404).json({
+        success: false,
+        message: '수정할 예약을 찾을 수 없습니다.',
+      });
+    }
+
+    // 4. 진행 중인 예약인지 확인
+    const activeStatuses = [
+      'RESERVED',
+      'WAITING',
+      'TREATING',
+      'CONSULTING',
+    ];
+
+    if (!activeStatuses.includes(existingReservation.STATUS)) {
+      return res.status(409).json({
+        success: false,
+        message: '이미 완료되었거나 취소된 예약은 수정할 수 없습니다.',
+      });
+    }
+
+    existingReservation.RESERVATION_DATE = parsedDate;
+    existingReservation.RESERVATION_TIME = reservationTime;
+    existingReservation.MEMO = memo?.trim() || null;
+
+    await reservationRepo.save(existingReservation);
+
+    return res.status(200).json({
+      success: true,
+      message: '예약이 성공적으로 수정되었습니다.'
+    });
+  }catch(err){
+    console.error('예약 수정 중 서버 에러 발생:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: '예약 수정 중 서버 에러가 발생했습니다.',
+      error: error.message,
+    });
+  }
+})
+
+
 
 app.post('/api/admin/reservation/today', async(req, res)=>{
   try{

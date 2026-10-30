@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 
 export const C = {
   green: "#1B3528",
@@ -11,8 +11,11 @@ export const C = {
   muted: "#6A786D",
   line: "rgba(28,60,42,.18)",
 };
-const serif = '"Noto Serif KR", "Nanum Myeongjo", Georgia, serif';
+const serif = 'var(--ahns-korean-display, "Pretendard Variable", sans-serif)';
+
 const latin = '"Cormorant Garamond", "Iowan Old Style", Georgia, serif';
+const emphasisFont =
+  '"Cormorant Garamond","Paperlogy","Pretendard Variable",sans-serif';
 const revealStyles = css`
   &[data-about-motion="on"] [data-about-reveal] {
     opacity: 0;
@@ -170,9 +173,15 @@ export const Title = styled.h1`
   line-height: 1.23;
   word-break: keep-all;
   em {
-    font-family: ${latin};
-    font-weight: 400;
-    font-size: 1.1em;
+    font-family: ${emphasisFont};
+    font-size: 1.12em;
+    font-weight: 300;
+    font-style: normal;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    word-break: keep-all;
+    color: #f0eee5;
+    background-color: #536c59;
   }
   @media (max-width: 600px) {
     font-size: clamp(42px, 11vw, 60px);
@@ -185,6 +194,17 @@ export const SectionTitle = styled.h2`
   letter-spacing: -0.07em;
   line-height: 1.35;
   word-break: keep-all;
+  em {
+    font-family: ${emphasisFont};
+    font-size: 1.12em;
+    font-weight: 300;
+    font-style: normal;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    word-break: keep-all;
+    color: #f0eee5;
+    background-color: #536c59;
+  }
 `;
 export const Body = styled.p`
   font-size: clamp(13px, 1.2vw, 16px);

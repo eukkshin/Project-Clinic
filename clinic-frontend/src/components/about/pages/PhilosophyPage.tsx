@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import * as S from "@/components/about/pages/AboutPages.styles";
-import {
-  AboutBottom,
-  AboutFrame,
-} from "@/components/about/shared/AboutFoundation";
+import * as S from '@/components/about/pages/AboutPages.styles';
+import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
+import HangulTyping from '@/components/ui/TypingText';
 
 const beliefs = [
   {
@@ -40,7 +38,9 @@ export default function PhilosophyPage() {
                 <br />
                 먼저 생각하는
                 <br />
-                <em>한 사람.</em>
+                <em>
+                  <HangulTyping text="한 사람." speed={90} />
+                </em>
               </S.Title>
               <S.Body
                 style={{ marginTop: 40, maxWidth: 425, color: S.C.muted }}

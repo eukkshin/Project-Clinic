@@ -1,13 +1,12 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
-import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
-import { Popup } from "@/components/ui/Popup";
-import * as S from "@/styles/auth/Auth.styles";
-
-import AuthBrandPanel from "@/components/auth/AuthBrandPanel";
+import AuthBrandPanel from '@/components/auth/AuthBrandPanel';
+import { Popup } from '@/components/ui/Popup';
+import { API_ORIGIN } from '@/lib/api/config';
+import * as S from '@/styles/auth/Auth.styles';
 
 type LoginForm = { userId: string; userPw: string };
 type PopupConfig = {
@@ -70,6 +69,7 @@ export default function LoginPage() {
     try {
       const response = await fetch(`${API_URL}/api/login`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: formData.userId.trim(),

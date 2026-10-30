@@ -3,9 +3,12 @@ const { Like, TreeRepository } = require("typeorm");
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const AppDataSource = require("./db"); // db.js 파일 경로 확인
+const AppDataSource = require("./db");
+const {
+  createPasswordRecoveryRouter,
+} = require("./src/routes/password-recovery.routes");
 
-const Member = require("./src/entity/Member"); // Member.js 파일 경로 확인
+const Member = require("./src/entity/Member");
 const FooterSettings = require("./src/entity/FooterSettings");
 const Consult = require("./src/entity/Consult");
 const NavSetting = require("./src/entity/NavSetting");
@@ -32,6 +35,20 @@ const path = require("path");
 
 const app = express();
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const {
+  COOKIE_NAME,
+  JWT_ISSUER,
+  JWT_AUDIENCE,
+} = require("./src/middleware/authenticateMember");
+const mypageRouter = require("./src/routes/mypage.routes");
+const {
+  router: reservationRouter,
+} = require("./src/routes/reservations.routes");
+
+const {
+  createAdminReservationRouter,
+} = require("./src/routes/admin-reservations.routes");
 
 // 1. CORS 설정 (프론트엔드 3000번 포트의 접근만 안전하게 허용)
 app.use(
@@ -48,6 +65,8 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+// 비밀번호 재설정 API
+app.use("/api", createPasswordRecoveryRouter({ AppDataSource }));
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 const uploadDir = path.join(__dirname, "public/images");
@@ -212,12 +231,48 @@ app.post("/api/login", async (req, res) => {
     }
 
     //4 로그인 성공! (프론트앤드에서 라우팅을 위해 isAdmin값을 같이 넘겨줍니다)
-    res.status(200).json({
+    // 4. 회원 계정 상태 확인
+    if (user.STATUS !== "정상") {
+      return res.status(403).json({
+        success: false,
+        message: "이용할 수 없는 계정입니다.",
+      });
+    }
+
+    // 5. JWT 환경변수 확인
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET이 설정되지 않았습니다.");
+
+      return res.status(500).json({
+        success: false,
+        message: "로그인 인증 설정 오류입니다.",
+      });
+    }
+
+    // 6. JWT 생성
+    const token = jwt.sign({}, process.env.JWT_SECRET, {
+      algorithm: "HS256",
+      subject: String(user.USER_IDX),
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
+      expiresIn: "8h",
+    });
+
+    // 7. 인증 쿠키 발급
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 8 * 60 * 60 * 1000,
+    });
+
+    // 8. 기존 로그인 응답 유지
+    return res.status(200).json({
       success: true,
       message: "로그인에 성공했습니다",
       isAdmin: user.IS_ADMIN,
       userName: user.USER_NAME,
-      //관리자면 1, 일반 회원이면 0
     });
   } catch (error) {
     console.error("로그인 에러:", error);
@@ -1230,117 +1285,6 @@ app.get("/api/boards/:idx", async (req, res) => {
   }
 });
 
-//비밀번호 찾기
-app.post("/api/send-reset-email", async (req, res) => {
-  try {
-    const { userId, userName, phone } = req.body;
-
-    if (!userId || !userName || !phone) {
-      return res.status(400).json({
-        success: false,
-        message: "인증 정보를 모두 입력해 주세요",
-      });
-    }
-
-    const memberRepository = AppDataSource.getRepository(Member);
-
-    //오라클에서 찾기
-    const user = await memberRepository.findOne({
-      where: { USER_ID: userId, USER_NAME: userName, PHONE: phone },
-    });
-
-    if (!user) {
-      return res.status(401).json({
-        sucess: false,
-        message: "입력하신 정보와 일치하는 회원이 없습니다.",
-      });
-    }
-
-    //이메일 발송기 세팅(구글 gmail 기준)
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "anakyn01@gmail.com",
-        pass: "",
-      },
-    });
-
-    const resetUrl = `http://localhost:3000/find/reset?userId=${user.USER_ID}`;
-
-    const mailOptions = {
-      from: '"성형외과 관리자" <nop@nobodyhelpme.com>',
-      to: user.EMAIL, // DB에 저장된 유저의 이메일로 쏩니다!
-      subject: "[성형외과] 비밀번호 재설정 안내",
-      html: `
-<div style="padding: 20px; text-align: center;">
-<h2>비밀번호 재설정</h2>
-<p>${user.USER_NAME}님, 본인인증이 완료되었습니다.</p>
-<p>아래 버튼을 클릭하여 새로운 비밀번호를 설정해 주세요.</p>
-<a href="${resetUrl}" style="display:inline-block; padding:10px 20px; background-color:#4e73df; color:#fff; text-decoration:none; border-radius:5px; margin-top:20px;">
-새 비밀번호 설정하기
-</a>
-</div>
-`,
-    };
-    //이메일 전송
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({
-      success: true,
-      message: "이메일 발송 성공",
-    });
-  } catch (error) {
-    console.error("이메일 발송 에러", error);
-    res.status(500).json({
-      success: false,
-      message: "서버 오류가 발생했습니다",
-    });
-  }
-});
-
-//비밀번호변경 api
-app.post("/api/reset-password", async (req, res) => {
-  try {
-    const { userId, newPw } = req.body;
-
-    if (!userId || !newPw) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-
-    const memberRepository = AppDataSource.getRepository(Member);
-
-    const user = await memberRepository.findOne({
-      where: { USER_ID: userId },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "회원을 찾을 수 없습니다.",
-      });
-    }
-
-    //새비밀번호를 암호화
-    const hashedPw = await bcrypt.hash(newPw, 10);
-
-    user.USER_PW = hashedPw;
-
-    await memberRepository.save(user);
-
-    res.status(200).json({
-      success: false,
-      message: "비밀번호가 성공적으로 변경되었습니다.",
-    });
-  } catch (error) {
-    console.error("비밀번호 업데이트 에러:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "서버 오류가 발생했습니다." });
-  }
-});
-
 const qnaRepository = AppDataSource.getRepository(Qna);
 
 // ==========================================
@@ -1516,6 +1460,32 @@ app.use("/api/admin/session", adminSessionRouter);
 app.use("/api/details", publicRouter);
 app.use("/api/admin/detail", adminRouter);
 app.use("/api/admin/detail/images", createDetailImageRouter({ requireAdmin }));
+// 마이페이지 API
+app.use("/api/mypage", mypageRouter);
+app.post("/api/logout", (req, res) => {
+  res.clearCookie("clinic_session", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "로그아웃되었습니다.",
+  });
+});
+// 일반 회원 예약
+app.use("/api/reservations", reservationRouter);
+
+// 관리자 예약 관리
+app.use(
+  "/api/admin/reservations",
+  createAdminReservationRouter({
+    dataSource: AppDataSource,
+    requireAdmin,
+  }),
+);
 
 const PORT = process.env.PORT || 4000;
 //포트폴리오로 고도화 아이디 확인하고 그사람에 가입 이메일을 판단하고..거기에 맞는 이메일 발송하겠끔..

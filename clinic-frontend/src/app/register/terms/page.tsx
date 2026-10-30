@@ -1,14 +1,13 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
-import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import DaumPostcode from "react-daum-postcode";
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import DaumPostcode from 'react-daum-postcode';
 
-import { Popup } from "@/components/ui/Popup";
-import * as S from "@/styles/auth/Auth.styles";
-
-import AuthBrandPanel from "@/components/auth/AuthBrandPanel";
+import AuthBrandPanel from '@/components/auth/AuthBrandPanel';
+import { Popup } from '@/components/ui/Popup';
+import { API_ORIGIN } from '@/lib/api/config';
+import * as S from '@/styles/auth/Auth.styles';
 
 type RegisterForm = {
   userName: string;
@@ -286,7 +285,7 @@ export default function TermsPage() {
 
   return (
     <>
-      <S.RegisterShell>
+      <S.RegisterShell data-lenis-prevent>
         <S.RegisterLayout>
           <AuthBrandPanel mode="register" />
           <S.FormSurface ref={formScrollRef} aria-labelledby="register-title">

@@ -1465,7 +1465,7 @@ app.put("/api/admin/qnas/:id", async (req, res) => {
 //  todayDashbord 대시보드  - 예약 시스템
 // ==========================================
 const memberRepo = AppDataSource.getRepository(Member);
-const reservationRepo = AppDataSource.getRepository(Reservation);
+const reservationRepo = AppDataSource.getRepository(AdminReservation);
 const treatmentRepo = AppDataSource.getRepository(Treatment);
 
 app.post('/api/admin/reservation', async (req, res) => {
@@ -1480,7 +1480,7 @@ app.post('/api/admin/reservation', async (req, res) => {
         }
         const memberRepo = AppDataSource.getRepository(Member);
         const treatmentRepo = AppDataSource.getRepository(Treatment);
-        const reservationRepo = AppDataSource.getRepository(Reservation);
+        const reservationRepo = AppDataSource.getRepository(AdminReservation);
 
         //  환자 존재 여부 확인
         const existingMember = await memberRepo.findOne({ where: { CHART_NO: chartNo } });
@@ -1596,7 +1596,7 @@ app.patch('/api/admin/reservation/:reservationId/status', async (req, res) => {
 
     try {
         await AppDataSource.transaction(async (transactionalEntityManager) => {
-            const reservationRepo = transactionalEntityManager.getRepository(Reservation);
+            const reservationRepo = transactionalEntityManager.getRepository(AdminReservation);
             const treatmentRepo = transactionalEntityManager.getRepository(Treatment);
 
             const reservation = await reservationRepo.findOne({ where: { id: reservationId } });

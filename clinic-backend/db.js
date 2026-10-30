@@ -22,7 +22,9 @@ const DetailCategory = require("./src/entity/DetailCategory");
 const DetailPage = require("./src/entity/DetailPage");
 const DetailSection = require("./src/entity/DetailSection");
 const Reservation = require("./src/entity/Reservation");
+const AdminReservation = require("./src/entity/AdminReservation");
 const ReservationBlock = require("./src/entity/ReservationBlock");
+
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -58,6 +60,7 @@ const AppDataSource = new DataSource({
     DetailSection,
     Reservation,
     ReservationBlock,
+    AdminReservation,
   ],
   extra: {
     poolMin: 2,

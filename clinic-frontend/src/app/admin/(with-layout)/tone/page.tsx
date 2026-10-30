@@ -1,11 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiCheck, FiMoon, FiSave, FiSun } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Tone.styles";
 
 export default function TonePage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -17,9 +17,7 @@ export default function TonePage() {
   useEffect(() => {
     const fetchTone = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/tone",
-        );
+        const response = await axios.get(`${API_ORIGIN}/api/admin/tone`);
         if (response.data.success) {
           const dbData = response.data.data;
           if (dbData.PRIMARY_TONE) setIsSelectedTone(dbData.PRIMARY_TONE);
@@ -38,10 +36,7 @@ export default function TonePage() {
         primaryTone: selectedTone,
         isDarkMode: isDarkMode ? "Y" : "N",
       };
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/tone",
-        payload,
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/tone`, payload);
       if (response.data.success) {
         setIsPopupOpen(true);
       }

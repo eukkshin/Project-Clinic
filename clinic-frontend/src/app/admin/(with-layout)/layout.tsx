@@ -1,37 +1,19 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import {
-  FiActivity,
-  FiAward,
-  FiCamera,
-  FiChevronLeft,
-  FiChevronRight,
-  FiClipboard,
-  FiCompass,
-  FiExternalLink,
-  FiFeather,
-  FiFileText,
-  FiFilm,
-  FiGrid,
-  FiHelpCircle,
-  FiLayers,
-  FiLayout,
-  FiLogOut,
-  FiMenu,
-  FiMessageSquare,
-  FiRadio,
-  FiShield,
-  FiUsers,
-  FiVideo,
-} from "react-icons/fi";
+    FiAward, FiCalendar, FiCamera, FiChevronLeft, FiChevronRight, FiClipboard, FiCompass,
+    FiExternalLink, FiFeather, FiFileText, FiFilm, FiGrid, FiHelpCircle, FiLayers, FiLayout,
+    FiLogOut, FiMenu, FiMessageSquare, FiRadio, FiShield, FiUsers, FiVideo
+} from 'react-icons/fi';
 
-import * as A from "@/assets/css/admin/AdminShell.styles";
-import { AdminWorkspaceTheme } from "@/assets/css/admin/AdminWorkspace.styles";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from '@/components/ui/Popup';
+import { API_ORIGIN } from '@/lib/api/config';
+import * as A from '@/styles/admin/AdminShell.styles';
+import { AdminWorkspaceTheme } from '@/styles/admin/AdminWorkspace.styles';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 const menuGroups = [
   {
@@ -63,6 +45,7 @@ const menuGroups = [
       { href: "/admin/safety", title: "안전 시스템", icon: FiShield },
       { href: "/admin/qna", title: "QnA 관리", icon: FiHelpCircle },
       { href: "/admin/details", title: "상세페이지", icon: FiFileText },
+      { href: "/admin/reservations", title: "예약 관리", icon: FiCalendar },
     ],
   },
   {

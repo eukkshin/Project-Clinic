@@ -1,11 +1,12 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Login.styles";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 export default function LoginPage() {
   const router = useRouter();

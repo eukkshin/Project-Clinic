@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useId, useRef, useState } from 'react';
 
-import * as S from "@/assets/css/components/dropdown/AccountDropdown.styles";
-
-import { Popup } from "../../ui/modal/Popup";
+import * as S from '@/components/dropdown/AccountDropdown.styles';
+import { Popup } from '@/components/ui/Popup';
 
 interface AccountDropdownProps {
   userName: string;
@@ -101,9 +100,9 @@ export default function AccountDropdown({
     });
   };
   const links: { title: string; href?: string }[] = [
-    { title: "마이페이지", href: myPageHref },
-    { title: "예약 내역", href: reservationsHref },
-    { title: "내 상담 내역", href: consultationsHref },
+    { title: "마이페이지", href: "/mypage" },
+    { title: "예약 내역", href: "/mypage/reservations" },
+    { title: "내 상담 내역", href: "/mypage/consultations" },
   ];
   return (
     <>

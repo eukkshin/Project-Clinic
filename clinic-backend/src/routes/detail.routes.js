@@ -33,6 +33,7 @@ function createDetailRouters({ dataSource, requireAdmin }) {
     "/categories",
     wrap(async (_req, res) => ok(res, await service.publicCategories())),
   );
+  publicRouter.get("/navigation", wrap(async (_req, res) => ok(res, await service.publicNavigation())));
   publicRouter.get(
     "/:category/:slug",
     wrap(async (req, res) => {
@@ -169,40 +170,30 @@ function createDetailRouters({ dataSource, requireAdmin }) {
         .json({ success: false, message: error.message });
     const ora = `${error.code || ""} ${error.message || ""}`;
     if (/ORA-00001/.test(ora))
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "동일한 slug 또는 섹션 키가 이미 존재합니다.",
-        });
-    if (/ORA-02292/.test(ora))
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "연결된 상세페이지가 있어 카테고리를 삭제할 수 없습니다.",
-        });
-    if (/ORA-02291/.test(ora))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "존재하지 않는 상위 항목을 참조했습니다.",
-        });
-    if (/ORA-12899|ORA-01400|ORA-02290/.test(ora))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "입력 필드의 형식이나 길이가 DB 제약조건과 맞지 않습니다.",
-        });
-    console.error("[Detail CMS]", error);
-    return res
-      .status(500)
-      .json({
+      return res.status(409).json({
         success: false,
-        message: "상세페이지 처리 중 서버 오류가 발생했습니다.",
+        message: "동일한 slug 또는 섹션 키가 이미 존재합니다.",
       });
+    if (/ORA-02292/.test(ora))
+      return res.status(409).json({
+        success: false,
+        message: "연결된 상세페이지가 있어 카테고리를 삭제할 수 없습니다.",
+      });
+    if (/ORA-02291/.test(ora))
+      return res.status(400).json({
+        success: false,
+        message: "존재하지 않는 상위 항목을 참조했습니다.",
+      });
+    if (/ORA-12899|ORA-01400|ORA-02290/.test(ora))
+      return res.status(400).json({
+        success: false,
+        message: "입력 필드의 형식이나 길이가 DB 제약조건과 맞지 않습니다.",
+      });
+    console.error("[Detail CMS]", error);
+    return res.status(500).json({
+      success: false,
+      message: "상세페이지 처리 중 서버 오류가 발생했습니다.",
+    });
   };
   publicRouter.use(errors);
   adminRouter.use(errors);

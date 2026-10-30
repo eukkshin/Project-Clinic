@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import DetailLayout from "@/components/detail/DetailLayout";
+import DetailLayout from "@/components/procedures/DetailLayout";
 import { getPublicDetailPage } from "@/lib/detail/getPublicDetailPage";
 
 type Props = {

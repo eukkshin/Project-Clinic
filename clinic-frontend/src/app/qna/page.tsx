@@ -1,9 +1,9 @@
 "use client";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-import { Accordion } from "@/components/QuaAccordion/Accordion";
-import * as S from "@/components/QuaAccordion/Accordion.style";
+import { Accordion } from '@/components/ui/Accordion';
+import * as S from '@/components/ui/Accordion.styles';
 
 interface QnAItem {
   id: string;

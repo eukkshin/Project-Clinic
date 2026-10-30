@@ -1,11 +1,13 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Cormorant_Garamond } from "next/font/google";
-import { GlobalStyle } from "@/assets/css/GlobalStyle";
-import ConditionalLayout from "@/components/ConditionalLayout";
-import StyledComponentsRegistry from "@/lib/registry";
 import QueryProvider from "@/components/provider/QueryProvider";
 import { ToastProvider } from "@/ui/feedback/toast/ToastContext";
+
+import ConditionalLayout from '@/components/layout/ConditionalLayout';
+import SmoothScroll from '@/components/layout/SmoothScroll';
+import StyledComponentsRegistry from '@/lib/registry';
+import { GlobalStyle } from '@/styles/global';
 
 // 영문 디스플레이: Next.js가 Google Font를 빌드 시 내려받아 자체 호스팅한다.
 const cormorant = Cormorant_Garamond({
@@ -22,13 +24,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" data-scroll-behavior="smooth" className={cormorant.variable}>
+    <html lang="ko" data-scroll-behavior="auto" className={cormorant.variable}>
       <head>
         {/* Pretendard Variable: 공식 동적 서브셋 CSS. 한글만 필요한 글리프를 내려받는다. */}
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/sun-typeface/SUITE@2/fonts/variable/woff2/SUITE-Variable.css"
         />
       </head>
       <body className="min-h-full flex flex-col">
@@ -36,7 +46,9 @@ export default function RootLayout({
           <GlobalStyle />
           <QueryProvider>
             <ToastProvider>
-              <ConditionalLayout>{children}</ConditionalLayout>
+              <ConditionalLayout>
+               <SmoothScroll>{children}</SmoothScroll>
+              </ConditionalLayout>
             </ToastProvider>
           </QueryProvider>
         </StyledComponentsRegistry>

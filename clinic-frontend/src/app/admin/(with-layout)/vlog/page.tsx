@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -11,8 +12,8 @@ import {
   FiVideo,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Vlog.styles";
 
 interface VlogData {
   id: number;
@@ -42,13 +43,13 @@ export default function Vlog() {
 
   const fetchVlogs = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/admin/vlogs");
+      const response = await axios.get(`${API_ORIGIN}/api/admin/vlogs`);
       if (response.data.success) {
         const formatted = response.data.data.map((item: any) => ({
           id: item.VLOG_IDX,
           title: item.TITLE,
           videoUrl: item.VIDEO_URL,
-          thumbnailUrl: `http://localhost:4000/images/${item.FILE_NAME}`,
+          thumbnailUrl: `${API_ORIGIN}/images/${item.FILE_NAME}`,
         }));
         setVlogList(formatted);
       }
@@ -81,7 +82,7 @@ export default function Vlog() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/vlogs",
+        `${API_ORIGIN}/api/admin/vlogs`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -109,7 +110,7 @@ export default function Vlog() {
     if (selectedDeleteId !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/vlogs/${selectedDeleteId}`,
+          `${API_ORIGIN}/api/admin/vlogs/${selectedDeleteId}`,
         );
         if (response.data.success) {
           fetchVlogs();
@@ -143,10 +144,9 @@ export default function Vlog() {
   const handleSave = async () => {
     const orderedIds = vlogList.map((v) => v.id);
     try {
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/vlogs/order",
-        { orderedIds },
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/vlogs/order`, {
+        orderedIds,
+      });
       if (response.data.success) {
         setIsSavePopupOpen(true);
       }

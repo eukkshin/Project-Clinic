@@ -23,7 +23,10 @@ export const QnAKicker = styled.p`
 `;
 
 export const QnATitle = styled.h2`
-  font: 400 clamp(32px, 4vw, 48px)/1.15 Georgia, "Times New Roman", serif;
+  font:
+    400 clamp(32px, 4vw, 48px)/1.15 Georgia,
+    "Times New Roman",
+    serif;
   letter-spacing: -0.04em;
   color: #284b37;
   margin: 0;
@@ -51,7 +54,7 @@ export const TabButton = styled.button<{ $active: boolean }>`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   border: 1px solid ${({ $active }) => ($active ? "#284b37" : "#dfe7dd")};
   background: ${({ $active }) => ($active ? "#284b37" : "#f9faf6")};
   color: ${({ $active }) => ($active ? "#f7f7ef" : "#566e5a")};
@@ -82,7 +85,7 @@ export const ItemContainer = styled.div<{ $isOpen: boolean }>`
   background: ${({ $isOpen }) => ($isOpen ? "#fffefa" : "#fbfcf9")};
   transition: all 0.25s ease;
   overflow: hidden;
-  box-shadow: ${({ $isOpen }) => 
+  box-shadow: ${({ $isOpen }) =>
     $isOpen ? "0 10px 30px rgba(40, 75, 55, 0.05)" : "none"};
 
   &:hover {
@@ -90,7 +93,7 @@ export const ItemContainer = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
-export const AccordionHeader = styled.button<{$isOpen: boolean}>`
+export const AccordionHeader = styled.button<{ $isOpen: boolean }>`
   width: 100%;
   display: flex;
   align-items: center;
@@ -144,7 +147,10 @@ export const ToggleIcon = styled.span<{ $isOpen: boolean }>`
   color: ${({ $isOpen }) => ($isOpen ? "#f7f7ef" : "#566e5a")};
   font-size: 14px;
   flex-shrink: 0;
-  transition: transform 0.3s ease, background 0.2s, color 0.2s;
+  transition:
+    transform 0.3s ease,
+    background 0.2s,
+    color 0.2s;
   /* transform: rotate(${({ $isOpen }) => ($isOpen ? "180deg" : "0deg")}); */
 `;
 

@@ -55,8 +55,40 @@ function enumerated(value, variants, label) {
 }
 function imageUrl(value, label) {
   const v = string(value, label, { max: 1000 });
-  if (v && !(/^\/(?!\/)/.test(v) || /^https:\/\//i.test(v)))
-    bad(`${label}은 /로 시작하는 경로 또는 HTTPS URL이어야 합니다.`);
+
+  if (!v) return v;
+
+  // 1. /images/... 경로 허용
+  const isRelative = /^\/(?!\/)/.test(v);
+
+  // 2. HTTPS URL 허용
+  const isHttps = /^https:\/\//i.test(v);
+
+  // 3. 개발 환경에서 Express 이미지 URL 허용
+  let isLocalImage = false;
+
+  try {
+    const url = new URL(v);
+    const apiOrigin = new URL(
+      process.env.PUBLIC_API_ORIGIN || "http://127.0.0.1:4000",
+    );
+
+    isLocalImage =
+      process.env.NODE_ENV !== "production" &&
+      url.protocol === "http:" &&
+      ["localhost", "127.0.0.1"].includes(url.hostname) &&
+      url.origin === apiOrigin.origin &&
+      url.pathname.startsWith("/images/detail-cms/");
+  } catch {
+    // URL 형식이 아니면 기존 규칙으로 검사
+  }
+
+  if (!isRelative && !isHttps && !isLocalImage) {
+    bad(
+      `${label}은 /로 시작하는 경로, HTTPS URL 또는 개발 서버 이미지 URL이어야 합니다.`,
+    );
+  }
+
   return v;
 }
 function heroPosition(v) {

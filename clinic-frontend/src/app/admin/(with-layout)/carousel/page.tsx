@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiImage, FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/NavSetting.styles";
 
 interface SlideItem {
   id: number;
@@ -22,9 +23,7 @@ export default function Visual() {
   useEffect(() => {
     const fetchVisualSettings = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/visual",
-        );
+        const response = await axios.get(`${API_ORIGIN}/api/admin/visual`);
         if (response.data.success) {
           const dbData = response.data.data;
           if (dbData.SLIDES && dbData.SLIDES !== "[]") {
@@ -89,7 +88,7 @@ export default function Visual() {
             formData.append("logoImage", slide.tempFile);
 
             const uploadRes = await axios.post(
-              "http://localhost:4000/api/admin/upload",
+              `${API_ORIGIN}/api/admin/upload`,
               formData,
               {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -112,7 +111,7 @@ export default function Visual() {
       // [STEP 2] DB로 보낼 때는 tempFile 속성을 제외하고 깔끔하게 텍스트만 보냅니다.
       const payloadSlides = updatedSlides.map(({ tempFile, ...rest }) => rest);
 
-      await axios.put("http://localhost:4000/api/admin/visual", {
+      await axios.put(`${API_ORIGIN}/api/admin/visual`, {
         slides: payloadSlides,
       });
 
@@ -203,7 +202,7 @@ export default function Visual() {
                     {/* 미리보기 (파일이 등록되어 있으면 표시) */}
                     {slide.fileName && !slide.tempFile && (
                       <img
-                        src={`http://localhost:4000/images/${slide.fileName}`}
+                        src={`${API_ORIGIN}/images/${slide.fileName}`}
                         alt="미리보기"
                         style={{
                           width: "100%",

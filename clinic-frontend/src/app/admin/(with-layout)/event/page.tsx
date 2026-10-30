@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,8 +11,8 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Event.styles";
 
 /*
 타입스크립트에서 인터페이스란..
@@ -51,15 +52,13 @@ export default function Event() {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/events",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/events`);
       if (response.data.success) {
         const formatted = response.data.data.map((item: any) => ({
           id: item.EVENT_IDX,
           title: item.TITLE,
           price: item.PRICE,
-          imageUrl: `http://localhost:4000/images/${item.FILE_NAME}`,
+          imageUrl: `${API_ORIGIN}/images/${item.FILE_NAME}`,
         }));
         setEvents(formatted);
       }
@@ -105,7 +104,7 @@ export default function Event() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/events",
+        `${API_ORIGIN}/api/admin/events`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -135,7 +134,7 @@ export default function Event() {
     if (selectedDeleteId !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/events/${selectedDeleteId}`,
+          `${API_ORIGIN}/api/admin/events/${selectedDeleteId}`,
         );
         if (response.data.success) {
           fetchEvents();
@@ -179,10 +178,9 @@ export default function Event() {
     // 현재 눈에 보이는 순서대로 ID값만 배열로 추출
     const orderedIds = events.map((e) => e.id);
     try {
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/events/order",
-        { orderedIds },
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/events/order`, {
+        orderedIds,
+      });
       if (response.data.success) {
         setIsSavePopupOpen(true);
       }

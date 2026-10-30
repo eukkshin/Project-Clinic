@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiClock, FiImage, FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Pop.styles";
 
 interface PopupData {
   id: number;
@@ -50,9 +51,7 @@ export default function Pop() {
 
   const fetchPopups = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/popups",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/popups`);
       const dbData = response.data;
       if (response.data.success) {
         setMaxPopups(dbData.maxPopups);
@@ -106,7 +105,7 @@ export default function Pop() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/popups",
+        `${API_ORIGIN}/api/admin/popups`,
         formData,
         {
           headers: {
@@ -138,7 +137,7 @@ export default function Pop() {
     if (confirm("정말 이 팝업을 삭제하시겠습니까?")) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/popups/${id}`,
+          `${API_ORIGIN}/api/admin/popups/${id}`,
         );
         if (response.data.success) fetchPopups();
       } catch (error) {
@@ -152,7 +151,7 @@ export default function Pop() {
       const payload = { maxPopups, popups };
       console.log("DB에 저장될 데이터:", payload);
       const response = await axios.put(
-        "http://localhost:4000/api/admin/popups/setting",
+        `${API_ORIGIN}/api/admin/popups/setting`,
         { maxPopups },
       );
       if (response.data.success) {
@@ -352,7 +351,7 @@ export default function Pop() {
                           <td>
                             {popup.fileName && (
                               <img
-                                src={`http://localhost:4000/images/${popup.fileName}`}
+                                src={`${API_ORIGIN}/images/${popup.fileName}`}
                                 alt="popup"
                                 style={{
                                   width: "50px",

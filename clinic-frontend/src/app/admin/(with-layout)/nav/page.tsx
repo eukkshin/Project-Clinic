@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiImage, FiPlus, FiSave, FiTrash2, FiType } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/ui/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/NavSetting.styles";
 
 interface MenuItem {
   id: number;
@@ -26,7 +27,7 @@ export default function NavPage() {
   useEffect(() => {
     const fetchNavSettings = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/admin/nav");
+        const response = await axios.get(`${API_ORIGIN}/api/admin/nav`);
         if (response.data.success) {
           const dbData = response.data.data;
           setLogoType(dbData.LOGO_TYPE);
@@ -94,7 +95,7 @@ export default function NavPage() {
         formData.append("logoImage", logoFile);
 
         const uploadRes = await axios.post(
-          "http://localhost:4000/api/admin/upload",
+          `${API_ORIGIN}/api/admin/upload`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -114,7 +115,7 @@ export default function NavPage() {
         menus: menus,
       };
 
-      await axios.put("http://localhost:4000/api/admin/nav", payload);
+      await axios.put(`${API_ORIGIN}/api/admin/nav`, payload);
       console.log("DB에 저장될 데이터", payload, finalFileName);
       setIsPopupOpen(true);
     } catch (error) {

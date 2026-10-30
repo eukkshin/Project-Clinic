@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaChevronDown, FaGlobe } from "react-icons/fa6";
 
-import * as S from "@/assets/css/components/dropdown/LanguageDropdown.styles";
+import * as S from "@/components/dropdown/LanguageDropdown.styles";
 
 export type Language = "KR" | "EN" | "JP" | "CN" | "TW";
 

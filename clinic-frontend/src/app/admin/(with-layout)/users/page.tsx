@@ -1,18 +1,19 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
+import * as Pagination from "@/styles/pagination";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiCheck,
   FiChevronLeft,
   FiChevronRight,
-  FiChevronsLeft,
   FiSearch,
   FiTrash2,
   FiUserX,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/User.styles";
 
 // 임시 회원 데이터 인터페이스
 interface UserData {
@@ -63,7 +64,7 @@ export default function Users() {
           success: boolean;
           data: RawUser[];
           pagination: Pagination;
-        }>("http://localhost:4000/api/admin/users", {
+        }>(`${API_ORIGIN}/api/admin/users`, {
           params: { page: currentPage, limit: 10, search: searchKeyword },
         });
         if (response.data.success) {
@@ -119,7 +120,7 @@ export default function Users() {
   const toggleStatus = async (idx: number) => {
     try {
       const response = await axios.put(
-        `http://localhost:4000/api/admin/users/${idx}/status`,
+        `${API_ORIGIN}/api/admin/users/${idx}/status`,
       );
       if (response.data.success) {
         setUserList(
@@ -146,7 +147,7 @@ export default function Users() {
     if (selectedDeleteIdx !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/users/${selectedDeleteIdx}`,
+          `${API_ORIGIN}/api/admin/users/${selectedDeleteIdx}`,
         );
         if (response.data.success) {
           setUserList(
@@ -262,35 +263,35 @@ export default function Users() {
             </S.UserTable>
           </S.UserTableWrapper>
           {totalPages > 0 && (
-            <S.Pagenation>
-              <S.Prev
+            <Pagination.Pagenation>
+              <Pagination.Prev
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage <= 1}
               >
                 <FiChevronLeft size={16} />
-              </S.Prev>
+              </Pagination.Prev>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
-                  <S.PagenationBtn
+                  <Pagination.PagenationBtn
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     $active={page === currentPage}
                   >
                     {page}
-                  </S.PagenationBtn>
+                  </Pagination.PagenationBtn>
                 ),
               )}
 
-              <S.Next
+              <Pagination.Next
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                 }
                 disabled={currentPage >= totalPages}
               >
                 <FiChevronRight size={16} />
-              </S.Next>
-            </S.Pagenation>
+              </Pagination.Next>
+            </Pagination.Pagenation>
           )}
         </S.UserTableCard>
       </S.UserContainer>

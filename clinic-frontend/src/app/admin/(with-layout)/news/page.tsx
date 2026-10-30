@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,8 +11,8 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/News.styles";
 
 interface CategoryData {
   id: number;
@@ -33,14 +34,12 @@ export default function News() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/categories",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/categories`);
       if (response.data.success) {
         const formatted = response.data.data.map((c: any) => ({
           id: c.CATEGORY_IDX,
           title: c.TITLE,
-          imageUrl: `http://localhost:4000/images/${c.FILE_NAME}`,
+          imageUrl: `${API_ORIGIN}/images/${c.FILE_NAME}`,
           link: c.LINK,
         }));
         setCategories(formatted);
@@ -81,7 +80,7 @@ export default function News() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/categories",
+        `${API_ORIGIN}/api/admin/categories`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -104,9 +103,7 @@ export default function News() {
   const handleDelete = async (id: number) => {
     if (confirm("해당 카테고리 아이콘을 삭제하시겠습니까?")) {
       try {
-        const response = await axios.delete(
-          `http://localhost:4000/api/admin/categories/${id}`,
-        );
+        await axios.delete(`${API_ORIGIN}/api/admin/categories/${id}`);
         fetchCategories();
       } catch (error) {
         console.error("카테고리 삭제 실패: ", error);
@@ -136,7 +133,7 @@ export default function News() {
     const orderedIds = categories.map((c) => c.id);
     try {
       const response = await axios.put(
-        "http://localhost:4000/api/admin/categories/order",
+        `${API_ORIGIN}/api/admin/categories/order`,
         {
           orderedIds,
         },

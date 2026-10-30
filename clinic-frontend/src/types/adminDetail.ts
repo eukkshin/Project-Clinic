@@ -1,13 +1,7 @@
 /** /api/admin/detail API response models (Oracle DETAIL_* tables) */
 export type DetailStatus = "DRAFT" | "PUBLISHED" | "HIDDEN";
 export type SectionType =
-  | "INTRO"
-  | "FEATURES"
-  | "PROCESS"
-  | "GALLERY"
-  | "FAQ"
-  | "TEXT"
-  | "CTA";
+  "INTRO" | "FEATURES" | "PROCESS" | "GALLERY" | "FAQ" | "TEXT" | "CTA";
 export type Visible = "Y" | "N";
 
 export interface DetailCategory {
@@ -40,6 +34,18 @@ export interface DetailPage {
 }
 export interface DetailSectionContent {
   description?: string;
+  layout?:
+    | "image-left"
+    | "image-right"
+    | "comparison"
+    | "cards"
+    | "rows"
+    | "steps"
+    | "timeline";
+  compareLeftTitle?: string;
+  compareLeftBody?: string;
+  compareRightTitle?: string;
+  compareRightBody?: string;
   items?: string[];
   imageUrl?: string;
   imageAlt?: string;

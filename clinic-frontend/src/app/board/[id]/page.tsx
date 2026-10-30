@@ -1,7 +1,8 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import AdminLayout from "@/app/admin/(with-layout)/layout";
 
@@ -23,7 +24,7 @@ export default function BoardDetail() {
   useEffect(() => {
     if (boardId) {
       axios
-        .get(`http://localhost:4000/api/boards/${boardId}`)
+        .get(`${API_ORIGIN}/api/boards/${boardId}`)
         .then((res) => {
           if (res.data.success) {
             setBoardInfo(res.data.data);

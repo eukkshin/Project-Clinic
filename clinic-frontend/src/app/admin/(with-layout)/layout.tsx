@@ -1,9 +1,9 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
-  FiActivity,
   FiAward,
   FiCamera,
   FiChevronLeft,
@@ -27,11 +27,11 @@ import {
   FiVideo,
 } from "react-icons/fi";
 
-import * as A from "@/assets/css/admin/AdminShell.styles";
-import { AdminWorkspaceTheme } from "@/assets/css/admin/AdminWorkspace.styles";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as A from "@/styles/admin/AdminShell.styles";
+import { AdminWorkspaceTheme } from "@/styles/admin/AdminWorkspace.styles";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 const menuGroups = [
   {

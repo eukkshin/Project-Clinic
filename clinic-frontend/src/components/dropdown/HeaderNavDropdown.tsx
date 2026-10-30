@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from "@/assets/css/components/dropdown/HeaderNavDropdown.styles";
+import * as S from "@/components/dropdown/HeaderNavDropdown.styles";
 
 export interface NavSubmenuItem {
   name: string;
@@ -76,10 +76,14 @@ export default function HeaderNavDropdown({
     return () => document.removeEventListener("pointerdown", onOutside);
   }, [open]);
 
+  const children = menu.children ?? [];
+
+  const hasCategoryPage =
+    menu.url !== "/" && !children.some((child) => child.url === menu.url);
+
   const items: NavSubmenuItem[] = [
-    // 기존 상위 메뉴 URL을 반드시 보존한다.
-    { name: menu.children?.length ? "전체 보기" : menu.name, url: menu.url },
-    ...(menu.children ?? []),
+    ...(hasCategoryPage ? [{ name: "전체 보기", url: menu.url }] : []),
+    ...children,
   ];
 
   useEffect(() => {

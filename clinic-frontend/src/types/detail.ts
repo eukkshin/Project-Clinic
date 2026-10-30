@@ -1,15 +1,22 @@
 /** Oracle DETAIL_SECTION.SECTION_TYPE */
 export type DetailSectionType =
-  | "INTRO"
-  | "FEATURES"
-  | "PROCESS"
-  | "GALLERY"
-  | "FAQ"
-  | "TEXT"
-  | "CTA";
+  "INTRO" | "FEATURES" | "PROCESS" | "GALLERY" | "FAQ" | "TEXT" | "CTA";
 
 export interface DetailSectionContent {
   description?: string;
+  /** 생략 시 기존 디자인 유지 */
+  layout?:
+    | "image-left"
+    | "image-right"
+    | "comparison"
+    | "cards"
+    | "rows"
+    | "steps"
+    | "timeline";
+  compareLeftTitle?: string;
+  compareLeftBody?: string;
+  compareRightTitle?: string;
+  compareRightBody?: string;
   items?: string[];
   imageUrl?: string;
   imageAlt?: string;

@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,8 +11,8 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Safety.styles";
 
 interface SafetyData {
   id: number;
@@ -39,15 +40,13 @@ export default function Safety() {
 
   const fetchSafetyItems = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/safety",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/safety`);
       if (response.data.success) {
         const formatted = response.data.data.map((item: any) => ({
           id: item.SAFETY_IDX,
           title: item.TITLE,
           description: item.DESCRIPTION,
-          imageUrl: `http://localhost:4000/images/${item.FILE_NAME}`,
+          imageUrl: `${API_ORIGIN}/images/${item.FILE_NAME}`,
         }));
         setSafetyList(formatted);
       }
@@ -79,7 +78,7 @@ export default function Safety() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/safety",
+        `${API_ORIGIN}/api/admin/safety`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -108,7 +107,7 @@ export default function Safety() {
     if (selectedDeleteId !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/safety/${selectedDeleteId}`,
+          `${API_ORIGIN}/api/admin/safety/${selectedDeleteId}`,
         );
         if (response.data.success) {
           fetchSafetyItems();
@@ -145,10 +144,9 @@ export default function Safety() {
     const orderedIds = safetyList.map((item) => item.id);
 
     try {
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/safety/order",
-        { orderedIds },
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/safety/order`, {
+        orderedIds,
+      });
       if (response.data.success) {
         setIsSavePopupOpen(true);
       }

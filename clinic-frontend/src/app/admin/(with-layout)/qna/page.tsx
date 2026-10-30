@@ -1,5 +1,6 @@
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -12,8 +13,8 @@ import {
   FiX,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/QnA.styles";
 
 interface QnAData {
   id: number;
@@ -45,7 +46,7 @@ const INITIAL_STATE: QnAForm = {
   answer: "",
 };
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/admin/qnas`;
+const API_URL = `${API_ORIGIN}/api/admin/qnas`;
 
 export default function AdminQnA() {
   const [qnaList, setQnaList] = useState<QnAData[]>([]);

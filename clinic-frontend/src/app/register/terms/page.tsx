@@ -1,13 +1,14 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import DaumPostcode from 'react-daum-postcode';
+import { API_ORIGIN } from "@/lib/api/config";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import DaumPostcode from "react-daum-postcode";
 
-import * as S from '@/assets/css/auth/Auth.styles';
-import { Popup } from '@/components/modal/Popup';
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/auth/Auth.styles";
 
-import AuthBrandPanel from '../AuthBrandPanel';
+import AuthBrandPanel from "@/components/auth/AuthBrandPanel";
 
 type RegisterForm = {
   userName: string;
@@ -44,7 +45,7 @@ type PostcodeData = {
 
 type ApiResponse = { message?: string };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = API_ORIGIN;
 
 // 아래 두 문구는 사용자가 전달한 기존 코드에서 가져온 초안이다.
 // 실제 서비스 배포 전 법무/개인정보 담당자가 적합한 약관 전문으로 교체해야 한다.
@@ -76,7 +77,7 @@ function validateResidentNumber(front: string, back: string): boolean {
   for (let i = 0; i < 12; i += 1) {
     sum += Number(rrn[i]) * weights[i];
   }
-  return ((11 - (sum % 11)) % 10) === Number(rrn[12]);
+  return (11 - (sum % 11)) % 10 === Number(rrn[12]);
 }
 
 function combineEmail(email: string, domain: string): string {
@@ -133,19 +134,32 @@ export default function TermsPage() {
   const hasConfirmValue = formData.userPwConfirm.length > 0;
   const passwordsMatch = formData.userPw === formData.userPwConfirm;
 
-  const openPopup = (title: string, message: string, onConfirm?: () => void) => {
+  const openPopup = (
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+  ) => {
     setPopupConfig({ isOpen: true, title, message, onConfirm });
   };
-  const closePopup = () => setPopupConfig((prev) => ({ ...prev, isOpen: false }));
+  const closePopup = () =>
+    setPopupConfig((prev) => ({ ...prev, isOpen: false }));
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = event.target;
     if (!(name in formData)) return;
-    if ((name === "residentNumFront" || name === "residentNumBack") && !/^\d*$/.test(value)) {
+    if (
+      (name === "residentNumFront" || name === "residentNumBack") &&
+      !/^\d*$/.test(value)
+    ) {
       return;
     }
     const checked = (event.target as HTMLInputElement).checked;
-    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleCompletePostcode = (data: PostcodeData) => {
@@ -154,11 +168,17 @@ export default function TermsPage() {
     if (data.addressType === "R") {
       if (data.bname) extraAddress += data.bname;
       if (data.buildingName) {
-        extraAddress += extraAddress ? `, ${data.buildingName}` : data.buildingName;
+        extraAddress += extraAddress
+          ? `, ${data.buildingName}`
+          : data.buildingName;
       }
       if (extraAddress) fullAddress += ` (${extraAddress})`;
     }
-    setFormData((prev) => ({ ...prev, zipcode: data.zonecode, address1: fullAddress }));
+    setFormData((prev) => ({
+      ...prev,
+      zipcode: data.zonecode,
+      address1: fullAddress,
+    }));
     setIsPostcodeOpen(false);
   };
 
@@ -190,20 +210,35 @@ export default function TermsPage() {
       setStep(1);
       return;
     }
-    if (!formData.userName.trim() || !formData.userId.trim() || !formData.userPw) {
+    if (
+      !formData.userName.trim() ||
+      !formData.userId.trim() ||
+      !formData.userPw
+    ) {
       openPopup("입력 오류", "이름, 아이디, 비밀번호를 모두 입력해 주세요.");
       return;
     }
     if (!passwordsMatch) {
-      openPopup("비밀번호 오류", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      openPopup(
+        "비밀번호 오류",
+        "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+      );
       return;
     }
     if (!formData.residentNumFront || !formData.residentNumBack) {
       openPopup("입력 오류", "주민등록번호를 입력해 주세요.");
       return;
     }
-    if (!validateResidentNumber(formData.residentNumFront, formData.residentNumBack)) {
-      openPopup("주민등록번호 오류", "유효하지 않은 주민등록번호입니다. 다시 확인해 주세요.");
+    if (
+      !validateResidentNumber(
+        formData.residentNumFront,
+        formData.residentNumBack,
+      )
+    ) {
+      openPopup(
+        "주민등록번호 오류",
+        "유효하지 않은 주민등록번호입니다. 다시 확인해 주세요.",
+      );
       return;
     }
     const fullEmail = combineEmail(formData.email, formData.emailDomain);
@@ -258,7 +293,9 @@ export default function TermsPage() {
             <S.FormContent>
               <S.Topline>
                 <span>JOIN AHN&apos;S / 02</span>
-                <S.TextLink href="/register/login">로그인으로 돌아가기 ↗</S.TextLink>
+                <S.TextLink href="/register/login">
+                  로그인으로 돌아가기 ↗
+                </S.TextLink>
               </S.Topline>
               <S.Kicker>BEGIN YOUR JOURNEY</S.Kicker>
               <S.Heading id="register-title">Ahn&apos;s 회원가입</S.Heading>
@@ -269,12 +306,21 @@ export default function TermsPage() {
               </S.Lead>
 
               <S.Stepper aria-label="회원가입 진행 단계">
-                <S.StepItem $active={step === 1} $done={step === 2} aria-current={step === 1 ? "step" : undefined}>
-                  <S.StepCircle $active={step === 1} $done={step === 2}>{step === 2 ? "✓" : "01"}</S.StepCircle>
+                <S.StepItem
+                  $active={step === 1}
+                  $done={step === 2}
+                  aria-current={step === 1 ? "step" : undefined}
+                >
+                  <S.StepCircle $active={step === 1} $done={step === 2}>
+                    {step === 2 ? "✓" : "01"}
+                  </S.StepCircle>
                   약관 동의
                 </S.StepItem>
                 <S.StepLine aria-hidden="true" />
-                <S.StepItem $active={step === 2} aria-current={step === 2 ? "step" : undefined}>
+                <S.StepItem
+                  $active={step === 2}
+                  aria-current={step === 2 ? "step" : undefined}
+                >
                   <S.StepCircle $active={step === 2}>02</S.StepCircle>
                   정보 입력
                 </S.StepItem>
@@ -299,35 +345,77 @@ export default function TermsPage() {
                   <S.TermsCard>
                     <S.TermsHeader>
                       <S.CheckboxLabel>
-                        <input type="checkbox" checked={termsAgreed} onChange={(event) => setTermsAgreed(event.target.checked)} />
-                        <strong>이용약관 <span aria-label="필수 항목">(필수)</span></strong>
+                        <input
+                          type="checkbox"
+                          checked={termsAgreed}
+                          onChange={(event) =>
+                            setTermsAgreed(event.target.checked)
+                          }
+                        />
+                        <strong>
+                          이용약관 <span aria-label="필수 항목">(필수)</span>
+                        </strong>
                       </S.CheckboxLabel>
-                      <S.TermsToggle type="button" aria-expanded={isTermsOpen} aria-controls="terms-content" onClick={() => setIsTermsOpen((open) => !open)}>
+                      <S.TermsToggle
+                        type="button"
+                        aria-expanded={isTermsOpen}
+                        aria-controls="terms-content"
+                        onClick={() => setIsTermsOpen((open) => !open)}
+                      >
                         {isTermsOpen ? "접기 −" : "펼치기 +"}
                       </S.TermsToggle>
                     </S.TermsHeader>
-                    {isTermsOpen && <S.TermsBody id="terms-content">{TERMS_TEXT}</S.TermsBody>}
+                    {isTermsOpen && (
+                      <S.TermsBody id="terms-content">{TERMS_TEXT}</S.TermsBody>
+                    )}
                   </S.TermsCard>
 
                   <S.TermsCard>
                     <S.TermsHeader>
                       <S.CheckboxLabel>
-                        <input type="checkbox" checked={privacyAgreed} onChange={(event) => setPrivacyAgreed(event.target.checked)} />
-                        <strong>개인정보 수집 및 이용 <span aria-label="필수 항목">(필수)</span></strong>
+                        <input
+                          type="checkbox"
+                          checked={privacyAgreed}
+                          onChange={(event) =>
+                            setPrivacyAgreed(event.target.checked)
+                          }
+                        />
+                        <strong>
+                          개인정보 수집 및 이용{" "}
+                          <span aria-label="필수 항목">(필수)</span>
+                        </strong>
                       </S.CheckboxLabel>
-                      <S.TermsToggle type="button" aria-expanded={isPrivacyOpen} aria-controls="privacy-content" onClick={() => setIsPrivacyOpen((open) => !open)}>
+                      <S.TermsToggle
+                        type="button"
+                        aria-expanded={isPrivacyOpen}
+                        aria-controls="privacy-content"
+                        onClick={() => setIsPrivacyOpen((open) => !open)}
+                      >
                         {isPrivacyOpen ? "접기 −" : "펼치기 +"}
                       </S.TermsToggle>
                     </S.TermsHeader>
-                    {isPrivacyOpen && <S.TermsBody id="privacy-content">{PRIVACY_TEXT}</S.TermsBody>}
+                    {isPrivacyOpen && (
+                      <S.TermsBody id="privacy-content">
+                        {PRIVACY_TEXT}
+                      </S.TermsBody>
+                    )}
                   </S.TermsCard>
 
                   <S.LegalNote>
-                    현재 약관 문구는 기존 코드의 초안입니다. 실제 서비스에서는 검토된 약관 전문으로 교체해야 합니다.
+                    현재 약관 문구는 기존 코드의 초안입니다. 실제 서비스에서는
+                    검토된 약관 전문으로 교체해야 합니다.
                   </S.LegalNote>
                   <S.ButtonRow>
-                    <S.Button type="button" $secondary onClick={() => router.push("/register/login")}>이전</S.Button>
-                    <S.Button type="button" onClick={goToForm}>다음 단계 ↗</S.Button>
+                    <S.Button
+                      type="button"
+                      $secondary
+                      onClick={() => router.push("/register/login")}
+                    >
+                      이전
+                    </S.Button>
+                    <S.Button type="button" onClick={goToForm}>
+                      다음 단계 ↗
+                    </S.Button>
                   </S.ButtonRow>
                 </div>
               ) : (
@@ -336,16 +424,36 @@ export default function TermsPage() {
                     <S.SectionHeading>기본 정보</S.SectionHeading>
                     <S.FieldGrid>
                       <S.Field>
-                        <S.Label htmlFor="join-name">이름 <span>(필수)</span></S.Label>
-                        <S.TextInput id="join-name" name="userName" autoComplete="name" value={formData.userName} onChange={handleChange} placeholder="이름을 입력해 주세요" />
+                        <S.Label htmlFor="join-name">
+                          이름 <span>(필수)</span>
+                        </S.Label>
+                        <S.TextInput
+                          id="join-name"
+                          name="userName"
+                          autoComplete="name"
+                          value={formData.userName}
+                          onChange={handleChange}
+                          placeholder="이름을 입력해 주세요"
+                        />
                       </S.Field>
                       <S.Field>
-                        <S.Label htmlFor="join-id">아이디 <span>(필수)</span></S.Label>
-                        <S.TextInput id="join-id" name="userId" autoComplete="username" value={formData.userId} onChange={handleChange} placeholder="사용할 아이디" />
+                        <S.Label htmlFor="join-id">
+                          아이디 <span>(필수)</span>
+                        </S.Label>
+                        <S.TextInput
+                          id="join-id"
+                          name="userId"
+                          autoComplete="username"
+                          value={formData.userId}
+                          onChange={handleChange}
+                          placeholder="사용할 아이디"
+                        />
                       </S.Field>
                     </S.FieldGrid>
                     <S.Field>
-                      <S.Label htmlFor="join-pw">비밀번호 <span>(필수)</span></S.Label>
+                      <S.Label htmlFor="join-pw">
+                        비밀번호 <span>(필수)</span>
+                      </S.Label>
                       <S.InputWrap>
                         <S.InputWithButton
                           id="join-pw"
@@ -356,13 +464,22 @@ export default function TermsPage() {
                           onChange={handleChange}
                           placeholder="비밀번호를 입력해 주세요"
                         />
-                        <S.InsideButton type="button" onClick={() => setShowPassword((show) => !show)} aria-pressed={showPassword} aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}>
+                        <S.InsideButton
+                          type="button"
+                          onClick={() => setShowPassword((show) => !show)}
+                          aria-pressed={showPassword}
+                          aria-label={
+                            showPassword ? "비밀번호 숨기기" : "비밀번호 표시"
+                          }
+                        >
                           {showPassword ? "숨기기" : "보기"}
                         </S.InsideButton>
                       </S.InputWrap>
                     </S.Field>
                     <S.Field>
-                      <S.Label htmlFor="join-pw-confirm">비밀번호 확인 <span>(필수)</span></S.Label>
+                      <S.Label htmlFor="join-pw-confirm">
+                        비밀번호 확인 <span>(필수)</span>
+                      </S.Label>
                       <S.TextInput
                         id="join-pw-confirm"
                         name="userPwConfirm"
@@ -372,11 +489,20 @@ export default function TermsPage() {
                         onChange={handleChange}
                         placeholder="비밀번호를 다시 입력해 주세요"
                         aria-invalid={hasConfirmValue && !passwordsMatch}
-                        aria-describedby={hasConfirmValue ? "password-match" : undefined}
+                        aria-describedby={
+                          hasConfirmValue ? "password-match" : undefined
+                        }
                       />
                       {hasConfirmValue && (
-                        <S.FieldHelp id="password-match" data-error={!passwordsMatch} data-valid={passwordsMatch} role="status">
-                          {passwordsMatch ? "비밀번호가 일치합니다." : "비밀번호가 일치하지 않습니다."}
+                        <S.FieldHelp
+                          id="password-match"
+                          data-error={!passwordsMatch}
+                          data-valid={passwordsMatch}
+                          role="status"
+                        >
+                          {passwordsMatch
+                            ? "비밀번호가 일치합니다."
+                            : "비밀번호가 일치하지 않습니다."}
                         </S.FieldHelp>
                       )}
                     </S.Field>
@@ -385,19 +511,60 @@ export default function TermsPage() {
                   <S.FormSection>
                     <S.SectionHeading>연락처 및 본인 정보</S.SectionHeading>
                     <S.Field>
-                      <S.Label htmlFor="join-resident-front">주민등록번호 <span>(기존 서버 필수 필드)</span></S.Label>
+                      <S.Label htmlFor="join-resident-front">
+                        주민등록번호 <span>(기존 서버 필수 필드)</span>
+                      </S.Label>
                       <S.InlinePair>
-                        <S.TextInput id="join-resident-front" type="text" inputMode="numeric" maxLength={6} placeholder="앞 6자리" name="residentNumFront" autoComplete="off" value={formData.residentNumFront} onChange={handleChange} />
+                        <S.TextInput
+                          id="join-resident-front"
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder="앞 6자리"
+                          name="residentNumFront"
+                          autoComplete="off"
+                          value={formData.residentNumFront}
+                          onChange={handleChange}
+                        />
                         <S.DividerDash aria-hidden="true">−</S.DividerDash>
-                        <S.TextInput id="join-resident-back" aria-label="주민등록번호 뒤 7자리" type="password" inputMode="numeric" maxLength={7} placeholder="뒤 7자리" name="residentNumBack" autoComplete="off" value={formData.residentNumBack} onChange={handleChange} />
+                        <S.TextInput
+                          id="join-resident-back"
+                          aria-label="주민등록번호 뒤 7자리"
+                          type="password"
+                          inputMode="numeric"
+                          maxLength={7}
+                          placeholder="뒤 7자리"
+                          name="residentNumBack"
+                          autoComplete="off"
+                          value={formData.residentNumBack}
+                          onChange={handleChange}
+                        />
                       </S.InlinePair>
-                      <S.FieldHelp>실제 서비스에서는 주민등록번호 수집의 법적 근거 및 보호 조치를 먼저 확인해야 합니다.</S.FieldHelp>
+                      <S.FieldHelp>
+                        실제 서비스에서는 주민등록번호 수집의 법적 근거 및 보호
+                        조치를 먼저 확인해야 합니다.
+                      </S.FieldHelp>
                     </S.Field>
                     <S.Field>
-                      <S.Label htmlFor="join-email">이메일 <span>(필수)</span></S.Label>
+                      <S.Label htmlFor="join-email">
+                        이메일 <span>(필수)</span>
+                      </S.Label>
                       <S.FieldGrid>
-                        <S.TextInput id="join-email" name="email" type="text" autoComplete="email" value={formData.email} onChange={handleChange} placeholder="이메일 또는 아이디" />
-                        <S.SelectInput name="emailDomain" value={formData.emailDomain} onChange={handleChange} aria-label="이메일 도메인 선택">
+                        <S.TextInput
+                          id="join-email"
+                          name="email"
+                          type="text"
+                          autoComplete="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="이메일 또는 아이디"
+                        />
+                        <S.SelectInput
+                          name="emailDomain"
+                          value={formData.emailDomain}
+                          onChange={handleChange}
+                          aria-label="이메일 도메인 선택"
+                        >
                           <option value="직접입력">직접 입력</option>
                           <option value="naver.com">@naver.com</option>
                           <option value="gmail.com">@gmail.com</option>
@@ -405,23 +572,64 @@ export default function TermsPage() {
                         </S.SelectInput>
                       </S.FieldGrid>
                       <S.CheckboxLabel>
-                        <input type="checkbox" name="isMailAgreed" checked={formData.isMailAgreed} onChange={handleChange} />
+                        <input
+                          type="checkbox"
+                          name="isMailAgreed"
+                          checked={formData.isMailAgreed}
+                          onChange={handleChange}
+                        />
                         정보 및 이벤트 이메일 수신 동의 (선택)
                       </S.CheckboxLabel>
                     </S.Field>
                     <S.Field>
-                      <S.Label htmlFor="join-phone">휴대폰 번호 <span>(선택)</span></S.Label>
-                      <S.TextInput id="join-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={formData.phone} onChange={handleChange} placeholder="'-' 없이 입력해 주세요" />
+                      <S.Label htmlFor="join-phone">
+                        휴대폰 번호 <span>(선택)</span>
+                      </S.Label>
+                      <S.TextInput
+                        id="join-phone"
+                        name="phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="'-' 없이 입력해 주세요"
+                      />
                       <S.CheckboxLabel>
-                        <input type="checkbox" name="isSnsAgreed" checked={formData.isSnsAgreed} onChange={handleChange} />
+                        <input
+                          type="checkbox"
+                          name="isSnsAgreed"
+                          checked={formData.isSnsAgreed}
+                          onChange={handleChange}
+                        />
                         정보 및 이벤트 SMS 수신 동의 (선택)
                       </S.CheckboxLabel>
                     </S.Field>
                     <S.Field>
-                      <S.Label>성별 <span>(선택)</span></S.Label>
+                      <S.Label>
+                        성별 <span>(선택)</span>
+                      </S.Label>
                       <S.RadioGroup role="radiogroup" aria-label="성별">
-                        <S.RadioPill><input type="radio" name="gender" value="male" checked={formData.gender === "male"} onChange={handleChange} /> 남성</S.RadioPill>
-                        <S.RadioPill><input type="radio" name="gender" value="female" checked={formData.gender === "female"} onChange={handleChange} /> 여성</S.RadioPill>
+                        <S.RadioPill>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="male"
+                            checked={formData.gender === "male"}
+                            onChange={handleChange}
+                          />{" "}
+                          남성
+                        </S.RadioPill>
+                        <S.RadioPill>
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="female"
+                            checked={formData.gender === "female"}
+                            onChange={handleChange}
+                          />{" "}
+                          여성
+                        </S.RadioPill>
                       </S.RadioGroup>
                     </S.Field>
                   </S.FormSection>
@@ -429,19 +637,57 @@ export default function TermsPage() {
                   <S.FormSection>
                     <S.SectionHeading>주소 정보</S.SectionHeading>
                     <S.Field>
-                      <S.Label htmlFor="join-postcode">주소 <span>(선택)</span></S.Label>
+                      <S.Label htmlFor="join-postcode">
+                        주소 <span>(선택)</span>
+                      </S.Label>
                       <S.InlinePair>
-                        <S.TextInput id="join-postcode" name="zipcode" value={formData.zipcode} readOnly placeholder="우편번호" />
-                        <S.MiniButton type="button" $secondary onClick={() => setIsPostcodeOpen(true)}>우편번호 찾기</S.MiniButton>
+                        <S.TextInput
+                          id="join-postcode"
+                          name="zipcode"
+                          value={formData.zipcode}
+                          readOnly
+                          placeholder="우편번호"
+                        />
+                        <S.MiniButton
+                          type="button"
+                          $secondary
+                          onClick={() => setIsPostcodeOpen(true)}
+                        >
+                          우편번호 찾기
+                        </S.MiniButton>
                       </S.InlinePair>
-                      <S.TextInput name="address1" aria-label="기본주소" value={formData.address1} readOnly placeholder="기본주소" />
-                      <S.TextInput name="address2" aria-label="상세주소" autoComplete="address-line2" value={formData.address2} onChange={handleChange} placeholder="상세주소를 입력해 주세요" />
+                      <S.TextInput
+                        name="address1"
+                        aria-label="기본주소"
+                        value={formData.address1}
+                        readOnly
+                        placeholder="기본주소"
+                      />
+                      <S.TextInput
+                        name="address2"
+                        aria-label="상세주소"
+                        autoComplete="address-line2"
+                        value={formData.address2}
+                        onChange={handleChange}
+                        placeholder="상세주소를 입력해 주세요"
+                      />
                     </S.Field>
                   </S.FormSection>
 
                   <S.ButtonRow>
-                    <S.Button type="button" $secondary onClick={() => { setStep(1); scrollRegistrationToTop(); }}>이전 단계</S.Button>
-                    <S.Button type="submit" disabled={submitting}>{submitting ? "가입 처리 중..." : "회원가입 완료 ↗"}</S.Button>
+                    <S.Button
+                      type="button"
+                      $secondary
+                      onClick={() => {
+                        setStep(1);
+                        scrollRegistrationToTop();
+                      }}
+                    >
+                      이전 단계
+                    </S.Button>
+                    <S.Button type="submit" disabled={submitting}>
+                      {submitting ? "가입 처리 중..." : "회원가입 완료 ↗"}
+                    </S.Button>
                   </S.ButtonRow>
                 </S.Form>
               )}
@@ -456,11 +702,25 @@ export default function TermsPage() {
       </S.RegisterShell>
 
       {isPostcodeOpen && (
-        <S.ModalScrim onMouseDown={(event) => { if (event.target === event.currentTarget) setIsPostcodeOpen(false); }}>
-          <S.ModalCard role="dialog" aria-modal="true" aria-labelledby="postcode-title">
+        <S.ModalScrim
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setIsPostcodeOpen(false);
+          }}
+        >
+          <S.ModalCard
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="postcode-title"
+          >
             <S.ModalHead>
               <h3 id="postcode-title">주소 검색</h3>
-              <S.ModalClose type="button" onClick={() => setIsPostcodeOpen(false)} aria-label="주소 검색 닫기">닫기 ✕</S.ModalClose>
+              <S.ModalClose
+                type="button"
+                onClick={() => setIsPostcodeOpen(false)}
+                aria-label="주소 검색 닫기"
+              >
+                닫기 ✕
+              </S.ModalClose>
             </S.ModalHead>
             <DaumPostcode onComplete={handleCompletePostcode} />
           </S.ModalCard>

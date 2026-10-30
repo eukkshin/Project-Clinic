@@ -1,12 +1,15 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes } from 'styled-components';
 
 const green = "#193a32";
 const ink = "#1c322b";
 const ivory = "#f8f6f1";
-const serif = '"Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif';
+const serif = 'var(--ahns-korean-display, "Pretendard Variable", sans-serif)';
+
 const latin =
   '"Cormorant Garamond", "Iowan Old Style", "Baskerville", Georgia, serif';
 const sans = '"Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif';
+const emphasisFont =
+  '"Cormorant Garamond","Paperlogy","Pretendard Variable",sans-serif';
 
 const arrive = keyframes`
   from { opacity: 0; transform: translate3d(0, 20px, 0); }
@@ -288,22 +291,28 @@ export const Eyebrow = styled.p`
 export const HeroTitle = styled.h1`
   max-width: 830px;
   margin-top: 30px !important;
+
   font-family: ${serif};
   font-size: clamp(54px, 5.1vw, 89px);
   font-weight: 400;
   line-height: 1.4;
-  letter-spacing: -0.093em;
+  letter-spacing: -0.04em;
   word-break: keep-all;
+
   em {
-    font-family: ${latin};
-    font-size: 1.2em;
-    line-height: 1.05;
+    font-family: ${emphasisFont};
+    font-size: 1.12em;
+    font-weight: 300;
     font-style: normal;
-    letter-spacing: -0.075em;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    word-break: keep-all;
   }
+
   @media (max-width: 1100px) {
     font-size: clamp(51px, 5.4vw, 69px);
   }
+
   @media (max-width: 700px) {
     font-size: clamp(42px, 9.5vw, 70px);
     margin-top: 24px !important;

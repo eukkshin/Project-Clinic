@@ -1,11 +1,11 @@
-import styled, { css, keyframes } from "styled-components";
+import styled, { css, keyframes } from 'styled-components';
 
 const GREEN = "#1B3528";
 const PAPER = "#F7F5EF";
 const INK = "#23382B";
 const MUTED = "#728076";
 const HAIR = "rgba(27,53,40,.16)";
-const SERIF = 'var(--ahns-display, "Noto Serif KR", Georgia, serif)';
+const SERIF = 'var(--ahns-korean-display, "Pretendard Variable", sans-serif)';
 
 const drawRoute = keyframes`
   from {stroke-dasharray: 1; stroke-dashoffset: 1; opacity:.2;}

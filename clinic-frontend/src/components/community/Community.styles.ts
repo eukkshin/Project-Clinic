@@ -1,4 +1,4 @@
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes } from 'styled-components';
 
 export const palette = {
   forest: "#1B3528",
@@ -11,7 +11,8 @@ export const palette = {
   white: "#FFFDF8",
   line: "rgba(31,58,43,.16)",
 };
-const serif = '"Noto Serif KR", "Nanum Myeongjo", Georgia, serif';
+const serif = 'var(--ahns-korean-display, "Pretendard Variable", sans-serif)';
+
 const display = '"Cormorant Garamond", "Iowan Old Style", Georgia, serif';
 
 export const Page = styled.main`

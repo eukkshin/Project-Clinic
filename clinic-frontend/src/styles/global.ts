@@ -1,14 +1,29 @@
 "use client";
 
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
-import { color, motion } from "@/styles/tokens";
+import { color, motion } from '@/styles/tokens';
 
 export const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: "Paperlogy";
+    src: url("https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy-4Regular.woff2")
+      format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
 :root {
+  /* 영문 제목 */
   --ahns-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+
+  /* 한글 제목 - 신규 */
+  --ahns-korean-display: "SUITE Variable", "Pretendard Variable", sans-serif;
+
+  /* 일반 본문 */
   --ahns-body: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+
   --color-brand: ${color.brand.primary};
   --color-ink: ${color.brand.ink};
   --color-cream: ${color.canvas.cream};

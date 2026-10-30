@@ -21,6 +21,8 @@ const Treatment = require("./src/entity/Treatment");
 const DetailCategory = require("./src/entity/DetailCategory");
 const DetailPage = require("./src/entity/DetailPage");
 const DetailSection = require("./src/entity/DetailSection");
+const Reservation = require("./src/entity/Reservation");
+const ReservationBlock = require("./src/entity/ReservationBlock");
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -54,6 +56,8 @@ const AppDataSource = new DataSource({
     DetailCategory,
     DetailPage,
     DetailSection,
+    Reservation,
+    ReservationBlock,
   ],
   extra: {
     poolMin: 2,

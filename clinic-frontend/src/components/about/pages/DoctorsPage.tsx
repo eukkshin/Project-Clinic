@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import * as S from "@/components/about/pages/AboutPages.styles";
-import {
-  AboutBottom,
-  AboutFrame,
-} from "@/components/about/shared/AboutFoundation";
+import * as S from '@/components/about/pages/AboutPages.styles';
+import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
+import TypingText from '@/components/ui/TypingText';
 
 export default function DoctorsPage() {
   return (
@@ -22,7 +20,9 @@ export default function DoctorsPage() {
                 <br />
                 사람을 바라보는
                 <br />
-                <em>시선.</em>
+                <em>
+                  <TypingText text="시선." speed={90} />
+                </em>
               </S.Title>
               <S.Body
                 style={{ maxWidth: 450, marginTop: 43, color: S.C.muted }}

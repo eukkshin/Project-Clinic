@@ -1,10 +1,9 @@
 "use client";
-import { API_ORIGIN } from "@/lib/api/config";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-import { Accordion } from "@/components/ui/Accordion";
-import * as S from "@/components/ui/Accordion.styles";
+import { Accordion } from '@/components/ui/Accordion';
+import * as S from '@/components/ui/Accordion.styles';
 
 interface QnAItem {
   id: string;
@@ -26,7 +25,7 @@ export default function QuaPage() {
 
   const fetchPublicQnAs = async () => {
     try {
-      const res = await axios.get(`${API_ORIGIN}/api/admin/qnas`);
+      const res = await axios.get("http://localhost:4000/api/admin/qnas");
 
       if (res.data.success) {
         const rawData = res.data.data;

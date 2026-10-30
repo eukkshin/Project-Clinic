@@ -1,13 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
+import Link from 'next/link';
+import { useState } from 'react';
 
-import * as S from "@/components/about/pages/AboutPages.styles";
-import {
-  AboutBottom,
-  AboutFrame,
-} from "@/components/about/shared/AboutFoundation";
+import * as S from '@/components/about/pages/AboutPages.styles';
+import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
+import HangulTyping from '@/components/ui/TypingText';
 
 // 미확인 장비·인증·의료인력·응급체계 등의 구체적 사실을 주장하지 않는 원칙 소개용 텍스트.
 const steps = [
@@ -50,7 +48,9 @@ export default function SafetyPage() {
               <br />
               부분까지
               <br />
-              <em>신중하게.</em>
+              <em>
+                <HangulTyping text="신중하게." speed={90} />
+              </em>
             </S.Title>
             <S.Body
               data-about-reveal

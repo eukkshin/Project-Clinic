@@ -21,9 +21,8 @@ const Treatment = require("./src/entity/Treatment");
 const DetailCategory = require("./src/entity/DetailCategory");
 const DetailPage = require("./src/entity/DetailPage");
 const DetailSection = require("./src/entity/DetailSection");
-const Reservation = require("./src/entity/Reservation");
-const AdminReservation = require("./src/entity/AdminReservation");
 const ReservationBlock = require("./src/entity/ReservationBlock");
+const AdminReservation = require("./src/entity/AdminReservation");
 
 
 const AppDataSource = new DataSource({

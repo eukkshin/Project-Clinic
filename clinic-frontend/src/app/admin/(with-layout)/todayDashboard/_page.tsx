@@ -11,6 +11,7 @@ import { FiMail } from 'react-icons/fi';
 import * as S from './today.style'
 
 interface TodayPatient{
+    reservationIdx: number;
     chartNo: string;
     name: string;
     phone: string;
@@ -21,58 +22,58 @@ interface TodayPatient{
     memo?: string;
 }
 
-const DEMO_PATIENTS :TodayPatient[]= [
-  {
-    chartNo: "C1001",
-    name: "김민준",
-    phone: "010-1234-5678",
-    birthDate: "900512",
-    gender: "M",
-    reservationTime: "09:30",
-    status: "WAITING",
-    memo: "초진, 정기 검진 요청"
-  },
-  {
-    chartNo: "C1002",
-    name: "이지은",
-    phone: "010-2345-6789",
-    birthDate: "950823",
-    gender: "F",
-    reservationTime: "10:00",
-    status: "TREATING",
-    memo: "스케일링 및 치주 치료"
-  },
-  {
-    chartNo: "C1003",
-    name: "박도윤",
-    phone: "010-3456-7890",
-    birthDate: "881204",
-    gender: "M",
-    reservationTime: "10:30",
-    status: "WAITING",
-    memo: "사랑니 통증 호소"
-  },
-  {
-    chartNo: "C1004",
-    name: "서지우",
-    phone: "010-4567-8901",
-    birthDate: "020315",
-    gender: "F",
-    reservationTime: "11:00",
-    status: "COMPLETED",
-    memo: "교정기 왁스 수령"
-  },
-  {
-    chartNo: "C1005",
-    name: "강서준",
-    phone: "010-5678-9012",
-    birthDate: "750918",
-    gender: "M",
-    reservationTime: "11:30",
-    status: "RESERVED",
-    memo: "보철 치료 상담"
-  }
-];
+// const DEMO_PATIENTS :TodayPatient[]= [
+//   {
+//     chartNo: "C1001",
+//     name: "김민준",
+//     phone: "010-1234-5678",
+//     birthDate: "900512",
+//     gender: "M",
+//     reservationTime: "09:30",
+//     status: "WAITING",
+//     memo: "초진, 정기 검진 요청"
+//   },
+//   {
+//     chartNo: "C1002",
+//     name: "이지은",
+//     phone: "010-2345-6789",
+//     birthDate: "950823",
+//     gender: "F",
+//     reservationTime: "10:00",
+//     status: "TREATING",
+//     memo: "스케일링 및 치주 치료"
+//   },
+//   {
+//     chartNo: "C1003",
+//     name: "박도윤",
+//     phone: "010-3456-7890",
+//     birthDate: "881204",
+//     gender: "M",
+//     reservationTime: "10:30",
+//     status: "WAITING",
+//     memo: "사랑니 통증 호소"
+//   },
+//   {
+//     chartNo: "C1004",
+//     name: "서지우",
+//     phone: "010-4567-8901",
+//     birthDate: "020315",
+//     gender: "F",
+//     reservationTime: "11:00",
+//     status: "COMPLETED",
+//     memo: "교정기 왁스 수령"
+//   },
+//   {
+//     chartNo: "C1005",
+//     name: "강서준",
+//     phone: "010-5678-9012",
+//     birthDate: "750918",
+//     gender: "M",
+//     reservationTime: "11:30",
+//     status: "RESERVED",
+//     memo: "보철 치료 상담"
+//   }
+// ];
 
 export default function ReservationDashboardComponent() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function ReservationDashboardComponent() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchedMemberList, setSearchedMemberList] = useState([]);
 
-  const [todayPatientList, setTodayPatientList] = useState<TodayPatient[]>(DEMO_PATIENTS);
+  const [todayPatientList, setTodayPatientList] = useState<TodayPatient[]>([]);
   const [filter, setFilter] = useState<TodayPatient['status']>('RESERVED');
 
   const [treatments, setTreatments] = useState<any[]>([]);

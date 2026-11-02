@@ -1,6 +1,59 @@
 import styled from 'styled-components';
-import { FiLoader } from 'react-icons/fi'; // 또는 선호하시는 아이콘
-import { BoxShadow, CircleBtn, FlexBetween, FlexCenter, NoDrag } from '@/assets/css/Common.styles';
+import { BoxShadow, FlexBetween, FlexCenter, NoDrag } from '@/styles/mixins';
+
+export const Button = styled.button<{
+  $variant?: "primary" | "danger" | "quiet";
+}>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid
+    ${({ $variant }) =>
+      $variant === "primary"
+        ? "#28593f"
+        : $variant === "danger"
+          ? "#ebcbc5"
+          : "#dce5dc"};
+  background: ${({ $variant }) =>
+    $variant === "primary"
+      ? "#28593f"
+      : $variant === "danger"
+        ? "#fff6f4"
+        : "#fff"};
+  color: ${({ $variant }) =>
+    $variant === "primary"
+      ? "#fff"
+      : $variant === "danger"
+        ? "#aa514b"
+        : "#345843"};
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 720;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease;
+  &:hover:not(:disabled) {
+    filter: brightness(0.96);
+    border-color: #a1bca5;
+  }
+  &:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+  }
+  &:focus-visible {
+    outline: 2px solid #689a77;
+    outline-offset: 2px;
+  }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+`;
 
 export const IconWrapper = styled.div`
   display: flex;
@@ -161,6 +214,8 @@ align-items: center;
 export const MemoIconButton = styled.button`
 display: inline-flex;
 align-items: center;
+outline: none;
+border: none;
 cursor: pointer;
 
 width: 35px;

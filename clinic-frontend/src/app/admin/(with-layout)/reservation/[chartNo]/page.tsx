@@ -6,7 +6,6 @@ import { useParams } from 'next/navigation'
 import { FaCheckCircle,FaRegCalendarCheck } from 'react-icons/fa';
 import * as S from './reservation.style'
 import { AddTreatmentModal } from '../components/AddTreatmentModal';
-import * as A from "@/assets/css/admin/DetailCMS.styles";
 import { FaRegClock, FaRegCommentDots } from 'react-icons/fa6';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import ErrorState  from '@/ui/feedback/ErrorState';
@@ -298,12 +297,12 @@ export default function PatientBookingPage (){
                       <S.PatientNo>{chartNo}</S.PatientNo>
                       
                     </div>
-                    <A.Button $variant='primary'
+                    <S.Button $variant='primary'
                       style={{marginLeft: 'auto'}}
                       onClick={() => setShowAddTreatModal(true)}
                     >
                       + 시술권 추가
-                    </A.Button>
+                    </S.Button>
                     </>
                   )}
                 </S.ProfileHeader>

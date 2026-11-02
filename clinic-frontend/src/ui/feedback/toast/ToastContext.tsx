@@ -14,7 +14,6 @@ export const ToastProvider = ({children}:{children:React.ReactNode})=>{
 
     const { toast , showToast: showToastMessage} = useToast();
 
-      // showToast 함수의 참조를 유지
       const showToast = useCallback((
         message:string,
         type: 'success' | 'error' | 'info' = 'success'

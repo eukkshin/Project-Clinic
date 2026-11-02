@@ -38,10 +38,7 @@ const COLOR = {
 
 const SHADOW = "0 10px 30px rgba(40, 75, 55, 0.05)";
 
-const FONT = {
-  sans: "'Pretendard', 'Noto Sans KR', sans-serif",
-  serif: "Georgia, 'Times New Roman', serif",
-};
+
 
 /* =========================================================
    페이지 전체
@@ -53,7 +50,6 @@ export const PageContainer = styled.div`
   padding: 32px;
   background: ${COLOR.canvas};
   color: ${COLOR.bodyText};
-  font-family: ${FONT.sans};
 
   box-sizing: border-box;
 
@@ -99,14 +95,12 @@ export const Eyebrow = styled.span`
 
 export const PageHeading = styled.div`
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
 `;
 
 export const PageTitle = styled.h1`
   margin: 0;
   color: ${COLOR.deepGreen};
-  font-family: ${FONT.serif};
   font-size: 30px;
   font-weight: 500;
   letter-spacing: -0.8px;
@@ -142,7 +136,6 @@ export const PrimaryButton = styled.button`
   background: ${COLOR.deepGreen};
   color: ${COLOR.warmWhite};
 
-  font-family: ${FONT.sans};
   font-size: 13px;
   font-weight: 600;
 
@@ -243,6 +236,32 @@ export const SummaryContent = styled.div`
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+
+  span {
+    color: #526555;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  strong {
+    color: #284b37;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+
+    small {
+      margin-left: 4px;
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+
+  small {
+    color: #9aa99a;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+  }
 `;
 
 export const SummaryLabel = styled.span`
@@ -253,7 +272,6 @@ export const SummaryLabel = styled.span`
 
 export const SummaryValue = styled.strong`
   color: ${COLOR.deepGreen};
-  font-family: ${FONT.serif};
   font-size: 27px;
   font-weight: 500;
   line-height: 1;
@@ -261,7 +279,6 @@ export const SummaryValue = styled.strong`
   small {
     margin-left: 4px;
     color: ${COLOR.mutedText};
-    font-family: ${FONT.sans};
     font-size: 12px;
     font-weight: 400;
   }
@@ -304,6 +321,12 @@ export const PanelTitleGroup = styled.div`
   gap: 6px;
 `;
 
+export const PanelWrapper = styled.div`
+display: flex;
+flex-direction: column;
+gap: 2px;
+`;
+
 export const PanelTitle = styled.h2`
   margin: 0;
   color: ${COLOR.deepGreen};
@@ -315,6 +338,7 @@ export const PanelTitle = styled.h2`
 export const PanelDescription = styled.p`
   margin: 0;
   color: ${COLOR.mutedText};
+  font-weight: 400 ;
   font-size: 12px;
   line-height: 1.5;
 `;
@@ -356,42 +380,6 @@ export const RecordCard = styled.div`
   }
 `;
 
-export const RecordIdentity = styled.div<{ $gender?: string }>`
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  min-width: 0;
-
-  /* 성별에 따른 아바타 색상 */
-  & > div:first-child {
-    background: ${({ $gender }) =>
-      $gender === "F" || $gender === "여성" || $gender === "여"
-        ? "#f4edf0"
-        : "#edf1f4"};
-
-    color: ${({ $gender }) =>
-      $gender === "F" || $gender === "여성" || $gender === "여"
-        ? "#a47788"
-        : "#647d91"};
-  }
-`;
-
-export const RecordAvatar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-
-  border-radius: 50%;
-  background: ${COLOR.lightSage};
-  color: ${COLOR.deepGreen};
-
-  font-size: 14px;
-  font-weight: 700;
-`;
 
 export const RecordInfo = styled.div`
   display: flex;
@@ -400,22 +388,6 @@ export const RecordInfo = styled.div`
   min-width: 0;
 `;
 
-export const RecordName = styled.strong`
-  overflow: hidden;
-  color: ${COLOR.bodyText};
-  font-size: 14px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-export const RecordSub = styled.span`
-  overflow: hidden;
-  color: ${COLOR.mutedText};
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
 
 export const RecordTime = styled.span`
   flex-shrink: 0;
@@ -483,43 +455,90 @@ export const StatusBadge = styled.span<{ $status: string }>`
   }};
 `;
 
+
+
 /* =========================================================
    상태 변경 Select
    ========================================================= */
 
-export const StatusSelect = styled.select`
-  min-width: 112px;
-  min-height: 34px;
-  padding: 0 27px 0 11px;
+// export const StatusSelect = styled.select<>`
+//   min-width: 112px;
+//   min-height: 34px;
+//   padding: 0 27px 0 11px;
 
-  border: 1px solid ${COLOR.sageBorder};
+//   border: 1px solid ${COLOR.sageBorder};
+//   border-radius: 8px;
+
+//   background-color: ${COLOR.warmWhite};
+//   color: ${COLOR.deepGreen};
+
+//   font-size: 12px;
+//   font-weight: 600;
+
+//   cursor: pointer;
+//   outline: none;
+
+//   transition: border-color 0.2s ease;
+
+//   &:hover {
+//     border-color: ${COLOR.deepGreen};
+//   }
+
+//   &:focus {
+//     border-color: ${COLOR.deepGreen};
+//     box-shadow: 0 0 0 3px rgba(109, 137, 111, 0.13);
+//   }
+
+//   &:disabled {
+//     background: ${COLOR.lightSage};
+//     color: ${COLOR.mutedText};
+//     cursor: not-allowed;
+//   }
+
+//   option {
+//     background: ${COLOR.warmWhite};
+//     color: ${COLOR.bodyText};
+//   }
+// `;
+type PatientStatus =
+  | "RESERVED"
+  | "WAITING"
+  | "CONSULTING"
+  | "TREATING"
+  | "COMPLETED"
+  | "CANCELLED";
+
+export const StatusSelect = styled.select<{ $status: PatientStatus }>`
+  min-width: 105px;
+  min-height: 36px;
+  padding: 0 28px 0 11px;
+
+  border: 1px solid ${COLOR.lightBorder};
   border-radius: 8px;
 
-  background-color: ${COLOR.warmWhite};
+  outline: none;
+  background: ${COLOR.warmWhite};
   color: ${COLOR.deepGreen};
 
-  font-family: ${FONT.sans};
   font-size: 12px;
   font-weight: 600;
 
   cursor: pointer;
-  outline: none;
+  transition: all 0.2s ease;
 
-  transition: border-color 0.2s ease;
-
-  &:hover {
-    border-color: ${COLOR.deepGreen};
+  &:hover:not(:disabled) {
+    border-color: ${COLOR.sageBorder};
   }
 
   &:focus {
-    border-color: ${COLOR.deepGreen};
-    box-shadow: 0 0 0 3px rgba(109, 137, 111, 0.13);
+    border-color: ${COLOR.sage};
+    box-shadow: 0 0 0 3px rgba(109, 137, 111, 0.12);
   }
 
   &:disabled {
     background: ${COLOR.lightSage};
     color: ${COLOR.mutedText};
-    cursor: not-allowed;
+    cursor: default;
   }
 
   option {
@@ -582,7 +601,6 @@ export const ModalTitleGroup = styled.div`
 export const ModalTitle = styled.h2`
   margin: 0;
   color: ${COLOR.deepGreen};
-  font-family: ${FONT.serif};
   font-size: 24px;
   font-weight: 500;
 `;
@@ -657,7 +675,6 @@ export const FormInput = styled.input`
   background: ${COLOR.warmWhite};
   color: ${COLOR.bodyText};
 
-  font-family: ${FONT.sans};
   font-size: 13px;
 
   outline: none;
@@ -695,7 +712,6 @@ export const FormTextarea = styled.textarea`
   background: ${COLOR.warmWhite};
   color: ${COLOR.bodyText};
 
-  font-family: ${FONT.sans};
   font-size: 13px;
   line-height: 1.6;
 
@@ -928,7 +944,6 @@ export const SecondaryButton = styled.button`
   background: ${COLOR.warmWhite};
   color: ${COLOR.deepGreen};
 
-  font-family: ${FONT.sans};
   font-size: 12px;
   font-weight: 600;
 
@@ -966,18 +981,20 @@ export const MessageText = styled.p<{ $type?: "success" | "error" }>`
 `;
 
 
-
-/* =========================================================
-   기존 대시보드 호환 스타일
-   ========================================================= */
-
 // 목록 상단 영역
 export const RecordTop = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 20px;
+
+  width: 100%;
+  min-width: 0;
+
+  @media (max-width: 600px) {
+    align-items: flex-start;
+    gap: 12px;
+  }
 `;
 
 // 목록 개수 표시
@@ -1101,5 +1118,399 @@ export const RefreshButton = styled.button`
   svg {
     width: 15px;
     height: 15px;
+  }
+`;
+
+
+/* =========================================================
+   환자 상태 필터
+   ========================================================= */
+
+// export const FilterBar = styled.div`
+//   display: flex;
+//   align-items: center;
+//   flex-wrap: wrap;
+//   gap: 4px;
+
+//   margin-bottom: 20px;
+//   padding: 5px;
+
+//   background: #f1f4ef;
+//   border: 1px solid ${COLOR.lightBorder};
+//   border-radius: 12px;
+
+//   @media (max-width: 600px) {
+//     gap: 3px;
+//     padding: 4px;
+//   }
+// `;
+
+// export const FilterButton = styled.button<{
+//   $active: boolean;
+// }>`
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 7px;
+
+//   min-height: 36px;
+//   padding: 0 14px;
+//   flex: 1;
+
+//   border: 1px solid transparent;
+//   border-radius: 8px;
+
+//   background: ${({ $active }) =>
+//     $active ? COLOR.warmWhite : "transparent"};
+
+//   color: ${({ $active }) =>
+//     $active ? COLOR.deepGreen : COLOR.mutedText};
+
+//   font-size: 12px;
+//   font-weight: ${({ $active }) => ($active ? 700 : 500)};
+
+//   cursor: pointer;
+//   transition:
+//     background 0.18s ease,
+//     color 0.18s ease,
+//     box-shadow 0.18s ease;
+
+//   ${({ $active }) =>
+//     $active &&
+//     `
+//       border-color: rgba(40, 75, 55, 0.07);
+//       box-shadow: 0 1px 3px rgba(40, 75, 55, 0.08);
+//     `}
+
+//   &:hover {
+//     color: ${COLOR.deepGreen};
+//     background: ${({ $active }) =>
+//       $active ? COLOR.warmWhite : "rgba(255, 255, 255, 0.55)"};
+//   }
+
+//   span {
+//     display: inline-flex;
+//     align-items: center;
+//     justify-content: center;
+
+//     min-width: 20px;
+//     height: 20px;
+//     padding: 0 5px;
+
+//     border-radius: 6px;
+
+//     background: ${({ $active }) =>
+//       $active ? COLOR.lightSage : "rgba(40, 75, 55, 0.05)"};
+
+//     color: ${({ $active }) =>
+//       $active ? COLOR.deepGreen : "#829087"};
+
+//     font-size: 10px;
+//     font-weight: 700;
+//     font-variant-numeric: tabular-nums;
+//   }
+
+//   &:focus-visible {
+//     outline: 2px solid ${COLOR.sage};
+//     outline-offset: 2px;
+//   }
+
+//   @media (max-width: 600px) {
+//     flex: 1 1 auto;
+//     min-width: 58px;
+//     padding: 0 10px;
+//   }
+// `;
+
+
+export const FilterBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 26px;
+
+  margin-bottom: 20px;
+  border-bottom: 1px solid ${COLOR.lightBorder};
+
+  @media (max-width: 600px) {
+    gap: 18px;
+    overflow-x: auto;
+  }
+`;
+
+export const FilterButton = styled.button<{
+  $active: boolean;
+}>`
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 2px 2px;
+
+  border: none;
+  background: transparent;
+
+  color: ${({ $active }) =>
+    $active ? COLOR.deepGreen : COLOR.mutedText};
+
+  font-size: 13px;
+  font-weight: ${({ $active }) => ($active ? 700 : 500)};
+
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+
+    border-radius: 2px;
+    background: ${COLOR.deepGreen};
+
+    transform: scaleX(${({ $active }) => ($active ? 1 : 0)});
+    transform-origin: center;
+    transition: transform 0.22s ease;
+  }
+
+  &:hover {
+    color: ${COLOR.deepGreen};
+  }
+
+  span {
+    color: ${({ $active }) =>
+      $active ? COLOR.sage : "#a2aca2"};
+
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${COLOR.sage};
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+`;
+
+
+
+
+export const RecordIdentity = styled.div<{
+  $gender?: string;
+}>`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+
+  .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+
+    border-radius: 14px;
+
+    background: ${({ $gender }) =>
+      $gender === "F" ? "#f4efee" : "#edf2eb"};
+
+    color: ${({ $gender }) =>
+      $gender === "F" ? "#a47788" : "#647d91"};
+
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .patient-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* gap: 3px; */
+    min-width: 0;
+  }
+`;
+
+export const TodayTreatment = styled.span`
+  display: inline-flex;
+  align-items: center;
+
+  padding: 3px 7px;
+
+  border: 1px solid #dfe7dd;
+  border-radius: 5px;
+
+  background: #edf2eb;
+  color: #526f56;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+`;
+
+export const RecordName = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+
+  .patient-name {
+    color: ${COLOR.deepGreen};
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+`;
+
+export const TreatmentTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+
+  padding: 3px 8px;
+
+  border: 1px solid ${COLOR.lightBorder};
+  border-radius: 6px;
+
+  background: ${COLOR.lightSage};
+  color: ${COLOR.deepGreen};
+
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
+export const RecordSub = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+
+  color: #9aa99a;
+  font-size: 11px;
+  font-weight: 400;
+
+  .separator {
+    color: #c5cec4;
+  }
+`;
+
+export const ReservationTime = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 2px;
+
+  svg {
+    color: ${COLOR.sage};
+    font-size: 12px;
+  }
+
+  strong {
+    color: ${COLOR.deepGreen};
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    color: ${COLOR.mutedText};
+    font-size: 11px;
+    font-weight: 500;
+  }
+`;
+
+//툴팁
+
+
+
+
+export const RecordActions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  flex-shrink: 0;
+`;
+
+export const MemoTooltip = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid ${COLOR.lightBorder};
+    border-radius: 9px;
+
+    background: ${COLOR.warmWhite};
+    color: ${COLOR.mutedText};
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: ${COLOR.lightSage};
+      border-color: ${COLOR.sageBorder};
+      color: ${COLOR.deepGreen};
+    }
+  }
+
+  .tooltip {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 10px);
+    right: 0;
+
+    width: max-content;
+    max-width: 260px;
+    padding: 11px 14px;
+
+    border: 1px solid ${COLOR.lightBorder};
+    border-radius: 10px;
+
+    background: ${COLOR.warmWhite};
+    color: ${COLOR.bodyText};
+
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: normal;
+    overflow-wrap: anywhere;
+
+    box-shadow: 0 8px 24px rgba(40, 75, 55, 0.12);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      visibility 0.18s ease;
+  }
+
+  &:hover .tooltip,
+  &:focus-within .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
   }
 `;

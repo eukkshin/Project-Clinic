@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -13,10 +12,11 @@ import {
   FaClock,
   FaPlus,
   FaTimes,
+  FaSyringe,
 } from "react-icons/fa";
 
 import * as S from "./today.style";
-
+import { FaRegNoteSticky } from "react-icons/fa6";
 
 type PatientStatus =
   | "RESERVED"
@@ -29,11 +29,12 @@ type PatientStatus =
 interface TodayPatient {
   reservationIdx: number;
   chartNo: string;
+  treatmentIdx: number | null;
   name: string;
   phone: string;
   birthDate: string;
   gender: "M" | "F";
-  reservationDate: string;
+//   reservationDate: string;
   reservationTime: string;
   status: PatientStatus;
   memo?: string;
@@ -52,8 +53,17 @@ interface ReservationForm {
   reservationTime: string;
   memo: string;
 }
+type StatusFilter = "ALL" | PatientStatus;
 
-//상태 관련 설정
+const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: "ALL", label: "전체" },
+  { value: "RESERVED", label: "예약" },
+  { value: "WAITING", label: "대기" },
+  { value: "CONSULTING", label: "상담" },
+  { value: "TREATING", label: "치료" },
+  { value: "COMPLETED", label: "완료" },
+  { value: "CANCELLED", label: "취소" },
+];
 
 const STATUS_LABEL: Record<PatientStatus, string> = {
   RESERVED: "예약",
@@ -75,7 +85,6 @@ const AVAILABLE_STATUSES: Record<PatientStatus, PatientStatus[]> = {
 };
 
 //  날짜 유틸리티
-
 const getToday = () => {
   const today = new Date();
 
@@ -102,6 +111,8 @@ export default function TodayDashboard() {
     useState(false);
 
   const [selectedPatient, setSelectedPatient] =useState<Member | null>(null);
+  
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>("ALL");
 
   const [reservationForm, setReservationForm] =useState<ReservationForm>({
       reservationDate: getToday(),
@@ -120,7 +131,7 @@ export default function TodayDashboard() {
       setIsLoading(true);
 
       const response = await axios.get(
-        "http://localhost:4000/api/admin/reservations/today"
+        "http://localhost:4000/api/admin/today"
       );
 
       setTodayPatientList(response.data.data || []);
@@ -165,24 +176,37 @@ export default function TodayDashboard() {
 
   // 요약 카드 숫자 계산
   const counts = useMemo(() => {
-    return {
-      RESERVED: todayPatientList.filter(
-        patient => patient.status === "RESERVED"
-      ).length,
+  return {
+    ALL: todayPatientList.length,
+    RESERVED: todayPatientList.filter(p => p.status === "RESERVED").length,
+    WAITING: todayPatientList.filter(p => p.status === "WAITING").length,
+    CONSULTING: todayPatientList.filter(p => p.status === "CONSULTING").length,
+    TREATING: todayPatientList.filter(p => p.status === "TREATING").length,
+    COMPLETED: todayPatientList.filter(p => p.status === "COMPLETED").length,
+    CANCELLED: todayPatientList.filter(p => p.status === "CANCELLED").length,
+  };
+}, [todayPatientList]);
 
-      WAITING: todayPatientList.filter(
-        patient => patient.status === "WAITING"
-      ).length,
+  
+  // const counts = useMemo(() => {
+  //   return {
+  //     RESERVED: todayPatientList.filter(
+  //       patient => patient.status === "RESERVED"
+  //     ).length,
 
-      CONSULTING: todayPatientList.filter(
-        patient => patient.status === "CONSULTING"
-      ).length,
+  //     WAITING: todayPatientList.filter(
+  //       patient => patient.status === "WAITING"
+  //     ).length,
 
-      TREATING: todayPatientList.filter(
-        patient => patient.status === "TREATING"
-      ).length,
-    };
-  }, [todayPatientList]);
+  //     CONSULTING: todayPatientList.filter(
+  //       patient => patient.status === "CONSULTING"
+  //     ).length,
+
+  //     TREATING: todayPatientList.filter(
+  //       patient => patient.status === "TREATING"
+  //     ).length,
+  //   };
+  // }, [todayPatientList]);
 
   // 예약 등록 모달 열기
   const handleOpenReservationModal = () => {
@@ -229,7 +253,6 @@ export default function TodayDashboard() {
   };
 
   // 예약 등록
-
   const handleCreateReservation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -292,9 +315,12 @@ export default function TodayDashboard() {
 
     try {
       await axios.patch(
-        `http://localhost:4000/api/admin/reservations/${patient.reservationIdx}/status`,
+        `http://localhost:4000/api/admin/reservation/${patient.reservationIdx}/status`,
         {
           status: nextStatus,
+        },
+        {
+          withCredentials:true,
         }
       );
 
@@ -324,31 +350,39 @@ export default function TodayDashboard() {
       CANCELLED: 6,
     };
 
-    return [...todayPatientList].sort((a, b) => {
+     // 선택한 상태에 해당하는 환자만 추출
+    const filteredList =
+      selectedStatus === "ALL"
+        ? todayPatientList
+        : todayPatientList.filter(
+            patient => patient.status === selectedStatus
+          );
+
+    return [...filteredList].sort((a, b) => {
       const statusOrder =priority[a.status] - priority[b.status];
 
       if (statusOrder !== 0) return statusOrder;
 
       return a.reservationTime.localeCompare(b.reservationTime);
     });
-  }, [todayPatientList]);
+  }, [todayPatientList, selectedStatus]);
 
   return (
-    <Layout>
+    <Layout >
       <S.PageContainer>
 
         {/* 상단 헤더 */}
-        <S.PageHeader>
+        <S.PageHeader className="admin-page-title-block">
           <S.PageHeading>
-            <S.Eyebrow>
-              CLINIC RECEPTION & APPOINTMENT DASHBOARD
+            <S.Eyebrow className="admin-page-eyebrow" >
+              CLINIC RECEPTION / APPOINTMENT DASHBOARD
             </S.Eyebrow>
 
             <S.PageTitle>
               오늘의 예약 및 내원 현황
             </S.PageTitle>
 
-            <S.PageDescription>
+            <S.PageDescription className="admin-page-description">
               오늘 예약된 환자와 내원 진행 상황을 관리합니다.
             </S.PageDescription>
           </S.PageHeading>
@@ -377,7 +411,7 @@ export default function TodayDashboard() {
         <S.SummaryGrid>
 
           <S.SummaryCard>
-            <S.SummaryIcon $variant="pink">
+            <S.SummaryIcon>
               <FaCalendarCheck />
             </S.SummaryIcon>
 
@@ -413,8 +447,8 @@ export default function TodayDashboard() {
           </S.SummaryCard>
 
           <S.SummaryCard>
-            <S.SummaryIcon $variant="green">
-              <FaUser />
+            <S.SummaryIcon $variant="purple">
+              <FaSyringe />
             </S.SummaryIcon>
 
             <S.SummaryContent>
@@ -435,24 +469,39 @@ export default function TodayDashboard() {
                 <FaCalendarCheck />
               </S.PanelIcon>
 
-              <div>
+              <S.PanelWrapper>
                 <S.PanelTitle>
                   오늘의 예약 및 내원 환자
                 </S.PanelTitle>
-
                 <S.PanelDescription>
                   환자별 현재 진행 상태를 직접 변경할 수 있습니다.
                 </S.PanelDescription>
-              </div>
+              </S.PanelWrapper>
             </S.PanelHeading>
 
             <S.ItemCount>
-              총 {todayPatientList.length}명
+              {selectedStatus === "ALL"
+                ? `전체 ${sortedPatientList.length}명`
+                : `${STATUS_LABEL[selectedStatus]} ${sortedPatientList.length}명`}
             </S.ItemCount>
           </S.PanelHeader>
 
-          <S.RecordList>
+          <S.FilterBar>
+            {STATUS_FILTERS.map(filter => (
+              <S.FilterButton
+                key={filter.value}
+                type="button"
+                $active={selectedStatus === filter.value}
+                onClick={() => setSelectedStatus(filter.value)}
+              >
+                {filter.label}
+                <span>{counts[filter.value]}</span>
+              </S.FilterButton>
+            ))}
+          </S.FilterBar>
 
+
+          <S.RecordList>
             {isLoading ? (
               <S.EmptyState>
                 예약 목록을 불러오는 중입니다.
@@ -460,66 +509,86 @@ export default function TodayDashboard() {
             ) : sortedPatientList.length === 0 ? (
               <S.EmptyState>
                 <FaCalendarCheck />
-                <strong>오늘 등록된 예약이 없습니다.</strong>
-                <span>예약 등록 버튼을 눌러 새로운 예약을 등록해 주세요.</span>
+                <strong>
+                  {selectedStatus === "ALL"
+                    ? "오늘 등록된 예약이 없습니다."
+                    : `${STATUS_LABEL[selectedStatus]} 상태의 환자가 없습니다.`}
+                </strong>
+                <span>
+                  {selectedStatus === "ALL"
+                    ? "예약 등록 버튼을 눌러 새로운 예약을 등록해 주세요."
+                    : "다른 상태를 선택하거나 예약 목록을 확인해 주세요."}
+                </span>
               </S.EmptyState>
             ) : (
               sortedPatientList.map((patient) => (
                 <S.RecordCard key={patient.reservationIdx}>
-
                   <S.RecordTop>
                     <S.RecordIdentity $gender={patient.gender}>
                       <div className="avatar">
                         {patient.name?.[0]}
                       </div>
 
-                      <div>
+                      <div className="patient-info">
                         <S.RecordName>
-                          {patient.name}
-                          <small>{patient.birthDate}</small>
+                          <span className="patient-name">{patient.name}</span>
+                          {patient.treatmentNames?.map((name, index) => (
+                            <S.TreatmentTag key={`${name}-${index}`}>
+                              {name}
+                            </S.TreatmentTag>
+                          ))}
                         </S.RecordName>
 
                         <S.RecordSub>
-                          {patient.reservationTime} 예약
-                          {" · "}
-                          차트: {patient.chartNo}
+                          <span>{patient.birthDate}</span>
+                          <span className="separator">·</span>
+                          <span>차트번호 {patient.chartNo}</span>
                         </S.RecordSub>
+
+                        <S.ReservationTime>
+                          <FaClock />
+                          <strong>{patient.reservationTime}</strong>
+                          <span>예약</span>
+                        </S.ReservationTime>
                       </div>
                     </S.RecordIdentity>
 
-                    <StatusSelect
-                      value={patient.status}
-                      disabled={
-                        AVAILABLE_STATUSES[patient.status].length === 0
-                      }
-                      $status={patient.status}
-                      onChange={(e) =>
-                        handleChangeStatus(
-                          patient,
-                          e.target.value as PatientStatus
-                        )
-                      }
-                    >
-                      <option value={patient.status}>
-                        {STATUS_LABEL[patient.status]}
-                      </option>
+                    <S.RecordActions>
+                      {patient.memo && (
+                        <S.MemoTooltip>
+                          <button type="button" aria-label="예약 메모 보기">
+                            <FaRegNoteSticky />
+                          </button>
 
-                      {AVAILABLE_STATUSES[patient.status].map(
-                        (status) => (
+                          <div className="tooltip">
+                            {patient.memo}
+                          </div>
+                        </S.MemoTooltip>
+                      )}
+
+                      <S.StatusSelect
+                        value={patient.status}
+                        disabled={AVAILABLE_STATUSES[patient.status].length === 0}
+                        $status={patient.status}
+                        onChange={(e) =>
+                          handleChangeStatus(
+                            patient,
+                            e.target.value as PatientStatus
+                          )
+                        }
+                      >
+                        <option value={patient.status}>
+                          {STATUS_LABEL[patient.status]}
+                        </option>
+
+                        {AVAILABLE_STATUSES[patient.status].map((status) => (
                           <option key={status} value={status}>
                             {STATUS_LABEL[status]}
                           </option>
-                        )
-                      )}
-                    </StatusSelect>
+                        ))}
+                      </S.StatusSelect>
+                     </S.RecordActions>
                   </S.RecordTop>
-
-                  {patient.memo && (
-                    <PatientMemo>
-                      {patient.memo}
-                    </PatientMemo>
-                  )}
-
                 </S.RecordCard>
               ))
             )}
@@ -560,7 +629,7 @@ export default function TodayDashboard() {
                 <FormLabel>예약 환자 검색</FormLabel>
 
                 {selectedPatient ? (
-                  <SelectedPatient>
+                  <S.SelectedPatient>
                     <div>
                       <strong>{selectedPatient.name}</strong>
                       <span>
@@ -576,7 +645,7 @@ export default function TodayDashboard() {
                     >
                       변경
                     </button>
-                  </SelectedPatient>
+                  </S.SelectedPatient>
                 ) : (
                   <>
                     <SearchBox>
@@ -694,7 +763,7 @@ export default function TodayDashboard() {
 // --------------------------------------
 
 const Layout = styled.div`
-  background-color: #f8fafc;
+    background: #fbfcf9;
   min-height: 100vh;
   padding: 40px 20px;
 `;
@@ -940,25 +1009,6 @@ const SubmitButton = styled.button`
   &:disabled {
     background: #aab9ae;
     cursor: not-allowed;
-  }
-`;
-
-const StatusSelect = styled.select<{ $status: PatientStatus }>`
-  min-width: 105px;
-  padding: 8px 28px 8px 11px;
-  border: 1px solid #d6e4d6;
-  border-radius: 8px;
-  outline: none;
-  background: #fff;
-  color: #244f39;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:disabled {
-    background: #f3f5f3;
-    color: #829087;
-    cursor: default;
   }
 `;
 

@@ -12,6 +12,7 @@ import {
   FaUserDoctor,
   FaCircleExclamation,
 } from "react-icons/fa6";
+import { useToastContext } from '@/ui/feedback/toast/ToastContext';
 
 interface AddTreatmentModalProps{
     chartNo: string;
@@ -51,7 +52,8 @@ const formattedPrice = (price:number)=>{
 
 export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalProps)=>{
 
-    const { mutate, isError, isPending, reset:resetMutation } = useAddTreatment(chartNo);
+    const {showToast} =useToastContext();
+    const { mutate, isPending, reset:resetMutation } = useAddTreatment(chartNo);
 
      const {
         register, 
@@ -128,7 +130,11 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
   const onSubmit = (data:TreatmentFormInput)=>{
     mutate({...data, chartNo}, {
       onSuccess: ()=>{
+        showToast('시술권이 등록되었습니다.', 'success')
         onClose()
+      },
+      onError:()=>{
+          showToast('시술권 등록에 실패했습니다. 다시 시도해 주세요.', 'error');
       }
     })
   }
@@ -154,13 +160,13 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
           onConfirm={handleSubmit(onSubmit)}
           >
 
-        {isError && 
+        {/* {isError && 
         <S.FormError>
           <FaCircleExclamation/>
           <span>
             요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.
           </span>
-        </S.FormError>}
+        </S.FormError>} */}
         <S.TreatmentForm>
          <S.FormHeader>
             <S.FormDescription>

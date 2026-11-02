@@ -1909,6 +1909,7 @@ app.post('/api/admin/reservation/today', async (req, res) => {
 app.get('/api/admin/today', async (req, res) => {
   try {
     const reservationRepo = AppDataSource.getRepository(AdminReservation);
+    const memberRepo = AppDataSource.getRepository(Member);
 
     const todayPatients = await reservationRepo
       .createQueryBuilder('r')
@@ -1928,7 +1929,7 @@ app.get('/api/admin/today', async (req, res) => {
       .where('TRUNC(r.RESERVATION_DATE) = TRUNC(SYSDATE)')
       .andWhere("r.STATUS != 'CANCELLED'")
       .orderBy(
-        `CASE r.STATUS
+        `CASE  "r"."STATUS"
           WHEN 'TREATING' THEN 1
           WHEN 'WAITING' THEN 2
           WHEN 'RESERVED' THEN 3
@@ -1955,12 +1956,13 @@ app.get('/api/admin/today', async (req, res) => {
   }
 });
 
-// 예약 상태 변경
+
 app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
   try {
     const reservationIdx = Number(req.params.reservationIdx);
     const { status: nextStatus } = req.body;
 
+    // 1. 예약 번호 검증
     if (!Number.isInteger(reservationIdx) || reservationIdx <= 0) {
       return res.status(400).json({
         success: false,
@@ -1968,10 +1970,13 @@ app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
       });
     }
 
+    // 2. 변경 가능한 예약 상태
     const allowedStatuses = [
       'WAITING',
+      'CONSULTING',
       'TREATING',
       'COMPLETED',
+      'CANCELLED',
     ];
 
     if (!allowedStatuses.includes(nextStatus)) {
@@ -1981,49 +1986,84 @@ app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
       });
     }
 
-    // 예약 상태와 시술권 차감을 하나의 트랜잭션으로 처리
+    // 3. 현재 상태에서 변경할 수 있는 상태
+    const nextStatusMap = {
+      RESERVED: ['WAITING', 'CANCELLED'],
+      WAITING: ['CONSULTING', 'TREATING', 'COMPLETED'],
+      CONSULTING: ['TREATING', 'COMPLETED'],
+      TREATING: ['COMPLETED'],
+      COMPLETED: [],
+      CANCELLED: [],
+    };
+
+    // 4. 예약 상태와 진행 시간, 시술권 차감을 하나의 트랜잭션으로 처리
     const result = await AppDataSource.transaction(async (manager) => {
       const reservationRepo = manager.getRepository(AdminReservation);
       const treatmentRepo = manager.getRepository(Treatment);
 
-      // 1. 예약 조회 및 행 잠금
-      const reservation = await reservationRepo.findOne({
-        where: {
-          RESERVATION_IDX: reservationIdx,
-        },
-        lock: {
-          mode: 'pessimistic_write',
-        },
-      });
+      // 4-1. 예약 조회 및 행 잠금
+      const reservation = await reservationRepo
+        .createQueryBuilder('reservation')
+        .where('reservation.RESERVATION_IDX = :reservationIdx', {
+          reservationIdx,
+        })
+        .setLock('pessimistic_write')
+        .getOne();
 
       if (!reservation) {
         throw new Error('RESERVATION_NOT_FOUND');
       }
 
-      // 2. 현재 상태에 맞는 다음 상태인지 확인
-      const nextStatusMap = {
-        RESERVED: 'WAITING',
-        WAITING: 'TREATING',
-        TREATING: 'COMPLETED',
-      };
+      // 4-2. 현재 상태에서 변경 가능한 상태인지 확인
+      const availableStatuses = nextStatusMap[reservation.STATUS] || [];
 
-      if (nextStatusMap[reservation.STATUS] !== nextStatus) {
+      if (!availableStatuses.includes(nextStatus)) {
         throw new Error('INVALID_STATUS_TRANSITION');
+      }
+
+      // 실제 진행 시간 기록
+      const now = new Date();
+
+      // 기존 시간이 없을 때만 최초 시간 기록
+      if (nextStatus === 'WAITING' && !reservation.ARRIVED_AT) {
+        reservation.ARRIVED_AT = now;
+      }
+
+      if (
+        nextStatus === 'CONSULTING' &&
+        !reservation.CONSULTING_STARTED_AT
+      ) {
+        reservation.CONSULTING_STARTED_AT = now;
+      }
+
+      if (
+        nextStatus === 'TREATING' &&
+        !reservation.TREATMENT_STARTED_AT
+      ) {
+        reservation.TREATMENT_STARTED_AT = now;
+      }
+
+      if (nextStatus === 'COMPLETED' && !reservation.COMPLETED_AT) {
+        reservation.COMPLETED_AT = now;
       }
 
       let remainingCount = null;
 
-      // 3. 완료 처리라면 시술권 횟수 차감
-      if (nextStatus === 'COMPLETED' && reservation.TREATMENT_IDX != null) {
-        const treatment = await treatmentRepo.findOne({
-          where: {
-            TREATMENT_IDX: reservation.TREATMENT_IDX,
-            CHART_NO: reservation.CHART_NO,
-          },
-          lock: {
-            mode: 'pessimistic_write',
-          },
-        });
+      // 4-3. 완료 처리라면 시술권 잔여 횟수 차감
+      if (
+        nextStatus === 'COMPLETED' &&
+        reservation.TREATMENT_IDX != null
+      ) {
+        const treatment = await treatmentRepo
+          .createQueryBuilder('treatment')
+          .where('treatment.TREATMENT_IDX = :treatmentIdx', {
+            treatmentIdx: reservation.TREATMENT_IDX,
+          })
+          .andWhere('treatment.CHART_NO = :chartNo', {
+            chartNo: reservation.CHART_NO,
+          })
+          .setLock('pessimistic_write')
+          .getOne();
 
         if (!treatment) {
           throw new Error('TREATMENT_NOT_FOUND');
@@ -2046,7 +2086,7 @@ app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
         remainingCount = treatment.REMAINING_COUNT;
       }
 
-      // 4. 예약 상태 변경
+      // 4-4. 예약 상태 변경
       reservation.STATUS = nextStatus;
 
       await reservationRepo.save(reservation);
@@ -2054,10 +2094,15 @@ app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
       return {
         reservationIdx: reservation.RESERVATION_IDX,
         status: reservation.STATUS,
+        arrivedAt: reservation.ARRIVED_AT,
+        consultingStartedAt: reservation.CONSULTING_STARTED_AT,
+        treatmentStartedAt: reservation.TREATMENT_STARTED_AT,
+        completedAt: reservation.COMPLETED_AT,
         remainingCount,
       };
     });
 
+    // 5. 성공 응답
     return res.status(200).json({
       success: true,
       message: '예약 상태가 변경되었습니다.',
@@ -2101,6 +2146,168 @@ app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
     });
   }
 });
+
+// 예약 상태 변경
+app.patch('/api/admin/reservation/:reservationIdx/status', async (req, res) => {
+  try {
+    const reservationIdx = Number(req.params.reservationIdx);
+    const { status: nextStatus } = req.body;
+
+    // 1. 예약 번호 검증
+    if (!Number.isInteger(reservationIdx) || reservationIdx <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: '올바르지 않은 예약 번호입니다.',
+      });
+    }
+
+    // 2. 변경 가능한 예약 상태
+    const allowedStatuses = [
+      'WAITING',
+      'CONSULTING',
+      'TREATING',
+      'COMPLETED',
+      'CANCELLED',
+    ];
+
+    if (!allowedStatuses.includes(nextStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: '올바르지 않은 예약 상태입니다.',
+      });
+    }
+
+    // 3. 현재 상태에서 변경할 수 있는 상태
+    const nextStatusMap = {
+      RESERVED: ['WAITING', 'CANCELLED'],
+      WAITING: ['CONSULTING', 'TREATING', 'COMPLETED'],
+      CONSULTING: ['TREATING', 'COMPLETED'],
+      TREATING: ['COMPLETED'],
+      COMPLETED: [],
+      CANCELLED: [],
+    };
+
+    // 4. 예약 상태와 시술권 차감을 하나의 트랜잭션으로 처리
+    const result = await AppDataSource.transaction(async (manager) => {
+      const reservationRepo = manager.getRepository(AdminReservation);
+      const treatmentRepo = manager.getRepository(Treatment);
+
+      // 4-1. 예약 조회 및 행 잠금
+      const reservation = await reservationRepo
+        .createQueryBuilder('reservation')
+        .where('reservation.RESERVATION_IDX = :reservationIdx', {
+          reservationIdx,
+        })
+        .setLock('pessimistic_write')
+        .getOne();
+
+      if (!reservation) {
+        throw new Error('RESERVATION_NOT_FOUND');
+      }
+
+      // 4-2. 현재 예약 상태에서 변경 가능한 상태인지 확인
+      const availableStatuses = nextStatusMap[reservation.STATUS] || [];
+
+      if (!availableStatuses.includes(nextStatus)) {
+        throw new Error('INVALID_STATUS_TRANSITION');
+      }
+
+      let remainingCount = null;
+
+      // 4-3. 완료 처리라면 시술권 잔여 횟수 차감
+      if (
+        nextStatus === 'COMPLETED' &&
+        reservation.TREATMENT_IDX != null
+      ) {
+        const treatment = await treatmentRepo
+          .createQueryBuilder('treatment')
+          .where('treatment.TREATMENT_IDX = :treatmentIdx', {
+            treatmentIdx: reservation.TREATMENT_IDX,
+          })
+          .andWhere('treatment.CHART_NO = :chartNo', {
+            chartNo: reservation.CHART_NO,
+          })
+          .setLock('pessimistic_write')
+          .getOne();
+
+        if (!treatment) {
+          throw new Error('TREATMENT_NOT_FOUND');
+        }
+
+        if (treatment.REMAINING_COUNT <= 0) {
+          throw new Error('NO_REMAINING_COUNT');
+        }
+
+        // 잔여 횟수 1회 차감
+        treatment.REMAINING_COUNT -= 1;
+
+        // 잔여 횟수가 0이면 시술권 완료
+        if (treatment.REMAINING_COUNT === 0) {
+          treatment.STATUS = 'COMPLETED';
+        }
+
+        await treatmentRepo.save(treatment);
+
+        remainingCount = treatment.REMAINING_COUNT;
+      }
+
+      // 4-4. 예약 상태 변경
+      reservation.STATUS = nextStatus;
+
+      await reservationRepo.save(reservation);
+
+      return {
+        reservationIdx: reservation.RESERVATION_IDX,
+        status: reservation.STATUS,
+        remainingCount,
+      };
+    });
+
+    // 5. 성공 응답
+    return res.status(200).json({
+      success: true,
+      message: '예약 상태가 변경되었습니다.',
+      data: result,
+    });
+
+  } catch (error) {
+    console.error('예약 상태 변경 실패:', error);
+
+    if (error.message === 'RESERVATION_NOT_FOUND') {
+      return res.status(404).json({
+        success: false,
+        message: '예약 정보를 찾을 수 없습니다.',
+      });
+    }
+
+    if (error.message === 'INVALID_STATUS_TRANSITION') {
+      return res.status(409).json({
+        success: false,
+        message: '현재 예약 상태에서는 해당 상태로 변경할 수 없습니다.',
+      });
+    }
+
+    if (error.message === 'TREATMENT_NOT_FOUND') {
+      return res.status(404).json({
+        success: false,
+        message: '연결된 시술권을 찾을 수 없습니다.',
+      });
+    }
+
+    if (error.message === 'NO_REMAINING_COUNT') {
+      return res.status(409).json({
+        success: false,
+        message: '시술권 잔여 횟수가 없습니다.',
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: '예약 상태 변경 중 서버 오류가 발생했습니다.',
+    });
+  }
+});
+
 
 
 const { router: adminSessionRouter, requireAdmin } = createAdminSession({

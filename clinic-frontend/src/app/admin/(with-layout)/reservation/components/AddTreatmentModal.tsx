@@ -10,7 +10,7 @@ import {
   FaWandMagicSparkles,
   FaSyringe,
   FaUserDoctor,
-  FaCircleExclamation,
+  FaXmark,
 } from "react-icons/fa6";
 import { useToastContext } from '@/ui/feedback/toast/ToastContext';
 
@@ -146,168 +146,239 @@ export const AddTreatmentModal=({chartNo, isOpen, onClose}: AddTreatmentModalPro
     }
   },[isOpen, reset])
 
+  if (!isOpen) return null;
 
-    return(
-        <Popup 
-          isOpen={isOpen} 
-          onClose={onClose} 
-          title='시술 및 수술 등록'
-          eyebrow="TREATMENT · REGISTER"
-          confirmText={isPending || isSubmitting ? '등록중..':'등록'}
-          maxWidth='560px'
-          closeOnOverlayClick={false}
-          isDisabled={isPending || isSubmitting}
-          onConfirm={handleSubmit(onSubmit)}
-          >
+  return(
+    <>
+    <S.TreatmentOverlay>
+    <S.TreatmentModal
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="treatment-modal-title"
+    >
+      <S.GlassShine />
 
-        {/* {isError && 
-        <S.FormError>
-          <FaCircleExclamation/>
-          <span>
-            요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.
-          </span>
-        </S.FormError>} */}
-        <S.TreatmentForm>
-         <S.FormHeader>
-            <S.FormDescription>
-              환자에게 등록할 시술권과 결제 정보를 입력해 주세요.
-            </S.FormDescription>
-          </S.FormHeader>
+      {/* 헤더 */}
+      <S.ModalHeader>
+        <S.ModalHeading>
+          <S.ModalEyebrow>
+            TREATMENT · REGISTER
+          </S.ModalEyebrow>
 
-           {/* 카테고리 */}
-          <S.FormField>
-            <S.FieldLabel>
-              카테고리<S.RequiredMark>*</S.RequiredMark>
-            </S.FieldLabel>
-            <S.CategoryOptions>
-              {CATE_OPTIONS.map(({value,label,Icon})=>(
-                <S.CategoryOption 
-                key={value}
-                $selected={selectedCategory === value}
-                >
-                  <input 
-                  type='radio'
-                  value={value}
-                  checked={selectedCategory === value}
-                  onChange={handleCategoryChange}
-                  />
-                  <Icon size={17}/>
-                  <span>{label}</span>
-                </S.CategoryOption>
-              ))}
-            </S.CategoryOptions>
-            {errors.category && (
-              <S.ErrorText>{errors.category.message}</S.ErrorText>
-            )}
-          </S.FormField>
-          {/* 시술명 */}
-          <S.FormField>
-            <S.FieldLabel>
-              시술 및 수술명<S.RequiredMark>*</S.RequiredMark>
-            </S.FieldLabel>
+          <S.ModalTitle id="treatment-modal-title">
+            시술 및 수술 등록
+          </S.ModalTitle>
 
-            <S.Select
-            {...register("treatmentName")}
-            value={selectedName}
-            onChange={handleTreatmentChange}
-            >
-              <option value="" disabled>항목을 선택하세요</option>
-              {availableTreatments.map(item=>(
-                <option key={item.name} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </S.Select>
-            {errors.treatmentName && (
-              <S.ErrorText>{errors.treatmentName.message}</S.ErrorText>
-            )}
-          </S.FormField>
+          <S.FormDescription>
+          환자에게 등록할 시술권과 결제 정보를 입력해 주세요.
+          </S.FormDescription>
+        </S.ModalHeading>
 
-          <S.FormGrid>
-            {/* 총 횟수 */}
+        <S.CloseButton
+          type="button"
+          onClick={onClose}
+          disabled={isPending || isSubmitting}
+          aria-label="닫기"
+        >
+          <FaXmark size={16} />
+        </S.CloseButton>
+      </S.ModalHeader>
+
+      {/* 폼 영역 */}
+      <S.TreatmentFormWrapper onSubmit={handleSubmit(onSubmit)}>
+        <S.ModalBody>
+          <S.TreatmentForm>
+            <S.FormHeader>
+             
+            </S.FormHeader>
+
+            {/* 카테고리 */}
             <S.FormField>
               <S.FieldLabel>
-                총 횟수<S.RequiredMark>*</S.RequiredMark>
+                카테고리
+                <S.RequiredMark>*</S.RequiredMark>
               </S.FieldLabel>
-              <S.CountOptions>
-                {COUNT_OPTIONS.map(item=>(
-                  <S.CountOption 
-                  $selected={selectedCount===item}
-                  key={item}>
+
+              <S.CategoryOptions>
+                {CATE_OPTIONS.map(({ value, label, Icon }) => (
+                  <S.CategoryOption
+                    key={value}
+                    $selected={selectedCategory === value}
+                  >
                     <input
-                    type='radio'
-                    name='totalCount'
-                    value={item}
-                    checked={selectedCount===item}
-                    onChange={()=>{setValue('totalCount', item, {shouldValidate:true})}}
+                      type="radio"
+                      value={value}
+                      checked={selectedCategory === value}
+                      onChange={handleCategoryChange}
                     />
-                    {`${item}회`}
-                  </S.CountOption>
+
+                    <Icon size={17} />
+                    <span>{label}</span>
+                  </S.CategoryOption>
                 ))}
-              </S.CountOptions>
-              
-              {errors.totalCount && (
-                <S.ErrorText>{errors.totalCount.message}</S.ErrorText>
+              </S.CategoryOptions>
+
+              {errors.category && (
+                <S.ErrorText>
+                  {errors.category.message}
+                </S.ErrorText>
               )}
             </S.FormField>
 
-            {/* 결제 금액 */}
+            {/* 시술명 */}
             <S.FormField>
               <S.FieldLabel>
-              결제 금액<S.RequiredMark>*</S.RequiredMark>
+                시술 및 수술명
+                <S.RequiredMark>*</S.RequiredMark>
               </S.FieldLabel>
 
-              <S.PriceBox>
-                <S.PriceInput
-                type='number'
-                min="0"
-                step='1000'
-                {...register("price",{ valueAsNumber: true})}
-                />
-                <S.PriceUnit>원</S.PriceUnit>
-              </S.PriceBox>
-             
-              {errors.price && (
-              <S.ErrorText>{errors.price.message}</S.ErrorText>
-               )}
+              <S.Select
+                {...register("treatmentName")}
+                value={selectedName}
+                onChange={handleTreatmentChange}
+              >
+                <option value="" disabled>
+                  항목을 선택하세요
+                </option>
+
+                {availableTreatments.map((item) => (
+                  <option key={item.name} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </S.Select>
+
+              {errors.treatmentName && (
+                <S.ErrorText>
+                  {errors.treatmentName.message}
+                </S.ErrorText>
+              )}
             </S.FormField>
 
-             {selectedPackage && (
+            <S.FormGrid>
+              {/* 총 횟수 */}
+              <S.FormField>
+                <S.FieldLabel>
+                  총 횟수
+                  <S.RequiredMark>*</S.RequiredMark>
+                </S.FieldLabel>
+
+                <S.CountOptions>
+                  {COUNT_OPTIONS.map((item) => (
+                    <S.CountOption
+                      key={item}
+                      $selected={selectedCount === item}
+                    >
+                      <input
+                        type="radio"
+                        name="totalCount"
+                        value={item}
+                        checked={selectedCount === item}
+                        onChange={() => {
+                          setValue('totalCount', item, {
+                            shouldValidate: true,
+                          });
+                        }}
+                      />
+
+                      {`${item}회`}
+                    </S.CountOption>
+                  ))}
+                </S.CountOptions>
+
+                {errors.totalCount && (
+                  <S.ErrorText>
+                    {errors.totalCount.message}
+                  </S.ErrorText>
+                )}
+              </S.FormField>
+
+              {/* 결제 금액 */}
+              <S.FormField>
+                <S.FieldLabel>
+                  결제 금액
+                  <S.RequiredMark>*</S.RequiredMark>
+                </S.FieldLabel>
+
+                <S.PriceBox>
+                  <S.PriceInput
+                    type="number"
+                    min="0"
+                    step="1000"
+                    {...register("price", {
+                      valueAsNumber: true,
+                    })}
+                  />
+
+                  <S.PriceUnit>원</S.PriceUnit>
+                </S.PriceBox>
+
+                {errors.price && (
+                  <S.ErrorText>
+                    {errors.price.message}
+                  </S.ErrorText>
+                )}
+              </S.FormField>
+
+              {selectedPackage && (
                 <S.HelperText>
-                  <span className='description'>선택한 패키지 기본 가격</span>
-                  <span className='price'>{formattedPrice(selectedPackage?.price)}원</span>
+                  <span className="description">
+                    선택한 패키지 기본 가격
+                  </span>
+
+                  <span className="price">
+                    {formattedPrice(selectedPackage.price)}원
+                  </span>
                 </S.HelperText>
               )}
-          </S.FormGrid>
-            
+            </S.FormGrid>
+
             {/* 결제 수단 */}
             <S.FormField>
               <S.FieldLabel>
-                결제 수단<S.RequiredMark>*</S.RequiredMark>
+                결제 수단
+                <S.RequiredMark>*</S.RequiredMark>
               </S.FieldLabel>
-              
+
               <S.PaymentOptions>
-                {PAYMENT_OPTION.map(({value,label})=>(
+                {PAYMENT_OPTION.map(({ value, label }) => (
                   <S.PaymentOption key={value}>
                     <input
-                    type='radio'
-                    value={value}
-                    {...register('paymentMethod')}
+                      type="radio"
+                      value={value}
+                      {...register('paymentMethod')}
                     />
+
                     <span>{label}</span>
                   </S.PaymentOption>
                 ))}
               </S.PaymentOptions>
 
               {errors.paymentMethod && (
-                <S.ErrorText>{errors.paymentMethod.message}</S.ErrorText>
+                <S.ErrorText>
+                  {errors.paymentMethod.message}
+                </S.ErrorText>
               )}
             </S.FormField>
-          
-        </S.TreatmentForm>
+          </S.TreatmentForm>
+        </S.ModalBody>
 
-    </Popup>
-    )
+        {/* 하단 등록 버튼 */}
+        <S.ModalFooter>
+          <S.SubmitButton
+            type="submit"
+            disabled={isPending || isSubmitting}
+          >
+            {isPending || isSubmitting
+              ? '등록 중...'
+              : '시술권 등록'}
+          </S.SubmitButton>
+        </S.ModalFooter>
+      </S.TreatmentFormWrapper>
+    </S.TreatmentModal>
+    </S.TreatmentOverlay>
+    </>
+  )
 }
 
 

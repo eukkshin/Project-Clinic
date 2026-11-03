@@ -82,7 +82,7 @@ const isPlainObject = (value:unknown): value is Record<string, unknown> =>{
  }
 const apiBaseURL = normalizeApiBaseURL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
 
-const http: AxiosInstance = axios.create({
+const https: AxiosInstance = axios.create({
     baseURL: apiBaseURL,
     timeout: 15000,
     headers:{
@@ -91,4 +91,27 @@ const http: AxiosInstance = axios.create({
     withCredentials: true,
 });
 
+//요청을 보내기 전 공통 헤더 설정
+https.interceptors.request.use((config)=>{
+    // const lang = (I18.language || 'ko').startsWith('en')
+    // ? "en"
+    // : "ko";
+    config.headers = config.headers ?? {};
+
+    if(config.data instanceof FormData){
+        delete config.headers['Content-Type'];
+    }    
+    
+    // config.headers['Accept-Language']= lang;
+    return config;
+})
+
+//응답을 받거나 에러가 났을 때 공통 후처리
+https.interceptors.response.use(
+    (response)=> response,
+    (error)=>{
+        const status = error.response?.status;
+        const method = (error.config?.method || 'GET').toUpperCase();
+    // }   const url = `${error.config?.}`
+)
 

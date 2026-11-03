@@ -13,10 +13,29 @@ export default function Toast ({toast}:ToastProps){
     if(!toast) return null;
 
     const icon = {
-        success: <FaCircleCheck/>,
-        error: <FaCircleExclamation/>,
-        info: <FaCircleInfo/>
-    }
+        success: (
+           <S.CheckSvg viewBox="0 0 56 56">
+            <circle
+                cx="28"
+                cy="28"
+                r="24"
+                fill="none"
+                stroke="#173c2a"
+                strokeWidth="3"
+            />
+            <path
+                d="M16 28.5l8 8 16-17"
+                fill="none"
+                stroke="#173c2a"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            </S.CheckSvg>
+        ),
+        error: <FaCircleExclamation />,
+        info: <FaCircleInfo />,
+        };
 
     return(
         <S.ToastContainer $type={toast.type}>   

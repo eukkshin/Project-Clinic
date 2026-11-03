@@ -3,7 +3,6 @@ import { useAddTreatment } from '../hooks/useAddTreatment'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { treatmentSchema, TreatmentFormInput } from '@/schema/treatmentSchema'
-import { Popup } from '@/ui/modal/Popup';
 import * as S from './AddTreatment.style'
 import TREATMENT_CATALOG from '@/data/treatment/dummy.json'
 import {

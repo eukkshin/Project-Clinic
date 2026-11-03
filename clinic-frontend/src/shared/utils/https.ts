@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios'
 // import i18n from '@/i18n/i18n';
+//SafeError 정의하기
 
 const isLocalDev = 
     typeof window !== 'undefined' && 
@@ -20,15 +21,15 @@ const isPlainObject = (value:unknown): value is Record<string, unknown> =>{
  }
 
  //디버깅 로그 출력을 위해 민감한 데이터를 마스킹([redacted]) 처리하는 함수
- const sanitizeForlog = (value:unknown): unknown=>{
+ const sanitizeForLog = (value:unknown): unknown=>{
     if(Array.isArray(value)){
-        return value.map((item)=> sanitizeForlog(item))
+        return value.map((item)=> sanitizeForLog(item))
     }
     if(isPlainObject(value)){
         return Object.fromEntries(
             Object.entries(value).map(([key,item])=>[
                 key,
-                SENSITIVE_KEY_PATTERN.test(key) ? REDACTED : sanitizeForlog(item),
+                SENSITIVE_KEY_PATTERN.test(key) ? REDACTED : sanitizeForLog(item),
             ]),
         );
     }
@@ -108,10 +109,67 @@ https.interceptors.request.use((config)=>{
 
 //응답을 받거나 에러가 났을 때 공통 후처리
 https.interceptors.response.use(
-    (response)=> response,
-    (error)=>{
-        const status = error.response?.status;
-        const method = (error.config?.method || 'GET').toUpperCase();
-    // }   const url = `${error.config?.}`
-)
+  (response) => response,
 
+  (error) => {
+    const status = error.response?.status;
+    const method = (error.config?.method || "GET").toUpperCase();
+    const url = `${error.config?.baseURL || ""}${error.config?.url || ""}`;
+
+    const requestHeaders = error.config?.headers ?? {};
+    const responseHeaders = error.response?.headers ?? {};
+
+    const requestParams = error.config?.params ?? {};
+    const requestBody = error.config?.data ?? null;
+    const responseBody = error.response?.data ?? null;
+
+    // 401, 403 인증 관련 처리
+    if (status === 401 || status === 403) {
+      if (isLocalDev) {
+        console.groupCollapsed(`[AUTH ${status}] ${method} ${url}`);
+
+        console.log("Request Headers:", sanitizeForLog(requestHeaders));
+        console.log("Request Params:", sanitizeForLog(requestParams));
+        console.log("Request Body:", sanitizeForLog(requestBody));
+        console.log("Response Headers:", sanitizeForLog(responseHeaders));
+        console.log("Response Body:", sanitizeForLog(responseBody));
+
+        console.groupEnd();
+      }
+
+      // 401일 때만 로그인 후 돌아갈 페이지 저장
+      if (status === 401 && typeof window !== "undefined") {
+        try {
+          sessionStorage.setItem(
+            "postLoginRedirect",
+            `${window.location.pathname}${window.location.search}`,
+          );
+        } catch {
+          // 스토리지 접근 오류 무시
+        }
+      }
+    }
+
+    // 공통 에러 메시지 처리
+    const data = error.response?.data;
+
+    const message = pickDisplayMessage(data, status);
+
+    (error as SafeError).displayMessage = message;
+
+    // 로컬 개발 환경에서 API 에러 출력
+    if (isLocalDev) {
+      console.error("[API Error]", {
+        status,
+        method,
+        url,
+        message,
+        responseBody: sanitizeForLog(responseBody),
+        responseHeaders: sanitizeForLog(responseHeaders),
+      });
+    }
+
+    // 에러를 호출한 곳으로 전달
+    return Promise.reject(error);
+  },
+);

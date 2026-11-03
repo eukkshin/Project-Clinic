@@ -1,4 +1,5 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -11,8 +12,8 @@ import {
   FiVideo,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Vlog.styles";
 
 interface VlogData {
   id: number;
@@ -42,13 +43,13 @@ export default function Vlog() {
 
   const fetchVlogs = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/admin/vlogs");
+      const response = await axios.get(`${API_ORIGIN}/api/admin/vlogs`);
       if (response.data.success) {
         const formatted = response.data.data.map((item: any) => ({
           id: item.VLOG_IDX,
           title: item.TITLE,
           videoUrl: item.VIDEO_URL,
-          thumbnailUrl: `http://localhost:4000/images/${item.FILE_NAME}`,
+          thumbnailUrl: `${API_ORIGIN}/images/${item.FILE_NAME}`,
         }));
         setVlogList(formatted);
       }
@@ -81,7 +82,7 @@ export default function Vlog() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/vlogs",
+        `${API_ORIGIN}/api/admin/vlogs`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -109,7 +110,7 @@ export default function Vlog() {
     if (selectedDeleteId !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/vlogs/${selectedDeleteId}`,
+          `${API_ORIGIN}/api/admin/vlogs/${selectedDeleteId}`,
         );
         if (response.data.success) {
           fetchVlogs();
@@ -143,10 +144,9 @@ export default function Vlog() {
   const handleSave = async () => {
     const orderedIds = vlogList.map((v) => v.id);
     try {
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/vlogs/order",
-        { orderedIds },
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/vlogs/order`, {
+        orderedIds,
+      });
       if (response.data.success) {
         setIsSavePopupOpen(true);
       }
@@ -158,22 +158,31 @@ export default function Vlog() {
   return (
     <>
       <S.AdminVlogContainer>
-        <S.AdminVlogPageHeader>
-          <S.AdminVlogPageTitle>VLOG 영상 관리</S.AdminVlogPageTitle>
-          <S.AdminVlogSaveButton onClick={handleSave}>
+        <S.AdminVlogPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CONTENT / VIDEO</span>
+            <S.AdminVlogPageTitle>VLOG 영상 관리</S.AdminVlogPageTitle>
+            <p className="admin-page-description">
+              영상 썸네일과 등록 콘텐츠를 관리합니다.
+            </p>
+          </div>
+          <S.AdminVlogSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.AdminVlogSaveButton>
         </S.AdminVlogPageHeader>
 
-        <S.AdminVlogGrid>
+        <S.AdminVlogGrid className="admin-page-grid">
           {/* ⚙️ 1. 새 VLOG 등록 폼 (좌측) */}
-          <S.AdminVlogLeftColumn>
-            <S.AdminVlogCard>
-              <S.AdminVlogCardHeader>
+          <S.AdminVlogLeftColumn className="admin-editor-column">
+            <S.AdminVlogCard className="admin-panel">
+              <S.AdminVlogCardHeader className="admin-panel-head">
                 <S.AdminVlogCardTitle>새 영상 등록</S.AdminVlogCardTitle>
               </S.AdminVlogCardHeader>
-              <S.AdminVlogCardBody>
-                <S.AdminVlogFormGroup>
+              <S.AdminVlogCardBody className="admin-panel-body">
+                <S.AdminVlogFormGroup className="admin-form-field">
                   <S.AdminVlogLabel>
                     영상 썸네일 이미지 (권장 비율 16:9)
                   </S.AdminVlogLabel>
@@ -215,7 +224,7 @@ export default function Vlog() {
                   )}
                 </S.AdminVlogFormGroup>
 
-                <S.AdminVlogFormGroup>
+                <S.AdminVlogFormGroup className="admin-form-field">
                   <S.AdminVlogLabel>영상 제목 (노출될 텍스트)</S.AdminVlogLabel>
                   <S.AdminVlogInput
                     type="text"
@@ -227,7 +236,7 @@ export default function Vlog() {
                   />
                 </S.AdminVlogFormGroup>
 
-                <S.AdminVlogFormGroup>
+                <S.AdminVlogFormGroup className="admin-form-field">
                   <S.AdminVlogLabel>영상 링크 (유튜브 URL 등)</S.AdminVlogLabel>
                   <S.AdminVlogInput
                     type="text"
@@ -239,7 +248,10 @@ export default function Vlog() {
                   />
                 </S.AdminVlogFormGroup>
 
-                <S.AdminVlogAddButton onClick={handleAddVlog}>
+                <S.AdminVlogAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddVlog}
+                >
                   <FiPlus size={18} /> 리스트에 추가
                 </S.AdminVlogAddButton>
               </S.AdminVlogCardBody>
@@ -247,15 +259,15 @@ export default function Vlog() {
           </S.AdminVlogLeftColumn>
 
           {/* 📋 2. 등록된 VLOG 리스트 (우측) */}
-          <S.AdminVlogRightColumn>
-            <S.AdminVlogCard style={{ height: "100%" }}>
-              <S.AdminVlogCardHeader>
+          <S.AdminVlogRightColumn className="admin-record-column">
+            <S.AdminVlogCard className="admin-panel" style={{ height: "100%" }}>
+              <S.AdminVlogCardHeader className="admin-panel-head">
                 <S.AdminVlogCardTitle>
                   현재 노출 순서 (총 {vlogList.length}개)
                 </S.AdminVlogCardTitle>
               </S.AdminVlogCardHeader>
-              <S.AdminVlogTableWrapper>
-                <S.AdminVlogTable>
+              <S.AdminVlogTableWrapper className="admin-table-scroll">
+                <S.AdminVlogTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th style={{ width: "15%" }}>순위/이동</th>
@@ -287,12 +299,14 @@ export default function Vlog() {
                               }}
                             >
                               <S.AdminVlogActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveVlog(index, "UP")}
                                 disabled={index === 0}
                               >
                                 <FiArrowUp size={14} />
                               </S.AdminVlogActionBtn>
                               <S.AdminVlogActionBtn
+                                className="admin-icon-action"
                                 onClick={() => moveVlog(index, "DOWN")}
                                 disabled={index === vlogList.length - 1}
                               >
@@ -356,6 +370,7 @@ export default function Vlog() {
                         </td>
                         <td>
                           <S.AdminVlogDeleteBtn
+                            className="admin-delete-action"
                             onClick={() => handleDeleteClick(vlog.id)}
                           >
                             <FiTrash2 size={16} />

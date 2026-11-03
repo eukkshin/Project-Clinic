@@ -1,18 +1,19 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
+import * as Pagination from "@/styles/pagination";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiCheck,
   FiChevronLeft,
   FiChevronRight,
-  FiChevronsLeft,
   FiSearch,
   FiTrash2,
   FiUserX,
 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/User.styles";
 
 // 임시 회원 데이터 인터페이스
 interface UserData {
@@ -63,7 +64,7 @@ export default function Users() {
           success: boolean;
           data: RawUser[];
           pagination: Pagination;
-        }>("http://localhost:4000/api/admin/users", {
+        }>(`${API_ORIGIN}/api/admin/users`, {
           params: { page: currentPage, limit: 10, search: searchKeyword },
         });
         if (response.data.success) {
@@ -95,10 +96,31 @@ export default function Users() {
     setCurrentPage(1); //검색시 무조건 1페이지로 이동
   };
 
+  const [popupConfig, setPopupConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
+
+  const openPopup = (title: string, message: string) => {
+    setPopupConfig({
+      isOpen: true,
+      title,
+      message,
+    });
+  };
+
+  const closePopup = () => {
+    setPopupConfig((prev) => ({
+      ...prev,
+      isOpen: false,
+    }));
+  };
+
   const toggleStatus = async (idx: number) => {
     try {
       const response = await axios.put(
-        `http://localhost:4000/api/admin/users/${idx}/status`,
+        `${API_ORIGIN}/api/admin/users/${idx}/status`,
       );
       if (response.data.success) {
         setUserList(
@@ -108,11 +130,11 @@ export default function Users() {
               : item,
           ),
         );
-        alert("유저 상태가 변경되었습니다!");
+        openPopup("상태 변경 완료", "회원 상태가 정상적으로 변경되었습니다.");
       }
     } catch (error) {
       console.error("유저 상태 변경 실패: ", error);
-      alert("유저 상태 변경을 실패했습니다");
+      openPopup("상태 변경 실패", "회원 상태 변경 중 오류가 발생했습니다.");
     }
   };
 
@@ -125,7 +147,7 @@ export default function Users() {
     if (selectedDeleteIdx !== null) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/users/${selectedDeleteIdx}`,
+          `${API_ORIGIN}/api/admin/users/${selectedDeleteIdx}`,
         );
         if (response.data.success) {
           setUserList(
@@ -144,13 +166,19 @@ export default function Users() {
   return (
     <>
       <S.UserContainer>
-        <S.UserPageHeader>
-          <S.UserPageTitle>회원 관리</S.UserPageTitle>
+        <S.UserPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">CUSTOMERS / MEMBERS</span>
+            <S.UserPageTitle>회원 관리</S.UserPageTitle>
+            <p className="admin-page-description">
+              회원 검색, 계정 상태 변경 및 회원 정보를 관리합니다.
+            </p>
+          </div>
         </S.UserPageHeader>
 
         {/* 🎯 검색 및 필터 영역 */}
-        <S.UserFilterCard>
-          <S.UserInputGroup>
+        <S.UserFilterCard className="admin-filter-panel">
+          <S.UserInputGroup className="admin-search-row">
             <S.UserInput
               type="text"
               placeholder="이름, 아이디 또는 연락처 검색"
@@ -158,22 +186,25 @@ export default function Users() {
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <S.UserSearchButton onClick={handleSearch}>
+            <S.UserSearchButton
+              className="admin-primary-action"
+              onClick={handleSearch}
+            >
               <FiSearch size={16} /> 검색
             </S.UserSearchButton>
           </S.UserInputGroup>
         </S.UserFilterCard>
 
         {/* 🎯 회원 내역 데이터 테이블 */}
-        <S.UserTableCard>
-          <S.UserCardHeader>
+        <S.UserTableCard className="admin-panel">
+          <S.UserCardHeader className="admin-panel-head">
             <S.UserCardTitle>
               가입 회원 목록 (총 {userList.length}명)
             </S.UserCardTitle>
           </S.UserCardHeader>
 
-          <S.UserTableWrapper>
-            <S.UserTable>
+          <S.UserTableWrapper className="admin-table-scroll">
+            <S.UserTable className="admin-data-table">
               <thead>
                 <tr>
                   <th>No.</th>
@@ -210,6 +241,7 @@ export default function Users() {
                     </td>
                     <td>
                       <S.UserDeleteActionBtn
+                        className="admin-delete-action"
                         onClick={() => handleDeleteClick(item.idx)}
                       >
                         <FiTrash2 size={16} />
@@ -231,38 +263,46 @@ export default function Users() {
             </S.UserTable>
           </S.UserTableWrapper>
           {totalPages > 0 && (
-            <S.Pagenation>
-              <S.Prev
+            <Pagination.Pagenation>
+              <Pagination.Prev
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage <= 1}
               >
                 <FiChevronLeft size={16} />
-              </S.Prev>
+              </Pagination.Prev>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
-                  <S.PagenationBtn
+                  <Pagination.PagenationBtn
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     $active={page === currentPage}
                   >
                     {page}
-                  </S.PagenationBtn>
+                  </Pagination.PagenationBtn>
                 ),
               )}
 
-              <S.Next
+              <Pagination.Next
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                 }
                 disabled={currentPage >= totalPages}
               >
                 <FiChevronRight size={16} />
-              </S.Next>
-            </S.Pagenation>
+              </Pagination.Next>
+            </Pagination.Pagenation>
           )}
         </S.UserTableCard>
       </S.UserContainer>
+      <Popup
+        isOpen={popupConfig.isOpen}
+        title={popupConfig.title}
+        onClose={closePopup}
+        onConfirm={closePopup}
+      >
+        {popupConfig.message}
+      </Popup>
 
       {/* ✅ 커스텀 삭제 팝업 */}
       <Popup

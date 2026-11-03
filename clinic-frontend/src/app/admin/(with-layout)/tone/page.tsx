@@ -1,11 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiCheck, FiMoon, FiSave, FiSun } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Tone.styles";
 
 export default function TonePage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -17,9 +17,7 @@ export default function TonePage() {
   useEffect(() => {
     const fetchTone = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/tone",
-        );
+        const response = await axios.get(`${API_ORIGIN}/api/admin/tone`);
         if (response.data.success) {
           const dbData = response.data.data;
           if (dbData.PRIMARY_TONE) setIsSelectedTone(dbData.PRIMARY_TONE);
@@ -38,10 +36,7 @@ export default function TonePage() {
         primaryTone: selectedTone,
         isDarkMode: isDarkMode ? "Y" : "N",
       };
-      const response = await axios.put(
-        "http://localhost:4000/api/admin/tone",
-        payload,
-      );
+      const response = await axios.put(`${API_ORIGIN}/api/admin/tone`, payload);
       if (response.data.success) {
         setIsPopupOpen(true);
       }
@@ -55,19 +50,28 @@ export default function TonePage() {
   return (
     <>
       <S.ToneContainer>
-        <S.TonePageHeader>
-          <S.TonePageTitle>톤앤매너 관리</S.TonePageTitle>
-          <S.ToneSaveButton onClick={handleSave}>
+        <S.TonePageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">BRAND / APPEARANCE</span>
+            <S.TonePageTitle>톤앤매너 관리</S.TonePageTitle>
+            <p className="admin-page-description">
+              사이트의 브랜드 색상과 표시 방식을 설정합니다.
+            </p>
+          </div>
+          <S.ToneSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} />
             저장하기
           </S.ToneSaveButton>
         </S.TonePageHeader>
-        <S.ToneCardGrid>
-          <S.ToneSettingsCard>
-            <S.ToneCardHeader>
+        <S.ToneCardGrid className="admin-settings-grid">
+          <S.ToneSettingsCard className="admin-panel">
+            <S.ToneCardHeader className="admin-panel-head">
               <S.ToneCardTitle>브랜드 메인 컬러(TONE)</S.ToneCardTitle>
             </S.ToneCardHeader>
-            <S.ToneCardBody>
+            <S.ToneCardBody className="admin-panel-body">
               <p>웹사이트 전체에 적용될 주요 색상을 선택하세요</p>
               <S.ToneColorOptionWrapper>
                 <S.ToneColorBox
@@ -111,11 +115,11 @@ export default function TonePage() {
             </S.ToneCardBody>
           </S.ToneSettingsCard>
           {/* Dark Mode 설정 카드 */}
-          <S.ToneSettingsCard>
-            <S.ToneCardHeader>
+          <S.ToneSettingsCard className="admin-panel">
+            <S.ToneCardHeader className="admin-panel-head">
               <S.ToneCardTitle>다크모드(Dark Mode)</S.ToneCardTitle>
             </S.ToneCardHeader>
-            <S.ToneCardBody>
+            <S.ToneCardBody className="admin-panel-body">
               <p>사용자 화면의 다크모드 기본 상태를 설정합니다.</p>
               <S.ToneToggleWrapper>
                 <S.ToneModeButton

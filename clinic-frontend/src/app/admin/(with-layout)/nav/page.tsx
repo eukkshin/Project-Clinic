@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiImage, FiPlus, FiSave, FiTrash2, FiType } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/NavSetting.styles";
 
 interface MenuItem {
   id: number;
@@ -26,7 +27,7 @@ export default function NavPage() {
   useEffect(() => {
     const fetchNavSettings = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/admin/nav");
+        const response = await axios.get(`${API_ORIGIN}/api/admin/nav`);
         if (response.data.success) {
           const dbData = response.data.data;
           setLogoType(dbData.LOGO_TYPE);
@@ -94,7 +95,7 @@ export default function NavPage() {
         formData.append("logoImage", logoFile);
 
         const uploadRes = await axios.post(
-          "http://localhost:4000/api/admin/upload",
+          `${API_ORIGIN}/api/admin/upload`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -114,7 +115,7 @@ export default function NavPage() {
         menus: menus,
       };
 
-      await axios.put("http://localhost:4000/api/admin/nav", payload);
+      await axios.put(`${API_ORIGIN}/api/admin/nav`, payload);
       console.log("DB에 저장될 데이터", payload, finalFileName);
       setIsPopupOpen(true);
     } catch (error) {
@@ -125,19 +126,28 @@ export default function NavPage() {
   return (
     <>
       <S.SetNavContainer>
-        <S.SetNavPageHeader>
-          <S.SetNavPageTitle>네비게이션 관리</S.SetNavPageTitle>
-          <S.SetNavSaveButton onClick={handleSave}>
+        <S.SetNavPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / NAVIGATION</span>
+            <S.SetNavPageTitle>네비게이션 관리</S.SetNavPageTitle>
+            <p className="admin-page-description">
+              사이트 메뉴 구성과 표시 순서를 관리합니다.
+            </p>
+          </div>
+          <S.SetNavSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} />
             저장하기
           </S.SetNavSaveButton>
         </S.SetNavPageHeader>
-        <S.SetNavContentGrid>
-          <S.SetNavCard>
-            <S.SetNavCardHeader>
+        <S.SetNavContentGrid className="admin-page-grid">
+          <S.SetNavCard className="admin-panel">
+            <S.SetNavCardHeader className="admin-panel-head">
               <S.SetNavCardTitle>상단 로고 설정</S.SetNavCardTitle>
             </S.SetNavCardHeader>
-            <S.SetNavCardBody>
+            <S.SetNavCardBody className="admin-panel-body">
               <p>웹사이트 최상단에 표시될 로고의 형태를 선택하세요.</p>
               <S.SetNavRadioGroup>
                 <S.SetNavRadioLabel
@@ -189,17 +199,20 @@ export default function NavPage() {
             </S.SetNavCardBody>
           </S.SetNavCard>
 
-          <S.SetNavCard>
-            <S.SetNavCardHeader>
+          <S.SetNavCard className="admin-panel">
+            <S.SetNavCardHeader className="admin-panel-head">
               <S.SetNavCardTitle>카테고리 및 URL 설정</S.SetNavCardTitle>
             </S.SetNavCardHeader>
-            <S.SetNavCardBody>
+            <S.SetNavCardBody className="admin-panel-body">
               <p>
                 사용자가 클릭할 네비게이션 메뉴 이름과 이동할 주소를 입력하세요.
               </p>
               <S.SetNavMenuList>
                 {menus.map((menu, index) => (
-                  <S.SetNavMenuItem key={`${menu.id}-${index}`}>
+                  <S.SetNavMenuItem
+                    className="admin-repeat-row"
+                    key={`${menu.id}-${index}`}
+                  >
                     <div className="menu-number">{index + 1}</div>
                     <S.SetNavInput
                       type="text"
@@ -218,6 +231,7 @@ export default function NavPage() {
                       }
                     />
                     <S.SetNavDeleteButton
+                      className="admin-delete-action"
                       onClick={() => handleRemoveMenu(menu.id)}
                     >
                       <FiTrash2 size={18} />
@@ -225,7 +239,10 @@ export default function NavPage() {
                   </S.SetNavMenuItem>
                 ))}
               </S.SetNavMenuList>
-              <S.NavAddButton onClick={handleAddMenu}>
+              <S.NavAddButton
+                className="admin-outline-action"
+                onClick={handleAddMenu}
+              >
                 <FiPlus size={18} />새 카테고리 추가
               </S.NavAddButton>
             </S.SetNavCardBody>

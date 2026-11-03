@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FiImage, FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/NavSetting.styles";
 
 interface SlideItem {
   id: number;
@@ -22,9 +23,7 @@ export default function Visual() {
   useEffect(() => {
     const fetchVisualSettings = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:4000/api/admin/visual",
-        );
+        const response = await axios.get(`${API_ORIGIN}/api/admin/visual`);
         if (response.data.success) {
           const dbData = response.data.data;
           if (dbData.SLIDES && dbData.SLIDES !== "[]") {
@@ -89,7 +88,7 @@ export default function Visual() {
             formData.append("logoImage", slide.tempFile);
 
             const uploadRes = await axios.post(
-              "http://localhost:4000/api/admin/upload",
+              `${API_ORIGIN}/api/admin/upload`,
               formData,
               {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -112,7 +111,7 @@ export default function Visual() {
       // [STEP 2] DB로 보낼 때는 tempFile 속성을 제외하고 깔끔하게 텍스트만 보냅니다.
       const payloadSlides = updatedSlides.map(({ tempFile, ...rest }) => rest);
 
-      await axios.put("http://localhost:4000/api/admin/visual", {
+      await axios.put(`${API_ORIGIN}/api/admin/visual`, {
         slides: payloadSlides,
       });
 
@@ -127,26 +126,39 @@ export default function Visual() {
   return (
     <>
       <S.SetNavContainer>
-        <S.SetNavPageHeader>
-          <S.SetNavPageTitle>메인 비주얼(캐러셀) 관리</S.SetNavPageTitle>
-          <S.SetNavSaveButton onClick={handleSave}>
+        <S.SetNavPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / HERO</span>
+            <S.SetNavPageTitle>메인 비주얼(캐러셀) 관리</S.SetNavPageTitle>
+            <p className="admin-page-description">
+              메인 화면의 이미지와 슬라이드를 관리합니다.
+            </p>
+          </div>
+          <S.SetNavSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.SetNavSaveButton>
         </S.SetNavPageHeader>
 
-        <S.SetNavContentGrid>
-          <S.SetNavCard style={{ gridColumn: "1 / -1" }}>
+        <S.SetNavContentGrid className="admin-page-grid">
+          <S.SetNavCard
+            className="admin-panel"
+            style={{ gridColumn: "1 / -1" }}
+          >
             {" "}
             {/* 가로로 꽉 차게 */}
-            <S.SetNavCardHeader>
+            <S.SetNavCardHeader className="admin-panel-head">
               <S.SetNavCardTitle>슬라이드 이미지 목록</S.SetNavCardTitle>
             </S.SetNavCardHeader>
-            <S.SetNavCardBody>
+            <S.SetNavCardBody className="admin-panel-body">
               <p>홈페이지 메인 화면에 롤링될 이미지들을 등록하세요.</p>
 
               <S.SetNavMenuList>
                 {slides.map((slide, index) => (
                   <S.SetNavMenuItem
+                    className="admin-repeat-row"
                     key={slide.id}
                     style={{
                       display: "flex",
@@ -164,6 +176,7 @@ export default function Visual() {
                     >
                       <strong>슬라이드 {index + 1}</strong>
                       <S.SetNavDeleteButton
+                        className="admin-delete-action"
                         onClick={() => handleRemoveSlide(slide.id)}
                       >
                         <FiTrash2 size={18} /> 삭제
@@ -189,7 +202,7 @@ export default function Visual() {
                     {/* 미리보기 (파일이 등록되어 있으면 표시) */}
                     {slide.fileName && !slide.tempFile && (
                       <img
-                        src={`http://localhost:4000/images/${slide.fileName}`}
+                        src={`${API_ORIGIN}/images/${slide.fileName}`}
                         alt="미리보기"
                         style={{
                           width: "100%",
@@ -234,6 +247,7 @@ export default function Visual() {
               </S.SetNavMenuList>
 
               <S.NavAddButton
+                className="admin-outline-action"
                 onClick={handleAddSlide}
                 style={{ marginTop: "20px" }}
               >

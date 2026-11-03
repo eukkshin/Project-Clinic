@@ -15,6 +15,15 @@ const Selfie = require("./src/entity/Selfie");
 const EventRanking = require("./src/entity/EventRanking");
 const Vlog = require("./src/entity/Vlog");
 const Board = require("./src/entity/Board");
+const Qna = require("./src/entity/Qna");
+const Reservation = require("./src/entity/Reservation");
+const Treatment = require("./src/entity/Treatment");
+const DetailCategory = require("./src/entity/DetailCategory");
+const DetailPage = require("./src/entity/DetailPage");
+const DetailSection = require("./src/entity/DetailSection");
+const ReservationBlock = require("./src/entity/ReservationBlock");
+const AdminReservation = require("./src/entity/AdminReservation");
+
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -42,6 +51,15 @@ const AppDataSource = new DataSource({
     EventRanking,
     Vlog,
     Board,
+    Qna,
+    Reservation,
+    Treatment,
+    DetailCategory,
+    DetailPage,
+    DetailSection,
+    Reservation,
+    ReservationBlock,
+    AdminReservation,
   ],
   extra: {
     poolMin: 2,

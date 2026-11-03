@@ -1,9 +1,12 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Login.styles";
+
+const API_URL = API_ORIGIN;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,24 +57,22 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:4000/api/login", {
+      const response = await fetch(`${API_URL}/api/admin/session/login`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       //분기
       if (response.ok) {
-        const targetPath = result.isAdmin === 1 ? "/admin/root" : "/";
+        const targetPath = "/admin/root";
         openPopup("로그인 성공", "로그인에 성공했습니다!", () => {
-          if (Number(result.isAdmin) === 1) {
-            //쿠키 설정
-            document.cookie = "admin_token=true; path=/; max-age=86400;";
-          }
-          router.push(targetPath);
           closePopup();
+          router.replace(targetPath);
+          router.refresh();
         });
         //관리자 라면
       } else {
@@ -90,13 +91,13 @@ export default function LoginPage() {
       <S.LoginWrapper>
         <S.LeftSection>
           <S.LoginHeader>
-            <S.LeftTitle>Ahn's</S.LeftTitle>
+            <S.LeftTitle>Ahn's.</S.LeftTitle>
             <S.Divider />
             <S.LoginDescription>
-              관리자 전용 페이지입니다. <br />
+              운영을 위한 단정하고 명확한 공간. <br />
               <small>
-                허가되지 않은 접근은 제한되며, 모든 시스템 접속 및 활동 내역은
-                보안 로그에 기록됩니다.
+                관리자 계정으로 로그인하여 회원, 상담 및 사이트 콘텐츠를
+                관리하세요.
               </small>
             </S.LoginDescription>
           </S.LoginHeader>
@@ -104,46 +105,55 @@ export default function LoginPage() {
         <S.RightSection>
           <S.LoginCard>
             <S.LoginHeader>
+              <span
+                style={{
+                  color: "#7c987f",
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: ".16em",
+                }}
+              >
+                SECURE ACCESS
+              </span>
               <S.LoginTitle>관리자 로그인</S.LoginTitle>
+              <p style={{ margin: 0, color: "#809084", fontSize: 12 }}>
+                관리 시스템 이용을 위해 계정 정보를 입력해주세요.
+              </p>
             </S.LoginHeader>
             <S.LoginForm onSubmit={handleLogin}>
               <S.LoginCol>
                 <S.LoginInput
                   type="text"
                   name="userId"
+                  id="userId"
+                  autoComplete="username"
                   placeholder=""
                   value={formData.userId}
                   onChange={handleChange}
                 />
-                <label htmlFor="userId">Enter User ID...</label>
+                <label htmlFor="userId">관리자 아이디</label>
               </S.LoginCol>
               <S.LoginCol>
                 <S.LoginInput
                   type="password"
                   name="userPw"
+                  id="password"
+                  autoComplete="current-password"
                   placeholder=""
                   value={formData.userPw}
                   onChange={handleChange}
                 />
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">비밀번호</label>
               </S.LoginCol>
 
-              <S.CheckboxGroup>
-                <S.CheckboxInput type="checkbox" id="customCheck" />
-                <S.CheckboxLabel htmlFor="customCheck">
-                  Remember Me
-                </S.CheckboxLabel>
-              </S.CheckboxGroup>
-
-              <S.LoginButton type="submit">Login</S.LoginButton>
+              <S.LoginButton type="submit">관리자 로그인</S.LoginButton>
             </S.LoginForm>
 
             <S.Divider />
 
             <S.LinkGroup>
-              <S.StyledLink>Forgot Password?</S.StyledLink>
               <S.StyledLink onClick={() => router.push("/register/terms")}>
-                Create an Account!
+                일반 회원가입
               </S.StyledLink>
             </S.LinkGroup>
           </S.LoginCard>

@@ -1,10 +1,11 @@
 "use client";
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { FiPlus, FiSave, FiTrash2 } from 'react-icons/fi';
+import { API_ORIGIN } from "@/lib/api/config";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from '@/assets/css/admin/Admin.style';
-import { Popup } from '@/components/modal/Popup';
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Footer.styles";
 
 interface ScheduleData {
   id: number;
@@ -63,7 +64,7 @@ export default function FooterSetting() {
       try {
         const response =
           //백앤드를 통해 데이터를 달라고 요청
-          await axios.get("http://localhost:4000/api/admin/footer");
+          await axios.get(`${API_ORIGIN}/api/admin/footer`);
         //서버가 통신성공을 알리고 빈껍데기가 아닌 실제 데이터가 있다면
         if (response.data.success && response.data.data) {
           //서버가 보내준 데이터 덩어리에서 필요한 3가지 속성만 쏙 빼냅니다(구조 분해 할당)
@@ -134,7 +135,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
     try {
       const response =
         //백앤드 api주소로 방금 패킹한 것을 post방식으로 던져주고 기다림
-        await axios.post("http://localhost:4000/api/admin/footer", payload);
+        await axios.post(`${API_ORIGIN}/api/admin/footer`, payload);
       // 백앤드에서 DB저장에 성공했어라고 대답을 보내주면
       if (response.data.success) {
         // 성공 시 세팅
@@ -152,21 +153,30 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
   return (
     <>
       <S.FooterAdminContainer>
-        <S.FooterPageHeader>
-          <S.FooterPageTitle>푸터(하단 영역) 관리</S.FooterPageTitle>
-          <S.FooterSaveButton onClick={handleSave}>
+        <S.FooterPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / FOOTER</span>
+            <S.FooterPageTitle>푸터(하단 영역) 관리</S.FooterPageTitle>
+            <p className="admin-page-description">
+              하단 안내 정보와 연관 사이트를 관리합니다.
+            </p>
+          </div>
+          <S.FooterSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.FooterSaveButton>
         </S.FooterPageHeader>
 
-        <S.FooterGrid>
+        <S.FooterGrid className="admin-footer-grid">
           {/* 🏢 1. 병원 기본 정보 카드 */}
-          <S.FooterCard>
-            <S.FooterCardHeader>
+          <S.FooterCard className="admin-panel">
+            <S.FooterCardHeader className="admin-panel-head">
               <S.FooterCardTitle>병원 기본 정보</S.FooterCardTitle>
             </S.FooterCardHeader>
-            <S.FooterCardBody>
-              <S.FooterFormGroup>
+            <S.FooterCardBody className="admin-panel-body">
+              <S.FooterFormGroup className="admin-form-field">
                 <S.FooterLabel>병원명 (타이틀)</S.FooterLabel>
                 <S.FooterInput
                   type="text"
@@ -176,7 +186,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                   }
                 />
               </S.FooterFormGroup>
-              <S.FooterFormGroup>
+              <S.FooterFormGroup className="admin-form-field">
                 <S.FooterLabel>상세 주소</S.FooterLabel>
                 <S.FooterInput
                   type="text"
@@ -190,7 +200,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                 />
               </S.FooterFormGroup>
               <S.FooterFlexRow>
-                <S.FooterFormGroup>
+                <S.FooterFormGroup className="admin-form-field">
                   <S.FooterLabel>의료기관 명칭</S.FooterLabel>
                   <S.FooterInput
                     type="text"
@@ -203,7 +213,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                     }
                   />
                 </S.FooterFormGroup>
-                <S.FooterFormGroup>
+                <S.FooterFormGroup className="admin-form-field">
                   <S.FooterLabel>대표번호</S.FooterLabel>
                   <S.FooterInput
                     type="text"
@@ -216,7 +226,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                     }
                   />
                 </S.FooterFormGroup>
-                <S.FooterFormGroup>
+                <S.FooterFormGroup className="admin-form-field">
                   <S.FooterLabel>이메일</S.FooterLabel>
                   <S.FooterInput
                     type="text"
@@ -230,7 +240,10 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                   />
                 </S.FooterFormGroup>
               </S.FooterFlexRow>
-              <S.FooterFormGroup style={{ marginBottom: 0 }}>
+              <S.FooterFormGroup
+                className="admin-form-field"
+                style={{ marginBottom: 0 }}
+              >
                 <S.FooterLabel>'오시는길 바로가기' 버튼 링크 URL</S.FooterLabel>
                 <S.FooterInput
                   type="text"
@@ -254,13 +267,13 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
             }}
           >
             {/* ⏰ 2. 진료 시간 안내 카드 */}
-            <S.FooterCard>
-              <S.FooterCardHeader>
+            <S.FooterCard className="admin-panel">
+              <S.FooterCardHeader className="admin-panel-head">
                 <S.FooterCardTitle>
                   진료 시간 안내 (CS CENTER)
                 </S.FooterCardTitle>
               </S.FooterCardHeader>
-              <S.FooterCardBody>
+              <S.FooterCardBody className="admin-panel-body">
                 {schedules.map((sch, index) => (
                   <div
                     key={sch.id}
@@ -275,7 +288,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                           : "1px dashed #e3e6f0",
                     }}
                   >
-                    <S.FooterFormGroup>
+                    <S.FooterFormGroup className="admin-form-field">
                       <S.FooterLabel>
                         구분명 (예: 성형외과, 스킨케어)
                       </S.FooterLabel>
@@ -292,7 +305,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                       />
                     </S.FooterFormGroup>
                     <S.FooterFlexRow>
-                      <S.FooterFormGroup>
+                      <S.FooterFormGroup className="admin-form-field">
                         <S.FooterLabel>평일 시간</S.FooterLabel>
                         <S.FooterInput
                           type="text"
@@ -306,7 +319,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                           }
                         />
                       </S.FooterFormGroup>
-                      <S.FooterFormGroup>
+                      <S.FooterFormGroup className="admin-form-field">
                         <S.FooterLabel>
                           야간 진료 (없으면 비워두기)
                         </S.FooterLabel>
@@ -322,7 +335,7 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                           }
                         />
                       </S.FooterFormGroup>
-                      <S.FooterFormGroup>
+                      <S.FooterFormGroup className="admin-form-field">
                         <S.FooterLabel>토요일 시간</S.FooterLabel>
                         <S.FooterInput
                           type="text"
@@ -343,13 +356,13 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
             </S.FooterCard>
 
             {/* 🔗 3. 패밀리 사이트 카드 */}
-            <S.FooterCard>
-              <S.FooterCardHeader>
+            <S.FooterCard className="admin-panel">
+              <S.FooterCardHeader className="admin-panel-head">
                 <S.FooterCardTitle>패밀리 사이트 설정</S.FooterCardTitle>
               </S.FooterCardHeader>
-              <S.FooterCardBody>
+              <S.FooterCardBody className="admin-panel-body">
                 {familySites.map((site) => (
-                  <S.FooterFamilyRow key={site.id}>
+                  <S.FooterFamilyRow className="admin-repeat-row" key={site.id}>
                     <S.FooterInput
                       type="text"
                       placeholder="사이트명 (예: Derm)"
@@ -367,13 +380,17 @@ filter 함수를 사용해, 휴지통을 누른 항목의 id와
                       }
                     />
                     <S.FooterDeleteBtn
+                      className="admin-delete-action"
                       onClick={() => handleRemoveFamilySite(site.id)}
                     >
                       <FiTrash2 size={18} />
                     </S.FooterDeleteBtn>
                   </S.FooterFamilyRow>
                 ))}
-                <S.FooterAddButton onClick={handleAddFamilySite}>
+                <S.FooterAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddFamilySite}
+                >
                   <FiPlus size={18} /> 패밀리 사이트 추가
                 </S.FooterAddButton>
               </S.FooterCardBody>

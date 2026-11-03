@@ -1,10 +1,11 @@
 "use client";
+import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiClock, FiImage, FiPlus, FiSave, FiTrash2 } from "react-icons/fi";
 
-import * as S from "@/assets/css/admin/Admin.style";
-import { Popup } from "@/components/modal/Popup";
+import { Popup } from "@/components/ui/Popup";
+import * as S from "@/styles/admin/Pop.styles";
 
 interface PopupData {
   id: number;
@@ -50,9 +51,7 @@ export default function Pop() {
 
   const fetchPopups = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/admin/popups",
-      );
+      const response = await axios.get(`${API_ORIGIN}/api/admin/popups`);
       const dbData = response.data;
       if (response.data.success) {
         setMaxPopups(dbData.maxPopups);
@@ -106,7 +105,7 @@ export default function Pop() {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/admin/popups",
+        `${API_ORIGIN}/api/admin/popups`,
         formData,
         {
           headers: {
@@ -138,7 +137,7 @@ export default function Pop() {
     if (confirm("정말 이 팝업을 삭제하시겠습니까?")) {
       try {
         const response = await axios.delete(
-          `http://localhost:4000/api/admin/popups/${id}`,
+          `${API_ORIGIN}/api/admin/popups/${id}`,
         );
         if (response.data.success) fetchPopups();
       } catch (error) {
@@ -152,7 +151,7 @@ export default function Pop() {
       const payload = { maxPopups, popups };
       console.log("DB에 저장될 데이터:", payload);
       const response = await axios.put(
-        "http://localhost:4000/api/admin/popups/setting",
+        `${API_ORIGIN}/api/admin/popups/setting`,
         { maxPopups },
       );
       if (response.data.success) {
@@ -166,21 +165,33 @@ export default function Pop() {
   return (
     <>
       <S.PopContainer>
-        <S.PopPageHeader>
-          <S.PopPageTitle>메인 팝업 관리</S.PopPageTitle>
-          <S.PopSaveButton onClick={handleSave}>
+        <S.PopPageHeader className="admin-page-header">
+          <div className="admin-page-title-block">
+            <span className="admin-page-eyebrow">WEBSITE / POPUPS</span>
+            <S.PopPageTitle>메인 팝업 관리</S.PopPageTitle>
+            <p className="admin-page-description">
+              팝업의 이미지·노출 여부와 콘텐츠를 관리합니다.
+            </p>
+          </div>
+          <S.PopSaveButton
+            className="admin-primary-action"
+            onClick={handleSave}
+          >
             <FiSave size={18} /> 설정 저장하기
           </S.PopSaveButton>
         </S.PopPageHeader>
 
-        <S.PopGrid>
-          <S.PopLeftColumn>
-            <S.PopCard style={{ marginBottom: "1.5rem" }}>
-              <S.PopCardHeader>
+        <S.PopGrid className="admin-page-grid">
+          <S.PopLeftColumn className="admin-editor-column">
+            <S.PopCard
+              className="admin-panel"
+              style={{ marginBottom: "1.5rem" }}
+            >
+              <S.PopCardHeader className="admin-panel-head">
                 <S.PopCardTitle>기본 설정</S.PopCardTitle>
               </S.PopCardHeader>
-              <S.PopCardBody>
-                <S.PopFormGroup>
+              <S.PopCardBody className="admin-panel-body">
+                <S.PopFormGroup className="admin-form-field">
                   <S.PopLabel>동시 노출 가능한 최대 팝업 갯수</S.PopLabel>
                   <S.PopInput
                     type="number"
@@ -204,12 +215,12 @@ export default function Pop() {
               </S.PopCardBody>
             </S.PopCard>
 
-            <S.PopCard>
-              <S.PopCardHeader>
+            <S.PopCard className="admin-panel">
+              <S.PopCardHeader className="admin-panel-head">
                 <S.PopCardTitle>새 팝업 등록</S.PopCardTitle>
               </S.PopCardHeader>
-              <S.PopCardBody>
-                <S.PopFormGroup>
+              <S.PopCardBody className="admin-panel-body">
+                <S.PopFormGroup className="admin-form-field">
                   <S.PopLabel>팝업 제목 (관리용)</S.PopLabel>
                   <S.PopInput
                     type="text"
@@ -221,7 +232,7 @@ export default function Pop() {
                   />
                 </S.PopFormGroup>
 
-                <S.PopFormGroup>
+                <S.PopFormGroup className="admin-form-field">
                   <S.PopLabel>이미지 등록</S.PopLabel>
                   <S.PopFileInputWrapper>
                     <S.PopFileInput
@@ -245,7 +256,7 @@ export default function Pop() {
                   </S.PopFileInputWrapper>
                 </S.PopFormGroup>
 
-                <S.PopFormGroup>
+                <S.PopFormGroup className="admin-form-field">
                   <S.PopLabel>
                     <FiClock /> 노출 기간 설정
                   </S.PopLabel>
@@ -274,7 +285,7 @@ export default function Pop() {
                   </div>
                 </S.PopFormGroup>
 
-                <S.PopFormGroup>
+                <S.PopFormGroup className="admin-form-field">
                   <S.PopLabel>클릭 시 이동할 링크 URL (선택)</S.PopLabel>
                   <S.PopInput
                     type="text"
@@ -300,22 +311,25 @@ export default function Pop() {
                   "오늘 하루 보지 않음" 버튼 사용하기
                 </S.PopCheckboxLabel>
 
-                <S.PopAddButton onClick={handleAddPopup}>
+                <S.PopAddButton
+                  className="admin-outline-action"
+                  onClick={handleAddPopup}
+                >
                   <FiPlus size={18} /> 새 팝업 추가하기
                 </S.PopAddButton>
               </S.PopCardBody>
             </S.PopCard>
           </S.PopLeftColumn>
 
-          <S.PopRightColumn>
-            <S.PopCard style={{ height: "100%" }}>
-              <S.PopCardHeader>
+          <S.PopRightColumn className="admin-record-column">
+            <S.PopCard className="admin-panel" style={{ height: "100%" }}>
+              <S.PopCardHeader className="admin-panel-head">
                 <S.PopCardTitle>
                   등록된 팝업 목록 (총 {popups.length}건)
                 </S.PopCardTitle>
               </S.PopCardHeader>
-              <S.PopTableWrapper>
-                <S.PopTable>
+              <S.PopTableWrapper className="admin-table-scroll">
+                <S.PopTable className="admin-data-table">
                   <thead>
                     <tr>
                       <th>미리보기</th>
@@ -337,7 +351,7 @@ export default function Pop() {
                           <td>
                             {popup.fileName && (
                               <img
-                                src={`http://localhost:4000/images/${popup.fileName}`}
+                                src={`${API_ORIGIN}/images/${popup.fileName}`}
                                 alt="popup"
                                 style={{
                                   width: "50px",
@@ -384,6 +398,7 @@ export default function Pop() {
                           </td>
                           <td>
                             <S.PopDeleteBtn
+                              className="admin-delete-action"
                               onClick={() => handleDelete(popup.id)}
                             >
                               <FiTrash2 size={16} />

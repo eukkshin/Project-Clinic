@@ -9,6 +9,13 @@ module.exports = new EntitySchema({
       type: "number",
       generated: "increment",
     },
+    // 병원 환자 식별을 위한 차트 번호
+    CHART_NO: {
+      type: "varchar2",
+      length: 20,
+      unique: true,
+      nullable: true, // 비회원 예약이나 현장 접수 후 가입하는 경우를 대비해 처음엔 null 허용 가능
+    },
     USER_NAME: {
       type: "varchar2",
       length: 50,

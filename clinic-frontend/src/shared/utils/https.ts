@@ -1,0 +1,94 @@
+import axios, { AxiosInstance } from 'axios'
+// import i18n from '@/i18n/i18n';
+
+const isLocalDev = 
+    typeof window !== 'undefined' && 
+    ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+const REDACTED = "[redacted]";
+
+const SENSITIVE_KEY_PATTERN =
+ /(authorization|cookie|set-cookie|token|secret|password|passphrase|api[-_]?key|refresh[-_]?token|access[-_]?token|id[-_]?token)/i;
+
+const SENSITIVE_MESSAGE_PATTERN =
+ /(exception|stack\s*trace|traceback|caused by:|org\.|java\.|jdbc|sql|at\s+\w+)/i;
+
+
+ //순수 객체(Plain Object) 여부를 확인
+const isPlainObject = (value:unknown): value is Record<string, unknown> =>{
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+ }
+
+ //디버깅 로그 출력을 위해 민감한 데이터를 마스킹([redacted]) 처리하는 함수
+ const sanitizeForlog = (value:unknown): unknown=>{
+    if(Array.isArray(value)){
+        return value.map((item)=> sanitizeForlog(item))
+    }
+    if(isPlainObject(value)){
+        return Object.fromEntries(
+            Object.entries(value).map(([key,item])=>[
+                key,
+                SENSITIVE_KEY_PATTERN.test(key) ? REDACTED : sanitizeForlog(item),
+            ]),
+        );
+    }
+    return value;
+ }
+
+ //중첩된 객체 구조에서 특정 경로의 값을 안전하게 가져오는 함수
+ const getNestedValue = (source:unknown, path: string[]): unknown=>{
+    let current: unknown = source;
+    for(const key of path){
+        if(!isPlainObject(current)){
+            return undefined;
+        }
+        current = current[key];
+    }
+    return current;
+ }
+
+
+ //서버 응답 데이터에서 사용자에게 보여줄 안전한 에러 메시지를 추출함수
+ const pickDisplayMessage = (data: unknown, status?:number)=>{
+    const candidates = [
+        getNestedValue(data, ['messsage']),
+        getNestedValue(data, ['result', 'errors','message']),
+        getNestedValue(data, ["errors", "message"]),
+    ];
+
+    for (const candidate of candidates){
+        if(typeof candidate !== 'string') continue;
+        const trimmed = candidate.trim();
+        if(!trimmed) continue;
+
+        if(status && status >= 500) continue;
+        if(SENSITIVE_MESSAGE_PATTERN.test(trimmed)) continue;
+        if(trimmed.length >500) continue;
+        return trimmed;
+    }
+    return "요청 처리 중 오류가 발생했습니다.";
+ }
+
+ //API 기본 URL(baseURL)을 정규화하는 함수
+ const normalizeApiBaseURL = (value:string)=>{
+    const trimmed = value.trim();
+    if(!trimmed || trimmed === '/'){
+        return "";
+    }
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")){
+        return trimmed.replace(/\/+$/, "");
+    }
+    return (trimmed.startsWith('/') ? trimmed : `/${trimmed}`).replace(/\/+$/,"");
+ }
+const apiBaseURL = normalizeApiBaseURL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "");
+
+const http: AxiosInstance = axios.create({
+    baseURL: apiBaseURL,
+    timeout: 15000,
+    headers:{
+        'Content-Type': 'application/json',
+    },
+    withCredentials: true,
+});
+
+

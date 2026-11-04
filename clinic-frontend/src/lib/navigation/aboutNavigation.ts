@@ -1,7 +1,8 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import { useEffect, useState } from "react";
+
+import { API_ORIGIN } from "@/lib/api/config";
 
 /**
  * Header와 브랜드 페이지 내부 메뉴의 공통 규칙.
@@ -139,7 +140,7 @@ export function useAboutNavigation(): AboutLink[] {
 
     async function load() {
       try {
-        const response = await fetch(`${apiUrl}/api/admin/nav`, {
+        const response = await fetch(`${apiUrl}/api/public/site/nav`, {
           signal: controller.signal,
           cache: "no-store",
         });

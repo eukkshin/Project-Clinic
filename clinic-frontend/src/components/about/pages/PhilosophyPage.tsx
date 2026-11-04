@@ -1,31 +1,36 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import Link from "next/link";
 
-import * as S from '@/components/about/pages/AboutPages.styles';
-import { AboutBottom, AboutFrame } from '@/components/about/shared/AboutFoundation';
-import HangulTyping from '@/components/ui/TypingText';
+import * as S from "@/components/about/pages/AboutPages.styles";
+import {
+  AboutBottom,
+  AboutFrame,
+} from "@/components/about/shared/AboutFoundation";
+import HangulTyping from "@/components/ui/TypingText";
 
 const beliefs = [
   {
     num: "01 /",
-    title: "먼저, 충분히 듣습니다.",
-    body: "어떤 부분이 고민인지, 무엇을 기대하는지 귀 기울이는 것에서 대화를 시작합니다. 상담의 출발점은 시술이 아니라 사람입니다.",
+    titleKey: "belief1Title",
+    bodyKey: "belief1Body",
   },
   {
     num: "02 /",
-    title: "조화를 함께 생각합니다.",
-    body: "누구에게나 같은 답을 제시하기보다 개인의 상태와 전체적인 균형을 고려해 가능한 방향을 설명하는 것을 중요하게 생각합니다.",
+    titleKey: "belief2Title",
+    bodyKey: "belief2Body",
   },
   {
     num: "03 /",
-    title: "선택을 존중합니다.",
-    body: "시술 방법뿐 아니라 예상 가능한 한계와 유의사항까지 충분히 이해하고 결정할 수 있도록 돕는 진료를 지향합니다.",
+    titleKey: "belief3Title",
+    bodyKey: "belief3Body",
   },
 ];
 
 export default function PhilosophyPage() {
+  const t = useTranslations("About");
   return (
     <AboutFrame>
       <S.PhilosophyHero>
@@ -34,25 +39,24 @@ export default function PhilosophyPage() {
           <S.PhilosophyHeroGrid>
             <div data-about-reveal style={{ paddingTop: 55 }}>
               <S.Title>
-                아름다움보다
+                {t("philosophy.hero1")}
                 <br />
-                먼저 생각하는
+                {t("philosophy.hero2")}
                 <br />
                 <em>
-                  <HangulTyping text="한 사람." speed={90} />
+                  <HangulTyping text={t("philosophy.hero3")} speed={90} />
                 </em>
               </S.Title>
               <S.Body
                 style={{ marginTop: 40, maxWidth: 425, color: S.C.muted }}
               >
-                아름다움은 정해진 하나의 기준이 아니라, 각자의 얼굴과 이야기에
-                맞게 발견하는 조화라고 생각합니다.
+                {t("philosophy.heroDesc")}
               </S.Body>
             </div>
             <S.PhilosophyImage data-about-reveal>
               <Image
                 src="/images/about/philosophy-hero.webp"
-                alt="부드러운 자연광 아래 섬세한 인물 사진"
+                alt={t("philosophy.heroAlt")}
                 fill
                 priority
                 sizes="(max-width: 800px) 90vw, 43vw"
@@ -63,16 +67,14 @@ export default function PhilosophyPage() {
       </S.PhilosophyHero>
       <S.PhilosophyRail>
         <S.Container>
-          <S.Eyebrow data-about-reveal>
-            OUR THREE PRINCIPLES / 세 가지 관점
-          </S.Eyebrow>
+          <S.Eyebrow data-about-reveal>{t("philosophy.railHeading")}</S.Eyebrow>
           <div style={{ height: 75 }} />
           {beliefs.map((item) => (
             <S.PhilosophyRow data-about-reveal key={item.num}>
               <span>{item.num}</span>
-              <h3>{item.title}</h3>
+              <h3>{t(`philosophy.${item.titleKey}`)}</h3>
               <S.Body style={{ color: S.C.muted, maxWidth: 400 }}>
-                {item.body}
+                {t(`philosophy.${item.bodyKey}`)}
               </S.Body>
             </S.PhilosophyRow>
           ))}
@@ -82,14 +84,14 @@ export default function PhilosophyPage() {
         <S.Container data-about-reveal>
           <S.Eyebrow>THE ART OF LISTENING</S.Eyebrow>
           <blockquote>
-            좋은 선택의 시작은
+            {t("philosophy.quote1")}
             <br />
-            충분한 이해에서 비롯됩니다.
+            {t("philosophy.quote2")}
           </blockquote>
           <p>AN APPROACH BUILT AROUND YOU</p>
           <div style={{ marginTop: 55 }}>
             <S.EditorialLink as={Link} href="/about/doctors">
-              의료진 알아보기 <span aria-hidden="true">↗</span>
+              {t("philosophy.doctorsLink")} <span aria-hidden="true">↗</span>
             </S.EditorialLink>
           </div>
         </S.Container>

@@ -1,7 +1,7 @@
 "use client";
 
 import { API_ORIGIN } from "@/lib/api/config";
-import axios from "axios";
+import axios from "@/lib/admin/apiClient";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   FiArrowDown,

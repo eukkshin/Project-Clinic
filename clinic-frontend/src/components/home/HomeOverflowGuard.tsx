@@ -1,6 +1,6 @@
 "use client";
 
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
 /** Prevent only PAGE-level horizontal overflow. Local horizontal galleries remain scrollable. */
 const HomeOverflowStyle = createGlobalStyle`

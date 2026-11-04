@@ -1,8 +1,10 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
+import { useLocale } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+
+import { API_ORIGIN } from "@/lib/api/config";
 
 import {
   HeaderNavMenu,
@@ -15,6 +17,7 @@ export function usePublishedProcedureMenus<T extends HeaderNavMenu>(
   menus: T[],
 ): T[] {
   const pathname = usePathname();
+  const locale = useLocale();
   const [publicPages, setPublicPages] = useState<PublicProcedureLink[] | null>(
     null,
   );
@@ -23,10 +26,13 @@ export function usePublishedProcedureMenus<T extends HeaderNavMenu>(
     const controller = new AbortController();
     const load = async () => {
       try {
-        const response = await fetch(`${API_ORIGIN}/api/details/navigation`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `${API_ORIGIN}/api/details/navigation?locale=${encodeURIComponent(locale)}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          },
+        );
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const body: { success?: boolean; data?: unknown } =
           await response.json();
@@ -48,7 +54,7 @@ export function usePublishedProcedureMenus<T extends HeaderNavMenu>(
     };
     void load();
     return () => controller.abort();
-  }, [pathname]); // 관리자에서 공개 상태 변경 후 페이지 이동 시 재조회
+  }, [pathname, locale]); // 페이지 또는 언어 변경 시 재조회
 
   return useMemo(
     () => mergePublishedProcedureMenus(menus, publicPages),

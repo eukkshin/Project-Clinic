@@ -1,6 +1,7 @@
 "use client";
 
 import gsap from "gsap";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { FiArrowDown, FiEye, FiMessageCircle, FiShield } from "react-icons/fi";
 
@@ -15,6 +16,7 @@ interface Props {
 
 export default function DetailHero({ hero, firstSectionId }: Props) {
   const heroRef = useRef<HTMLElement>(null);
+  const t = useTranslations("Procedures");
 
   useEffect(() => {
     const el = heroRef.current;
@@ -67,31 +69,31 @@ export default function DetailHero({ hero, firstSectionId }: Props) {
       <S.HeroShade />
       <S.HeroInner>
         <S.HeroEyebrow data-hero-text>
-          {hero.eyebrow ?? "AHN'S · PROCEDURE"}
+          {hero.eyebrow ?? `AHN'S · ${t("procedure")}`}
         </S.HeroEyebrow>
         <S.HeroTitle data-hero-text>{hero.title}</S.HeroTitle>
         <S.HeroLine data-hero-text />
         {hero.description && (
           <S.HeroDesc data-hero-text>{hero.description}</S.HeroDesc>
         )}
-        <S.HeroPoints data-hero-text aria-label="상담 안내">
+        <S.HeroPoints data-hero-text aria-label={t("consultationGuide")}>
           <S.HeroPoint>
             <FiEye aria-hidden="true" />
-            <span>개인별 눈 상태 확인</span>
+            <span>{t("individualCondition")}</span>
           </S.HeroPoint>
           <S.HeroPoint>
             <FiMessageCircle aria-hidden="true" />
-            <span>맞춤 상담</span>
+            <span>{t("personalizedConsultation")}</span>
           </S.HeroPoint>
           <S.HeroPoint>
             <FiShield aria-hidden="true" />
-            <span>경과 관리 안내</span>
+            <span>{t("followUpCare")}</span>
           </S.HeroPoint>
         </S.HeroPoints>
       </S.HeroInner>
       {firstSectionId && (
         <S.HeroScroll href={`#detail-${firstSectionId}`}>
-          SCROLL TO EXPLORE <FiArrowDown aria-hidden="true" />
+          {t("scrollExplore")} <FiArrowDown aria-hidden="true" />
         </S.HeroScroll>
       )}
     </S.Hero>

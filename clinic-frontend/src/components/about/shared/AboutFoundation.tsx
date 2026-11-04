@@ -1,10 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 
 import * as S from "@/components/about/pages/AboutPages.styles";
+import { stripLocalePrefix } from "@/i18n/url";
 import {
   isAboutLinkActive,
   useAboutNavigation,
@@ -53,10 +55,19 @@ function AboutMotion() {
 }
 
 export function AboutNav() {
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
   const links = useAboutNavigation();
+  const t = useTranslations("About");
+  const labels: Record<string, string> = {
+    "/about/brand": t("shared.navBrand"),
+    "/about/philosophy": t("shared.navPhilosophy"),
+    "/about/doctors": t("shared.navDoctors"),
+    "/about/facilities": t("shared.navFacilities"),
+    "/about/safety": t("shared.navSafety"),
+    "/about/location": t("shared.navLocation"),
+  };
   return (
-    <S.AboutNavWrap aria-label="병원소개 내비게이션">
+    <S.AboutNavWrap aria-label={t("shared.navLabel")}>
       <S.AboutNavCaption>
         ABOUT <span>/</span>
       </S.AboutNavCaption>
@@ -71,7 +82,7 @@ export function AboutNav() {
               $active={active}
               aria-current={active ? "page" : undefined}
             >
-              {link.name}
+              {labels[link.url] ?? link.name}
             </S.AboutNavLink>
           );
         })}
@@ -90,19 +101,16 @@ export function AboutFrame({ children }: { children: ReactNode }) {
   );
 }
 
-export function AboutBottom({
-  title = "당신의 이야기를 듣겠습니다.",
-}: {
-  title?: string;
-}) {
+export function AboutBottom({ title }: { title?: string }) {
+  const t = useTranslations("About");
   return (
     <S.BottomCall>
       <S.Container data-about-reveal>
         <S.Eyebrow>AHN&apos;S · YOUR NEXT CHAPTER</S.Eyebrow>
-        <h2>{title}</h2>
-        <p>궁금한 점이 있다면 편안하게 문의해 주세요.</p>
+        <h2>{title ?? t("shared.bottomDefault")}</h2>
+        <p>{t("shared.bottomDesc")}</p>
         <S.EditorialLink as={Link} href="/#site-footer-contact">
-          상담 및 문의 <span aria-hidden="true">↗</span>
+          {t("shared.bottomLink")} <span aria-hidden="true">↗</span>
         </S.EditorialLink>
       </S.Container>
     </S.BottomCall>

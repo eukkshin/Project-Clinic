@@ -1,8 +1,8 @@
 "use client";
 
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from "styled-components";
 
-import { color, motion } from '@/styles/tokens';
+import { color, motion } from "@/styles/tokens";
 
 export const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -22,7 +22,8 @@ export const GlobalStyle = createGlobalStyle`
 
   /* 일반 본문 */
   --ahns-body: "Pretendard Variable", Pretendard, -apple-system,
-    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "PingFang SC", "PingFang TC",
+    "Microsoft YaHei", "Microsoft JhengHei", "Yu Gothic", "Malgun Gothic", sans-serif;
 
   --color-brand: ${color.brand.primary};
   --color-ink: ${color.brand.ink};

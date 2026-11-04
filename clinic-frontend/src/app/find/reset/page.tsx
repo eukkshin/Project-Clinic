@@ -1,13 +1,9 @@
-import type { Metadata } from "next";
-import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
+import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
+import { authPageMetadata } from "@/lib/auth/pageMetadata";
 
-export const metadata: Metadata = {
-  title: "새 비밀번호 설정 | AHNS 성형외과",
-  robots: { index: false, follow: false },
-  referrer: "no-referrer",
-};
+export const generateMetadata = () => authPageMetadata("reset");
 
-export default async function Page({
+export default async function ResetPage({
   searchParams,
 }: {
   searchParams: Promise<{ token?: string | string[] }>;

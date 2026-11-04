@@ -1,10 +1,11 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useEffect, useId, useRef, useState } from "react";
 
-import * as S from '@/components/dropdown/AccountDropdown.styles';
-import { Popup } from '@/components/ui/Popup';
+import * as S from "@/components/dropdown/AccountDropdown.styles";
+import { Popup } from "@/components/ui/Popup";
 
 interface AccountDropdownProps {
   userName: string;
@@ -30,6 +31,7 @@ export default function AccountDropdown({
   reservationsHref,
   consultationsHref,
 }: AccountDropdownProps) {
+  const tAccount = useTranslations("Account");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -93,16 +95,17 @@ export default function AccountDropdown({
   };
 
   const handleLogout = () => {
-    openPopup("로그아웃", "정말 로그아웃하시겠습니까?", () => {
+    openPopup(tAccount("logout"), tAccount("logoutConfirm"), () => {
       setOpen(false);
       onNavigate?.();
       onLogout();
     });
   };
   const links: { title: string; href?: string }[] = [
-    { title: "마이페이지", href: "/mypage" },
-    { title: "예약 내역", href: "/mypage/reservations" },
-    { title: "내 상담 내역", href: "/mypage/consultations" },
+    { title: tAccount("myPage"), href: "/mypage" },
+    { title: tAccount("reservationHistory"), href: "/mypage/reservations" },
+    { title: tAccount("consultationHistory"), href: "/mypage/consultations" },
+    { title: tAccount("settings"), href: "/mypage/accountsettings" },
   ];
   return (
     <>
@@ -116,7 +119,9 @@ export default function AccountDropdown({
           aria-expanded={open}
           onClick={() => setOpen((previous) => !previous)}
         >
-          <S.TriggerName>{userName}님</S.TriggerName>
+          <S.TriggerName>
+            {tAccount("userLabel", { name: userName })}
+          </S.TriggerName>
           <S.Chevron $open={open} aria-hidden="true">
             <svg
               width="12"
@@ -135,14 +140,16 @@ export default function AccountDropdown({
           <S.GlassPanel
             id={menuId}
             role="region"
-            aria-label="회원 계정 메뉴"
+            aria-label={tAccount("menuLabel")}
             $mobile={mobile}
             $transparent={transparent}
           >
             <S.GlassShine aria-hidden="true" />
             <S.ProfileSection>
               <S.ProfileEyebrow>MY ACCOUNT</S.ProfileEyebrow>
-              <S.ProfileName>{userName}님, 환영합니다.</S.ProfileName>
+              <S.ProfileName>
+                {tAccount("welcome", { name: userName })}
+              </S.ProfileName>
               <S.ProfileCaption>
                 AHN&apos;S PERSONAL EXPERIENCE
               </S.ProfileCaption>
@@ -163,7 +170,7 @@ export default function AccountDropdown({
                 ) : (
                   <S.MenuUnavailable key={title} aria-disabled="true">
                     <S.MenuLabel>{title}</S.MenuLabel>
-                    <S.ComingSoon>준비 중</S.ComingSoon>
+                    <S.ComingSoon>{tAccount("comingSoon")}</S.ComingSoon>
                   </S.MenuUnavailable>
                 ),
               )}
@@ -172,7 +179,7 @@ export default function AccountDropdown({
             <S.MenuDivider />
 
             <S.LogoutButton type="button" onClick={handleLogout}>
-              <S.MenuLabel>로그아웃</S.MenuLabel>
+              <S.MenuLabel>{tAccount("logout")}</S.MenuLabel>
             </S.LogoutButton>
             <S.GlassBottom aria-hidden="true" />
           </S.GlassPanel>

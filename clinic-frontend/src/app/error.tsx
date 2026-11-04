@@ -1,38 +1,38 @@
-'use client';
-import styled from "styled-components";
+"use client";
 import { useEffect } from "react";
 import { FiAlertTriangle, FiRefreshCcw } from "react-icons/fi";
+import styled from "styled-components";
 
-interface ErrorProps{
-    error: Error & { digest?: string}; //diget:서버 오류 식별자
-    reset: ()=>{};
+interface ErrorProps {
+  error: Error & { digest?: string }; //diget:서버 오류 식별자
+  reset: () => {};
 }
 
-export default function Error({ error, reset }: ErrorProps){
-    useEffect(()=>{
-        console.log(error);
-    } ,[error])
+export default function Error({ error, reset }: ErrorProps) {
+  useEffect(() => {
+    console.log(error);
+  }, [error]);
 
-    return(
-        <ErrorContainer>
-          <ErrorIcon>
-            <FiAlertTriangle/>
-          </ErrorIcon>
+  return (
+    <ErrorContainer>
+      <ErrorIcon>
+        <FiAlertTriangle />
+      </ErrorIcon>
 
-          <ErrorTitle>문제가 발생했습니다</ErrorTitle>
+      <ErrorTitle>문제가 발생했습니다</ErrorTitle>
 
-          <ErrorDescription>
-            페이지를 표시하는 중 오류가 발생했어요.
-            <br />
-            잠시 후 다시 시도해 주세요.
-          </ErrorDescription>
+      <ErrorDescription>
+        페이지를 표시하는 중 오류가 발생했어요.
+        <br />
+        잠시 후 다시 시도해 주세요.
+      </ErrorDescription>
 
-          <RetryButton type="button" onClick={() => reset()}>
-            <FiRefreshCcw />
-            다시 시도
-          </RetryButton>
-        </ErrorContainer>
-    )
+      <RetryButton type="button" onClick={() => reset()}>
+        <FiRefreshCcw />
+        다시 시도
+      </RetryButton>
+    </ErrorContainer>
+  );
 }
 
 const ErrorContainer = styled.main`

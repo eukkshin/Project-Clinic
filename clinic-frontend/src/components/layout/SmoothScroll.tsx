@@ -6,8 +6,10 @@ import Lenis from "lenis";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 
+import { stripLocalePrefix } from "@/i18n/url";
+
 export default function SmoothScroll({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
 
   useEffect(() => {
     // 관리자 페이지에서는 Lenis 실행하지 않음

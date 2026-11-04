@@ -1,14 +1,16 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import * as S from "@/components/home/CategoryNav.styles";
+import { API_ORIGIN } from "@/lib/api/config";
+import { localizeNavigationLabel } from "@/lib/i18n/localizeNavigation";
 
 /**
  * [기존 관리자 API 응답 형식]
@@ -55,6 +57,9 @@ function getSafeLink(link: string | null): string {
 }
 
 export default function CategoryNav() {
+  const tHome = useTranslations("Home");
+  const tNavigation = useTranslations("Navigation");
+  const tProcedures = useTranslations("Procedures");
   // categories: 서버에서 가져와 카드로 표시할 진료 분야 목록.
   const [categories, setCategories] = useState<CategoryData[]>([]);
 
@@ -84,7 +89,7 @@ export default function CategoryNav() {
     const fetchCategories = async () => {
       try {
         const response = await axios.get<CategoryApiResponse>(
-          `${API_URL}/api/admin/categories`,
+          `${API_URL}/api/public/site/categories`,
           { signal: controller.signal },
         );
 
@@ -287,9 +292,9 @@ export default function CategoryNav() {
     return (
       <>
         {transitionBridge}
-        <S.Section aria-label="진료 분야 불러오는 중">
+        <S.Section aria-label={tHome("categoryLoading")}>
           <S.LoadingMessage role="status">
-            PREPARING YOUR EXPERIENCE...
+            {tProcedures("preparingExperience")}
           </S.LoadingMessage>
         </S.Section>
       </>
@@ -304,7 +309,7 @@ export default function CategoryNav() {
       {/* Hero와 갤러리 사이에 일반 스크롤로 지나가는 세이지→아이보리 전환 구간 */}
       {transitionBridge}
 
-      <S.Section ref={sectionRef} aria-label="진료 분야 소개">
+      <S.Section ref={sectionRef} aria-label={tHome("categorySectionLabel")}>
         <S.Heading>
           <S.Kicker>
             AHN'S SIGNATURE COLLECTION
@@ -312,12 +317,12 @@ export default function CategoryNav() {
           </S.Kicker>
           <S.HeadingRow>
             <S.Title data-editorial-reveal>
-              Discover Your <em>Own Beauty.</em>
+              {tProcedures("discoverYour")} <em>{tProcedures("ownBeauty")}</em>
             </S.Title>
             <S.Intro data-editorial-reveal>
-              아름다움은 하나의 기준이 아닌, 각자의 이야기에서 시작됩니다.
+              {tHome("categoryIntroLine1")}
               <br />
-              아래로 스크롤하며 진료 분야를 만나보세요.
+              {tHome("categoryIntroLine2")}
             </S.Intro>
           </S.HeadingRow>
         </S.Heading>
@@ -331,62 +336,72 @@ export default function CategoryNav() {
           onScroll={handleNativeScroll}
           tabIndex={0}
           role="region"
-          aria-label="진료 분야 이미지 갤러리"
+          aria-label={tHome("categoryGalleryLabel")}
         >
           <S.Track ref={trackRef}>
-            {categories.map((category, index) => (
-              <S.Card key={category.id} $index={index}>
-                {/*
-                  카드 전체를 링크로 만들어 진료 상세 페이지로 이동한다.
-                  href는 기존 관리자 API의 LINK 값을 사용한다.
-                */}
-                <S.CardLink
-                  data-editorial-spotlight
-                  as={Link}
-                  href={category.link}
-                  aria-label={`${category.name} 자세히 보기`}
-                >
-                  <S.CardImage>
-                    <Image
-                      src={category.img}
-                      alt={`${category.name} 진료 이미지`}
-                      fill
-                      sizes="(max-width: 768px) 84vw, (max-width: 1200px) 64vw, 800px"
-                      style={{ objectFit: "cover" }}
-                      // 첫 번째 이미지는 사용자가 가장 먼저 보므로 빠르게 로드한다.
-                      priority={index === 0}
-                    />
-                    <S.ImageShade />
-                  </S.CardImage>
+            {categories.map((category, index) => {
+              // Translate only known core category names. Custom admin titles stay unchanged.
+              const label = localizeNavigationLabel(
+                category.name,
+                category.link,
+                "top",
+                tNavigation,
+              );
+              return (
+                <S.Card key={category.id} $index={index}>
+                  {/*
+                    카드 전체를 링크로 만들어 진료 상세 페이지로 이동한다.
+                    href는 기존 관리자 API의 LINK 값을 사용한다.
+                  */}
+                  <S.CardLink
+                    data-editorial-spotlight
+                    as={Link}
+                    href={category.link}
+                    aria-label={tHome("categoryViewMore", { name: label })}
+                  >
+                    <S.CardImage>
+                      <Image
+                        src={category.img}
+                        alt={tHome("categoryImageAlt", { name: label })}
+                        fill
+                        sizes="(max-width: 768px) 84vw, (max-width: 1200px) 64vw, 800px"
+                        style={{ objectFit: "cover" }}
+                        // 첫 번째 이미지는 사용자가 가장 먼저 보므로 빠르게 로드한다.
+                        priority={index === 0}
+                      />
+                      <S.ImageShade />
+                    </S.CardImage>
 
-                  <S.CardTop>
-                    <S.CardEyebrow>AHN'S EXPERTISE</S.CardEyebrow>
-                    <S.CardArrow aria-hidden="true">↗</S.CardArrow>
-                  </S.CardTop>
+                    <S.CardTop>
+                      <S.CardEyebrow>AHN'S EXPERTISE</S.CardEyebrow>
+                      <S.CardArrow aria-hidden="true">↗</S.CardArrow>
+                    </S.CardTop>
 
-                  <S.CardBottom>
-                    <S.CardNumber>
-                      {String(index + 1).padStart(2, "0")}
-                      <span>
-                        {" "}
-                        / {String(categories.length).padStart(2, "0")}
-                      </span>
-                    </S.CardNumber>
-                    <S.CardTitle>{category.name}</S.CardTitle>
-                    <S.CardDiscover>
-                      DISCOVER THE TREATMENT <span aria-hidden="true">→</span>
-                    </S.CardDiscover>
-                  </S.CardBottom>
-                </S.CardLink>
-              </S.Card>
-            ))}
+                    <S.CardBottom>
+                      <S.CardNumber>
+                        {String(index + 1).padStart(2, "0")}
+                        <span>
+                          {" "}
+                          / {String(categories.length).padStart(2, "0")}
+                        </span>
+                      </S.CardNumber>
+                      <S.CardTitle>{label}</S.CardTitle>
+                      <S.CardDiscover>
+                        {tProcedures("discoverTreatment")}{" "}
+                        <span aria-hidden="true">→</span>
+                      </S.CardDiscover>
+                    </S.CardBottom>
+                  </S.CardLink>
+                </S.Card>
+              );
+            })}
           </S.Track>
         </S.Viewport>
 
         <S.ProgressInfo>
           <S.ScrollGuide>
-            <span className="desktop">SCROLL TO EXPLORE</span>
-            <span className="mobile">SWIPE TO EXPLORE</span>
+            <span className="desktop">{tProcedures("scrollExplore")}</span>
+            <span className="mobile">{tProcedures("swipeExplore")}</span>
             <span aria-hidden="true">→</span>
           </S.ScrollGuide>
           <S.ProgressBar aria-hidden="true">

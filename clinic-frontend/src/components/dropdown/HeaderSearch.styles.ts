@@ -121,39 +121,70 @@ export const SearchPanel = styled.div<{ $transparent: boolean }>`
     $transparent ? "calc(100% + 13px)" : "calc(100% + 30px)"};
   right: 0;
   z-index: 30;
+
   width: min(430px, calc(100vw - 32px));
   max-height: min(70svh, 660px);
   overflow: auto;
   box-sizing: border-box;
+
   padding: 27px clamp(20px, 2.2vw, 35px) 20px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
+
+  /* AccountDropdown GlassPanel과 동일 */
+  isolation: isolate;
+
   color: #244535;
   text-shadow: none;
+
   transition: top 0.25s ease;
+
   background:
     radial-gradient(
       ellipse at 10% -10%,
-      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.65),
       transparent 65%
     ),
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.52),
-      rgba(229, 240, 227, 0.42)
-    );
+    linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(229, 240, 227, 0.6));
+
   -webkit-backdrop-filter: blur(30px) saturate(135%);
   backdrop-filter: blur(30px) saturate(135%);
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+
   box-shadow:
     0 16px 45px rgba(22, 48, 33, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
   animation: ${dropIn} 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background: rgba(245, 250, 245, 0.28);
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+
   @media (max-width: 768px) {
     right: -54px;
     top: calc(100% + 24px);
     width: calc(100vw - 28px);
     padding: 22px 21px 17px;
   }
+
+  @supports not (
+    (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+  ) {
+    background: #f3f8f0;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }

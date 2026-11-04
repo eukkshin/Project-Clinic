@@ -34,6 +34,11 @@ export default function LanguageDropdown({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
+  // Refreshing a locale cookie must update the selected language label.
+  useEffect(() => {
+    setLanguage(defaultLanguage);
+  }, [defaultLanguage]);
+
   useEffect(() => {
     if (!open) return;
 

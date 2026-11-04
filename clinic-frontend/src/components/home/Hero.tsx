@@ -1,15 +1,21 @@
 "use client";
 
-import axios from 'axios';
-import useEmblaCarousel from 'embla-carousel-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import axios from "axios";
+import useEmblaCarousel from "embla-carousel-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 // 기존 프로젝트의 스타일 파일 경로를 그대로 사용한다.
-import * as S from './Hero.styles';
+import * as S from "./Hero.styles";
 
 import type { ReactNode } from "react";
 
@@ -205,7 +211,7 @@ export default function Hero({
     const fetchVisualSettings = async () => {
       try {
         const response = await axios.get<VisualResponse>(
-          `${API_URL}/api/admin/visual`,
+          `${API_URL}/api/public/site/visual`,
 
           { signal: controller.signal },
         );

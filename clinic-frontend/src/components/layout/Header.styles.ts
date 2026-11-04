@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 interface HeaderProps {
   $hidden: boolean;
@@ -70,43 +70,26 @@ export const HeaderWrapper = styled.header<HeaderProps>`
 
 export const HeaderInner = styled.div<{ $searchOpen: boolean }>`
   width: min(100%, 1860px);
-
   height: 88px;
-
   margin: 0 auto;
-
   padding: 0 clamp(20px, 2.6vw, 52px);
-
   display: grid;
 
-  grid-template-columns: ${({ $searchOpen }) =>
-    $searchOpen
-      ? "minmax(140px, auto) minmax(0, 1fr)"
-      : "minmax(135px, 1fr) max-content minmax(0, 1fr)"};
-
-  ${({ $searchOpen }) =>
-    $searchOpen &&
-    css`
-      @media (min-width: 1501px) {
-        > :last-child {
-          width: 100%;
-          min-width: 0;
-          justify-self: stretch;
-          flex-direction: row-reverse;
-          justify-content: flex-start;
-          gap: clamp(16px, 2vw, 30px);
-        }
-      }
-    `}
-
+  /* 검색을 열어도 Logo / NavGroup / 오른쪽 영역의 3열 구조를 유지한다. */
+  grid-template-columns: minmax(135px, 1fr) max-content minmax(0, 1fr);
   align-items: center;
-
   gap: clamp(12px, 1.5vw, 24px);
+
+  /* 중앙 메뉴와 별개로 오른쪽 유틸리티만 끝에 붙인다. */
+  > :last-child {
+    justify-self: end;
+    min-width: 0;
+    max-width: 100%;
+  }
 
   @media (max-width: 1500px) {
     grid-template-columns: 1fr auto;
   }
-
   @media (max-width: 768px) {
     height: 68px;
   }
@@ -178,14 +161,16 @@ export const UtilGroup = styled.div`
   gap: 12px;
 `;
 
-export const DesktopOnly = styled.div`
+export const DesktopOnly = styled.div<{ $searchOpen?: boolean }>`
   display: flex;
+  position: relative;
+  z-index: 40;
 
   align-items: center;
-
-  gap: clamp(8px, 1vw, 16px);
-
+  flex: 0 0 auto;
   min-width: 0;
+
+  gap: ${({ $searchOpen }) => ($searchOpen ? "4px" : "clamp(8px, 1vw, 16px)")};
 
   @media (max-width: 1500px) {
     display: none;
@@ -722,8 +707,7 @@ export const HeaderActionRow = styled.div<{ $searchOpen: boolean }>`
   justify-content: flex-end;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: ${({ $searchOpen }) =>
-    $searchOpen ? "clamp(12px, 1.2vw, 20px)" : "18px"};
+  gap: ${({ $searchOpen }) => ($searchOpen ? "4px" : "18px")};
   width: max-content;
   flex: 0 0 auto;
   min-width: 0;
@@ -848,5 +832,52 @@ export const ReservationEditorialLink = styled.a<{
     > span {
       transition: none;
     }
+  }
+`;
+
+/* 검색 시에만 상담/예약 버튼을 짧은 아이콘으로 전환한다. */
+
+export const CompactHeaderLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 40px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+
+  padding: 0;
+  margin: 0;
+
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: background-color 180ms ease;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(135, 157, 135, 0.16);
+  }
+
+  &:active {
+    background: rgba(135, 157, 135, 0.24);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #69826b;
+    outline-offset: 3px;
   }
 `;

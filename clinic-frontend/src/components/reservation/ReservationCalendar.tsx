@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useMemo, useState } from 'react';
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
 
-import { getReservationAvailability } from '@/lib/reservation/api';
-import * as S from '@/styles/reservation/Reservation.styles';
+import { getReservationAvailability } from "@/lib/reservation/api";
+import * as S from "@/styles/reservation/Reservation.styles";
 
 import type { ReservationDay } from "@/types/reservation";
 
@@ -14,8 +15,22 @@ const offsetMonth = (month: string, offset: number) => {
   const [year, mm] = month.split("-").map(Number);
   return new Date(Date.UTC(year, mm - 1 + offset, 1)).toISOString().slice(0, 7);
 };
-const formatDate = (date: string) =>
-  date ? `${Number(date.slice(5, 7))}월 ${Number(date.slice(8, 10))}일` : "";
+// Display format changes by locale; backend dates stay in YYYY-MM-DD.
+const displayLocales: Record<string, string> = {
+  ko: "ko-KR",
+  en: "en-US",
+  ja: "ja-JP",
+  "zh-CN": "zh-CN",
+  "zh-TW": "zh-TW",
+};
+const formatDate = (date: string, locale: string) =>
+  date
+    ? new Intl.DateTimeFormat(displayLocales[locale] ?? "ko-KR", {
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${date}T00:00:00Z`))
+    : "";
 
 export interface CalendarSelection {
   date: string;
@@ -34,6 +49,19 @@ export default function ReservationCalendar({
   refreshKey = 0,
   onAvailabilityChange,
 }: Props) {
+  const t = useTranslations("Reservation");
+  const locale = useLocale();
+  const weekdays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(Date.UTC(2024, 0, 1 + index)); // Monday first
+        return new Intl.DateTimeFormat(displayLocales[locale] ?? "ko-KR", {
+          weekday: "short",
+          timeZone: "UTC",
+        }).format(date);
+      }),
+    [locale],
+  );
   const [month, setMonth] = useState(() => monthOf(kstToday()));
   const [days, setDays] = useState<ReservationDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,9 +90,7 @@ export default function ReservationCalendar({
         if (active) {
           setDays([]);
           setError(
-            reason instanceof Error
-              ? reason.message
-              : "예약 가능 시간 조회에 실패했습니다.",
+            reason instanceof Error ? reason.message : t("availabilityFailed"),
           );
         }
       })
@@ -76,7 +102,7 @@ export default function ReservationCalendar({
     };
     // onAvailabilityChange는 부모가 useCallback으로 감싸지 않아도 달력 요청에 영향이 없도록 제외합니다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month, refreshKey, attempt]);
+  }, [month, refreshKey, attempt, t]);
 
   const firstWeekday = useMemo(() => {
     const [y, m] = month.split("-").map(Number);
@@ -90,7 +116,7 @@ export default function ReservationCalendar({
         <S.CalendarHeader>
           <S.CalendarNav
             type="button"
-            aria-label="이전 달"
+            aria-label={t("prevMonth")}
             disabled={month <= monthOf(today)}
             onClick={() => {
               setMonth(offsetMonth(month, -1));
@@ -104,7 +130,7 @@ export default function ReservationCalendar({
           </strong>
           <S.CalendarNav
             type="button"
-            aria-label="다음 달"
+            aria-label={t("nextMonth")}
             disabled={month >= maxMonth}
             onClick={() => {
               setMonth(offsetMonth(month, 1));
@@ -115,11 +141,11 @@ export default function ReservationCalendar({
           </S.CalendarNav>
         </S.CalendarHeader>
         <S.CalendarWeek>
-          {["월", "화", "수", "목", "금", "토", "일"].map((day) => (
+          {weekdays.map((day) => (
             <span key={day}>{day}</span>
           ))}
         </S.CalendarWeek>
-        <S.CalendarGrid aria-label={`${month} 예약 달력`}>
+        <S.CalendarGrid aria-label={t("calendarAria", { month })}>
           {Array.from({ length: firstWeekday }, (_, i) => (
             <S.CalendarBlank key={`blank-${i}`} aria-hidden="true" />
           ))}
@@ -131,28 +157,23 @@ export default function ReservationCalendar({
               $available={day.availableCount > 0}
               disabled={loading || day.availableCount === 0}
               aria-pressed={selected.date === day.date}
-              aria-label={`${day.date}, ${day.availableCount ? `예약 가능 ${day.availableCount}개 시간` : "예약 마감 또는 휴무"}`}
+              aria-label={`${day.date}, ${day.availableCount ? t("availableTimes", { count: day.availableCount }) : t("fullyBookedAria")}`}
               onClick={() => onChange({ date: day.date, time: "" })}
             >
               <span>{Number(day.date.slice(-2))}</span>
               <small>
                 {day.slots.length === 0
-                  ? "휴무"
+                  ? t("closed")
                   : day.availableCount
-                    ? `${day.availableCount}개 가능`
-                    : "마감"}
+                    ? t("availableCount", { count: day.availableCount })
+                    : t("full")}
               </small>
             </S.CalendarDay>
           ))}
         </S.CalendarGrid>
-        <S.CalendarLegend>
-          날짜를 선택하면 남은 예약 시간이 표시됩니다. 회색 날짜는 휴무 또는
-          마감입니다.
-        </S.CalendarLegend>
+        <S.CalendarLegend>{t("calendarLegend")}</S.CalendarLegend>
         {loading && (
-          <S.FieldHint role="status">
-            예약 가능한 날짜를 확인하고 있습니다...
-          </S.FieldHint>
+          <S.FieldHint role="status">{t("loadingAvailability")}</S.FieldHint>
         )}
         {error && (
           <S.Message $error role="alert">
@@ -161,7 +182,7 @@ export default function ReservationCalendar({
               type="button"
               onClick={() => setAttempt((count) => count + 1)}
             >
-              다시 조회
+              {t("reload")}
             </button>
           </S.Message>
         )}
@@ -169,9 +190,9 @@ export default function ReservationCalendar({
       {activeDay && (
         <S.SlotSection>
           <S.SlotHeading>
-            {formatDate(selected.date)} 예약 시간 선택
+            {t("selectTime", { date: formatDate(selected.date, locale) })}
           </S.SlotHeading>
-          <S.TimeGrid role="group" aria-label="예약 가능한 시간대">
+          <S.TimeGrid role="group" aria-label={t("timeGroup")}>
             {activeDay.slots.map((slot) => (
               <S.SlotButton
                 key={slot.time}
@@ -195,19 +216,17 @@ export default function ReservationCalendar({
                 {slot.time}
                 <small>
                   {slot.available
-                    ? "예약가능"
+                    ? t("slotAvailable")
                     : slot.reason === "booked"
-                      ? "예약마감"
+                      ? t("slotBooked")
                       : slot.reason === "blocked"
-                        ? "예약불가"
-                        : "접수종료"}
+                        ? t("slotBlocked")
+                        : t("slotClosed")}
                 </small>
               </S.SlotButton>
             ))}
           </S.TimeGrid>
-          {!activeDay.slots.length && (
-            <S.FieldHint>해당 날짜는 운영 시간이 없습니다.</S.FieldHint>
-          )}
+          {!activeDay.slots.length && <S.FieldHint>{t("noHours")}</S.FieldHint>}
         </S.SlotSection>
       )}
     </>

@@ -1,11 +1,12 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
 import * as S from "@/components/ui/QuickConsultBar.styles";
+import { API_ORIGIN } from "@/lib/api/config";
 
 /** 실제 백엔드 주소를 환경변수로 바꾸더라도 동일하게 작동한다. */
 const API_URL = API_ORIGIN;
@@ -19,6 +20,7 @@ interface QuickConsultResponse {
 }
 
 export default function QuickConsultBar() {
+  const tQuick = useTranslations("QuickConsult");
   // 닫기 버튼을 누르면 바를 숨긴다. 새로고침하면 다시 열린다는 기존 동작을 유지한다.
   const [isOpen, setIsOpen] = useState(true);
   const [name, setName] = useState("");
@@ -40,22 +42,22 @@ export default function QuickConsultBar() {
 
     // 인풋에도 required를 주지만, 전송 직전 한 번 더 검사한다.
     if (!trimmedName) {
-      setMessage("이름을 입력해 주세요.");
+      setMessage(tQuick("nameRequired"));
       setMessageType("error");
       return;
     }
     if (!/^\d{9,11}$/.test(trimmedPhone) || /^(\d)\1{8,}$/.test(trimmedPhone)) {
-      setMessage("연락처는 숫자 9~11자리로 입력해 주세요.");
+      setMessage(tQuick("phoneInvalid"));
       setMessageType("error");
       return;
     }
     if (!department) {
-      setMessage("상담 분야를 선택해 주세요.");
+      setMessage(tQuick("departmentRequired"));
       setMessageType("error");
       return;
     }
     if (!isAgreed) {
-      setMessage("개인정보 수집·이용에 동의해 주세요.");
+      setMessage(tQuick("agreementRequired"));
       setMessageType("error");
       return;
     }
@@ -67,11 +69,16 @@ export default function QuickConsultBar() {
       // 기존 빠른 상담 API 경로와 전송 필드는 변경하지 않았다.
       const { data } = await axios.post<QuickConsultResponse>(
         `${API_URL}/api/consult/quick`,
-        { name: trimmedName, phone: trimmedPhone, department },
+        {
+          name: trimmedName,
+          phone: trimmedPhone,
+          department,
+          privacyConsent: isAgreed,
+        },
       );
 
       if (!data.success) {
-        throw new Error(data.message || "상담 접수에 실패했습니다.");
+        throw new Error(data.message || tQuick("submitFailed"));
       }
 
       setName("");
@@ -79,15 +86,11 @@ export default function QuickConsultBar() {
       setDepartment("");
       setIsAgreed(false);
       setMessageType("success");
-      setMessage(
-        "상담 신청이 접수되었습니다. 빠른 시일 내에 연락드리겠습니다.",
-      );
+      setMessage(tQuick("submitted"));
     } catch (error) {
       console.error("빠른 상담 신청 실패:", error);
       setMessageType("error");
-      setMessage(
-        "상담 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
-      );
+      setMessage(tQuick("submitError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -96,22 +99,24 @@ export default function QuickConsultBar() {
   if (!isOpen) return null;
 
   return (
-    <S.BarWrapper aria-label="빠른 상담 신청 영역">
+    <S.BarWrapper aria-label={tQuick("regionLabel")}>
       <S.BarInner>
         <S.Identity>
           <S.IdentityEyebrow>AHN'S CONSULTATION</S.IdentityEyebrow>
-          <S.Title>가볍게 남겨주세요.</S.Title>
-          <S.IdentityCaption>아름다움에 관한 첫 번째 이야기</S.IdentityCaption>
+          <S.Title>{tQuick("title")}</S.Title>
+          <S.IdentityCaption>{tQuick("caption")}</S.IdentityCaption>
         </S.Identity>
 
         <S.ConsultForm onSubmit={handleSubmit}>
           <S.Field>
-            <S.FieldLabel htmlFor="quick-consult-name">이름</S.FieldLabel>
+            <S.FieldLabel htmlFor="quick-consult-name">
+              {tQuick("name")}
+            </S.FieldLabel>
             <S.Input
               id="quick-consult-name"
               type="text"
               autoComplete="name"
-              placeholder="성함을 입력해 주세요"
+              placeholder={tQuick("namePlaceholder")}
               value={name}
               onChange={(event) => {
                 setName(event.target.value);
@@ -123,13 +128,15 @@ export default function QuickConsultBar() {
           </S.Field>
 
           <S.Field>
-            <S.FieldLabel htmlFor="quick-consult-phone">연락처</S.FieldLabel>
+            <S.FieldLabel htmlFor="quick-consult-phone">
+              {tQuick("phone")}
+            </S.FieldLabel>
             <S.Input
               id="quick-consult-phone"
               type="tel"
               autoComplete="tel"
               inputMode="numeric"
-              placeholder="숫자만 입력"
+              placeholder={tQuick("phonePlaceholder")}
               value={phone}
               maxLength={11}
               onChange={(event) => {
@@ -142,7 +149,7 @@ export default function QuickConsultBar() {
 
           <S.Field>
             <S.FieldLabel htmlFor="quick-consult-department">
-              상담 분야
+              {tQuick("department")}
             </S.FieldLabel>
             <S.Select
               id="quick-consult-department"
@@ -155,11 +162,17 @@ export default function QuickConsultBar() {
               required
             >
               <option value="" disabled>
-                분야를 선택해 주세요
+                {tQuick("departmentPlaceholder")}
               </option>
-              {DEPARTMENTS.map((item) => (
+              {DEPARTMENTS.map((item, index) => (
                 <option key={item} value={item}>
-                  {item}
+                  {tQuick(
+                    ["eyes", "nose", "antiAging", "petit"][index] as
+                      | "eyes"
+                      | "nose"
+                      | "antiAging"
+                      | "petit",
+                  )}
                 </option>
               ))}
             </S.Select>
@@ -173,7 +186,7 @@ export default function QuickConsultBar() {
                 onChange={(event) => setIsAgreed(event.target.checked)}
                 required
               />
-              <S.AgreeText>개인정보 수집·이용 동의</S.AgreeText>
+              <S.AgreeText>{tQuick("agreement")}</S.AgreeText>
             </S.CheckboxLabel>
             <S.SubmitBtn
               type="submit"
@@ -185,7 +198,7 @@ export default function QuickConsultBar() {
                 !department
               }
             >
-              {isSubmitting ? "접수 중..." : "빠른 상담 신청"}
+              {isSubmitting ? tQuick("submitting") : tQuick("submit")}
               <FiArrowUpRight aria-hidden="true" size={17} />
             </S.SubmitBtn>
           </S.ActionGroup>
@@ -194,8 +207,8 @@ export default function QuickConsultBar() {
         <S.CloseBtn
           type="button"
           onClick={() => setIsOpen(false)}
-          aria-label="빠른 상담바 닫기"
-          title="닫기"
+          aria-label={tQuick("closeBar")}
+          title={tQuick("close")}
         >
           <FiX size={17} aria-hidden="true" />
         </S.CloseBtn>

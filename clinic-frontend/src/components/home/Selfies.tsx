@@ -1,14 +1,15 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import * as S from "@/components/home/Selfies.styles";
+import { API_ORIGIN } from "@/lib/api/config";
 
 // ScrollTrigger는 GSAP의 추가 기능이다.
 // 일반 gsap.to()와 달리 '스크롤 위치에 따라 애니메이션을 시작'할 때 필요하다.
@@ -76,6 +77,7 @@ function isSelfieApiItem(value: unknown): value is SelfieApiItem {
 const numberFormatter = new Intl.NumberFormat("ko-KR");
 
 export default function Selfies() {
+  const tHome = useTranslations("Home");
   const [items, setItems] = useState<SelfieItem[]>([]);
   const [status, setStatus] = useState<LoadingStatus>("loading");
   const [requestKey, setRequestKey] = useState(0);
@@ -104,7 +106,7 @@ export default function Selfies() {
     const fetchSelfies = async () => {
       try {
         const response = await axios.get<SelfieApiResponse>(
-          `${API_URL}/api/admin/selfies`,
+          `${API_URL}/api/public/site/selfies`,
           { signal: controller.signal },
         );
 
@@ -363,16 +365,16 @@ export default function Selfies() {
                 Real <em>Stories.</em>
               </S.Title>
               <S.Description>
-                안즈와 함께한, 더 특별해진 일상.
+                {tHome("selfiesIntroLine1")}
                 <br />
-                자연스러운 순간을 만나보세요.
+                {tHome("selfiesIntroLine2")}
               </S.Description>
             </S.HeadingMain>
 
-            <S.Controls aria-label="갤러리 이동 버튼">
+            <S.Controls aria-label={tHome("selfiesControls")}>
               <S.ArrowButton
                 type="button"
-                aria-label="이전 사진"
+                aria-label={tHome("selfiesPrevious")}
                 onClick={() => moveGallery(-1)}
                 disabled={!controls.canPrev}
               >
@@ -380,7 +382,7 @@ export default function Selfies() {
               </S.ArrowButton>
               <S.ArrowButton
                 type="button"
-                aria-label="다음 사진"
+                aria-label={tHome("selfiesNext")}
                 onClick={() => moveGallery(1)}
                 disabled={!controls.canNext}
               >
@@ -395,7 +397,7 @@ export default function Selfies() {
           <S.StatusMessage role="status">GALLERY LOADING...</S.StatusMessage>
         ) : status === "error" ? (
           <S.StatusMessage role="status">
-            갤러리를 불러오지 못했어요.
+            {tHome("selfiesError")}
             <S.RetryButton
               type="button"
               onClick={() => {
@@ -403,18 +405,18 @@ export default function Selfies() {
                 setRequestKey((old) => old + 1);
               }}
             >
-              다시 시도 ↗
+              {tHome("selfiesRetry")} ↗
             </S.RetryButton>
           </S.StatusMessage>
         ) : items.length === 0 ? (
           <S.StatusMessage role="status">
-            현재 공개된 갤러리 사진이 없습니다.
+            {tHome("selfiesEmpty")}
           </S.StatusMessage>
         ) : (
           <>
             <S.GalleryViewport
               ref={viewportRef}
-              aria-label="등록된 셀피 사진 갤러리"
+              aria-label={tHome("selfiesGallery")}
               tabIndex={0}
             >
               {items.map((item, index) => (

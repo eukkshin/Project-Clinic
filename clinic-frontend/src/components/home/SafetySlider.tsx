@@ -112,7 +112,7 @@ export function SafetySlider() {
 
       try {
         const response = await axios.get<SafetyApiResponse>(
-          `${API_URL}/api/admin/safety`,
+          `${API_URL}/api/public/site/safety`,
           { signal: controller.signal },
         );
 

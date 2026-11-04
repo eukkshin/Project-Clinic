@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -50,6 +51,7 @@ export default function DetailSideNav({
   sections,
   scrollOffset = 86,
 }: DetailSideNavProps) {
+  const t = useTranslations("Procedures");
   const [mountTarget, setMountTarget] = useState<HTMLElement | null>(null);
   const [activeId, setActiveId] = useState(sections[0]?.id ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -172,9 +174,7 @@ export default function DetailSideNav({
         $hidden={atFooter}
         aria-controls="ahns-detail-side-navigation"
         aria-expanded={mobileOpen && !atFooter}
-        aria-label={
-          mobileOpen ? "상세페이지 목차 닫기" : "상세페이지 목차 열기"
-        }
+        aria-label={mobileOpen ? t("closeContents") : t("openContents")}
         onClick={() => setMobileOpen((previous) => !previous)}
       >
         {mobileOpen ? <FiX size={19} /> : <FiList size={19} />}
@@ -183,7 +183,7 @@ export default function DetailSideNav({
       <S.SideNav
         ref={navRef}
         id="ahns-detail-side-navigation"
-        aria-label="상세페이지 목차"
+        aria-label={t("contentsNav")}
         aria-hidden={atFooter ? true : undefined}
         $hidden={atFooter}
         $mobileOpen={mobileOpen}
@@ -208,7 +208,7 @@ export default function DetailSideNav({
                 type="button"
                 $active={isActive}
                 tabIndex={atFooter ? -1 : 0}
-                aria-label={`${section.title} 섹션으로 이동`}
+                aria-label={t("goToSection", { title: section.title })}
                 aria-current={isActive ? "location" : undefined}
                 onClick={() => goToSection(section.id)}
               >

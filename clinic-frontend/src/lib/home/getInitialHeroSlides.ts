@@ -29,7 +29,7 @@ function isSlideItem(value: unknown): value is InitialHeroSlide {
 
 export async function getInitialHeroSlides(): Promise<InitialHeroSlide[]> {
   try {
-    const response = await fetch(`${API_URL}/api/admin/visual`, {
+    const response = await fetch(`${API_URL}/api/public/site/visual`, {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(1200),
     });

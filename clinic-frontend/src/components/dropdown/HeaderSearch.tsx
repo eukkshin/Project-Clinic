@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -10,6 +11,8 @@ import {
 } from "react-icons/fa6";
 
 import * as S from "@/components/dropdown/HeaderSearch.styles";
+import PopularSearches from "@/components/dropdown/PopularSearches";
+import { recordSearchKeyword } from "@/lib/search/recordSearchKeyword";
 
 interface MenuItem {
   id: number;
@@ -32,19 +35,10 @@ interface HeaderSearchProps {
   transparent?: boolean;
 }
 
-// 관리자에서 실제 인기 검색어 API를 연결하기 전까지 사용할 임시 노출 목록.
-// 실시간 인기순위라고 가정하거나 서버 순위인 것처럼 표시하지 않는다.
-const RECOMMENDED_TERMS = [
-  "눈성형",
-  "코성형",
-  "동안성형",
-  "쁘띠시술",
-  "병원소개",
-];
-const clean = (text: string) =>
-  text.toLocaleLowerCase("ko-KR").replace(/\s+/g, "");
+const clean = (value: string) =>
+  value.toLocaleLowerCase("ko-KR").replace(/\s+/g, "");
 
-function safeHref(value: string) {
+function safeHref(value: string): string {
   const url = value.trim();
   if (url.startsWith("/") && !url.startsWith("//")) return url;
   if (/^https?:\/\//i.test(url)) return url;
@@ -58,6 +52,7 @@ export default function HeaderSearch({
   transparent = false,
 }: HeaderSearchProps) {
   const router = useRouter();
+  const tSearch = useTranslations("Search");
   const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,12 +61,14 @@ export default function HeaderSearch({
 
   const entries = useMemo<SearchEntry[]>(() => {
     const list: SearchEntry[] = [];
+
     for (const menu of menus) {
       list.push({
         key: `main-${menu.id}`,
         name: menu.name,
         url: safeHref(menu.url),
       });
+
       for (let index = 0; index < (menu.children?.length ?? 0); index++) {
         const item = menu.children![index];
         list.push({
@@ -82,6 +79,7 @@ export default function HeaderSearch({
         });
       }
     }
+
     return list;
   }, [menus]);
 
@@ -103,8 +101,9 @@ export default function HeaderSearch({
 
   useEffect(() => {
     if (!open) return;
-    // 열리는 CSS transition 이후에도 포커스가 정확하게 입력창에 머물도록 한다.
+
     const frame = requestAnimationFrame(() => inputRef.current?.focus());
+
     const onPointerDown = (event: PointerEvent) => {
       if (
         event.target instanceof Node &&
@@ -114,6 +113,7 @@ export default function HeaderSearch({
         setQuery("");
       }
     };
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.stopPropagation();
@@ -122,8 +122,10 @@ export default function HeaderSearch({
         triggerRef.current?.focus();
       }
     };
+
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
+
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("pointerdown", onPointerDown);
@@ -132,26 +134,27 @@ export default function HeaderSearch({
   }, [open, onOpenChange]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    // 아직 프로젝트에 /search 라우트가 없으므로 존재하지 않는 URL을 만들지 않는다.
     event.preventDefault();
-    const target = matches.find((item) => item.url && item.url !== "/");
-    if (target) {
-      close();
-      if (/^https?:\/\//i.test(target.url)) window.location.assign(target.url);
-      else router.push(target.url);
-    }
+    const term = query.replace(/\s+/g, " ").trim().slice(0, 60);
+    if (!term) return;
+
+    // 현재 Header.tsx에 상위 onSubmitCapture가 있으면 그쪽에서 먼저
+    // 제출을 처리하고 전파를 중단합니다. 이 코드는 단독 사용 시 대비용입니다.
+    recordSearchKeyword(term);
+    close();
+    router.push(`/search?q=${encodeURIComponent(term)}`);
   };
 
   return (
-    <S.SearchRoot ref={rootRef} $open={open} role="search">
+    <S.SearchRoot ref={rootRef} $open={open} role="search" data-lenis-prevent>
       <S.SearchForm $open={open} onSubmit={handleSubmit}>
         {open && (
           <S.SearchInput
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="무엇을 찾으시나요?"
-            aria-label="사이트 메뉴 검색어 입력"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={tSearch("placeholder")}
+            aria-label={tSearch("searchInput")}
             autoComplete="off"
             enterKeyHint="search"
           />
@@ -160,8 +163,8 @@ export default function HeaderSearch({
           ref={triggerRef}
           type="button"
           onClick={() => (open ? close() : onOpenChange(true))}
-          aria-label={open ? "검색 닫기" : "검색 열기"}
-          title={open ? "검색 닫기" : "검색"}
+          aria-label={open ? tSearch("searchClose") : tSearch("searchOpen")}
+          title={open ? tSearch("searchClose") : tSearch("searchButton")}
           aria-expanded={open}
           aria-controls={open ? panelId : undefined}
         >
@@ -172,80 +175,65 @@ export default function HeaderSearch({
       {open && (
         <S.SearchPanel
           id={panelId}
-          aria-label="사이트 검색"
+          aria-label={tSearch("searchInSite")}
           $transparent={transparent}
         >
-          <S.PanelHeader>
-            <S.PanelEyebrow>AHN&apos;S SEARCH</S.PanelEyebrow>
-            <S.PanelTitle>{trimmed ? "검색 결과" : "인기 검색어"}</S.PanelTitle>
-            {!trimmed && (
-              <S.PanelNote>추천 검색어 · 순위 데이터 연결 전</S.PanelNote>
-            )}
-          </S.PanelHeader>
-
           {trimmed ? (
-            matches.length ? (
-              <S.ResultList>
-                {matches.map((item) => (
-                  <li key={item.key}>
-                    {item.url && item.url !== "/" ? (
-                      <S.ResultLink as={Link} href={item.url} onClick={close}>
-                        <span>
-                          <S.ResultTitle>{item.name}</S.ResultTitle>
-                          {item.parent && (
-                            <S.ResultParent>{item.parent}</S.ResultParent>
-                          )}
-                        </span>
-                        <FaArrowUpRightFromSquare
-                          size={11}
-                          aria-hidden="true"
-                        />
-                      </S.ResultLink>
-                    ) : (
-                      <S.ResultDisabled
-                        type="button"
-                        onClick={() => setQuery(item.name)}
-                        title="아직 연결된 메뉴 주소가 없습니다"
-                      >
-                        <span>
-                          <S.ResultTitle>{item.name}</S.ResultTitle>
-                          {item.parent && (
-                            <S.ResultParent>{item.parent}</S.ResultParent>
-                          )}
-                        </span>
-                        <S.Preparing>페이지 준비 중</S.Preparing>
-                      </S.ResultDisabled>
-                    )}
-                  </li>
-                ))}
-              </S.ResultList>
-            ) : (
-              <S.EmptyState>
-                “{trimmed}”와 일치하는 메뉴가 없습니다.
-              </S.EmptyState>
-            )
+            <>
+              <S.PanelHeader>
+                <S.PanelEyebrow>AHN&apos;S SEARCH</S.PanelEyebrow>
+                <S.PanelTitle>{tSearch("menuShortcut")}</S.PanelTitle>
+                <S.PanelNote>{tSearch("enterHint")}</S.PanelNote>
+              </S.PanelHeader>
+
+              {matches.length ? (
+                <S.ResultList>
+                  {matches.map((item) => (
+                    <li key={item.key}>
+                      {item.url && item.url !== "/" ? (
+                        <S.ResultLink as={Link} href={item.url} onClick={close}>
+                          <span>
+                            <S.ResultTitle>{item.name}</S.ResultTitle>
+                            {item.parent && (
+                              <S.ResultParent>{item.parent}</S.ResultParent>
+                            )}
+                          </span>
+                          <FaArrowUpRightFromSquare
+                            size={11}
+                            aria-hidden="true"
+                          />
+                        </S.ResultLink>
+                      ) : (
+                        <S.ResultDisabled
+                          type="button"
+                          onClick={() => {
+                            setQuery(item.name);
+                            inputRef.current?.focus();
+                          }}
+                          title={tSearch("unavailableLink")}
+                        >
+                          <span>
+                            <S.ResultTitle>{item.name}</S.ResultTitle>
+                            {item.parent && (
+                              <S.ResultParent>{item.parent}</S.ResultParent>
+                            )}
+                          </span>
+                          <S.Preparing>{tSearch("preparing")}</S.Preparing>
+                        </S.ResultDisabled>
+                      )}
+                    </li>
+                  ))}
+                </S.ResultList>
+              ) : (
+                <S.EmptyState>
+                  {tSearch("menuEmpty", { query: trimmed })}
+                </S.EmptyState>
+              )}
+              <S.PanelFooter>{tSearch("menuFooter")}</S.PanelFooter>
+            </>
           ) : (
-            <S.PopularList>
-              {RECOMMENDED_TERMS.map((term, index) => (
-                <li key={term}>
-                  <S.PopularButton
-                    type="button"
-                    onClick={() => {
-                      setQuery(term);
-                      inputRef.current?.focus();
-                    }}
-                  >
-                    <S.PopularIndex>
-                      {String(index + 1).padStart(2, "0")}
-                    </S.PopularIndex>
-                    <span>{term}</span>
-                    <FaMagnifyingGlass size={11} aria-hidden="true" />
-                  </S.PopularButton>
-                </li>
-              ))}
-            </S.PopularList>
+            <PopularSearches enabled={open} onNavigate={close} />
           )}
-          <S.PanelFooter>검색 대상: 관리자 메뉴 및 하위 메뉴</S.PanelFooter>
         </S.SearchPanel>
       )}
     </S.SearchRoot>

@@ -1,25 +1,23 @@
-import type { Metadata } from "next";
-import { headers } from 'next/headers';
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
+import { headers } from "next/headers";
 
-import CategoryNav from '@/components/home/CategoryNav';
-import CircularOverlay from '@/components/home/CircularOverlay';
-import EditorialExperience from '@/components/home/EditorialExperience';
-import Hero from '@/components/home/Hero';
-import HomeAtmosphere from '@/components/home/HomeAtmosphere';
-import HomeOverflowGuard from '@/components/home/HomeOverflowGuard';
-import RollingBanner from '@/components/home/RollingBanner';
-import { SafetySlider } from '@/components/home/SafetySlider';
-import Selfies from '@/components/home/Selfies';
-import VlogSafetyFlow from '@/components/home/VlogSafetyFlow';
-import { VlogSlider } from '@/components/home/VlogSlider';
-import BrandIntro from '@/components/intro/BrandIntro';
-import { getInitialHeroSlides } from '@/lib/home/getInitialHeroSlides';
+import CategoryNav from "@/components/home/CategoryNav";
+import CircularOverlay from "@/components/home/CircularOverlay";
+import EditorialExperience from "@/components/home/EditorialExperience";
+import Hero from "@/components/home/Hero";
+import HomeAtmosphere from "@/components/home/HomeAtmosphere";
+import HomeOverflowGuard from "@/components/home/HomeOverflowGuard";
+import RollingBanner from "@/components/home/RollingBanner";
+import { SafetySlider } from "@/components/home/SafetySlider";
+import Selfies from "@/components/home/Selfies";
+import VlogSafetyFlow from "@/components/home/VlogSafetyFlow";
+import { VlogSlider } from "@/components/home/VlogSlider";
+import BrandIntro from "@/components/intro/BrandIntro";
+import { getInitialHeroSlides } from "@/lib/home/getInitialHeroSlides";
 
-export const metadata: Metadata = {
-  title: "AHNS | 아름다움, 그 이상의 가치",
-  description:
-    "AHNS의 진료 철학과 시술 안내, 후기 및 상담 정보를 확인해 보세요.",
-};
+export async function generateMetadata() {
+  return publicPageMetadata("/");
+}
 
 /**
  * Intro policy: only an external LINK opening the homepage in a new

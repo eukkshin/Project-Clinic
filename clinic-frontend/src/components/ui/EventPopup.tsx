@@ -1,12 +1,13 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
 import * as S from "@/components/ui/EventPopup.styles";
+import { stripLocalePrefix } from "@/i18n/url";
+import { API_ORIGIN } from "@/lib/api/config";
 
 const API_URL = API_ORIGIN;
 
@@ -84,8 +85,8 @@ function PopupCard({
 
       // 원래 이벤트 팝업에서 사용하던 API와 데이터 키를 유지한다.
       const { data } = await axios.post<QuickConsultResponse>(
-        `${API_URL}/api/admin/consult/quick`,
-        { name: name.trim(), phone, department: department.trim() },
+        `${API_URL}/api/consult/quick`,
+        { name: name.trim(), phone, department: department.trim(), privacyConsent: isAgreed },
       );
 
       if (!data.success) throw new Error(data.message || "상담 접수 실패");
@@ -244,7 +245,7 @@ function PopupCard({
 }
 
 export default function EventPopup() {
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
   const [popupList, setPopupList] = useState<PopupData[]>([]);
   const [visiblePopupIds, setVisiblePopupIds] = useState<number[]>([]);
 
@@ -254,7 +255,7 @@ export default function EventPopup() {
     const fetchPopups = async () => {
       try {
         const { data } = await axios.get<PopupApiResponse>(
-          `${API_URL}/api/admin/popups`,
+          `${API_URL}/api/public/site/popups`,
           { signal: controller.signal },
         );
         if (

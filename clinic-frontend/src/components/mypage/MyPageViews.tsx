@@ -1,16 +1,17 @@
 "use client";
 
-import { ReactNode, useState } from 'react';
+import { useLocale, useTranslations } from "next-intl";
+import { ReactNode, useState } from "react";
 
-import { Popup } from '@/components/ui/Popup';
-import { cancelReservation } from '@/lib/reservation/api';
-import * as S from '@/styles/mypage/MyPage.styles';
+import { Popup } from "@/components/ui/Popup";
+import { cancelReservation } from "@/lib/reservation/api";
+import * as S from "@/styles/mypage/MyPage.styles";
 
-import { useMyPageData } from './useMyPageData';
+import { useMyPageData } from "./useMyPageData";
 
 import type { MyConsultation, MyProfile, MyReservation } from "@/types/mypage";
 
-type Tab = "profile" | "reservations" | "consultations";
+type Tab = "profile" | "reservations" | "consultations" | "accountsettings";
 
 const previewProfile: MyProfile = {
   name: "샘플 회원",
@@ -62,11 +63,18 @@ const previewConsultations: MyConsultation[] = [
   },
 ];
 
-function formatDate(value: string | null | undefined) {
+const DISPLAY_LOCALES: Record<string, string> = {
+  ko: "ko-KR",
+  en: "en-US",
+  ja: "ja-JP",
+  "zh-CN": "zh-CN",
+  "zh-TW": "zh-TW",
+};
+function formatDate(value: string | null | undefined, locale: string) {
   if (!value) return "-";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-  return new Intl.DateTimeFormat("ko-KR", {
+  return new Intl.DateTimeFormat(DISPLAY_LOCALES[locale] ?? "ko-KR", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -76,7 +84,29 @@ function formatDate(value: string | null | undefined) {
   }).format(d);
 }
 
+// Known backend department values are translated only for display.
+// Unknown administrator-written values stay unchanged until CMS translations exist.
+function useDepartmentLabel() {
+  const t = useTranslations("MyPage");
+  const names: Record<string, string> = {
+    "진료 상담": t("deptGeneral"),
+    "의료진 상담": t("deptDoctor"),
+    "기타 상담": t("deptOther"),
+    "눈 성형": t("deptEyes"),
+    눈성형: t("deptEyes"),
+    "코 성형": t("deptNose"),
+    코성형: t("deptNose"),
+    안면윤곽: t("deptContour"),
+    동안성형: t("deptAntiAging"),
+    리프팅: t("deptLifting"),
+    "피부·쁘띠": t("deptSkin"),
+    쁘띠시술: t("deptPetit"),
+  };
+  return (value: string) => names[value] ?? value;
+}
+
 function Shell({ tab, children }: { tab: Tab; children: ReactNode }) {
+  const t = useTranslations("MyPage");
   const title: Record<Tab, ReactNode> = {
     profile: (
       <>
@@ -93,19 +123,34 @@ function Shell({ tab, children }: { tab: Tab; children: ReactNode }) {
         My <em>Consultations.</em>
       </>
     ),
+    accountsettings: (
+      <>
+        Account <em>Settings.</em>
+      </>
+    ),
   };
   const description: Record<Tab, string> = {
-    profile: "나의 정보와 예약, 상담 기록을 한곳에서 확인하세요.",
-    reservations: "예약한 일정을 편리하게 확인할 수 있는 공간입니다.",
-    consultations: "상담 문의와 진행 상태를 확인할 수 있는 공간입니다.",
+    profile: t("descProfile"),
+    reservations: t("descReservations"),
+    consultations: t("descConsultations"),
+    accountsettings: t("descSettings"),
   };
   const routes: { key: Tab; text: string; href: string }[] = [
-    { key: "profile", text: "내 정보", href: "/mypage" },
-    { key: "reservations", text: "예약 내역", href: "/mypage/reservations" },
+    { key: "profile", text: t("navProfile"), href: "/mypage" },
+    {
+      key: "reservations",
+      text: t("navReservations"),
+      href: "/mypage/reservations",
+    },
     {
       key: "consultations",
-      text: "내 상담 내역",
+      text: t("navConsultations"),
       href: "/mypage/consultations",
+    },
+    {
+      key: "accountsettings",
+      text: t("navSettings"),
+      href: "/mypage/accountsettings",
     },
   ];
   return (
@@ -122,10 +167,10 @@ function Shell({ tab, children }: { tab: Tab; children: ReactNode }) {
           <S.SidebarEyebrow>PRIVATE MEMBERSHIP</S.SidebarEyebrow>
           <S.SidebarHeading>My AHNS</S.SidebarHeading>
           <S.SidebarDescription>
-            나를 위한 기록과 일정을
-            <br /> 한곳에서 확인하세요.
+            {t("sidebarDesc1")}
+            <br /> {t("sidebarDesc2")}
           </S.SidebarDescription>
-          <S.SideNav aria-label="마이페이지 메뉴">
+          <S.SideNav aria-label={t("sidebarMenu")}>
             {routes.map((r) => (
               <S.SideLink
                 key={r.key}
@@ -180,6 +225,7 @@ function StateNotice({
   onRetry?: () => void;
   onDemo?: () => void;
 }) {
+  const t = useTranslations("MyPage");
   return (
     <S.EmptyPanel role="status">
       <S.EmptyMark>✳</S.EmptyMark>
@@ -188,27 +234,29 @@ function StateNotice({
       <S.ButtonRow>
         {onRetry && (
           <S.PlainButton type="button" onClick={onRetry}>
-            다시 불러오기
+            {t("retry")}
           </S.PlainButton>
         )}
         {onDemo && (
           <S.PlainButton type="button" onClick={onDemo}>
-            샘플 화면 보기
+            {t("preview")}
           </S.PlainButton>
         )}
-        <S.PrimaryLink href="/register/login">로그인 페이지</S.PrimaryLink>
+        <S.PrimaryLink href="/register/login">{t("loginPage")}</S.PrimaryLink>
       </S.ButtonRow>
     </S.EmptyPanel>
   );
 }
 
 function ProfileDetails({ profile }: { profile: MyProfile }) {
+  const t = useTranslations("MyPage");
+  const locale = useLocale();
   const fields = [
-    { label: "이름", value: profile.name },
-    { label: "아이디", value: profile.userId },
-    { label: "이메일", value: profile.email ?? "-" },
-    { label: "휴대폰 번호", value: profile.phone ?? "-" },
-    { label: "가입일", value: formatDate(profile.joinedAt) },
+    { label: t("fieldName"), value: profile.name },
+    { label: t("fieldId"), value: profile.userId },
+    { label: t("fieldEmail"), value: profile.email ?? "-" },
+    { label: t("fieldPhone"), value: profile.phone ?? "-" },
+    { label: t("fieldJoined"), value: formatDate(profile.joinedAt, locale) },
   ];
   return (
     <S.InfoGrid>
@@ -223,6 +271,15 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
 }
 
 export function MyPageView() {
+  const t = useTranslations("MyPage");
+  const locale = useLocale();
+  const departmentLabel = useDepartmentLabel();
+  const reservationLabels: Record<string, string> = {
+    예약대기: t("reservationPending"),
+    예약확정: t("reservationConfirmed"),
+    방문완료: t("reservationCompleted"),
+    취소: t("reservationCancelled"),
+  };
   const { data, loading, error, retry, connected } =
     useMyPageData<MyProfile>("me");
   const [demo, setDemo] = useState(false);
@@ -245,52 +302,52 @@ export function MyPageView() {
       <S.WelcomePanel>
         <S.WelcomeEyebrow>WELCOME TO YOUR PRIVATE SPACE</S.WelcomeEyebrow>
         <S.WelcomeHeading>
-          안녕하세요, {profile?.name ?? "회원님"}.
+          {t("greeting", {
+            name: demo ? t("sampleMember") : (profile?.name ?? t("member")),
+          })}
         </S.WelcomeHeading>
-        <S.WelcomeDescription>
-          AHNS에서의 소중한 일정과 상담 기록을 편안하게 확인하세요.
-        </S.WelcomeDescription>
+        <S.WelcomeDescription>{t("welcomeDesc")}</S.WelcomeDescription>
       </S.WelcomePanel>
       <S.SummaryCard>
         <S.SummaryEyebrow>UPCOMING RESERVATION</S.SummaryEyebrow>
         <S.SummaryDate>
           {upcoming
-            ? formatDate(upcoming.scheduledAt)
+            ? formatDate(upcoming.scheduledAt, locale)
             : reservationsLoading && !demo
-              ? "방문 일정을 확인하는 중입니다."
-              : "예정된 방문 상담이 없습니다."}
+              ? t("loadingNextVisit")
+              : t("noNextVisit")}
         </S.SummaryDate>
         <S.SummaryMeta>
           {upcoming
-            ? `${upcoming.department} · ${upcoming.status}`
+            ? `${departmentLabel(upcoming.department)} · ${reservationLabels[upcoming.status] ?? upcoming.status}`
             : reservationsLoading && !demo
-              ? "등록된 예약을 확인하고 있습니다."
-              : "원하시는 날짜와 시간을 선택해 방문 예약을 진행할 수 있습니다."}
+              ? t("loadingReservations")
+              : t("createVisitDesc")}
         </S.SummaryMeta>
         <S.SummaryLink
           href={upcoming ? "/mypage/reservations" : "/reservation"}
         >
-          {upcoming ? "예약 내역 확인" : "방문 상담 예약하기"}{" "}
+          {upcoming ? t("checkReservations") : t("bookVisit")}{" "}
           <span aria-hidden="true">↗</span>
         </S.SummaryLink>
       </S.SummaryCard>
       <Heading
         number="01"
-        title="회원 정보"
-        description="회원님의 기본 정보를 확인하실 수 있습니다."
+        title={t("memberInfo")}
+        description={t("memberInfoDesc")}
         action={
           profile && !demo ? (
             <S.PlainButton onClick={retry} type="button">
-              새로고침
+              {t("refresh")}
             </S.PlainButton>
           ) : undefined
         }
       />
       {demo && (
         <S.DemoMessage>
-          샘플 미리보기입니다. 실제 회원 정보가 아니며 저장되지 않습니다.{" "}
+          {t("sampleProfileNotice")}{" "}
           <S.PlainButton onClick={() => setDemo(false)}>
-            미리보기 종료
+            {t("endPreview")}
           </S.PlainButton>
         </S.DemoMessage>
       )}
@@ -302,16 +359,12 @@ export function MyPageView() {
         <StateNotice
           title={
             loading
-              ? "회원 정보를 불러오는 중입니다"
+              ? t("loadingProfile")
               : error
-                ? "회원 정보를 확인하지 못했습니다"
-                : "회원 정보 연동 준비 중"
+                ? t("profileFailed")
+                : t("profileNotReady")
           }
-          description={
-            connected
-              ? "등록된 회원 정보를 확인해 주세요."
-              : "개인정보 보호를 위한 로그인 연동 후 회원 정보가 표시됩니다."
-          }
+          description={connected ? t("checkProfile") : t("loginForProfile")}
           error={error}
           onRetry={connected && error ? retry : undefined}
           onDemo={() => setDemo(true)}
@@ -320,15 +373,13 @@ export function MyPageView() {
       <S.Cards>
         <S.CardLink href="/mypage/reservations">
           <S.CardNumber>01</S.CardNumber>
-          <S.CardTitle>예약 내역 ↗</S.CardTitle>
-          <S.CardDescription>
-            예약 일정과 진행 상태를 확인하세요.
-          </S.CardDescription>
+          <S.CardTitle>{t("navReservations")} ↗</S.CardTitle>
+          <S.CardDescription>{t("reservationCardDesc")}</S.CardDescription>
         </S.CardLink>
         <S.CardLink href="/mypage/consultations">
           <S.CardNumber>02</S.CardNumber>
-          <S.CardTitle>내 상담 내역 ↗</S.CardTitle>
-          <S.CardDescription>상담 문의와 답변을 확인하세요.</S.CardDescription>
+          <S.CardTitle>{t("navConsultations")} ↗</S.CardTitle>
+          <S.CardDescription>{t("consultationCardDesc")}</S.CardDescription>
         </S.CardLink>
       </S.Cards>
     </Shell>
@@ -336,6 +387,16 @@ export function MyPageView() {
 }
 
 export function ReservationsView() {
+  const t = useTranslations("MyPage");
+  const locale = useLocale();
+  const departmentLabel = useDepartmentLabel();
+  const reservationStatusLabels: Record<string, string> = {
+    전체: t("all"),
+    예약대기: t("reservationPending"),
+    예약확정: t("reservationConfirmed"),
+    방문완료: t("reservationCompleted"),
+    취소: t("reservationCancelled"),
+  };
   const { data, loading, error, retry, connected } =
     useMyPageData<MyReservation[]>("reservations");
   const [cancelTarget, setCancelTarget] = useState<string | number | null>(
@@ -361,7 +422,7 @@ export function ReservationsView() {
       retry();
     } catch (reason) {
       setCancelError(
-        reason instanceof Error ? reason.message : "예약 취소에 실패했습니다.",
+        reason instanceof Error ? reason.message : t("cancelFailed"),
       );
       setCancelTarget(null);
     } finally {
@@ -373,25 +434,23 @@ export function ReservationsView() {
     <Shell tab="reservations">
       <Heading
         number="02"
-        title="예약 내역"
-        description="예약 상태를 확인하고 방문 일정을 살펴보세요."
+        title={t("navReservations")}
+        description={t("reservationHeadingDesc")}
         action={
-          <S.PrimaryLink href="/reservation">
-            방문 상담 예약하기 ↗
-          </S.PrimaryLink>
+          <S.PrimaryLink href="/reservation">{t("bookVisit")} ↗</S.PrimaryLink>
         }
       />
       {cancelError && <S.Notice role="alert">{cancelError}</S.Notice>}
       {demo && (
         <S.DemoMessage>
-          샘플 예약 3건을 보여주고 있습니다. 실제 예약 내역이 아닙니다.{" "}
+          {t("sampleReservationNotice")}{" "}
           <S.PlainButton onClick={() => setDemo(false)}>
-            미리보기 종료
+            {t("endPreview")}
           </S.PlainButton>
         </S.DemoMessage>
       )}
       {(items.length > 0 || loading) && (
-        <S.FilterRow role="group" aria-label="예약 상태 필터">
+        <S.FilterRow role="group" aria-label={t("reservationFiltersAria")}>
           {filters.map((f) => (
             <S.FilterButton
               key={f}
@@ -400,40 +459,36 @@ export function ReservationsView() {
               aria-pressed={filter === f}
               onClick={() => setFilter(f)}
             >
-              {f}
+              {reservationStatusLabels[f] ?? f}
             </S.FilterButton>
           ))}
         </S.FilterRow>
       )}
       {loading && !demo ? (
         <StateNotice
-          title="예약 내역을 불러오는 중입니다"
-          description="예약 정보를 확인하고 있습니다."
+          title={t("reservationLoading")}
+          description={t("reservationLoadingDesc")}
         />
       ) : error && !demo ? (
         <StateNotice
-          title="예약 내역 조회 실패"
-          description="잠시 후 다시 시도해 주세요."
+          title={t("reservationLoadFailed")}
+          description={t("tryLater")}
           error={error}
           onRetry={retry}
           onDemo={() => setDemo(true)}
         />
       ) : !items.length ? (
         <StateNotice
-          title={
-            connected ? "예약 내역이 없습니다" : "예약 서비스 연동 준비 중"
-          }
+          title={connected ? t("noReservations") : t("reservationNotReady")}
           description={
-            connected
-              ? "예약 내역이 등록되면 이곳에 표시됩니다."
-              : "인증된 예약 조회 API가 연결되면 내 예약만 표시됩니다."
+            connected ? t("reservationsAppear") : t("reservationApiNotice")
           }
           onDemo={() => setDemo(true)}
         />
       ) : !filtered.length ? (
         <StateNotice
-          title="해당 상태의 예약이 없습니다"
-          description="다른 예약 상태를 선택해 주세요."
+          title={t("noStatusReservations")}
+          description={t("chooseAnotherStatus")}
         />
       ) : (
         <S.ItemList>
@@ -444,13 +499,19 @@ export function ReservationsView() {
                 <S.Status
                   $done={r.status === "방문완료" || r.status === "취소"}
                 >
-                  {r.status}
+                  {reservationStatusLabels[r.status] ?? r.status}
                 </S.Status>
               </S.ItemTop>
-              <S.ItemTitle>{r.department}</S.ItemTitle>
+              <S.ItemTitle>{departmentLabel(r.department)}</S.ItemTitle>
               <S.ItemMeta>
-                <span>방문 예정 · {formatDate(r.scheduledAt)}</span>
-                {r.createdAt && <span>접수일 · {formatDate(r.createdAt)}</span>}
+                <span>
+                  {t("scheduled")} · {formatDate(r.scheduledAt, locale)}
+                </span>
+                {r.createdAt && (
+                  <span>
+                    {t("submittedOn")} · {formatDate(r.createdAt, locale)}
+                  </span>
+                )}
               </S.ItemMeta>
               {r.memo && <S.Detail>{r.memo}</S.Detail>}
               {!demo &&
@@ -463,20 +524,17 @@ export function ReservationsView() {
                       setCancelTarget(r.id);
                     }}
                   >
-                    예약 취소
+                    {t("cancelReservation")}
                   </S.PlainButton>
                 )}
             </S.ItemCard>
           ))}
         </S.ItemList>
       )}
-      <S.Notice>
-        예약대기·예약확정 상태의 미래 예약은 온라인 취소할 수 있습니다. 취소 후
-        다른 회원이 해당 시간대를 예약할 수 있습니다.
-      </S.Notice>
+      <S.Notice>{t("cancelNotice")}</S.Notice>
       <Popup
         isOpen={cancelTarget !== null}
-        title="방문 예약 취소"
+        title={t("cancelPopupTitle")}
         onClose={() => {
           if (!cancelling) setCancelTarget(null);
         }}
@@ -484,14 +542,22 @@ export function ReservationsView() {
           void confirmCancellation();
         }}
       >
-        방문 예약을 취소할까요? 취소하면 해당 시간대가 다시 예약 가능 상태로
-        전환됩니다.
+        {t("cancelPopupBody")}
       </Popup>
     </Shell>
   );
 }
 
 export function ConsultationsView() {
+  const t = useTranslations("MyPage");
+  const locale = useLocale();
+  const departmentLabel = useDepartmentLabel();
+  const consultationStatusLabels: Record<string, string> = {
+    전체: t("all"),
+    대기중: t("consultPending"),
+    상담중: t("consultInProgress"),
+    상담완료: t("consultComplete"),
+  };
   const { data, loading, error, retry, connected } =
     useMyPageData<MyConsultation[]>("consultations");
   const [filter, setFilter] = useState("전체");
@@ -511,19 +577,19 @@ export function ConsultationsView() {
     <Shell tab="consultations">
       <Heading
         number="03"
-        title="내 상담 내역"
-        description="문의하신 상담 내용과 처리 상태를 확인하세요."
+        title={t("navConsultations")}
+        description={t("consultationHeadingDesc")}
         action={
           <S.PrimaryLink href="/community/consultation">
-            상담 안내 보기 ↗
+            {t("consultationInfo")} ↗
           </S.PrimaryLink>
         }
       />
       {demo && (
         <S.DemoMessage>
-          샘플 상담 2건을 보여주고 있습니다. 실제 상담 내역이 아닙니다.{" "}
+          {t("sampleConsultationNotice")}{" "}
           <S.PlainButton onClick={() => setDemo(false)}>
-            미리보기 종료
+            {t("endPreview")}
           </S.PlainButton>
         </S.DemoMessage>
       )}
@@ -531,16 +597,16 @@ export function ConsultationsView() {
         <>
           <S.SearchRow>
             <S.Search
-              aria-label="상담 제목 검색"
-              placeholder="상담 제목 검색"
+              aria-label={t("consultationTitleSearch")}
+              placeholder={t("consultationTitleSearch")}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
             {connected && !demo && (
-              <S.PlainButton onClick={retry}>새로고침</S.PlainButton>
+              <S.PlainButton onClick={retry}>{t("refresh")}</S.PlainButton>
             )}
           </S.SearchRow>
-          <S.FilterRow role="group" aria-label="상담 상태 필터">
+          <S.FilterRow role="group" aria-label={t("consultationFiltersAria")}>
             {filters.map((f) => (
               <S.FilterButton
                 type="button"
@@ -549,7 +615,7 @@ export function ConsultationsView() {
                 aria-pressed={filter === f}
                 onClick={() => setFilter(f)}
               >
-                {f}
+                {consultationStatusLabels[f] ?? f}
               </S.FilterButton>
             ))}
           </S.FilterRow>
@@ -557,33 +623,27 @@ export function ConsultationsView() {
       )}
       {loading && !demo ? (
         <StateNotice
-          title="상담 내역을 불러오는 중입니다"
-          description="상담 정보를 확인하고 있습니다."
+          title={t("consultLoading")}
+          description={t("consultLoadingDesc")}
         />
       ) : error && !demo ? (
         <StateNotice
-          title="상담 내역 조회 실패"
-          description="잠시 후 다시 시도해 주세요."
+          title={t("consultLoadFailed")}
+          description={t("tryLater")}
           error={error}
           onRetry={retry}
           onDemo={() => setDemo(true)}
         />
       ) : !items.length ? (
         <StateNotice
-          title={
-            connected ? "상담 내역이 없습니다" : "상담 서비스 연동 준비 중"
-          }
-          description={
-            connected
-              ? "문의한 내역이 등록되면 이곳에 표시됩니다."
-              : "인증된 상담 조회 API가 연결되면 내 상담 내역이 표시됩니다."
-          }
+          title={connected ? t("noConsultations") : t("consultNotReady")}
+          description={connected ? t("consultsAppear") : t("consultApiNotice")}
           onDemo={() => setDemo(true)}
         />
       ) : !filtered.length ? (
         <StateNotice
-          title="검색 결과가 없습니다"
-          description="검색어나 상태 조건을 변경해 주세요."
+          title={t("noSearchResults")}
+          description={t("changeFilters")}
         />
       ) : (
         <S.ItemList>
@@ -591,12 +651,27 @@ export function ConsultationsView() {
             <S.ItemCard key={c.id}>
               <S.ItemTop>
                 <S.ItemIndex>CONSULTATION · {c.id}</S.ItemIndex>
-                <S.Status $done={c.status === "상담완료"}>{c.status}</S.Status>
+                <S.Status $done={c.status === "상담완료"}>
+                  {consultationStatusLabels[c.status] ?? c.status}
+                </S.Status>
               </S.ItemTop>
-              <S.ItemTitle>{c.title}</S.ItemTitle>
+              <S.ItemTitle>
+                {demo
+                  ? c.id === "EX-C01"
+                    ? t("sampleConsultTitle1")
+                    : t("sampleConsultTitle2")
+                  : c.title}
+              </S.ItemTitle>
               <S.ItemMeta>
-                <span>접수일 · {formatDate(c.createdAt)}</span>
-                {c.department && <span>상담분야 · {c.department}</span>}
+                <span>
+                  {t("submittedOn")} · {formatDate(c.createdAt, locale)}
+                </span>
+                {c.department && (
+                  <span>
+                    {t("consultationCategory")} ·{" "}
+                    {departmentLabel(c.department)}
+                  </span>
+                )}
               </S.ItemMeta>
               <S.Toggle
                 type="button"
@@ -604,19 +679,28 @@ export function ConsultationsView() {
                 aria-controls={`consult-body-${c.id}`}
                 onClick={() => setOpenId(openId === c.id ? null : c.id)}
               >
-                {openId === c.id ? "내용 닫기 −" : "상담 내용 확인 +"}
+                {openId === c.id
+                  ? `${t("closeDetails")} −`
+                  : `${t("showDetails")} +`}
               </S.Toggle>
               {openId === c.id && (
                 <div id={`consult-body-${c.id}`}>
-                  <S.Detail>{c.content}</S.Detail>
+                  <S.Detail>
+                    {demo
+                      ? c.id === "EX-C01"
+                        ? t("sampleConsultContent1")
+                        : t("sampleConsultContent2")
+                      : c.content}
+                  </S.Detail>
                   {c.response ? (
                     <S.Reply>
-                      <b>상담 답변</b>
-                      {c.response}
+                      <b>{t("reply")}</b>
+                      {demo ? t("sampleConsultResponse1") : c.response}
                     </S.Reply>
                   ) : (
                     <S.Reply>
-                      <b>답변 대기중</b>담당자가 상담 내용을 확인하고 있습니다.
+                      <b>{t("waitingReply")}</b>
+                      {t("waitingReplyDesc")}
                     </S.Reply>
                   )}
                 </div>
@@ -625,10 +709,7 @@ export function ConsultationsView() {
           ))}
         </S.ItemList>
       )}
-      <S.Notice>
-        상담 내용은 민감한 정보일 수 있으므로, 관리자 전체 조회 API가 아닌 본인
-        인증 전용 API를 사용해야 합니다.
-      </S.Notice>
+      <S.Notice>{t("privacyNotice")}</S.Notice>
     </Shell>
   );
 }

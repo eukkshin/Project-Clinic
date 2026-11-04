@@ -1,6 +1,7 @@
+import { API_ORIGIN } from "@/lib/api/config";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import axios from "@/lib/admin/apiClient";
 import { TreatmentFormInput } from "@/schema/treatmentSchema";
 
 interface AddTreatmentPayload extends TreatmentFormInput{
@@ -14,7 +15,7 @@ export const useAddTreatment = (chartNo: string)=>{
 
     return useMutation({
       mutationFn: async(newTreatment: AddTreatmentPayload)=>{
-          const res = await axios.post('http://localhost:4000/api/treatment', newTreatment)
+          const res = await axios.post(`${API_ORIGIN}/api/treatment`, newTreatment)
           return res.data;
       },
       onMutate: async(newTreatment)=>{

@@ -2,6 +2,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 import { ReactNode, useEffect, useRef } from "react";
 
 import * as S from "@/components/home/VlogSafetyFlow.styles";
@@ -34,6 +35,7 @@ interface VlogSafetyFlowProps {
  * scrub만으로 문자와 원형 장식이 움직이도록 한다.
  */
 export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
+  const tHome = useTranslations("Home");
   // 전체 배경을 가진 부모 DOM이다. CSS 변수를 이 요소에 설정한다.
   const flowRef = useRef<HTMLDivElement>(null);
   // Vlog 높이는 API 데이터·반응형 화면에 따라 변할 수 있다.
@@ -240,9 +242,9 @@ export default function VlogSafetyFlow({ vlog, safety }: VlogSafetyFlowProps) {
           </S.BrandTitle>
           <S.Tagline data-brand-tagline>BEAUTY IN EVERY MOMENT.</S.Tagline>
           <S.KoreanText>
-            아름다움에 대한 이야기에서
+            {tHome("vlogIntroLine1")}
             <br />
-            안전을 생각하는 마음까지.
+            {tHome("vlogIntroLine2")}
           </S.KoreanText>
         </S.BrandContent>
         <S.EdgeNote aria-hidden="true">FROM BEAUTY TO CARE · AHN'S</S.EdgeNote>

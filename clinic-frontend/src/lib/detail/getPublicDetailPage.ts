@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getLocale } from "next-intl/server";
 import { cache } from "react";
 
 import type {
@@ -115,7 +116,8 @@ export const getPublicDetailPage = cache(
       "http://127.0.0.1:4000"
     ).replace(/\/+$/, "");
 
-    const url = `${origin}/api/details/${encodeURIComponent(category)}/${encodeURIComponent(slug)}`;
+    const locale = await getLocale();
+    const url = `${origin}/api/details/${encodeURIComponent(category)}/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`;
     let response: Response;
     try {
       response = await fetch(url, {

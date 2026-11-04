@@ -137,7 +137,7 @@ export function VlogSlider() {
       setStatus("loading");
       try {
         const response = await axios.get<VlogApiResponse>(
-          `${API_URL}/api/admin/vlogs`,
+          `${API_URL}/api/public/site/vlogs`,
           { signal: controller.signal },
         );
 

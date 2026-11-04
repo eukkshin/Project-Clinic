@@ -46,12 +46,7 @@ module.exports = new EntitySchema({
     PHONE: {
       type: "varchar2",
       length: 20,
-      nullable: false,
-    },
-    RESIDENT_NUM: {
-      type: "varchar2",
-      length: 255,
-      nullable: false,
+      nullable: true,
     },
     ZIPCODE: {
       type: "varchar2",
@@ -87,6 +82,15 @@ module.exports = new EntitySchema({
     REG_DATE: {
       type: "date",
       createDate: true,
+    },
+    SESSION_VERSION: {
+      type: "number",
+      default: 0,
+      nullable: false,
+    },
+    WITHDRAWN_AT: {
+      type: "timestamp",
+      nullable: true,
     },
     STATUS: {
       type: "varchar2",

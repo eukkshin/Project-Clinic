@@ -1,6 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import type { Metadata } from 'next';
+import { getSiteOrigin } from '@/lib/seo/publicMetadata';
 
 import { Cormorant_Garamond } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import QueryProvider from "@/components/provider/QueryProvider";
 import { ToastProvider } from "@/ui/feedback/toast/ToastContext";
 
@@ -18,13 +22,20 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
 });
 
-export default function RootLayout({
+export const metadata: Metadata = {
+  ...(getSiteOrigin() ? { metadataBase: new URL(getSiteOrigin()!) } : {}),
+  robots: { index: true, follow: true },
+};
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+
   return (
-    <html lang="ko" data-scroll-behavior="auto" className={cormorant.variable}>
+    <html lang={locale} data-scroll-behavior="auto" className={cormorant.variable}>
       <head>
         {/* Pretendard Variable: 공식 동적 서브셋 CSS. 한글만 필요한 글리프를 내려받는다. */}
         <link
@@ -42,6 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <NextIntlClientProvider>
         <StyledComponentsRegistry>
           <GlobalStyle />
           <QueryProvider>
@@ -52,6 +64,7 @@ export default function RootLayout({
             </ToastProvider>
           </QueryProvider>
         </StyledComponentsRegistry>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

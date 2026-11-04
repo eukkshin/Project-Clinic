@@ -1,9 +1,10 @@
 'use client'
 
+import { API_ORIGIN } from "@/lib/api/config";
 import React, { useState,useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDebounce } from 'use-debounce';
-import axios from 'axios';
+import axios from "@/lib/admin/apiClient";
 import styled from 'styled-components';
 
 import { FaSearch, FaUser, FaCalendarCheck, FaClock, FaArrowCircleRight } from 'react-icons/fa';
@@ -96,7 +97,7 @@ export default function ReservationDashboardComponent() {
             return;
         }
         try {   
-            const response = await axios.get('http://localhost:4000/api/admin/users',{
+            const response = await axios.get(`${API_ORIGIN}/api/admin/users`,{
                 params: { search: debouncedSearchTerm }
             })
             const searchUsers = response.data.data || [];

@@ -1,15 +1,19 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { FaInstagram, FaRegCommentDots, FaYoutube } from "react-icons/fa6";
 import { RiKakaoTalkLine } from "react-icons/ri";
 
 import * as S from "@/components/layout/Footer.styles";
+import { localizedPath, stripLocalePrefix } from "@/i18n/url";
+import { isAppLocale, defaultLocale } from "@/i18n/config";
+import { legalKinds, legalPaths, legalUi } from "@/lib/legal/content";
+import { API_ORIGIN } from "@/lib/api/config";
 
 import HospitalMap from "./HospitalMap";
 
@@ -130,13 +134,16 @@ const QUICK_LINKS: QuickLink[] = [
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
+  const tFooter = useTranslations("Footer");
+  const currentLocale = useLocale();
+  const locale = isAppLocale(currentLocale) ? currentLocale : defaultLocale;
   const footerRef = useRef<HTMLElement>(null);
   const quickMenuRef = useRef<HTMLDivElement>(null);
   const messageTriggerRef = useRef<HTMLButtonElement>(null);
   const [messageOpen, setMessageOpen] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [isSafety, setIsSafety] = useState(false);
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
 
   // 화면 맨 위에서는 TOP을 숨기고, 320px 이상 스크롤하면 아래에서 등장.
   useEffect(() => {
@@ -164,16 +171,25 @@ export default function Footer() {
       observer?.disconnect();
 
       const rect = button.getBoundingClientRect();
-      const centerY = rect.top + rect.height / 2;
+      const viewportHeight = window.innerHeight;
 
-      const top = Math.round(centerY);
-      const bottom = Math.max(0, Math.floor(window.innerHeight - centerY - 2));
+      // 버튼 중심 좌표
+      const rawCenterY = rect.top + rect.height / 2;
+
+      // 중심 좌표를 화면 범위 안으로 제한
+      const centerY = Math.max(0, Math.min(rawCenterY, viewportHeight));
+
+      // rootMargin이 잘못된 음수 문자열이 되지 않도록 제한
+      const top = Math.max(0, Math.floor(centerY - 1));
+
+      const bottom = Math.max(0, Math.floor(viewportHeight - centerY - 1));
 
       observer = new IntersectionObserver(
         ([entry]) => {
           setIsSafety(entry.isIntersecting);
         },
         {
+          root: null,
           rootMargin: `-${top}px 0px -${bottom}px 0px`,
           threshold: 0,
         },
@@ -270,7 +286,7 @@ export default function Footer() {
     const fetchFooterData = async () => {
       try {
         const response = await axios.get<FooterResponse>(
-          `${API_URL}/api/admin/footer`,
+          `${API_URL}/api/public/site/footer`,
           {
             signal: controller.signal,
           },
@@ -331,8 +347,9 @@ export default function Footer() {
                 <em>Own Beauty.</em>
               </S.IntroTitle>
               <S.IntroDescription data-footer-motion>
-                당신만의 아름다움을 찾아가는 여정.
-                <br />그 시작을 함께하겠습니다.
+                {tFooter("introLine1")}
+                <br />
+                {tFooter("introLine2")}
               </S.IntroDescription>
 
               <S.ContactGroup data-footer-motion>
@@ -343,7 +360,9 @@ export default function Footer() {
                   </S.PhoneAnchor>
                 ) : (
                   <S.ContactPlaceholder>
-                    {loading ? "연락처를 불러오는 중..." : "전화번호 등록 예정"}
+                    {loading
+                      ? tFooter("contactLoading")
+                      : tFooter("phonePending")}
                   </S.ContactPlaceholder>
                 )}
                 {emailHref && (
@@ -358,7 +377,9 @@ export default function Footer() {
                 <S.ClinicTitle>{clinicName}</S.ClinicTitle>
                 <S.AddressText>
                   {companyInfo.address ||
-                    (loading ? "주소를 불러오는 중..." : "주소 등록 예정")}
+                    (loading
+                      ? tFooter("addressLoading")
+                      : tFooter("addressPending"))}
                 </S.AddressText>
                 {locationLink && (
                   <S.SimpleTextLink
@@ -366,7 +387,8 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    오시는 길 바로가기<span aria-hidden="true">↗</span>
+                    {tFooter("locationLink")}
+                    <span aria-hidden="true">↗</span>
                   </S.SimpleTextLink>
                 )}
               </S.ContactGroup>
@@ -378,11 +400,19 @@ export default function Footer() {
                     <S.HoursItem key={schedule.id}>
                       <strong>{schedule.departments}</strong>
                       {schedule.weekday && (
-                        <span>평일　{schedule.weekday}</span>
+                        <span>
+                          {tFooter("weekday")}　{schedule.weekday}
+                        </span>
                       )}
-                      {schedule.night && <span>야간　{schedule.night}</span>}
+                      {schedule.night && (
+                        <span>
+                          {tFooter("night")}　{schedule.night}
+                        </span>
+                      )}
                       {schedule.weekend && (
-                        <span>토요일　{schedule.weekend}</span>
+                        <span>
+                          {tFooter("saturday")}　{schedule.weekend}
+                        </span>
                       )}
                     </S.HoursItem>
                   ))}
@@ -399,9 +429,23 @@ export default function Footer() {
 
           <S.FooterBottom>
             <S.FooterLegal>
+              <S.LegalNavigation aria-label={legalUi[locale].subtitle}>
+                {legalKinds.map((kind) => (
+                  <S.LegalNavigationLink
+                    key={kind}
+                    href={localizedPath(legalPaths[kind], locale)}
+                  >
+                    {legalUi[locale].nav[kind]}
+                  </S.LegalNavigationLink>
+                ))}
+              </S.LegalNavigation>
               <strong>{clinicName}</strong>
               {companyInfo.address && <span>{companyInfo.address}</span>}
-              {companyInfo.phone && <span>대표전화 {companyInfo.phone}</span>}
+              {companyInfo.phone && (
+                <span>
+                  {tFooter("phonePrefix")} {companyInfo.phone}
+                </span>
+              )}
               {companyInfo.email && <span>{companyInfo.email}</span>}
               <span>
                 © {new Date().getFullYear()} AHN&apos;S. ALL RIGHTS RESERVED.
@@ -437,13 +481,13 @@ export default function Footer() {
       </S.FooterWrapper>
 
       {/* FloatingActions만 Footer 바깥으로 이동: overflow:clip의 잘림 방지 */}
-      <S.FloatingActions aria-label="빠른 메뉴" $isSafety={isSafety}>
+      <S.FloatingActions aria-label={tFooter("quickMenu")} $isSafety={isSafety}>
         <S.QuickMessageRoot ref={quickMenuRef}>
           <S.QuickMenuList
             id="ahns-quick-message-menu"
             $open={messageOpen}
             role="group"
-            aria-label="빠른 링크 메뉴"
+            aria-label={tFooter("quickLinks")}
             aria-hidden={!messageOpen}
             inert={!messageOpen}
           >
@@ -477,7 +521,9 @@ export default function Footer() {
           <S.FloatMessage
             ref={messageTriggerRef}
             type="button"
-            aria-label={messageOpen ? "문자 메뉴 닫기" : "문자 메뉴 열기"}
+            aria-label={
+              messageOpen ? tFooter("closeQuickMenu") : tFooter("openQuickMenu")
+            }
             aria-controls="ahns-quick-message-menu"
             aria-expanded={messageOpen}
             onClick={() => setMessageOpen((previous) => !previous)}
@@ -497,7 +543,7 @@ export default function Footer() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             $isSafety={isSafety}
-            aria-label="페이지 맨 위로"
+            aria-label={tFooter("backToTop")}
           >
             ↑
           </S.FloatTop>

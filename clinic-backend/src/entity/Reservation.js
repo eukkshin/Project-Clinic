@@ -1,11 +1,10 @@
-
 "use strict";
 
 const { EntitySchema } = require("typeorm");
 
 module.exports = new EntitySchema({
-  name: "CustomerReservation",
-  tableName: "CUSTOMER_RESERVATION_TB",
+  name: "Reservation",
+  tableName: "RESERVATION_TB",
 
   columns: {
     ID: {

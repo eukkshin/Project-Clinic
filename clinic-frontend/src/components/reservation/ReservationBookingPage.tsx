@@ -1,20 +1,32 @@
 "use client";
 
-import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { FormEvent, useEffect, useState } from "react";
 
-import { useMyPageData } from '@/components/mypage/useMyPageData';
-import { createReservation } from '@/lib/reservation/api';
-import * as S from '@/styles/reservation/Reservation.styles';
+import { handleLoginLinkClick } from "@/components/auth/openLoginModal";
+import { useMyPageData } from "@/components/mypage/useMyPageData";
+import { createReservation } from "@/lib/reservation/api";
+import * as S from "@/styles/reservation/Reservation.styles";
 import {
-    RESERVATION_DEPARTMENTS, ReservationDepartment, ReservationResponse
-} from '@/types/reservation';
+  RESERVATION_DEPARTMENTS,
+  ReservationDepartment,
+  ReservationResponse,
+} from "@/types/reservation";
 
-import ReservationCalendar, { CalendarSelection } from './ReservationCalendar';
+import ReservationCalendar, { CalendarSelection } from "./ReservationCalendar";
 
 import type { MyProfile } from "@/types/mypage";
 
 export default function ReservationBookingPage() {
+  const t = useTranslations("Reservation");
+  const departmentLabels: Record<ReservationDepartment, string> = {
+    "눈 성형": t("deptEyes"),
+    "코 성형": t("deptNose"),
+    리프팅: t("deptLifting"),
+    "피부·쁘띠": t("deptSkin"),
+    "기타 상담": t("deptOther"),
+  };
   const {
     data: profile,
     loading: profileLoading,
@@ -33,6 +45,12 @@ export default function ReservationBookingPage() {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState<ReservationResponse | null>(null);
 
+  // Keep the reservation form open and reload the member profile after modal login.
+  useEffect(() => {
+    window.addEventListener("login-success", retry);
+    return () => window.removeEventListener("login-success", retry);
+  }, [retry]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (submitting) return;
@@ -44,9 +62,7 @@ export default function ReservationBookingPage() {
       !selection.time ||
       !consent
     ) {
-      setError(
-        "회원 정보, 상담 분야, 예약 시간, 안내 사항 동의를 확인해 주세요.",
-      );
+      setError(t("validationError"));
       return;
     }
     setSubmitting(true);
@@ -59,11 +75,7 @@ export default function ReservationBookingPage() {
       });
       setSubmitted(result);
     } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "예약을 완료하지 못했습니다.",
-      );
+      setError(reason instanceof Error ? reason.message : t("submitFailed"));
       // 다른 사용자가 방금 예약한 경우 남은 시간 목록을 즉시 갱신합니다.
       setSelection({ date: selection.date, time: "" });
       setRefreshKey((value) => value + 1);
@@ -89,9 +101,9 @@ export default function ReservationBookingPage() {
           Visit <em>Reservation.</em>
         </S.HeroTitle>
         <S.HeroSub>
-          원하시는 날짜와 빈 시간대를 직접 선택하세요.
+          {t("heroSub1")}
           <br />
-          예약 가능 시간에 신청하면 즉시 확정됩니다.
+          {t("heroSub2")}
         </S.HeroSub>
       </S.Hero>
       <S.Inner>
@@ -102,80 +114,90 @@ export default function ReservationBookingPage() {
             <br />
             for <em>you.</em>
           </S.AsideTitle>
-          <S.AsideDesc>
-            달력에서 예약 가능한 날짜를 선택한 뒤 희망 시간과 상담 분야를 지정해
-            주세요. 한 시간대에는 한 건의 방문 상담만 예약할 수 있습니다.
-          </S.AsideDesc>
+          <S.AsideDesc>{t("asideDesc")}</S.AsideDesc>
           <S.AsideSteps>
             <S.Step>
               <span>01.</span>
-              <p>로그인 회원정보 확인</p>
+              <p>{t("step1")}</p>
             </S.Step>
             <S.Step>
               <span>02.</span>
-              <p>날짜와 예약 가능 시간 선택</p>
+              <p>{t("step2")}</p>
             </S.Step>
             <S.Step>
               <span>03.</span>
-              <p>신청과 동시에 예약 확정</p>
+              <p>{t("step3")}</p>
             </S.Step>
           </S.AsideSteps>
-          <S.HelpLink href="/mypage/reservations">내 예약 확인 ↗</S.HelpLink>
+          <S.HelpLink href="/mypage/reservations">
+            {t("myReservations")} ↗
+          </S.HelpLink>
         </S.Aside>
         <S.FormShell>
           {submitted ? (
             <S.Result role="status">
               <S.ResultSymbol>✓</S.ResultSymbol>
               <S.SectionNo>RESERVATION CONFIRMED</S.SectionNo>
-              <S.ResultTitle>예약이 확정되었습니다.</S.ResultTitle>
+              <S.ResultTitle>{t("confirmed")}</S.ResultTitle>
               <S.ResultDesc>
-                예약번호 {submitted.id}
+                {t("reservationNo", { id: submitted.id })}
                 <br />
-                {submitted.department} · {selection.date} {selection.time}
+                {departmentLabels[
+                  submitted.department as ReservationDepartment
+                ] ?? submitted.department}{" "}
+                · {selection.date} {selection.time}
                 <br />
-                예약 상태: <strong>예약확정</strong>
+                {t("status")} <strong>{t("statusConfirmed")}</strong>
               </S.ResultDesc>
               <S.ActionRow>
                 <S.SolidLink href="/mypage/reservations">
-                  내 예약 내역 ↗
+                  {t("history")} ↗
                 </S.SolidLink>
                 <S.GhostButton type="button" onClick={reset}>
-                  다른 일정 예약
+                  {t("bookAnother")}
                 </S.GhostButton>
               </S.ActionRow>
             </S.Result>
           ) : (
             <>
               <S.FormTop>
-                <S.FormTitle>방문 상담 예약</S.FormTitle>
+                <S.FormTitle>{t("formTitle")}</S.FormTitle>
                 <S.FormIndex>01 — 04</S.FormIndex>
               </S.FormTop>
               <S.Form onSubmit={(event) => void handleSubmit(event)} noValidate>
                 <S.Fieldset>
-                  <S.FieldTitle as="legend">01. 예약자 정보</S.FieldTitle>
+                  <S.FieldTitle as="legend">
+                    01. {t("personalInfo")}
+                  </S.FieldTitle>
                   {profileLoading ? (
-                    <S.Message role="status">
-                      회원 정보를 확인하고 있습니다...
-                    </S.Message>
+                    <S.Message role="status">{t("loadingProfile")}</S.Message>
                   ) : profile ? (
                     <S.ProfileCard>
-                      <S.ProfileName>{profile.name} 님</S.ProfileName>
+                      <S.ProfileName>
+                        {profile.name}
+                        {t("memberSuffix")}
+                      </S.ProfileName>
                       <S.ProfileText>
-                        연락처 · {profile.phone || "등록되지 않음"}
+                        {t("phone")} · {profile.phone || t("notRegistered")}
                       </S.ProfileText>
                       <S.ProfileText>
-                        이메일 · {profile.email || "등록되지 않음"}
+                        {t("email")} · {profile.email || t("notRegistered")}
                       </S.ProfileText>
                     </S.ProfileCard>
                   ) : (
                     <>
                       <S.Message $error role="alert">
-                        {profileError || "로그인이 필요합니다."}
+                        {profileError || t("loginRequired")}
                       </S.Message>
                       <S.ActionRow>
-                        <S.SolidLink href="/login">로그인하기 ↗</S.SolidLink>
+                        <S.SolidLink
+                          href="/register/login"
+                          onClick={handleLoginLinkClick}
+                        >
+                          {t("login")} ↗
+                        </S.SolidLink>
                         <S.GhostButton type="button" onClick={retry}>
-                          다시 확인
+                          {t("retry")}
                         </S.GhostButton>
                       </S.ActionRow>
                     </>
@@ -183,7 +205,7 @@ export default function ReservationBookingPage() {
                 </S.Fieldset>
                 <S.Fieldset>
                   <S.FieldTitle as="legend">
-                    02. 상담 분야 <S.Required>*</S.Required>
+                    02. {t("department")} <S.Required>*</S.Required>
                   </S.FieldTitle>
                   <S.ChoiceGrid>
                     {RESERVATION_DEPARTMENTS.map((item) => (
@@ -194,34 +216,33 @@ export default function ReservationBookingPage() {
                         aria-pressed={department === item}
                         onClick={() => setDepartment(item)}
                       >
-                        {item}
+                        {departmentLabels[item]}
                       </S.ChoiceButton>
                     ))}
                   </S.ChoiceGrid>
                 </S.Fieldset>
                 <S.Fieldset>
                   <S.FieldTitle as="legend">
-                    03. 방문 날짜와 시간 <S.Required>*</S.Required>
+                    03. {t("dateTime")} <S.Required>*</S.Required>
                   </S.FieldTitle>
                   <ReservationCalendar
                     selected={selection}
                     onChange={setSelection}
                     refreshKey={refreshKey}
                   />
-                  <S.FieldHint>
-                    예약시간은 병원에서 설정한 예시 운영시간을 기준으로
-                    제공됩니다. 운영시간 확정 후 관리자와 협의해 변경해 주세요.
-                  </S.FieldHint>
+                  <S.FieldHint>{t("hoursNote")}</S.FieldHint>
                 </S.Fieldset>
                 <S.Fieldset>
-                  <S.FieldTitle as="legend">04. 요청사항 (선택)</S.FieldTitle>
+                  <S.FieldTitle as="legend">04. {t("memo")}</S.FieldTitle>
                   <S.Textarea
                     maxLength={1000}
                     value={memo}
                     onChange={(e) => setMemo(e.target.value)}
-                    placeholder="예약에 필요한 요청사항을 남겨주세요. 민감한 의료정보는 입력하지 않는 것을 권장합니다."
+                    placeholder={t("memoPlaceholder")}
                   />
-                  <S.FieldHint>{memo.length} / 1000자</S.FieldHint>
+                  <S.FieldHint>
+                    {t("characters", { count: memo.length })}
+                  </S.FieldHint>
                 </S.Fieldset>
                 <S.Consent>
                   <input
@@ -229,11 +250,7 @@ export default function ReservationBookingPage() {
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}
                   />
-                  <span>
-                    예약 접수 및 연락을 위해 회원 이름과 연락처를 사용하는 데
-                    동의합니다. 빈 시간대 예약은 즉시 확정되며, 일정 변경과
-                    취소는 내 예약에서 확인할 수 있습니다.
-                  </span>
+                  <span>{t("consent")}</span>
                 </S.Consent>
                 {error && (
                   <S.Message $error role="alert">
@@ -250,15 +267,12 @@ export default function ReservationBookingPage() {
                   }
                   type="submit"
                 >
-                  {submitting ? "예약 확정 처리 중..." : "상담 예약 확정하기 ↗"}
+                  {submitting ? t("submitting") : `${t("submit")} ↗`}
                 </S.SubmitButton>
+                <S.FieldHint>{t("conflictNote")}</S.FieldHint>
                 <S.FieldHint>
-                  동시 예약 요청이 발생하면 서버에서 선착순으로 확정하므로,
-                  선택한 시간이 방금 마감되었을 수 있습니다.
-                </S.FieldHint>
-                <S.FieldHint>
-                  로그인 계정에 등록된 연락처가 정확한지 확인해 주세요.{" "}
-                  <Link href="/mypage">회원 정보 확인</Link>
+                  {t("contactNote")}{" "}
+                  <Link href="/mypage">{t("checkProfile")}</Link>
                 </S.FieldHint>
               </S.Form>
             </>

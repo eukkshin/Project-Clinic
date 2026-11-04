@@ -1,11 +1,12 @@
 "use client";
 
-import Link from 'next/link';
-import { FormEvent, useRef, useState } from 'react';
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { FormEvent, useRef, useState } from "react";
 
-import { submitGuestConsult } from '@/lib/consultation/api';
-import * as S from '@/styles/consultation/Consultation.styles';
-import { CONSULT_DEPARTMENTS, ConsultDepartment } from '@/types/consultation';
+import { submitGuestConsult } from "@/lib/consultation/api";
+import * as S from "@/styles/consultation/Consultation.styles";
+import { CONSULT_DEPARTMENTS, ConsultDepartment } from "@/types/consultation";
 
 const initial = {
   name: "",
@@ -16,22 +17,39 @@ const initial = {
   website: "",
 };
 
-function validate(form: typeof initial, consent: boolean): string | null {
-  if (!/^[가-힣a-zA-Z\s]{2,50}$/.test(form.name.trim()))
-    return "성함을 2~50자로 입력해 주세요.";
+type ValidationMessages = Record<
+  "name" | "phone" | "department" | "title" | "content" | "consent",
+  string
+>;
+function validate(
+  form: typeof initial,
+  consent: boolean,
+  messages: ValidationMessages,
+): string | null {
+  if (!/^[가-힣a-zA-Z\s]{2,50}$/.test(form.name.trim())) return messages.name;
   if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(form.phone.replace(/\s/g, "")))
-    return "연락처를 정확히 입력해 주세요.";
+    return messages.phone;
   if (!CONSULT_DEPARTMENTS.includes(form.department as ConsultDepartment))
-    return "관심 시술을 선택해 주세요.";
+    return messages.department;
   if (form.title.trim().length < 4 || form.title.trim().length > 120)
-    return "상담 제목은 4~120자로 입력해 주세요.";
+    return messages.title;
   if (form.content.trim().length < 10 || form.content.trim().length > 3000)
-    return "상담 내용은 10~3,000자로 입력해 주세요.";
-  if (!consent) return "개인정보 수집 및 이용에 동의해 주세요.";
+    return messages.content;
+  if (!consent) return messages.consent;
   return null;
 }
 
 export default function ConsultationPage() {
+  const t = useTranslations("Consultation");
+  const departmentLabels: Record<ConsultDepartment, string> = {
+    눈성형: t("deptEyes"),
+    코성형: t("deptNose"),
+    안면윤곽: t("deptContour"),
+    동안성형: t("deptAntiAging"),
+    리프팅: t("deptLifting"),
+    쁘띠시술: t("deptPetit"),
+    "기타 상담": t("deptOther"),
+  };
   const [form, setForm] = useState(initial);
   const [consent, setConsent] = useState(false);
   const [pending, setPending] = useState(false);
@@ -48,7 +66,14 @@ export default function ConsultationPage() {
     event.preventDefault();
     if (pendingRef.current) return;
 
-    const problem = validate(form, consent);
+    const problem = validate(form, consent, {
+      name: t("nameInvalid"),
+      phone: t("phoneInvalid"),
+      department: t("departmentRequired"),
+      title: t("titleInvalid"),
+      content: t("contentInvalid"),
+      consent: t("consentRequired"),
+    });
     if (problem) {
       setError(problem);
       return;
@@ -71,11 +96,7 @@ export default function ConsultationPage() {
       setForm(initial);
       setConsent(false);
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "상담 신청에 실패했습니다. 다시 시도해 주세요.",
-      );
+      setError(cause instanceof Error ? cause.message : t("submitFailed"));
     } finally {
       pendingRef.current = false;
       setPending(false);
@@ -93,28 +114,25 @@ export default function ConsultationPage() {
             <br />
             <em>Consultation.</em>
           </S.Title>
-          <S.Subtitle>아름다움의 시작은, 당신의 이야기로부터.</S.Subtitle>
-          <S.Description>
-            고민하고 있는 시술이나 궁금한 점을 편안하게 남겨 주세요. 로그인 없이
-            신청할 수 있으며, 담당자가 내용을 확인한 후 연락드리겠습니다.
-          </S.Description>
+          <S.Subtitle>{t("subtitle")}</S.Subtitle>
+          <S.Description>{t("description")}</S.Description>
 
-          <S.Steps aria-label="상담 진행 절차">
+          <S.Steps aria-label={t("stepsAria")}>
             <S.Step>
               <span>01.</span>
-              <p>상담 내용 작성</p>
+              <p>{t("step1")}</p>
             </S.Step>
             <S.Step>
               <span>02.</span>
-              <p>담당자 확인</p>
+              <p>{t("step2")}</p>
             </S.Step>
             <S.Step>
               <span>03.</span>
-              <p>개별 상담 안내</p>
+              <p>{t("step3")}</p>
             </S.Step>
           </S.Steps>
           <S.AsideLink as={Link} href="/reservation">
-            날짜를 직접 선택하고 싶다면 <span>방문예약 ↗</span>
+            {t("visitIntro")} <span>{t("visitLink")} ↗</span>
           </S.AsideLink>
         </S.Aside>
 
@@ -123,14 +141,14 @@ export default function ConsultationPage() {
             <S.Success role="status">
               <S.SuccessMark aria-hidden="true">✓</S.SuccessMark>
               <S.FormEyebrow>REQUEST RECEIVED</S.FormEyebrow>
-              <S.SuccessTitle>상담이 접수되었습니다.</S.SuccessTitle>
+              <S.SuccessTitle>{t("received")}</S.SuccessTitle>
               <S.SuccessText>
-                접수번호 <strong>{receipt}</strong>
+                {t("receiptNo")} <strong>{receipt}</strong>
                 <br />
-                입력하신 연락처로 담당자가 상담을 안내해 드리겠습니다.
+                {t("receivedMessage")}
               </S.SuccessText>
               <S.Submit type="button" onClick={() => setReceipt(null)}>
-                다른 상담 신청하기 <span aria-hidden="true">↗</span>
+                {t("another")} <span aria-hidden="true">↗</span>
               </S.Submit>
             </S.Success>
           ) : (
@@ -138,7 +156,7 @@ export default function ConsultationPage() {
               <S.FormTop>
                 <div>
                   <S.FormEyebrow>YOUR MESSAGE</S.FormEyebrow>
-                  <S.FormTitle>1:1 상담 신청</S.FormTitle>
+                  <S.FormTitle>{t("formTitle")}</S.FormTitle>
                 </div>
                 <S.FormIndex>01 — 03</S.FormIndex>
               </S.FormTop>
@@ -146,7 +164,7 @@ export default function ConsultationPage() {
               <S.TwoCol>
                 <S.Field>
                   <label htmlFor="consult-name">
-                    성함 <b>*</b>
+                    {t("name")} <b>*</b>
                   </label>
                   <input
                     id="consult-name"
@@ -154,14 +172,14 @@ export default function ConsultationPage() {
                     autoComplete="name"
                     maxLength={50}
                     required
-                    placeholder="성함을 입력해 주세요"
+                    placeholder={t("namePlaceholder")}
                     value={form.name}
                     onChange={(e) => set("name", e.target.value)}
                   />
                 </S.Field>
                 <S.Field>
                   <label htmlFor="consult-phone">
-                    연락처 <b>*</b>
+                    {t("phone")} <b>*</b>
                   </label>
                   <input
                     id="consult-phone"
@@ -181,7 +199,7 @@ export default function ConsultationPage() {
               <S.TwoCol>
                 <S.Field>
                   <label htmlFor="consult-department">
-                    관심 시술 <b>*</b>
+                    {t("procedure")} <b>*</b>
                   </label>
                   <select
                     id="consult-department"
@@ -189,23 +207,23 @@ export default function ConsultationPage() {
                     value={form.department}
                     onChange={(e) => set("department", e.target.value)}
                   >
-                    <option value="">상담 분야 선택</option>
+                    <option value="">{t("selectDepartment")}</option>
                     {CONSULT_DEPARTMENTS.map((department) => (
                       <option key={department} value={department}>
-                        {department}
+                        {departmentLabels[department]}
                       </option>
                     ))}
                   </select>
                 </S.Field>
                 <S.Field>
                   <label htmlFor="consult-title">
-                    상담 제목 <b>*</b>
+                    {t("subject")} <b>*</b>
                   </label>
                   <input
                     id="consult-title"
                     maxLength={120}
                     required
-                    placeholder="문의 제목을 입력해 주세요"
+                    placeholder={t("subjectPlaceholder")}
                     value={form.title}
                     onChange={(e) => set("title", e.target.value)}
                   />
@@ -214,7 +232,7 @@ export default function ConsultationPage() {
 
               <S.Field>
                 <label htmlFor="consult-content">
-                  상담 내용 <b>*</b>
+                  {t("message")} <b>*</b>
                 </label>
                 <S.TextareaWrap>
                   <textarea
@@ -223,7 +241,7 @@ export default function ConsultationPage() {
                     minLength={10}
                     required
                     rows={4}
-                    placeholder="문의하실 내용을 남겨 주세요. 주민등록번호, 병력 등 민감한 정보는 입력하지 마세요."
+                    placeholder={t("messagePlaceholder")}
                     value={form.content}
                     onChange={(e) => set("content", e.target.value)}
                   />
@@ -239,19 +257,17 @@ export default function ConsultationPage() {
                     onChange={(e) => setConsent(e.target.checked)}
                   />
                   <span>
-                    <strong>개인정보 수집 및 이용에 동의합니다.</strong> (필수)
+                    <strong>{t("privacyAgree")}</strong> {t("required")}
                   </span>
                 </label>
                 <details>
-                  <summary>수집 및 이용 안내 보기</summary>
+                  <summary>{t("privacyDetails")}</summary>
                   <p>
-                    수집 항목: 성함, 연락처, 관심 시술, 상담 제목 및 내용.
+                    {t("privacyItems")}
                     <br />
-                    이용 목적: 상담 접수와 개별 연락.
+                    {t("privacyPurpose")}
                     <br />
-                    보유 기간: 운영 중인 개인정보 처리방침에 따릅니다. 실제 운영
-                    전 정확한 보유기간과 개인정보 처리방침을 확정하여 고지해야
-                    합니다.
+                    {t("privacyRetention")}
                   </p>
                 </details>
               </S.Privacy>
@@ -279,12 +295,10 @@ export default function ConsultationPage() {
 
               {error && <S.Error role="alert">{error}</S.Error>}
               <S.Submit type="submit" disabled={pending}>
-                {pending ? "상담을 접수하고 있습니다…" : "상담 신청하기"}
+                {pending ? t("submitting") : t("submit")}
                 <span aria-hidden="true">↗</span>
               </S.Submit>
-              <S.Notice>
-                상담은 예약 확정이 아니며, 신청 내용은 공개되지 않습니다.
-              </S.Notice>
+              <S.Notice>{t("notice")}</S.Notice>
             </S.Form>
           )}
         </S.FormShell>

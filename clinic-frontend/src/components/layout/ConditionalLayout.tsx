@@ -3,10 +3,12 @@
 import { usePathname } from "next/navigation";
 import React from "react";
 
+import AuthModalHost from "@/components/auth/AuthModalHost";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import EventPopup from "@/components/ui/EventPopup";
 import QuickConsultBar from "@/components/ui/QuickConsultBar";
+import { stripLocalePrefix } from "@/i18n/url";
 
 export default function ConditionalLayout({
   children,
@@ -14,7 +16,7 @@ export default function ConditionalLayout({
   children: React.ReactNode;
 }) {
   // pathname변수에 현재 주소를 저장
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
   const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/find");
   // ⭕ 백틱(`)을 사용해 문자열과 변수를 합칩니다.
   const AdminBoardPage = /^\/board\/.+/.test(pathname);
@@ -31,6 +33,7 @@ export default function ConditionalLayout({
 
       {!isAdmin && !AdminBoardPage && !isAuthPage && <Footer />}
       {!isAdmin && !AdminBoardPage && !isAuthPage && <QuickConsultBar />}
+      {!isAdmin && !AdminBoardPage && !isAuthPage && <AuthModalHost />}
     </>
   );
 }

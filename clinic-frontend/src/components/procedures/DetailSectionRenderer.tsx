@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import {
   FiArrowRight,
@@ -36,6 +37,7 @@ export default function DetailSectionRenderer({
   isLast = false,
 }: Props) {
   const { content } = section;
+  const t = useTranslations("Procedures");
   const layout = content.layout ?? "default";
   const galleryRef = useRef<HTMLDivElement>(null);
   const eyebrow =
@@ -86,17 +88,17 @@ export default function DetailSectionRenderer({
               <V.ComparisonGrid>
                 <V.ComparisonCard $light={light}>
                   <V.ComparisonIndex $light={light}>
-                    01 / {content.compareLeftTitle || "첫 번째 항목"}
+                    01 / {content.compareLeftTitle || t("firstItem")}
                   </V.ComparisonIndex>
-                  <h3>{content.compareLeftTitle || "첫 번째 항목"}</h3>
-                  <p>{content.compareLeftBody || "설명을 입력해 주세요."}</p>
+                  <h3>{content.compareLeftTitle || t("firstItem")}</h3>
+                  <p>{content.compareLeftBody || t("enterDescription")}</p>
                 </V.ComparisonCard>
                 <V.ComparisonCard $light={light}>
                   <V.ComparisonIndex $light={light}>
-                    02 / {content.compareRightTitle || "두 번째 항목"}
+                    02 / {content.compareRightTitle || t("secondItem")}
                   </V.ComparisonIndex>
-                  <h3>{content.compareRightTitle || "두 번째 항목"}</h3>
-                  <p>{content.compareRightBody || "설명을 입력해 주세요."}</p>
+                  <h3>{content.compareRightTitle || t("secondItem")}</h3>
+                  <p>{content.compareRightBody || t("enterDescription")}</p>
                 </V.ComparisonCard>
               </V.ComparisonGrid>
             </div>
@@ -117,7 +119,7 @@ export default function DetailSectionRenderer({
                 {content.imageUrl ? (
                   <DetailImage
                     src={content.imageUrl}
-                    alt={content.imageAlt ?? "시술 소개 이미지"}
+                    alt={content.imageAlt ?? t("introImageAlt")}
                     fill
                     sizes="(max-width:768px) 100vw, 50vw"
                   />
@@ -126,7 +128,9 @@ export default function DetailSectionRenderer({
                     <span>AHN'S</span>
                   </S.EmptyMedia>
                 )}
-                <S.IntroMark aria-hidden="true">Natural Beauty</S.IntroMark>
+                <S.IntroMark aria-hidden="true">
+                  {t("naturalBeauty")}
+                </S.IntroMark>
               </S.IntroVisual>
             </V.IntroVariantGrid>
           ))}
@@ -177,7 +181,7 @@ export default function DetailSectionRenderer({
                       <Icon aria-hidden="true" />
                       <h3>{item}</h3>
                       <span>
-                        AHN’S KEY POINT · {String(i + 1).padStart(2, "0")}
+                        {t("keyPoint")} · {String(i + 1).padStart(2, "0")}
                       </span>
                     </S.FeatureCard>
                   );
@@ -208,7 +212,7 @@ export default function DetailSectionRenderer({
                     data-detail-animate
                   >
                     <span className="step">
-                      STEP {String(i + 1).padStart(2, "0")}
+                      {t("step", { number: String(i + 1).padStart(2, "0") })}
                     </span>
                     <h3>{item}</h3>
                   </V.TimelineItem>
@@ -230,7 +234,9 @@ export default function DetailSectionRenderer({
                         <Icon aria-hidden="true" />
                       </S.ProcessDisc>
                       <h3>{item}</h3>
-                      <p>STEP {String(i + 1).padStart(2, "0")}</p>
+                      <p>
+                        {t("step", { number: String(i + 1).padStart(2, "0") })}
+                      </p>
                     </S.ProcessItem>
                   );
                 })}
@@ -252,14 +258,14 @@ export default function DetailSectionRenderer({
                 <S.GalleryControls>
                   <button
                     type="button"
-                    aria-label="이전 이미지"
+                    aria-label={t("previousImage")}
                     onClick={() => moveGallery(-1)}
                   >
                     <FiChevronLeft />
                   </button>
                   <button
                     type="button"
-                    aria-label="다음 이미지"
+                    aria-label={t("nextImage")}
                     onClick={() => moveGallery(1)}
                   >
                     <FiChevronRight />
@@ -277,7 +283,7 @@ export default function DetailSectionRenderer({
               </S.Description>
             )}
             {(content.images?.length ?? 0) > 0 ? (
-              <S.GalleryTrack ref={galleryRef} aria-label="시술 이미지 갤러리">
+              <S.GalleryTrack ref={galleryRef} aria-label={t("galleryAria")}>
                 {(content.images ?? []).map((img, i) => (
                   <S.GalleryCard key={`${section.id}-${i}`}>
                     <S.GalleryVisual>
@@ -293,10 +299,10 @@ export default function DetailSectionRenderer({
                 ))}
               </S.GalleryTrack>
             ) : (
-              <S.Description>등록된 이미지가 없습니다.</S.Description>
+              <S.Description>{t("noImages")}</S.Description>
             )}
             <S.FinePrint $light={light}>
-              이미지와 진료 내용은 개인의 상태에 따라 차이가 있을 수 있습니다.
+              {t("individualDisclaimer")}
             </S.FinePrint>
           </>
         )}
@@ -343,7 +349,7 @@ export default function DetailSectionRenderer({
               </S.Description>
             )}
             <S.CtaButton href={content.buttonHref ?? "/#site-footer-contact"}>
-              {content.buttonLabel ?? "상담 문의하기"}{" "}
+              {content.buttonLabel ?? t("contactConsultation")}{" "}
               <FiArrowRight aria-hidden="true" />
             </S.CtaButton>
           </S.CtaPanel>

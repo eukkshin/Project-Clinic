@@ -1,13 +1,15 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
-import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import * as S from "@/components/home/CircularOverlay.styles";
+import { loadCommunity } from "@/lib/community/client";
+
+import type { AppLocale } from "@/i18n/config";
 
 // GSAP 기본 패키지에는 스크롤 감지 기능이 없다.
 
@@ -15,69 +17,25 @@ import * as S from "@/components/home/CircularOverlay.styles";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API_URL = API_ORIGIN;
-
-/** Express API가 보내 주는 실제 이벤트 필드명. 기존 DB 계약을 변경하지 않는다. */
-
-interface EventApiItem {
-  EVENT_IDX: number;
-
-  TITLE: string;
-
-  PRICE: string | number | null;
-
-  FILE_NAME: string;
-
-  IS_ACTIVE?: string | null;
-}
-
-interface EventsResponse {
-  success: boolean;
-
-  data: EventApiItem[];
-}
-
-/** 컴포넌트 안에서 사용하기 쉽게 가공한 데이터 형태. */
-
+/** 공개 콘텐츠 API의 데이터만 사용합니다. 관리자 API는 호출하지 않습니다. */
 interface EventData {
-  id: number;
-
+  id: string;
   title: string;
-
   price: string;
-
   imageUrl: string;
 }
 
-/**
+const priceInquiry: Record<AppLocale, string> = {
+  ko: "가격 문의",
+  en: "Price on request",
+  ja: "価格はお問い合わせください",
+  "zh-CN": "价格请咨询",
+  "zh-TW": "價格請洽詢",
+};
 
- * 서버 데이터가 일부 잘못됐을 때 페이지 전체에 오류가 발생하지 않도록 검사한다.
-
- * TypeScript의 interface는 실행 중 데이터를 검사해 주지 않으므로 별도 함수가 필요하다.
-
- */
-
-function isEventItem(value: unknown): value is EventApiItem {
-  if (typeof value !== "object" || value === null) return false;
-
-  const item = value as Partial<EventApiItem>;
-
-  return (
-    typeof item.EVENT_IDX === "number" &&
-    Number.isFinite(item.EVENT_IDX) &&
-    typeof item.TITLE === "string" &&
-    item.TITLE.trim().length > 0 &&
-    typeof item.FILE_NAME === "string" &&
-    item.FILE_NAME.trim().length > 0
-  );
-}
-
-/** 관리자가 입력한 가격을 그대로 유지하고, 값이 없을 때만 안내 문구를 출력한다. */
-
-function formatPrice(price: string | number | null): string {
-  const text = String(price ?? "").trim();
-
-  return text || "가격 문의";
+/** 가격 원문은 번역하지 않으며, 비어 있는 경우 안내 문구만 현지화합니다. */
+function formatPrice(value: string, locale: AppLocale): string {
+  return value.trim() || priceInquiry[locale];
 }
 
 /**
@@ -116,6 +74,8 @@ const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export default function EventRanking() {
+  const tHome = useTranslations("Home");
+  const locale = useLocale() as AppLocale;
   const sectionRef = useRef<HTMLElement | null>(null);
 
   const headingRef = useRef<HTMLDivElement | null>(null);
@@ -127,68 +87,36 @@ export default function EventRanking() {
   const [errorMessage, setErrorMessage] = useState("");
 
   /**
-
-   * 1단계: 관리자 DB에서 이벤트 정보 가져오기
-
-   *
-
-   * [] 의존성 배열 때문에 최초 마운트 시 데이터를 요청한다.
-
-   * 컴포넌트를 떠나면 AbortController가 진행 중인 요청을 취소한다.
-
+   * 이벤트/커뮤니티에서 공통으로 쓰는 공개 다국어 API를 사용합니다.
+   * 선택 언어가 바뀔 때마다 재조회하고, 이전 요청은 취소합니다.
    */
-
   useEffect(() => {
     const controller = new AbortController();
+    setLoading(true);
+    setErrorMessage("");
+    setEvents([]);
 
     const fetchEvents = async () => {
       try {
-        const response = await axios.get<EventsResponse>(
-          `${API_URL}/api/admin/events`,
-
-          { signal: controller.signal },
-        );
-
-        if (!response.data.success || !Array.isArray(response.data.data)) {
-          throw new Error("이벤트 API 응답 형식이 올바르지 않습니다.");
+        const result = await loadCommunity("events", controller.signal, locale);
+        if (!result.connected) {
+          throw new Error("이벤트 공개 API가 연결되지 않았습니다.");
         }
-
-        // 기존 관리자 설정의 정렬 순서를 그대로 유지한다.
-
-        // IS_ACTIVE가 아예 없는 응답도 정상으로 취급한다.
-
-        const formatted: EventData[] = response.data.data
-
-          .filter(isEventItem)
-
-          .filter((item) => item.IS_ACTIVE !== "N")
-
+        const formatted: EventData[] = result.entries
+          .filter((item) => item.image !== null && item.title.trim().length > 0)
           .map((item) => ({
-            id: item.EVENT_IDX,
-
-            title: item.TITLE.trim(),
-
-            price: formatPrice(item.PRICE),
-
-            // 이미지는 반드시 Express 서버에서 제공하는 /images를 사용한다.
-
-            imageUrl: `${API_URL}/images/${encodeURIComponent(item.FILE_NAME)}`,
+            id: item.id,
+            title: item.title.trim(),
+            price: formatPrice(item.price, locale),
+            imageUrl: item.image!,
           }));
 
         if (controller.signal.aborted) return;
-
         setEvents(formatted);
-
-        setErrorMessage("");
       } catch (error) {
-        // 페이지 이동 등으로 요청이 취소된 경우는 정상 종료다.
-
         if (controller.signal.aborted) return;
-
         console.error("이벤트 데이터 로드 실패:", error);
-
         setEvents([]);
-
         setErrorMessage("이벤트 정보를 불러오지 못했습니다.");
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -196,9 +124,8 @@ export default function EventRanking() {
     };
 
     void fetchEvents();
-
     return () => controller.abort();
-  }, []);
+  }, [locale]);
 
   /**
 
@@ -383,9 +310,9 @@ export default function EventRanking() {
               <S.TitleRule aria-hidden="true" data-editorial-rule />
 
               <S.Description data-editorial-reveal>
-                지금 가장 주목받는 아름다움.
+                {tHome("eventIntroLine1")}
                 <br />
-                당신을 위한 특별한 이벤트를 만나보세요.
+                {tHome("eventIntroLine2")}
               </S.Description>
 
               <S.HeadingFoot>
@@ -414,7 +341,7 @@ export default function EventRanking() {
             ) : errorMessage ? (
               <S.Status role="alert">{errorMessage}</S.Status>
             ) : events.length === 0 ? (
-              <S.Status>현재 진행 중인 이벤트가 없습니다.</S.Status>
+              <S.Status>{tHome("eventEmpty")}</S.Status>
             ) : (
               <S.EventGrid>
                 {events.map((event, index) => (

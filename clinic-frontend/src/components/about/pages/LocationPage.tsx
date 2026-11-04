@@ -1,5 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+
 import * as S from "@/components/about/location/LocationFlat.styles";
 import LocationFlatMap from "@/components/about/location/LocationFlatMap";
 import { AboutFrame } from "@/components/about/shared/AboutFoundation";
@@ -11,7 +14,6 @@ import {
   flatNaverUrl,
 } from "@/data/about/flatLocationData";
 import { API_ORIGIN } from "@/lib/api/config";
-import { useEffect, useState } from "react";
 
 type Schedule = {
   departments?: string;
@@ -84,13 +86,14 @@ function Icon({ name, size = 21 }: { name: IconName; size?: number }) {
  * 공통 Header, Footer, ABOUT 내비게이션, 관리자 데이터 조회는 수정하지 않습니다.
  */
 export default function LocationPage() {
+  const t = useTranslations("About");
   const [phone, setPhone] = useState("");
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
     const apiBase = API_ORIGIN;
-    fetch(`${apiBase}/api/admin/footer`, {
+    fetch(`${apiBase}/api/public/site/footer`, {
       signal: controller.signal,
       cache: "no-store",
     })
@@ -123,15 +126,16 @@ export default function LocationPage() {
             <div>
               <span className="eyebrow">AHN’S PLASTIC SURGERY · LOCATION</span>
               <h1>
-                오시는 길.<span className="english">Come closer.</span>
+                {t("location.heroTitle")}
+                <span className="english">Come closer.</span>
               </h1>
             </div>
             <p className="intro-description">
-              아름다움이 시작되는 곳, AHN’S.
+              {t("location.heroDesc1")}
               <br />
-              당신의 발걸음이 조금 더 편안하도록
+              {t("location.heroDesc2")}
               <br />
-              찾아오시는 길을 안내합니다.
+              {t("location.heroDesc3")}
             </p>
           </S.Intro>
           <S.MainGrid data-about-reveal>
@@ -140,9 +144,9 @@ export default function LocationPage() {
               <S.AsideTop>
                 <div className="index">01 / VISIT AHN’S</div>
                 <h2>
-                  반가운 만남이
+                  {t("location.aside1")}
                   <br />
-                  시작되는 곳.
+                  {t("location.aside2")}
                 </h2>
                 <div className="bar" />
               </S.AsideTop>
@@ -152,7 +156,7 @@ export default function LocationPage() {
                     <Icon name="pin" />
                   </div>
                   <div>
-                    <strong>주소</strong>
+                    <strong>{t("location.address")}</strong>
                     <p>
                       {FLAT_LOCATION.address}
                       <br />
@@ -165,12 +169,14 @@ export default function LocationPage() {
                     <Icon name="phone" />
                   </div>
                   <div>
-                    <strong>대표번호</strong>
+                    <strong>{t("location.phone")}</strong>
                     <p>
                       {tel ? (
                         <a href={`tel:${tel}`}>{phone}</a>
                       ) : (
-                        <span className="quiet">전화번호 등록 후 표시</span>
+                        <span className="quiet">
+                          {t("location.phonePending")}
+                        </span>
                       )}
                     </p>
                   </div>
@@ -180,32 +186,32 @@ export default function LocationPage() {
                     <Icon name="clock" />
                   </div>
                   <div>
-                    <strong>진료시간</strong>
+                    <strong>{t("location.hours")}</strong>
                     {mainSchedule ? (
                       <S.ScheduleLines>
                         {mainSchedule.weekday && (
                           <div>
-                            <span>평일</span>
+                            <span>{t("location.weekday")}</span>
                             <b>{mainSchedule.weekday}</b>
                           </div>
                         )}
                         {mainSchedule.night && (
                           <div>
-                            <span>야간</span>
+                            <span>{t("location.night")}</span>
                             <b>{mainSchedule.night}</b>
                           </div>
                         )}
                         {mainSchedule.weekend && (
                           <div>
-                            <span>주말</span>
+                            <span>{t("location.weekend")}</span>
                             <b>{mainSchedule.weekend}</b>
                           </div>
                         )}
                       </S.ScheduleLines>
                     ) : (
-                      <p className="quiet">병원에 문의해 주세요.</p>
+                      <p className="quiet">{t("location.contactClinic")}</p>
                     )}
-                    <small>방문 전에 휴진 여부를 확인해 주세요.</small>
+                    <small>{t("location.hoursNote")}</small>
                   </div>
                 </S.ContactRow>
               </S.ContactGroup>
@@ -216,7 +222,7 @@ export default function LocationPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  카카오맵에서 길찾기 <span aria-hidden="true">↗</span>
+                  {t("location.kakaoLink")} <span aria-hidden="true">↗</span>
                 </a>
                 <a
                   href={flatNaverUrl}
@@ -224,7 +230,7 @@ export default function LocationPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  네이버 지도에서 보기 <span aria-hidden="true">↗</span>
+                  {t("location.naverLink")} <span aria-hidden="true">↗</span>
                 </a>
               </S.MapButtons>
             </S.Details>
@@ -233,12 +239,12 @@ export default function LocationPage() {
             <S.TransportHead>
               <div>
                 <p className="small">GETTING HERE / TRANSPORTATION</p>
-                <h2>교통 안내</h2>
+                <h2>{t("location.transportHeading")}</h2>
               </div>
               <p className="footnote">
-                아래 안내는 방문을 돕기 위한 기본 정보입니다.
+                {t("location.transportDesc1")}
                 <br />
-                출구, 노선, 실제 이동시간은 지도 서비스에서 확인해 주세요.
+                {t("location.transportDesc2")}
               </p>
             </S.TransportHead>
             <S.TransportGrid>
@@ -247,18 +253,18 @@ export default function LocationPage() {
                   <Icon name="train" size={26} />
                 </span>
                 <div>
-                  <h3>지하철</h3>
+                  <h3>{t("location.subway")}</h3>
                   <div className="lines">
                     <i style={{ backgroundColor: "#3481AF" }}>4</i>
                     <i style={{ backgroundColor: "#748947" }}>7</i>
                     <span style={{ fontSize: 12, color: "#49624C" }}>
-                      노원역 이용
+                      {t("location.subwayStop")}
                     </span>
                   </div>
                   <p>
-                    7호선 노원역에서 도보 약 3분
+                    {t("location.subway1")}
                     <br />
-                    4호선은 출구별 경로 확인
+                    {t("location.subway2")}
                   </p>
                 </div>
               </S.TransportCell>
@@ -267,11 +273,11 @@ export default function LocationPage() {
                   <Icon name="bus" size={26} />
                 </span>
                 <div>
-                  <h3>버스</h3>
+                  <h3>{t("location.bus")}</h3>
                   <p>
-                    노원역 인근 정류장 이용
+                    {t("location.bus1")}
                     <br />
-                    실시간 운행 노선과 하차 위치는 지도 앱에서 확인해 주세요.
+                    {t("location.bus2")}
                   </p>
                 </div>
               </S.TransportCell>
@@ -280,11 +286,11 @@ export default function LocationPage() {
                   <Icon name="car" size={26} />
                 </span>
                 <div>
-                  <h3>자가용</h3>
+                  <h3>{t("location.car")}</h3>
                   <p>
-                    서울 노원구 노해로 460 검색
+                    {t("location.car1")}
                     <br />
-                    주차 가능 여부는 방문 전 병원에 문의해 주세요.
+                    {t("location.car2")}
                   </p>
                 </div>
               </S.TransportCell>
@@ -294,7 +300,7 @@ export default function LocationPage() {
         <S.RealMap>
           <summary>
             <span className="summary-inner">
-              정확한 실제 지도 확인하기 <i aria-hidden="true">＋</i>
+              {t("location.mapExpand")} <i aria-hidden="true">＋</i>
             </span>
           </summary>
           <S.Content>
@@ -311,9 +317,9 @@ export default function LocationPage() {
           <S.Content data-about-reveal>
             <p className="overline">AHN’S · A MORE BEAUTIFUL TOMORROW</p>
             <h2>
-              당신의 발걸음 끝에서,
+              {t("location.footer1")}
               <br />
-              따뜻하게 맞이하겠습니다.
+              {t("location.footer2")}
             </h2>
             <div className="bottomline">
               <span>AHN’S</span>

@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import NoseDetailView from "@/components/procedures/NoseDetailView";
 import { getNosePreviewPage } from "@/data/detail/nosePreview";
 import { getPublicDetailPage } from "@/lib/detail/getPublicDetailPage";
+import { detailCanonical } from "@/lib/seo/publicMetadata";
 
+import type { Metadata } from "next";
 import type { DetailPageData } from "@/types/detail";
 
 type Props = {
@@ -35,6 +36,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const page = await loadPage(props);
   if (!page) return { title: "페이지를 찾을 수 없습니다" };
   return {
+    alternates: await detailCanonical(`/${page.category}/${page.slug}`),
     title: page.seo?.title || page.title,
     description: page.seo?.description || page.hero.description,
   };

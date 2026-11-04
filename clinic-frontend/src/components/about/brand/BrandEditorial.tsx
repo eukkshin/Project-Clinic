@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,6 +8,7 @@ import { useState } from "react";
 
 import * as S from "@/components/about/brand/BrandEditorial.styles";
 import BrandEditorialMotion from "@/components/about/brand/BrandEditorialMotion";
+import { stripLocalePrefix } from "@/i18n/url";
 import {
   isAboutLinkActive,
   useAboutNavigation,
@@ -22,15 +24,15 @@ import {
 const heroImages = [
   {
     src: "/images/brand-editorial/hero-profile.webp",
-    alt: "자연광 속 인물의 측면 사진",
+    altKey: "heroAlt1",
   },
   {
     src: "/images/brand-editorial/hero-portrait.webp",
-    alt: "은은한 조명 속 인물의 정면 사진",
+    altKey: "heroAlt2",
   },
   {
     src: "/images/brand-editorial/hero-soft.webp",
-    alt: "부드러운 표정의 인물 사진",
+    altKey: "heroAlt3",
   },
 ] as const;
 
@@ -38,31 +40,40 @@ const values = [
   {
     index: "01",
     title: "Listen",
-    subtitle: "깊이 듣는 상담",
-    copy: "한 사람의 이야기를 충분히 듣고, 진짜 필요한 변화를 함께 찾아갑니다.",
+    subtitleKey: "v1Subtitle",
+    copyKey: "v1Copy",
     image: "/images/brand-editorial/value-listen.webp",
-    alt: "부드러운 조명의 얼굴 클로즈업 사진",
+    altKey: "v1Alt",
   },
   {
     index: "02",
     title: "Balance",
-    subtitle: "조화로운 디자인",
-    copy: "개인의 특성과 전체적인 조화를 고려해 자연스러운 아름다움을 생각합니다.",
+    subtitleKey: "v2Subtitle",
+    copyKey: "v2Copy",
     image: "/images/brand-editorial/value-balance.webp",
-    alt: "자연광과 식물 그림자가 어우러진 장면",
+    altKey: "v2Alt",
   },
   {
     index: "03",
     title: "Respect",
-    subtitle: "진심 어린 케어",
-    copy: "수술 전부터 회복 과정까지, 항상 진심을 다해 함께하겠습니다.",
+    subtitleKey: "v3Subtitle",
+    copyKey: "v3Copy",
     image: "/images/brand-editorial/value-respect.webp",
-    alt: "인물의 자연스러운 옆모습 사진",
+    altKey: "v3Alt",
   },
 ] as const;
 
 export default function BrandEditorial() {
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
+  const t = useTranslations("About");
+  const navNames: Record<string, string> = {
+    "/about/brand": t("shared.navBrand"),
+    "/about/philosophy": t("shared.navPhilosophy"),
+    "/about/doctors": t("shared.navDoctors"),
+    "/about/facilities": t("shared.navFacilities"),
+    "/about/safety": t("shared.navSafety"),
+    "/about/location": t("shared.navLocation"),
+  };
   const aboutPages = useAboutNavigation();
 
   const [slide, setSlide] = useState(0);
@@ -94,7 +105,7 @@ export default function BrandEditorial() {
         <S.HeroGradient aria-hidden="true" />
 
         <S.HeroInner>
-          <S.AboutNav aria-label="병원소개 페이지 내비게이션">
+          <S.AboutNav aria-label={t("brand.navLabel")}>
             <S.NavIdentity>
               ABOUT <span>/</span>
             </S.NavIdentity>
@@ -110,7 +121,7 @@ export default function BrandEditorial() {
                     isAboutLinkActive(pathname, page.url) ? "page" : undefined
                   }
                 >
-                  {page.name}
+                  {navNames[page.url] ?? page.name}
                 </S.NavItem>
               ))}
             </S.NavItems>
@@ -121,19 +132,22 @@ export default function BrandEditorial() {
               BRAND STORY <span aria-hidden="true">—</span> AHN&apos;S
             </S.Eyebrow>
             <S.HeroTitle id="brand-heading">
-              아름다움의
+              {t("brand.hero1")}
               <br />
-              기준이 되는 곳,
+              {t("brand.hero2")}
               <br />
               <em>AHN&apos;S</em>
             </S.HeroTitle>
             <S.HeroRule aria-hidden="true" />
             <S.HeroDescription>
-              사람을 이해하는 섬세한 시선으로
+              {t("brand.heroDesc1")}
               <br />
-              자연스럽고 조화로운 아름다움을 만들어갑니다.
+              {t("brand.heroDesc2")}
             </S.HeroDescription>
-            <S.HeroScroll href="#brand-story" aria-label="브랜드 스토리로 이동">
+            <S.HeroScroll
+              href="#brand-story"
+              aria-label={t("brand.scrollLabel")}
+            >
               <span>SCROLL TO EXPLORE</span>
               <i aria-hidden="true" />
             </S.HeroScroll>
@@ -141,7 +155,7 @@ export default function BrandEditorial() {
           <S.HeroSideText aria-hidden="true">
             NATURAL <br /> BALANCE <br /> CONFIDENCE
           </S.HeroSideText>
-          <S.HeroControls aria-label="브랜드 메인 이미지 전환">
+          <S.HeroControls aria-label={t("brand.controlsLabel")}>
             <span aria-live="polite">
               {String(slide + 1).padStart(2, "0")} /{" "}
               {String(heroImages.length).padStart(2, "0")}
@@ -149,14 +163,14 @@ export default function BrandEditorial() {
             <button
               type="button"
               onClick={() => moveSlide(-1)}
-              aria-label="이전 이미지"
+              aria-label={t("brand.prevImage")}
             >
               ←
             </button>
             <button
               type="button"
               onClick={() => moveSlide(1)}
-              aria-label="다음 이미지"
+              aria-label={t("brand.nextImage")}
             >
               →
             </button>
@@ -170,32 +184,33 @@ export default function BrandEditorial() {
             01 <span>OUR STORY</span>
           </S.SmallLabel>
           <S.StoryTitle id="brand-story-title">
-            사람을 먼저
+            {t("brand.story1")}
             <br />
-            생각하는 아름다움
+            {t("brand.story2")}
           </S.StoryTitle>
           <S.StoryText>
-            AHN&apos;S는 단순한 변화가 아닌,
+            {t("brand.storyText1")}
             <br />
-            한 사람의 일상과 자신감을 함께 고려한
+            {t("brand.storyText2")}
             <br />
-            조화로운 아름다움을 추구합니다.
+            {t("brand.storyText3")}
           </S.StoryText>
           <S.StoryLink as={Link} href="/about/philosophy">
-            브랜드 스토리 더 보기 <span aria-hidden="true">↗</span>
+            {t("brand.storyLink")} <span aria-hidden="true">↗</span>
           </S.StoryLink>
         </S.StoryCopy>
         <S.StoryPhoto data-brand-editorial-parallax>
           <Image
             src="/images/brand-editorial/story-space.webp"
-            alt="햇살과 식물이 어우러진 차분한 공간의 콘셉트 이미지"
+            alt={t("brand.storyPhotoAlt")}
             fill
             sizes="(max-width: 760px) 100vw, 52vw"
           />
           <S.StoryPhotoShade />
           <S.StoryPhotoCopy data-brand-editorial-reveal>
-            당신의 오늘이
-            <br />더 빛날 수 있도록
+            {t("brand.storyPhoto1")}
+            <br />
+            {t("brand.storyPhoto2")}
           </S.StoryPhotoCopy>
           <S.StoryNumber aria-hidden="true">02 / 05</S.StoryNumber>
         </S.StoryPhoto>
@@ -207,13 +222,13 @@ export default function BrandEditorial() {
             <div>
               <S.SectionEyebrow>OUR VALUES</S.SectionEyebrow>
               <S.ValuesHeading id="brand-values-heading">
-                AHN&apos;S가 지켜가는 세 가지 약속
+                {t("brand.valuesHeading")}
               </S.ValuesHeading>
             </div>
             <S.ValuesIntro>
-              아름다움은 결과가 아닌 과정에서 시작됩니다.
+              {t("brand.valuesIntro1")}
               <br />
-              AHN&apos;S는 언제나 사람을 중심에 두고 생각합니다.
+              {t("brand.valuesIntro2")}
             </S.ValuesIntro>
           </S.ValuesHeader>
           <S.ValueGrid>
@@ -222,7 +237,7 @@ export default function BrandEditorial() {
                 <S.ValuePhoto data-brand-editorial-parallax>
                   <Image
                     src={value.image}
-                    alt={value.alt}
+                    alt={t(`brand.${value.altKey}`)}
                     fill
                     sizes="(max-width: 760px) 100vw, 33vw"
                   />
@@ -233,8 +248,10 @@ export default function BrandEditorial() {
                   {value.index} <span aria-hidden="true" />
                 </S.ValueMeta>
                 <S.ValueEnglish>{value.title}</S.ValueEnglish>
-                <S.ValueKorean>{value.subtitle}</S.ValueKorean>
-                <S.ValueDescription>{value.copy}</S.ValueDescription>
+                <S.ValueKorean>{t(`brand.${value.subtitleKey}`)}</S.ValueKorean>
+                <S.ValueDescription>
+                  {t(`brand.${value.copyKey}`)}
+                </S.ValueDescription>
               </S.ValueCard>
             ))}
           </S.ValueGrid>
@@ -245,7 +262,7 @@ export default function BrandEditorial() {
         <S.SpaceImage data-brand-editorial-parallax>
           <Image
             src="/images/brand-editorial/quiet-space.webp"
-            alt="따뜻한 햇살이 스며드는 차분한 공간 콘셉트 사진"
+            alt={t("brand.spaceAlt")}
             fill
             sizes="100vw"
           />
@@ -254,16 +271,17 @@ export default function BrandEditorial() {
         <S.SpaceContent data-brand-editorial-reveal>
           <S.SectionEyebrow $light>THE SPACE OF AHN&apos;S</S.SectionEyebrow>
           <S.SpaceTitle id="brand-space-heading">
-            사람을 위한 공간,
-            <br />더 나은 내일을 위한 약속
+            {t("brand.spaceTitle1")}
+            <br />
+            {t("brand.spaceTitle2")}
           </S.SpaceTitle>
           <S.SpaceDescription>
-            마음을 편안하게 하는 환경부터, 대화에 집중하는 시간까지.
+            {t("brand.spaceDesc1")}
             <br />
-            당신의 경험을 소중히 생각합니다.
+            {t("brand.spaceDesc2")}
           </S.SpaceDescription>
           <S.SpaceLink as={Link} href="/about/facilities">
-            진료 환경 둘러보기 <span aria-hidden="true">↗</span>
+            {t("brand.spaceLink")} <span aria-hidden="true">↗</span>
           </S.SpaceLink>
         </S.SpaceContent>
       </S.Space>
@@ -272,18 +290,18 @@ export default function BrandEditorial() {
         <S.ClosingInner>
           <S.ClosingCopy data-brand-editorial-reveal>
             <S.ClosingTitle id="brand-closing-heading">
-              AHN&apos;S와 함께,
+              {t("brand.close1")}
               <br />
-              당신의 새로운 이야기를 시작하세요.
+              {t("brand.close2")}
             </S.ClosingTitle>
             <S.ClosingSmall>BEAUTY IN YOUR OWN WAY.</S.ClosingSmall>
           </S.ClosingCopy>
           <S.ClosingActions data-brand-editorial-reveal>
             <S.ContactLink href="/#site-footer-contact">
-              상담 문의하기 <span aria-hidden="true">↗</span>
+              {t("brand.contactLink")} <span aria-hidden="true">↗</span>
             </S.ContactLink>
             <S.LocationLink as={Link} href="/about/location">
-              오시는 길 보기 <span aria-hidden="true">↗</span>
+              {t("brand.locationLink")} <span aria-hidden="true">↗</span>
             </S.LocationLink>
           </S.ClosingActions>
         </S.ClosingInner>

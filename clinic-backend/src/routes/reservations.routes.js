@@ -81,6 +81,14 @@ router.post("/", authenticateMember, trustedOrigin, async (req, res) => {
   if (message) return res.status(400).json({ success: false, message });
   try {
     const row = await AppDataSource.transaction(async (manager) => {
+      // 인증 직후 탈퇴된 계정이 예약을 생성하지 못하도록 DB 상태를 잠가 재검증합니다.
+      const accounts = await manager.query(
+        "SELECT STATUS FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE",
+        [req.user.userIdx],
+      );
+      if (accounts[0]?.STATUS !== "정상") {
+        throw new BookingError(403, "회원 상태를 확인한 후 다시 로그인해 주세요.");
+      }
       await lockCalendar(manager);
       return insertConfirmed(manager, {
         userIdx: req.user.userIdx,

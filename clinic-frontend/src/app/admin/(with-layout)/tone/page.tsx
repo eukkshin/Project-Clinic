@@ -1,6 +1,6 @@
 "use client";
 import { API_ORIGIN } from "@/lib/api/config";
-import axios from "axios";
+import axios from "@/lib/admin/apiClient";
 import { useEffect, useState } from "react";
 import { FiCheck, FiMoon, FiSave, FiSun } from "react-icons/fi";
 

@@ -1,9 +1,10 @@
 
 "use client";
 
+import { API_ORIGIN } from "@/lib/api/config";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
-import axios from "axios";
+import axios from "@/lib/admin/apiClient";
 import styled from "styled-components";
 
 import {
@@ -120,7 +121,7 @@ export default function TodayDashboard() {
       setIsLoading(true);
 
       const response = await axios.get(
-        "http://localhost:4000/api/admin/reservations/today"
+        `${API_ORIGIN}/api/admin/reservations/today`
       );
 
       setTodayPatientList(response.data.data || []);
@@ -146,7 +147,7 @@ export default function TodayDashboard() {
 
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/admin/users",
+          `${API_ORIGIN}/api/admin/users`,
           {
             params: {
               search: debouncedSearchTerm,
@@ -250,7 +251,7 @@ export default function TodayDashboard() {
       setIsSaving(true);
 
       await axios.post(
-        "http://localhost:4000/api/admin/reservations",
+        `${API_ORIGIN}/api/admin/reservations`,
         {
           chartNo: selectedPatient.chartNo,
           reservationDate: reservationForm.reservationDate,
@@ -292,7 +293,7 @@ export default function TodayDashboard() {
 
     try {
       await axios.patch(
-        `http://localhost:4000/api/admin/reservations/${patient.reservationIdx}/status`,
+        `${API_ORIGIN}/api/admin/reservations/${patient.reservationIdx}/status`,
         {
           status: nextStatus,
         }

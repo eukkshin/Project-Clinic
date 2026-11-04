@@ -1,5 +1,6 @@
-import * as H from "@/components/layout/Header.styles";
 import styled, { css } from "styled-components";
+
+import * as H from "@/components/layout/Header.styles";
 
 /** 검색 중 오른쪽 UtilGroup에만 간격 축소. 중앙 Nav 및 3열 Grid는 원본 그대로 유지. */
 export const SearchUtilGroup = styled(H.UtilGroup)<{ $searchOpen: boolean }>`
@@ -85,6 +86,9 @@ export const CompactAccount = styled.span<{ $compact: boolean }>`
       min-width: 40px;
       height: 40px;
       > div > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 40px;
         min-width: 40px;
         height: 40px;
@@ -93,7 +97,7 @@ export const CompactAccount = styled.span<{ $compact: boolean }>`
         gap: 0;
       }
       > div > button > span {
-        visibility: hidden;
+        display: none;
       }
     `}
 `;
@@ -111,6 +115,9 @@ export const CompactLanguage = styled.span<{ $compact: boolean }>`
       min-width: 40px;
       height: 40px;
       > div > button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 40px;
         min-width: 40px;
         height: 40px;
@@ -121,7 +128,7 @@ export const CompactLanguage = styled.span<{ $compact: boolean }>`
       }
       > div > button > svg,
       > div > button > span {
-        visibility: hidden;
+        display: none;
       }
     `}
 `;
@@ -129,12 +136,22 @@ export const CompactLanguage = styled.span<{ $compact: boolean }>`
 /** 실제 원본 버튼이 클릭되게 하는 시각적 아이콘 (이벤트 통과). */
 export const CoverIcon = styled.span`
   position: absolute;
-  top: 50%;
-  left: 20px;
-  transform: translate(-50%, -50%);
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
   pointer-events: none;
-  line-height: 0;
   color: inherit;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
 `;
 
 export const MobileAction = styled.span<{ $searchOpen: boolean }>`

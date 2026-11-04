@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,6 +8,7 @@ import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import * as S from "@/components/community/Community.styles";
+import { stripLocalePrefix } from "@/i18n/url";
 import {
   CommunityEntry,
   CommunityResult,
@@ -60,7 +62,7 @@ function CommunityMotion() {
 }
 
 function CommunityNav() {
-  const pathname = usePathname();
+  const pathname = stripLocalePrefix(usePathname());
   return (
     <S.TopBar aria-label="커뮤니티 하위 페이지">
       <S.NavTitle>
@@ -245,6 +247,7 @@ function SubHero({ kind }: { kind: CommunityKind }) {
 }
 
 function useCommunityEntries(kind: CommunityKind) {
+  const locale = useLocale();
   const [status, setStatus] = useState<DataStatus>("loading");
   const [result, setResult] = useState<CommunityResult>({
     connected: false,
@@ -255,7 +258,7 @@ function useCommunityEntries(kind: CommunityKind) {
     const controller = new AbortController();
     setStatus("loading");
     setResult({ connected: false, entries: [] });
-    loadCommunity(kind, controller.signal)
+    loadCommunity(kind, controller.signal, locale)
       .then((data) => {
         if (controller.signal.aborted) return;
         setResult(data);
@@ -267,7 +270,7 @@ function useCommunityEntries(kind: CommunityKind) {
         setStatus("error");
       });
     return () => controller.abort();
-  }, [kind, retry]);
+  }, [kind, retry, locale]);
   return { status, result, retry: () => setRetry((v) => v + 1) };
 }
 
@@ -793,6 +796,7 @@ function ConsultationPage() {
         name: cleanName,
         phone: cleanPhone,
         department,
+        privacyConsent: agreed,
       });
       setName("");
       setPhone("");

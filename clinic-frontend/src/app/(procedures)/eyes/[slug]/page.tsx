@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import DetailLayout from "@/components/procedures/DetailLayout";
 import { getPreviewDetailPage } from "@/data/detail/preview";
 import { getPublicDetailPage } from "@/lib/detail/getPublicDetailPage";
+import { detailCanonical } from "@/lib/seo/publicMetadata";
 
+import type { Metadata } from "next";
 import type { DetailPageData } from "@/types/detail";
 
 interface Props {
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = await loadPage(slug);
   if (!page) return { title: "페이지를 찾을 수 없습니다" };
   return {
+    alternates: await detailCanonical(`/${page.category}/${page.slug}`),
     title: page.seo?.title || page.title,
     description: page.seo?.description || page.hero.description,
   };

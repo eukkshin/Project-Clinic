@@ -4,6 +4,10 @@ const express = require("express");
 const { createDetailService } = require("../services/detail.service");
 const V = require("../utils/detail.validation");
 const { allowOriginForWrite } = require("../auth/adminSession");
+const {
+  locale,
+  ContentI18nError,
+} = require("../services/content-i18n.service");
 
 /**
  * Factory pattern: reuse existing TypeORM DataSource and the existing authenticated admin guard.
@@ -28,18 +32,28 @@ function createDetailRouters({ dataSource, requireAdmin }) {
     res.status(code).json({ success: true, data });
   const paramId = (req) => V.id(req.params.id);
 
-  // Visitor endpoints (never expose drafts/hidden pages or sections)
+  // Public endpoints; only PUBLISHED locale values are used. Missing fields fall back to Korean.
   publicRouter.get(
     "/categories",
-    wrap(async (_req, res) => ok(res, await service.publicCategories())),
+    wrap(async (req, res) =>
+      ok(res, await service.publicCategories(locale(req.query.locale))),
+    ),
   );
-  publicRouter.get("/navigation", wrap(async (_req, res) => ok(res, await service.publicNavigation())));
+  publicRouter.get(
+    "/navigation",
+    wrap(async (req, res) =>
+      ok(res, await service.publicNavigation(locale(req.query.locale))),
+    ),
+  );
   publicRouter.get(
     "/:category/:slug",
     wrap(async (req, res) => {
       const category = V.slug(req.params.category, "category", 80);
       const slug = V.slug(req.params.slug, "slug", 120);
-      return ok(res, await service.publicPage(category, slug));
+      return ok(
+        res,
+        await service.publicPage(category, slug, locale(req.query.locale)),
+      );
     }),
   );
 
@@ -164,6 +178,10 @@ function createDetailRouters({ dataSource, requireAdmin }) {
   // Scoped error handling. Existing global error middleware can still handle unrelated routes.
   const errors = (error, _req, res, next) => {
     if (res.headersSent) return next(error);
+    if (error instanceof ContentI18nError)
+      return res
+        .status(error.status)
+        .json({ success: false, message: error.message });
     if (error instanceof V.HttpError)
       return res
         .status(error.status)

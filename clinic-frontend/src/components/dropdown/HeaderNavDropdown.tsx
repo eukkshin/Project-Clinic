@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -40,6 +41,7 @@ export default function HeaderNavDropdown({
   transparent,
   dark = false,
 }: Props) {
+  const tNav = useTranslations("Navigation");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLAnchorElement>(null);
@@ -82,7 +84,7 @@ export default function HeaderNavDropdown({
     menu.url !== "/" && !children.some((child) => child.url === menu.url);
 
   const items: NavSubmenuItem[] = [
-    ...(hasCategoryPage ? [{ name: "전체 보기", url: menu.url }] : []),
+    ...(hasCategoryPage ? [{ name: tNav("all"), url: menu.url }] : []),
     ...children,
   ];
 

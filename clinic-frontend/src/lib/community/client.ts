@@ -1,10 +1,12 @@
 import { API_ORIGIN } from "@/lib/api/config";
+
 import type { CommunityKind } from "./config";
 
 export interface CommunityEntry {
   id: string;
   title: string;
   subtitle: string;
+  price: string;
   image: string | null;
   video: string | null;
   category: string;
@@ -26,9 +28,9 @@ const API = API_ORIGIN;
  * Expose these only after a verified public, consent-aware backend API is available.
  */
 const VERIFIED_ENDPOINTS: Partial<Record<CommunityKind, string>> = {
-  events: "/api/admin/events",
-  qna: "/api/admin/qnas",
-  vlog: "/api/admin/vlogs",
+  events: "/api/public/content/events",
+  qna: "/api/public/content/faq",
+  vlog: "/api/public/site/vlogs",
 };
 
 const OPTIONAL_PUBLIC_ENDPOINTS: Partial<
@@ -115,6 +117,7 @@ function normalize(
       "PRICE",
       "price",
     ),
+    price: stringField(row, "PRICE", "price"),
     image: pictureUrl(row),
     video: safeUrl(field(row, "VIDEO_URL", "videoUrl", "video")),
     category:
@@ -142,6 +145,7 @@ function normalize(
 export async function loadCommunity(
   kind: CommunityKind,
   signal: AbortSignal,
+  locale = "ko",
 ): Promise<CommunityResult> {
   const configured =
     VERIFIED_ENDPOINTS[kind] || OPTIONAL_PUBLIC_ENDPOINTS[kind];
@@ -153,7 +157,14 @@ export async function loadCommunity(
       : null;
   if (!endpoint) return { connected: false, entries: [] };
 
-  const response = await fetch(endpoint, { signal, cache: "no-store" });
+  const localizedEndpoint =
+    kind === "events" || kind === "qna"
+      ? `${endpoint}?locale=${encodeURIComponent(locale)}`
+      : endpoint;
+  const response = await fetch(localizedEndpoint, {
+    signal,
+    cache: "no-store",
+  });
   if (!response.ok) throw new Error(`서버 응답: ${response.status}`);
   const body: unknown = await response.json();
   if (!body || typeof body !== "object")
@@ -198,6 +209,7 @@ export async function submitQuickConsultation(payload: {
   name: string;
   phone: string;
   department: string;
+  privacyConsent: boolean;
 }): Promise<void> {
   // The same endpoint and payload as existing QuickConsultBar.tsx.
   const response = await fetch(`${API}/api/consult/quick`, {

@@ -4,13 +4,15 @@
  * AHNS 비밀번호 복구: OracleDB / TypeORM / Express / Nodemailer
  * - 이 라우터는 /api 에 마운트합니다.
  * - 기존 /api/send-reset-email, /api/reset-password 핸들러는 반드시 제거해야 합니다.
- * - 비밀번호는 변경 후 로그인으로만 접근하도록 합니다. 일반 로그인 세션 무효화는
- *   현재 프로젝트의 세션/JWT 구조에 맞춰 별도 연결이 필요합니다.
+ * - 재설정 시 SESSION_VERSION을 증가시켜 모든 기기의 기존 로그인 세션을 무효화합니다.
  */
 const express = require("express");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const crypto = require("node:crypto");
+const {
+  buildPasswordResetEmail,
+} = require("../templates/password-reset-email");
 
 const GENERIC_MESSAGE =
   "입력하신 정보와 일치하는 계정이 있다면 재설정 이메일을 발송했습니다. 메일함을 확인해 주세요.";
@@ -102,7 +104,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
 
     try {
       const users = await AppDataSource.query(
-        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = :1 AND LOWER(EMAIL) = :2",
+        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = :1 AND LOWER(EMAIL) = :2 AND STATUS = '정상'",
         [userId, email],
       );
       // 등록 여부는 방문자에게 공개하지 않습니다.
@@ -135,12 +137,13 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       });
 
       try {
+        const { html, text } = buildPasswordResetEmail({ resetUrl });
         await transporter.sendMail({
           from: process.env.SMTP_FROM || process.env.SMTP_USER,
           to: user.EMAIL,
           subject: "[AHNS 성형외과] 비밀번호 재설정 안내",
-          text: `AHNS 비밀번호 재설정 링크입니다.\n\n${resetUrl.toString()}\n\n이 링크는 30분 동안 한 번만 사용 가능합니다. 본인이 요청하지 않았다면 이 메일을 무시해 주세요.`,
-          html: `<!doctype html><html lang="ko"><body style="margin:0;padding:36px 16px;background:#f7f6f0;font-family:Arial,sans-serif;color:#233e32"><div style="max-width:540px;margin:auto;background:#fff;padding:40px;border:1px solid #e1e5dc"><div style="font-family:Georgia,serif;font-size:30px">AHNS.</div><p style="font-size:11px;letter-spacing:2px;color:#79877d">ACCOUNT RECOVERY</p><h1 style="font-size:24px;font-weight:normal">비밀번호 재설정</h1><p style="line-height:1.8;font-size:14px">아래 버튼을 눌러 새 비밀번호를 설정해 주세요. 링크는 30분 동안 한 번만 사용할 수 있습니다.</p><p style="margin:30px 0"><a href="${resetUrl.toString()}" style="display:inline-block;padding:16px 28px;background:#234337;color:#fff;text-decoration:none">비밀번호 재설정하기 ↗</a></p><p style="font-size:12px;color:#718276">본인이 요청하지 않았다면 이 메일을 무시해 주세요.</p></div></body></html>`,
+          text,
+          html,
         });
         // 새 링크가 실제 발송된 뒤 이전 미사용 링크를 무효화합니다.
         await AppDataSource.query(
@@ -201,7 +204,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
         if (!matches.length) throw new InvalidTokenError();
         const memberId = matches[0].USER_IDX;
         await manager.query(
-          "UPDATE MEMBER_TB SET USER_PW = :1 WHERE USER_IDX = :2",
+          "UPDATE MEMBER_TB SET USER_PW = :1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = :2",
           [newHash, memberId],
         );
         // 같은 회원의 기존 발급 링크까지 함께 무효화하여 재사용을 막습니다.

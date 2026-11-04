@@ -1,4 +1,6 @@
 import styled, { keyframes } from "styled-components";
+import Link from "next/link";
+
 const CREAM = "#244535";
 const MUTED = "#647969";
 const HAIRLINE = "rgba(36,69,53,.18)";
@@ -795,4 +797,25 @@ export const FloatTop = styled.button<{ $isSafety: boolean }>`
   font-size: 21px;
   font-weight: 400;
   color: ${({ $isSafety }) => ($isSafety ? "#F7F6F1" : "#244535")};
+`;
+
+
+/* 고지 페이지 링크: 기존 Footer·GSAP 구조는 유지합니다. */
+export const LegalNavigation = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin: 0 0 25px;
+  max-width: 620px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid ${HAIRLINE};
+`;
+export const LegalNavigationLink = styled(Link)`
+  font-size: 12px;
+  text-decoration: none;
+  color: ${CREAM};
+  transition: opacity .2s ease;
+  &:hover { opacity: .65; text-decoration: underline; text-underline-offset: 5px; }
+  &:focus-visible { outline: 2px solid ${CREAM}; outline-offset: 4px; }
 `;

@@ -56,6 +56,7 @@ async function authenticateMember(req, res, next) {
         REG_DATE: true,
         STATUS: true,
         IS_ADMIN: true,
+        SESSION_VERSION: true,
       },
     });
 
@@ -68,6 +69,18 @@ async function authenticateMember(req, res, next) {
       return res
         .status(403)
         .json({ success: false, message: "이용할 수 없는 계정입니다." });
+    }
+
+    // 서명/만료가 유효해도 비밀번호 변경/회원탈퇴 후의 기존 토큰은 거부합니다.
+    // 배포 이전 sv 없는 토큰도 보안상 재로그인이 필요합니다.
+    if (
+      !Number.isSafeInteger(payload?.sv) ||
+      Number(member.SESSION_VERSION) !== payload.sv
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: "로그인 정보가 변경되었습니다. 다시 로그인해 주세요.",
+      });
     }
 
     req.user = { userIdx: member.USER_IDX, userId: member.USER_ID };

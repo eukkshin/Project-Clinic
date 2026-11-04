@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import * as S from "@/components/dropdown/MobileProcedureSubmenu.styles";
@@ -18,11 +19,12 @@ function safeHref(url: string): string {
 
 /** 기존 모바일 상위 메뉴 아래에만 작은 하위 메뉴를 노출한다. */
 export default function MobileProcedureSubmenu({ items, onNavigate }: Props) {
+  const tNav = useTranslations("Navigation");
   if (!items.length) return null;
   return (
     <S.Root>
       <S.Toggle>
-        세부 메뉴 보기 <span aria-hidden="true">⌄</span>
+        {tNav("expand")} <span aria-hidden="true">⌄</span>
       </S.Toggle>
       <S.Items>
         {items.map((item) => (

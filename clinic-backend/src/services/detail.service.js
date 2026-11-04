@@ -2,6 +2,10 @@
 
 const oracledb = require("oracledb");
 const { HttpError } = require("../utils/detail.validation");
+const {
+  createContentI18nService,
+  applyTranslation,
+} = require("./content-i18n.service");
 
 // Query strings use Oracle bind placeholders :1, :2 ...; never interpolate user input.
 function createDetailService(dataSource) {
@@ -12,6 +16,7 @@ function createDetailService(dataSource) {
   ) {
     throw new Error("TypeORM DataSource 인스턴스가 필요합니다.");
   }
+  const i18n = createContentI18nService(dataSource);
   const query = (sql, bind = [], manager = dataSource) =>
     manager.query(sql, bind);
   const first = async (sql, bind = [], manager) =>
@@ -142,25 +147,52 @@ function createDetailService(dataSource) {
     };
   }
   return {
-    async publicNavigation() {
-      const rows = await query(`SELECT C.SLUG AS CATEGORY_SLUG, P.SLUG AS PAGE_SLUG, P.TITLE AS PAGE_TITLE
+    async publicNavigation(lang = "ko") {
+      const rows =
+        await query(`SELECT P.PAGE_ID, C.SLUG AS CATEGORY_SLUG, P.SLUG AS PAGE_SLUG, P.TITLE AS PAGE_TITLE
         FROM DETAIL_PAGE P JOIN DETAIL_CATEGORY C ON C.CATEGORY_ID = P.CATEGORY_ID
         WHERE C.IS_VISIBLE = 'Y' AND P.STATUS = 'PUBLISHED'
         ORDER BY C.SORT_ORDER, P.SORT_ORDER, P.PAGE_ID`);
+      const translations = await i18n.publishedMany(
+        "DETAIL_PAGE",
+        rows.map((r) => Number(r.PAGE_ID)),
+        lang,
+      );
       return rows.map((r) => ({
         category: r.CATEGORY_SLUG,
         slug: r.PAGE_SLUG,
-        name: r.PAGE_TITLE,
+        name: applyTranslation(
+          { title: r.PAGE_TITLE },
+          "DETAIL_PAGE",
+          translations.get(Number(r.PAGE_ID)),
+        ).title,
         url: `/${encodeURIComponent(r.CATEGORY_SLUG)}/${encodeURIComponent(r.PAGE_SLUG)}`,
       }));
     },
-    async publicCategories() {
-      return (
+    async publicCategories(lang = "ko") {
+      const rows =
         await query(`SELECT CATEGORY_ID, SLUG, NAME, DESCRIPTION, SORT_ORDER, IS_VISIBLE
-      FROM DETAIL_CATEGORY WHERE IS_VISIBLE = 'Y' ORDER BY SORT_ORDER, CATEGORY_ID`)
-      ).map(mapCategory);
+        FROM DETAIL_CATEGORY WHERE IS_VISIBLE = 'Y' ORDER BY SORT_ORDER, CATEGORY_ID`);
+      const translations = await i18n.publishedMany(
+        "DETAIL_CATEGORY",
+        rows.map((r) => Number(r.CATEGORY_ID)),
+        lang,
+      );
+      return rows.map((r) => {
+        const item = mapCategory(r);
+        const translated = applyTranslation(
+          { name: item.name, description: item.description },
+          "DETAIL_CATEGORY",
+          translations.get(item.categoryId),
+        );
+        return {
+          ...item,
+          name: translated.name,
+          description: translated.description,
+        };
+      });
     },
-    async publicPage(category, slug) {
+    async publicPage(category, slug, lang = "ko") {
       const row = must(
         await first(
           `SELECT ${pageCols}${pageFrom} WHERE C.SLUG = :1
@@ -170,21 +202,50 @@ function createDetailService(dataSource) {
         "공개 상세페이지",
       );
       const p = mapPage(row);
+      const pagePayloads = await i18n.publishedMany(
+        "DETAIL_PAGE",
+        [p.pageId],
+        lang,
+      );
+      const flat = applyTranslation(
+        {
+          title: p.title,
+          heroEyebrow: p.hero.eyebrow,
+          heroTitle: p.hero.title,
+          heroDescription: p.hero.description,
+          heroImageAlt: p.hero.imageAlt,
+          seoTitle: p.seo.title,
+          seoDescription: p.seo.description,
+        },
+        "DETAIL_PAGE",
+        pagePayloads.get(p.pageId),
+      );
+      const sections = await readSections(p.pageId, true);
+      const sectionPayloads = await i18n.publishedMany(
+        "DETAIL_SECTION",
+        sections.map((s) => s.sectionId),
+        lang,
+      );
       return {
         category: p.category,
         slug: p.slug,
-        title: p.title,
-        hero: p.hero,
-        seo: p.seo,
-        sections: (await readSections(p.pageId, true)).map(
-          ({ id, type, title, eyebrow, content }) => ({
-            id,
-            type,
-            title,
-            eyebrow,
-            content,
-          }),
-        ),
+        title: flat.title,
+        hero: {
+          ...p.hero,
+          eyebrow: flat.heroEyebrow,
+          title: flat.heroTitle,
+          description: flat.heroDescription,
+          imageAlt: flat.heroImageAlt,
+        },
+        seo: { title: flat.seoTitle, description: flat.seoDescription },
+        sections: sections.map((s) => {
+          const translated = applyTranslation(
+            { title: s.title, eyebrow: s.eyebrow, content: s.content },
+            "DETAIL_SECTION",
+            sectionPayloads.get(s.sectionId),
+          );
+          return { id: s.id, type: s.type, ...translated };
+        }),
       };
     },
     async categories() {

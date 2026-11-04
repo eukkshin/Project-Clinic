@@ -1,7 +1,8 @@
 'use client';
 
+import { API_ORIGIN } from "@/lib/api/config";
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from "@/lib/admin/apiClient";
 import { useParams } from 'next/navigation'
 import { FaCheckCircle,FaRegCalendarCheck } from 'react-icons/fa';
 import * as S from './reservation.style'
@@ -130,7 +131,7 @@ export default function PatientBookingPage (){
   const fetchPatientData = async (chartNo:string) : Promise<PatientData>=> {
         
     //chartNo로 환자 정보 및 시술권 조회 API 호출
-    const response = await axios.get(`http://localhost:4000/api/reservation/patient/${chartNo}`);
+    const response = await axios.get(`${API_ORIGIN}/api/reservation/patient/${chartNo}`);
 
     const userData = response?.data?.user;
     const treatData = response?.data?.treatments;
@@ -169,7 +170,7 @@ export default function PatientBookingPage (){
     const { mutate, isPending } = useMutation({
       mutationFn: async(data: CreateReservationItem)=>{
         if(editingReservationIdx !== null){
-          const response = await axios.patch( `http://localhost:4000/api/admin/reservation/${editingReservationIdx}`,{
+          const response = await axios.patch( `${API_ORIGIN}/api/admin/reservation/${editingReservationIdx}`,{
             reservationDate: data.reservationDate,
             reservationTime: data.reservationTime,
             memo: data.memo,
@@ -179,7 +180,7 @@ export default function PatientBookingPage (){
           }
           return response.data;
         }
-        const response = await axios.post('http://localhost:4000/api/admin/reservation',data)
+        const response = await axios.post(`${API_ORIGIN}/api/admin/reservation`,data)
         if(!response.data.success){
           throw new Error(response.data.message || '예약등록에 실패했습니다')
         }

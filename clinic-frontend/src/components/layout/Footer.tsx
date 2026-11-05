@@ -10,10 +10,10 @@ import { FaInstagram, FaRegCommentDots, FaYoutube } from "react-icons/fa6";
 import { RiKakaoTalkLine } from "react-icons/ri";
 
 import * as S from "@/components/layout/Footer.styles";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
 import { localizedPath, stripLocalePrefix } from "@/i18n/url";
-import { isAppLocale, defaultLocale } from "@/i18n/config";
-import { legalKinds, legalPaths, legalUi } from "@/lib/legal/content";
 import { API_ORIGIN } from "@/lib/api/config";
+import { legalKinds, legalPaths, legalUi } from "@/lib/legal/content";
 
 import HospitalMap from "./HospitalMap";
 
@@ -135,6 +135,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
   const tFooter = useTranslations("Footer");
+  const tConsultation = useTranslations("Consultation");
   const currentLocale = useLocale();
   const locale = isAppLocale(currentLocale) ? currentLocale : defaultLocale;
   const footerRef = useRef<HTMLElement>(null);
@@ -439,6 +440,11 @@ export default function Footer() {
                   </S.LegalNavigationLink>
                 ))}
               </S.LegalNavigation>
+              <S.LegalNavigationLink
+                href={localizedPath("/consultation/check", locale)}
+              >
+                {tConsultation("lookupAnswers")} ↗
+              </S.LegalNavigationLink>
               <strong>{clinicName}</strong>
               {companyInfo.address && <span>{companyInfo.address}</span>}
               {companyInfo.phone && (

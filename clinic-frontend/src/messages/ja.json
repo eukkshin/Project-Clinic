@@ -325,7 +325,22 @@
     "deptAntiAging": "アンチエイジング",
     "deptLifting": "リフティング",
     "deptPetit": "プチ整形",
-    "deptOther": "その他の相談"
+    "deptOther": "その他の相談",
+    "lookupCodeLabel": "回答照会用コード",
+    "lookupCodeNotice": "照会コードはこの画面で一度だけ表示されます。安全に保管し、他人には共有しないでください。",
+    "copyLookupCode": "受付番号とコードをコピー",
+    "lookupAnswers": "相談の回答を確認",
+    "lookupPageTitle": "相談回答の確認",
+    "lookupPageDescription": "受付時に発行された照会コードだけを入力すると、受付番号と回答を確認できます。コードを紛失した場合は医院にお問い合わせください。",
+    "lookupStatus": "状態",
+    "lookupPending": "まだ回答が登録されていません。",
+    "lookupBack": "相談申込に戻る",
+    "captchaRequired": "不正申請防止の認証を完了してください。",
+    "lookupCodeHint": "照会コードのみを入力してください。受付番号は照会後に表示されます。",
+    "copyReceiptNo": "受付番号をコピー",
+    "copyAccessKey": "照会コードをコピー",
+    "lookupCodeCopied": "照会コードをコピーしました。安全に保管してください。",
+    "lookupCodeCopyFailed": "コピーできませんでした。コードを選択して手動でコピーしてください。"
   },
   "MyPage": {
     "descProfile": "会員情報・予約・相談履歴をまとめて確認できます。",

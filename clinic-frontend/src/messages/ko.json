@@ -325,7 +325,22 @@
     "deptAntiAging": "동안성형",
     "deptLifting": "리프팅",
     "deptPetit": "쁘띠시술",
-    "deptOther": "기타 상담"
+    "deptOther": "기타 상담",
+    "lookupCodeLabel": "비회원 답변 조회 코드",
+    "lookupCodeNotice": "조회코드는 이 화면에서 한 번만 표시됩니다. 안전한 곳에 보관하고 다른 사람과 공유하지 마세요.",
+    "copyLookupCode": "접수번호와 조회 코드 복사",
+    "lookupAnswers": "상담 답변 조회",
+    "lookupPageTitle": "내 상담 답변 확인",
+    "lookupPageDescription": "상담 접수 시 발급된 비밀 조회코드만 붙여넣으면 접수번호와 답변을 확인할 수 있습니다. 코드를 분실한 경우 병원에 문의해 주세요.",
+    "lookupStatus": "진행 상태",
+    "lookupPending": "아직 답변이 등록되지 않았습니다.",
+    "lookupBack": "상담 신청으로 돌아가기",
+    "captchaRequired": "자동 신청 방지 인증을 완료해 주세요.",
+    "lookupCodeHint": "발급받은 조회코드 하나만 입력하세요. 접수번호는 조회 후 자동으로 표시됩니다.",
+    "copyReceiptNo": "접수번호 복사",
+    "copyAccessKey": "조회 코드 복사",
+    "lookupCodeCopied": "조회코드가 복사됐습니다. 안전한 곳에 보관해 주세요.",
+    "lookupCodeCopyFailed": "복사에 실패했습니다. 조회코드를 직접 선택해 복사해 주세요."
   },
   "MyPage": {
     "descProfile": "나의 정보와 예약, 상담 기록을 한곳에서 확인하세요.",

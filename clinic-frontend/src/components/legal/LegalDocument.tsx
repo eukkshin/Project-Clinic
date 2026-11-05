@@ -1,19 +1,17 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import {
-  defaultLocale,
-  isAppLocale,
-  type AppLocale,
-} from "@/i18n/config";
+
+import { AppLocale, defaultLocale, isAppLocale } from "@/i18n/config";
 import { localizedPath } from "@/i18n/url";
 import {
   legalContent,
+  LegalKind,
   legalKinds,
   legalPaths,
   legalUi,
-  type LegalKind,
 } from "@/lib/legal/content";
+
 import * as S from "./LegalDocument.styles";
 
 type EditorialKind = Exclude<LegalKind, "patient-rights">;
@@ -40,9 +38,11 @@ const editorialCopy: Record<AppLocale, SharedCopy> = {
     contents: "이 페이지의 목차",
     sectionWord: "안내 조항",
     closeHeading: "Care begins with clarity.",
-    closeDescription: "궁금한 점은 병원에 문의해 주세요. 안스성형외과는 이해하기 쉬운 정보를 제공하기 위해 노력합니다.",
+    closeDescription:
+      "궁금한 점은 병원에 문의해 주세요. 안스성형외과는 이해하기 쉬운 정보를 제공하기 위해 노력합니다.",
     feesLabel: "비급여 진료비용 및 제증명수수료",
-    feesNotice: "현재 실제 병원 가격표가 제공되지 않아 항목별 금액을 게시하지 않았습니다. 아래 표는 디자인 예시이며 공식 비용 고지가 아닙니다.",
+    feesNotice:
+      "현재 실제 병원 가격표가 제공되지 않아 항목별 금액을 게시하지 않았습니다. 아래 표는 디자인 예시이며 공식 비용 고지가 아닙니다.",
     feesColumns: ["구분", "항목", "금액 (원)"],
     feesPending: "[확인 필요: 병원에서 승인한 실제 비급여·제증명 가격표]",
     policyMark: "AHN'S POLICY",
@@ -54,11 +54,14 @@ const editorialCopy: Record<AppLocale, SharedCopy> = {
     contents: "On this page",
     sectionWord: "Sections",
     closeHeading: "Care begins with clarity.",
-    closeDescription: "For further details, please contact the clinic. We aim to make important information easier to understand.",
+    closeDescription:
+      "For further details, please contact the clinic. We aim to make important information easier to understand.",
     feesLabel: "Non-covered medical fees and certificate charges",
-    feesNotice: "The clinic's verified fee schedule has not yet been supplied. The table is a layout placeholder, not an official fee disclosure.",
+    feesNotice:
+      "The clinic's verified fee schedule has not yet been supplied. The table is a layout placeholder, not an official fee disclosure.",
     feesColumns: ["Category", "Item", "Fee (KRW)"],
-    feesPending: "[VERIFY: Actual non-covered and certificate fees approved by the clinic]",
+    feesPending:
+      "[VERIFY: Actual non-covered and certificate fees approved by the clinic]",
     policyMark: "AHN'S POLICY",
     scrollAction: "Explore the details",
   },
@@ -68,9 +71,11 @@ const editorialCopy: Record<AppLocale, SharedCopy> = {
     contents: "このページの目次",
     sectionWord: "ご案内項目",
     closeHeading: "Care begins with clarity.",
-    closeDescription: "ご不明点は医院までお問い合わせください。大切な情報をわかりやすくお伝えできるよう努めます。",
+    closeDescription:
+      "ご不明点は医院までお問い合わせください。大切な情報をわかりやすくお伝えできるよう努めます。",
     feesLabel: "自由診療料金・証明書発行手数料",
-    feesNotice: "正式な料金表が未提供のため、項目別の金額を掲載していません。以下はレイアウト例であり、正式な料金告知ではありません。",
+    feesNotice:
+      "正式な料金表が未提供のため、項目別の金額を掲載していません。以下はレイアウト例であり、正式な料金告知ではありません。",
     feesColumns: ["区分", "項目", "料金（KRW）"],
     feesPending: "［要確認：医院が承認した料金表］",
     policyMark: "AHN'S POLICY",
@@ -82,9 +87,11 @@ const editorialCopy: Record<AppLocale, SharedCopy> = {
     contents: "本页目录",
     sectionWord: "公告条款",
     closeHeading: "Care begins with clarity.",
-    closeDescription: "如需进一步了解，请联系医院。我们致力于提供清晰易懂的信息。",
+    closeDescription:
+      "如需进一步了解，请联系医院。我们致力于提供清晰易懂的信息。",
     feesLabel: "非医保诊疗费用及证明文件收费",
-    feesNotice: "目前尚未提供经医院确认的实际价目表，以下表格仅用于展示布局，不构成正式的收费公示。",
+    feesNotice:
+      "目前尚未提供经医院确认的实际价目表，以下表格仅用于展示布局，不构成正式的收费公示。",
     feesColumns: ["类别", "项目", "金额（韩元）"],
     feesPending: "【待核实：医院批准的实际价目表】",
     policyMark: "AHN'S POLICY",
@@ -96,9 +103,11 @@ const editorialCopy: Record<AppLocale, SharedCopy> = {
     contents: "本頁目錄",
     sectionWord: "公告條款",
     closeHeading: "Care begins with clarity.",
-    closeDescription: "如需進一步瞭解，請聯絡院所。我們致力於提供清楚易懂的資訊。",
+    closeDescription:
+      "如需進一步瞭解，請聯絡院所。我們致力於提供清楚易懂的資訊。",
     feesLabel: "非健保診療費用及證明文件收費",
-    feesNotice: "目前尚未提供經院所確認的實際價目表，以下表格僅供版面展示，不構成正式收費公告。",
+    feesNotice:
+      "目前尚未提供經院所確認的實際價目表，以下表格僅供版面展示，不構成正式收費公告。",
     feesColumns: ["類別", "項目", "金額（韓元）"],
     feesPending: "【待確認：院所核准的實際價目表】",
     policyMark: "AHN'S POLICY",
@@ -120,7 +129,8 @@ const shortCodes: Record<EditorialKind, string> = {
   "reservation-policy": "RESERVATION",
 };
 
-const sectionId = (index: number) => `legal-section-${String(index + 1).padStart(2, "0")}`;
+const sectionId = (index: number) =>
+  `legal-section-${String(index + 1).padStart(2, "0")}`;
 const sectionNumber = (index: number) => String(index + 1).padStart(2, "0");
 
 /**
@@ -142,7 +152,10 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
       <S.Hero aria-labelledby="legal-title">
         <S.HeroInner>
           <S.HeroContent>
-            <S.Eyebrow><S.EyebrowRule />{copy.eyebrow}</S.Eyebrow>
+            <S.Eyebrow>
+              <S.EyebrowRule />
+              {copy.eyebrow}
+            </S.Eyebrow>
             <S.HeroTitle id="legal-title">{document.title}</S.HeroTitle>
             <S.HeroScript>{decorativeLabels[kind]}</S.HeroScript>
             <S.HeroLead>{document.lead}</S.HeroLead>
@@ -154,7 +167,11 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
             <S.ArtOuter />
             <S.ArtInner />
             <S.ArtLetter>A</S.ArtLetter>
-            <S.ArtCaption>AHN&apos;S<br />PLASTIC SURGERY</S.ArtCaption>
+            <S.ArtCaption>
+              AHN&apos;S
+              <br />
+              PLASTIC SURGERY
+            </S.ArtCaption>
           </S.HeroArtwork>
         </S.HeroInner>
         <S.HeroFoot>
@@ -166,15 +183,23 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
       <S.IntroBand id="legal-content">
         <S.Container>
           <S.IntroHead>
-            <S.IntroKicker>{copy.policyMark} <span aria-hidden="true">—</span> {shortCodes[kind]}</S.IntroKicker>
+            <S.IntroKicker>
+              {copy.policyMark} <span aria-hidden="true">—</span>{" "}
+              {shortCodes[kind]}
+            </S.IntroKicker>
             <S.IntroTitle>{ui.nav[kind]}</S.IntroTitle>
-            <S.IntroCount>{String(document.sections.length).padStart(2, "0")} <small>{copy.sectionWord}</small></S.IntroCount>
+            <S.IntroCount>
+              {String(document.sections.length).padStart(2, "0")}{" "}
+              <small>{copy.sectionWord}</small>
+            </S.IntroCount>
           </S.IntroHead>
           <S.ReviewNote aria-label={ui.draft}>
             <S.ReviewMarker aria-hidden="true">i</S.ReviewMarker>
             <S.ReviewCopy>
               <strong>{ui.draft}</strong>
-              <span>{ui.draftDescription} {ui.reviewRequired}</span>
+              <span>
+                {ui.draftDescription} {ui.reviewRequired}
+              </span>
             </S.ReviewCopy>
           </S.ReviewNote>
         </S.Container>
@@ -183,15 +208,25 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
       {isFees && (
         <S.FeesSection aria-labelledby="fees-table-title">
           <S.Container>
-            <S.FeesHeading id="fees-table-title">{copy.feesLabel}</S.FeesHeading>
+            <S.FeesHeading id="fees-table-title">
+              {copy.feesLabel}
+            </S.FeesHeading>
             <S.FeesDescription>{copy.feesNotice}</S.FeesDescription>
             <S.FeesTableScroll>
               <S.FeesTable>
                 <thead>
-                  <tr>{copy.feesColumns.map((column) => <th key={column} scope="col">{column}</th>)}</tr>
+                  <tr>
+                    {copy.feesColumns.map((column) => (
+                      <th key={column} scope="col">
+                        {column}
+                      </th>
+                    ))}
+                  </tr>
                 </thead>
                 <tbody>
-                  <tr><td colSpan={3}>{copy.feesPending}</td></tr>
+                  <tr>
+                    <td colSpan={3}>{copy.feesPending}</td>
+                  </tr>
                 </tbody>
               </S.FeesTable>
             </S.FeesTableScroll>
@@ -205,7 +240,10 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
           {isReservation ? (
             <S.TimelineGrid>
               {document.sections.map((section, index) => (
-                <S.TimelineCard key={`${kind}-${locale}-${index}`} id={sectionId(index)}>
+                <S.TimelineCard
+                  key={`${kind}-${locale}-${index}`}
+                  id={sectionId(index)}
+                >
                   <S.CardTop>
                     <S.CardNumber>{sectionNumber(index)}</S.CardNumber>
                     <S.CardIcon aria-hidden="true">↗</S.CardIcon>
@@ -224,7 +262,10 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
                   <S.IndexHeading>{copy.contents}</S.IndexHeading>
                   <S.IndexItems>
                     {document.sections.map((section, index) => (
-                      <S.IndexLink key={`${kind}-nav-${index}`} href={`#${sectionId(index)}`}>
+                      <S.IndexLink
+                        key={`${kind}-nav-${index}`}
+                        href={`#${sectionId(index)}`}
+                      >
                         <span>{sectionNumber(index)}</span>
                         <span>{section.heading}</span>
                       </S.IndexLink>
@@ -234,7 +275,10 @@ export default function LegalDocument({ kind }: { kind: EditorialKind }) {
               </S.IndexNav>
               <S.ArticleColumn>
                 {document.sections.map((section, index) => (
-                  <S.ArticleCard key={`${kind}-${locale}-${index}`} id={sectionId(index)}>
+                  <S.ArticleCard
+                    key={`${kind}-${locale}-${index}`}
+                    id={sectionId(index)}
+                  >
                     <S.ArticleHead>
                       <S.ArticleNumber>{sectionNumber(index)}</S.ArticleNumber>
                       <S.ArticleHeading>{section.heading}</S.ArticleHeading>

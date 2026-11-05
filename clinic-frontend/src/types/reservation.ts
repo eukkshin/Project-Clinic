@@ -45,6 +45,11 @@ export interface AdminReservation {
   name: string;
   phone: string;
   source: string;
+  noShowCount?: number;
+  visitConfirmedAt?: string | null;
+  reminderState?: "PENDING" | "READY" | "CONTACTED" | "CANCELLED" | null;
+  reminderDueAtKst?: string | null;
+  reminderContactedAt?: string | null;
 }
 export interface AdminBlock {
   ID: number;
@@ -56,3 +61,13 @@ export interface AdminReservationData {
   reservations: AdminReservation[];
   blocks: AdminBlock[];
 }
+
+export type AttendanceAction = "VISITED" | "NO_SHOW" | "REVOKE_NO_SHOW";
+export type ReservationStatusHistory = {
+  id: number;
+  from: string;
+  to: string;
+  reason: string;
+  adminId: string;
+  createdAt: string;
+};

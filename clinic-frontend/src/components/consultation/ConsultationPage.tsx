@@ -4,6 +4,9 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 
+import ConsultCaptcha, {
+  consultCaptchaEnabled,
+} from "@/components/security/ConsultCaptcha";
 import { submitGuestConsult } from "@/lib/consultation/api";
 import * as S from "@/styles/consultation/Consultation.styles";
 import { CONSULT_DEPARTMENTS, ConsultDepartment } from "@/types/consultation";
@@ -52,10 +55,27 @@ export default function ConsultationPage() {
   };
   const [form, setForm] = useState(initial);
   const [consent, setConsent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
-  const [receipt, setReceipt] = useState<number | null>(null);
+  const [copyStatus, setCopyStatus] = useState<"success" | "error" | null>(
+    null,
+  );
+  const [receipt, setReceipt] = useState<{
+    receiptNo: string;
+    accessKey: string;
+  } | null>(null);
   const pendingRef = useRef(false);
+
+  async function copyAccessKey(accessKey: string) {
+    try {
+      await navigator.clipboard.writeText(accessKey);
+      setCopyStatus("success");
+    } catch {
+      setCopyStatus("error");
+    }
+  }
 
   function set(field: keyof typeof initial, value: string) {
     setForm((previous) => ({ ...previous, [field]: value }));
@@ -78,6 +98,10 @@ export default function ConsultationPage() {
       setError(problem);
       return;
     }
+    if (consultCaptchaEnabled && !captchaToken) {
+      setError(t("captchaRequired"));
+      return;
+    }
 
     pendingRef.current = true;
     setPending(true);
@@ -91,8 +115,15 @@ export default function ConsultationPage() {
         content: form.content.trim(),
         privacyConsent: true,
         website: form.website,
+        captchaToken: captchaToken || undefined,
       });
-      setReceipt(result.id);
+      if (result.receiptNo && result.accessKey) {
+        setReceipt({
+          receiptNo: result.receiptNo,
+          accessKey: result.accessKey,
+        });
+        setCopyStatus(null);
+      } else throw new Error(t("submitFailed"));
       setForm(initial);
       setConsent(false);
     } catch (cause) {
@@ -100,6 +131,7 @@ export default function ConsultationPage() {
     } finally {
       pendingRef.current = false;
       setPending(false);
+      setCaptchaReset((v) => v + 1);
     }
   }
 
@@ -134,6 +166,18 @@ export default function ConsultationPage() {
           <S.AsideLink as={Link} href="/reservation">
             {t("visitIntro")} <span>{t("visitLink")} ↗</span>
           </S.AsideLink>
+          <div style={{ marginTop: 14 }}>
+            <Link
+              href="/consultation/check"
+              style={{
+                color: "inherit",
+                textDecoration: "underline",
+                textUnderlineOffset: 5,
+              }}
+            >
+              {t("lookupAnswers")} ↗
+            </Link>
+          </div>
         </S.Aside>
 
         <S.FormShell>
@@ -143,10 +187,48 @@ export default function ConsultationPage() {
               <S.FormEyebrow>REQUEST RECEIVED</S.FormEyebrow>
               <S.SuccessTitle>{t("received")}</S.SuccessTitle>
               <S.SuccessText>
-                {t("receiptNo")} <strong>{receipt}</strong>
+                {t("receiptNo")} <strong>{receipt.receiptNo}</strong>
                 <br />
                 {t("receivedMessage")}
               </S.SuccessText>
+              <S.SuccessText style={{ wordBreak: "break-all", marginTop: 14 }}>
+                {t("lookupCodeLabel")}: <strong>{receipt.accessKey}</strong>
+                <br />
+                {t("lookupCodeNotice")}
+              </S.SuccessText>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  flexWrap: "wrap",
+                  marginTop: 12,
+                }}
+              >
+                <S.Submit
+                  type="button"
+                  style={{ flex: "1 1 180px" }}
+                  onClick={() => void copyAccessKey(receipt.accessKey)}
+                >
+                  {t("copyAccessKey")}
+                </S.Submit>
+              </div>
+              {copyStatus && (
+                <p role="status" style={{ fontSize: 13, marginTop: 8 }}>
+                  {copyStatus === "success"
+                    ? t("lookupCodeCopied")
+                    : t("lookupCodeCopyFailed")}
+                </p>
+              )}
+              <Link
+                href="/consultation/check"
+                style={{
+                  display: "inline-block",
+                  marginTop: 12,
+                  textDecoration: "underline",
+                }}
+              >
+                {t("lookupAnswers")}
+              </Link>
               <S.Submit type="button" onClick={() => setReceipt(null)}>
                 {t("another")} <span aria-hidden="true">↗</span>
               </S.Submit>
@@ -293,6 +375,10 @@ export default function ConsultationPage() {
                 />
               </div>
 
+              <ConsultCaptcha
+                onToken={setCaptchaToken}
+                resetKey={captchaReset}
+              />
               {error && <S.Error role="alert">{error}</S.Error>}
               <S.Submit type="submit" disabled={pending}>
                 {pending ? t("submitting") : t("submit")}

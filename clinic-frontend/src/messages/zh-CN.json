@@ -325,7 +325,22 @@
     "deptAntiAging": "抗衰老整形",
     "deptLifting": "提升紧致",
     "deptPetit": "微整形",
-    "deptOther": "其他咨询"
+    "deptOther": "其他咨询",
+    "lookupCodeLabel": "私密查询码",
+    "lookupCodeNotice": "查询码仅显示一次，请妥善保管，切勿透露给他人。",
+    "copyLookupCode": "复制受理编号及查询码",
+    "lookupAnswers": "查询咨询回复",
+    "lookupPageTitle": "查询咨询回复",
+    "lookupPageDescription": "只需粘贴申请时获得的私密查询码，即可查看受理编号和回复。若丢失查询码，请联系医院。",
+    "lookupStatus": "处理状态",
+    "lookupPending": "目前尚无回复。",
+    "lookupBack": "返回咨询申请",
+    "captchaRequired": "请完成防机器人验证。",
+    "lookupCodeHint": "只输入查询码即可。验证成功后会自动显示受理编号。",
+    "copyReceiptNo": "复制受理编号",
+    "copyAccessKey": "复制查询码",
+    "lookupCodeCopied": "查询码已复制，请妥善保管。",
+    "lookupCodeCopyFailed": "复制失败，请手动选择并复制查询码。"
   },
   "MyPage": {
     "descProfile": "集中查看个人资料、预约和咨询记录。",

@@ -2,6 +2,8 @@ const express = require("express");
 const AppDataSource = require("../../db");
 const Consult = require("../entity/Consult");
 const Reservation = require("../entity/Reservation");
+const ReservationReminder = require("../entity/ReservationReminder");
+const { In } = require("typeorm");
 const { authenticateMember } = require("../middleware/authenticateMember");
 
 const router = express.Router();
@@ -96,6 +98,9 @@ router.get("/reservations", async (req, res) => {
         STATUS: true,
         CREATED_AT: true,
         MEMO: true,
+        SLOT_DATE: true,
+        SLOT_TIME: true,
+        VISIT_CONFIRMED_AT: true,
       },
       order: {
         SCHEDULED_AT: "DESC",
@@ -103,6 +108,14 @@ router.get("/reservations", async (req, res) => {
       take: 100,
     });
 
+    const reminders = rows.length
+      ? await AppDataSource.getRepository(ReservationReminder).find({
+          where: { RESERVATION_ID: In(rows.map((r) => r.ID)) },
+        })
+      : [];
+    const reminderMap = new Map(
+      reminders.map((r) => [Number(r.RESERVATION_ID), r]),
+    );
     const data = rows.map((row) => ({
       id: row.ID,
       department: row.DEPARTMENT,
@@ -110,6 +123,11 @@ router.get("/reservations", async (req, res) => {
       status: row.STATUS,
       createdAt: iso(row.CREATED_AT),
       memo: row.MEMO ?? null,
+      slotDate: row.SLOT_DATE,
+      slotTime: row.SLOT_TIME,
+      visitConfirmedAt: iso(row.VISIT_CONFIRMED_AT),
+      reminderState: reminderMap.get(Number(row.ID))?.STATE || null,
+      reminderDueAtKst: reminderMap.get(Number(row.ID))?.DUE_AT_KST || null,
     }));
 
     return res.status(200).json({

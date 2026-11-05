@@ -72,6 +72,8 @@ module.exports = new EntitySchema({
       nullable: true,
     },
 
+    VISIT_CONFIRMED_AT: { type: "timestamp", nullable: true },
+
     SOURCE: {
       type: "varchar2",
       length: 12,

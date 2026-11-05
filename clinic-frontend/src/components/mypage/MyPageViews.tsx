@@ -1,14 +1,20 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import { Popup } from "@/components/ui/Popup";
-import { cancelReservation } from "@/lib/reservation/api";
+import {
+  cancelReservation,
+  confirmVisitReservation,
+  getReservationAvailability,
+  rescheduleMyReservation,
+} from "@/lib/reservation/api";
 import * as S from "@/styles/mypage/MyPage.styles";
 
 import { useMyPageData } from "./useMyPageData";
 
+import type { ReservationSlot } from "@/types/reservation";
 import type { MyConsultation, MyProfile, MyReservation } from "@/types/mypage";
 
 type Tab = "profile" | "reservations" | "consultations" | "accountsettings";
@@ -386,22 +392,117 @@ export function MyPageView() {
   );
 }
 
+export // 현재 마이페이지 i18n 메시지를 덮어쓰지 않기 위해 운영 안내 문구를 로컬 언어로 제공
+const REMINDER_LABELS: Record<string, Record<string, string>> = {
+  ko: {
+    confirm: "방문 예정 확인",
+    confirmed: "방문 예정 확인됨",
+    change: "일정 변경",
+    save: "선택한 일정으로 변경",
+    close: "닫기",
+    date: "새 방문 날짜",
+    time: "새 방문 시간",
+    due: "방문 전날 안내 예정",
+    ready: "방문 전날 안내를 확인해 주세요",
+    contacted: "직원이 직접 안내 완료",
+    noshow: "노쇼",
+    notice:
+      "문자 자동 발송은 아직 연결되지 않았습니다. 사이트에서 예약을 확인하거나 변경할 수 있습니다.",
+    done: "예약 내용이 업데이트됐습니다.",
+  },
+  en: {
+    confirm: "Confirm visit",
+    confirmed: "Visit confirmed",
+    change: "Change schedule",
+    save: "Save new schedule",
+    close: "Close",
+    date: "New date",
+    time: "New time",
+    due: "Reminder scheduled",
+    ready: "Please check your upcoming visit",
+    contacted: "Staff contacted",
+    noshow: "No-show",
+    notice:
+      "Automatic text messages are not connected yet. You can confirm or change your booking here.",
+    done: "Reservation updated.",
+  },
+  ja: {
+    confirm: "来院予定を確認",
+    confirmed: "来院予定を確認済み",
+    change: "予約日時を変更",
+    save: "変更を保存",
+    close: "閉じる",
+    date: "変更後の日付",
+    time: "変更後の時間",
+    due: "前日案内の予定",
+    ready: "来院予定をご確認ください",
+    contacted: "スタッフが連絡済み",
+    noshow: "無断キャンセル",
+    notice:
+      "自動SMSはまだ連携されていません。こちらから予約を確認・変更できます。",
+    done: "予約を更新しました。",
+  },
+  "zh-CN": {
+    confirm: "确认到院",
+    confirmed: "已确认到院",
+    change: "修改预约",
+    save: "保存新预约",
+    close: "关闭",
+    date: "新日期",
+    time: "新时间",
+    due: "预约前一天提醒",
+    ready: "请确认即将到来的预约",
+    contacted: "工作人员已联系",
+    noshow: "未到诊",
+    notice: "自动短信尚未接入。您可以在此确认或修改预约。",
+    done: "预约已更新。",
+  },
+  "zh-TW": {
+    confirm: "確認到院",
+    confirmed: "已確認到院",
+    change: "修改預約",
+    save: "儲存新預約",
+    close: "關閉",
+    date: "新日期",
+    time: "新時間",
+    due: "預約前一天提醒",
+    ready: "請確認即將到來的預約",
+    contacted: "工作人員已聯絡",
+    noshow: "未到診",
+    notice: "自動簡訊尚未串接。您可以在此確認或修改預約。",
+    done: "預約已更新。",
+  },
+};
+function kstDate(offsetDays = 0) {
+  return new Date(Date.now() + 9 * 3600000 + offsetDays * 86400000)
+    .toISOString()
+    .slice(0, 10);
+}
 export function ReservationsView() {
   const t = useTranslations("MyPage");
   const locale = useLocale();
   const departmentLabel = useDepartmentLabel();
+  const op = REMINDER_LABELS[locale] ?? REMINDER_LABELS.ko;
   const reservationStatusLabels: Record<string, string> = {
     전체: t("all"),
     예약대기: t("reservationPending"),
     예약확정: t("reservationConfirmed"),
     방문완료: t("reservationCompleted"),
     취소: t("reservationCancelled"),
+    노쇼: op.noshow,
   };
   const { data, loading, error, retry, connected } =
     useMyPageData<MyReservation[]>("reservations");
   const [cancelTarget, setCancelTarget] = useState<string | number | null>(
     null,
   );
+  const [moveTarget, setMoveTarget] = useState<string | number | null>(null);
+  const [moveDate, setMoveDate] = useState(kstDate());
+  const [moveTime, setMoveTime] = useState("");
+  const [moveSlots, setMoveSlots] = useState<ReservationSlot[]>([]);
+  const [moveLoading, setMoveLoading] = useState(false);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionNotice, setActionNotice] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [filter, setFilter] = useState("전체");
@@ -410,7 +511,68 @@ export function ReservationsView() {
   const filtered = items.filter(
     (r) => filter === "전체" || r.status === filter,
   );
-  const filters = ["전체", "예약대기", "예약확정", "방문완료", "취소"];
+  const filters = ["전체", "예약대기", "예약확정", "방문완료", "노쇼", "취소"];
+
+  // 날짜 선택 시 실제 예약 가능 시간만 제공합니다.
+  useEffect(() => {
+    if (moveTarget === null || !/^\d{4}-\d{2}-\d{2}$/.test(moveDate)) return;
+    let alive = true;
+    setMoveLoading(true);
+    setMoveTime("");
+    getReservationAvailability(moveDate.slice(0, 7))
+      .then((data) => {
+        if (alive)
+          setMoveSlots(
+            data.days
+              .find((d) => d.date === moveDate)
+              ?.slots.filter((s) => s.available) ?? [],
+          );
+      })
+      .catch((err) => {
+        if (alive) {
+          setMoveSlots([]);
+          setCancelError(err instanceof Error ? err.message : "조회 실패");
+        }
+      })
+      .finally(() => {
+        if (alive) setMoveLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [moveTarget, moveDate]);
+
+  async function confirmVisit(id: string | number) {
+    if (actionBusy) return;
+    setActionBusy(true);
+    setCancelError(null);
+    setActionNotice("");
+    try {
+      await confirmVisitReservation(id);
+      setActionNotice(op.done);
+      retry();
+    } catch (e) {
+      setCancelError(e instanceof Error ? e.message : "방문 확인 실패");
+    } finally {
+      setActionBusy(false);
+    }
+  }
+  async function saveChange() {
+    if (moveTarget === null || !moveTime || actionBusy) return;
+    setActionBusy(true);
+    setCancelError(null);
+    setActionNotice("");
+    try {
+      await rescheduleMyReservation(moveTarget, moveDate, moveTime);
+      setMoveTarget(null);
+      setActionNotice(op.done);
+      retry();
+    } catch (e) {
+      setCancelError(e instanceof Error ? e.message : "예약 변경 실패");
+    } finally {
+      setActionBusy(false);
+    }
+  }
 
   async function confirmCancellation() {
     if (cancelTarget === null || cancelling) return;
@@ -441,6 +603,7 @@ export function ReservationsView() {
         }
       />
       {cancelError && <S.Notice role="alert">{cancelError}</S.Notice>}
+      {actionNotice && <S.Notice role="status">{actionNotice}</S.Notice>}
       {demo && (
         <S.DemoMessage>
           {t("sampleReservationNotice")}{" "}
@@ -515,6 +678,106 @@ export function ReservationsView() {
               </S.ItemMeta>
               {r.memo && <S.Detail>{r.memo}</S.Detail>}
               {!demo &&
+                r.reminderState &&
+                ["예약대기", "예약확정"].includes(r.status) && (
+                  <S.Notice role="status">
+                    {r.reminderState === "READY"
+                      ? op.ready
+                      : r.reminderState === "CONTACTED"
+                        ? op.contacted
+                        : op.due}
+                    {r.reminderDueAtKst ? ` · ${r.reminderDueAtKst} KST` : ""}
+                  </S.Notice>
+                )}
+              {!demo &&
+                r.visitConfirmedAt &&
+                ["예약대기", "예약확정"].includes(r.status) && (
+                  <S.Notice>{op.confirmed}</S.Notice>
+                )}
+              {!demo &&
+                ["예약대기", "예약확정"].includes(r.status) &&
+                new Date(r.scheduledAt).getTime() > Date.now() && (
+                  <S.ButtonRow>
+                    {!r.visitConfirmedAt && (
+                      <S.PlainButton
+                        type="button"
+                        disabled={actionBusy}
+                        onClick={() => void confirmVisit(r.id)}
+                      >
+                        {op.confirm}
+                      </S.PlainButton>
+                    )}
+                    <S.PlainButton
+                      type="button"
+                      disabled={actionBusy}
+                      onClick={() => {
+                        setMoveTarget(moveTarget === r.id ? null : r.id);
+                        setMoveDate(kstDate());
+                        setMoveTime("");
+                        setCancelError(null);
+                      }}
+                    >
+                      {moveTarget === r.id ? op.close : op.change}
+                    </S.PlainButton>
+                  </S.ButtonRow>
+                )}
+              {moveTarget === r.id && !demo && (
+                <div
+                  style={{
+                    marginTop: 12,
+                    padding: 16,
+                    border: "1px solid #d6e0d8",
+                    borderRadius: 12,
+                    display: "grid",
+                    gap: 10,
+                  }}
+                >
+                  <label style={{ display: "grid", gap: 5 }}>
+                    {op.date}
+                    <input
+                      type="date"
+                      value={moveDate}
+                      min={kstDate()}
+                      max={kstDate(90)}
+                      onChange={(e) => setMoveDate(e.target.value)}
+                      style={{
+                        padding: 10,
+                        border: "1px solid #d6e0d8",
+                        borderRadius: 8,
+                      }}
+                    />
+                  </label>
+                  <label style={{ display: "grid", gap: 5 }}>
+                    {op.time}
+                    <select
+                      value={moveTime}
+                      disabled={moveLoading}
+                      onChange={(e) => setMoveTime(e.target.value)}
+                      style={{
+                        padding: 10,
+                        border: "1px solid #d6e0d8",
+                        borderRadius: 8,
+                      }}
+                    >
+                      <option value="">{moveLoading ? "..." : "—"}</option>
+                      {moveSlots.map((slot) => (
+                        <option key={slot.time} value={slot.time}>
+                          {slot.time}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <S.PlainButton
+                    type="button"
+                    disabled={!moveTime || moveLoading || actionBusy}
+                    onClick={() => void saveChange()}
+                  >
+                    {op.save}
+                  </S.PlainButton>
+                </div>
+              )}
+
+              {!demo &&
                 ["예약대기", "예약확정"].includes(r.status) &&
                 new Date(r.scheduledAt).getTime() > Date.now() && (
                   <S.PlainButton
@@ -532,6 +795,7 @@ export function ReservationsView() {
         </S.ItemList>
       )}
       <S.Notice>{t("cancelNotice")}</S.Notice>
+      <S.Notice>{op.notice}</S.Notice>
       <Popup
         isOpen={cancelTarget !== null}
         title={t("cancelPopupTitle")}

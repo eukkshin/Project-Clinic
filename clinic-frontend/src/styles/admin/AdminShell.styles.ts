@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FiSettings } from "react-icons/fi";
 import styled from "styled-components";
 
 export const Shell = styled.div`
@@ -335,6 +336,16 @@ export const SiteLink = styled(Link)`
     span {
       display: none;
     }
+  }
+`;
+
+export const StyledFiIcon = styled(FiSettings)`
+  color: #555555;
+  vertical-align: middle;
+  transition: transform 0.3s ease-in-out;
+
+  a:hover & {
+    transform: rotate(90deg);
   }
 `;
 

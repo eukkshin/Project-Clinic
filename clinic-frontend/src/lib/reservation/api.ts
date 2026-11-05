@@ -1,4 +1,4 @@
-import { API_ORIGIN } from '@/lib/api/config';
+import { API_ORIGIN } from "@/lib/api/config";
 
 import type {
   AvailabilityCalendar,
@@ -80,6 +80,48 @@ export function removeReservationBlock(id: number) {
 }
 export function cancelAdminReservation(id: number) {
   return request<void>(`/api/admin/reservations/${id}/cancel`, {
+    method: "PATCH",
+  });
+}
+
+export function setReservationAttendance(
+  id: number,
+  action: "VISITED" | "NO_SHOW" | "REVOKE_NO_SHOW",
+  reason: string,
+) {
+  return request<{ id: number; status: string }>(
+    `/api/admin/reservations/${id}/attendance`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ action, reason }),
+    },
+  );
+}
+export function getReservationStatusHistory(id: number) {
+  return request<import("@/types/reservation").ReservationStatusHistory[]>(
+    `/api/admin/reservations/${id}/history`,
+  );
+}
+
+// 예약 변경/방문 확인은 로그인한 본인에게만 허용됩니다.
+export function confirmVisitReservation(id: number | string) {
+  return request<{ id: number; visitConfirmedAt: string }>(
+    `/api/reservations/${encodeURIComponent(String(id))}/confirm`,
+    { method: "PATCH" },
+  );
+}
+export function rescheduleMyReservation(
+  id: number | string,
+  date: string,
+  time: string,
+) {
+  return request<{ id: number; scheduledAt: string }>(
+    `/api/reservations/${encodeURIComponent(String(id))}/reschedule`,
+    { method: "PATCH", body: JSON.stringify({ date, time }) },
+  );
+}
+export function markReminderContacted(id: number) {
+  return request<void>(`/api/admin/reservations/${id}/reminder/contacted`, {
     method: "PATCH",
   });
 }

@@ -1,9 +1,10 @@
 "use client";
-import { API_ORIGIN } from "@/lib/api/config";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 import { Popup } from "@/components/ui/Popup";
+import { readAdminPreferences } from "@/lib/admin/preferences";
+import { API_ORIGIN } from "@/lib/api/config";
 import * as S from "@/styles/admin/Login.styles";
 
 const API_URL = API_ORIGIN;
@@ -68,7 +69,7 @@ export default function LoginPage() {
 
       //분기
       if (response.ok) {
-        const targetPath = "/admin/root";
+        const targetPath = readAdminPreferences().landingPage;
         openPopup("로그인 성공", "로그인에 성공했습니다!", () => {
           closePopup();
           router.replace(targetPath);

@@ -1,23 +1,21 @@
-
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import React, { useEffect, useMemo, useState } from "react";
-import { useDebounce } from "use-debounce";
-import axios from "@/lib/admin/apiClient";
-import styled from "styled-components";
-
 import {
-  FaSearch,
-  FaUser,
   FaCalendarCheck,
   FaClock,
   FaPlus,
+  FaSearch,
   FaTimes,
+  FaUser,
 } from "react-icons/fa";
+import styled from "styled-components";
+import { useDebounce } from "use-debounce";
+
+import axios from "@/lib/admin/apiClient";
+import { API_ORIGIN } from "@/lib/api/config";
 
 import * as S from "./today.style";
-
 
 type PatientStatus =
   | "RESERVED"
@@ -87,9 +85,7 @@ const getToday = () => {
   return `${year}-${month}-${day}`;
 };
 
-
 export default function TodayDashboard() {
-
   // 오늘 예약 환자 목록
   const [todayPatientList, setTodayPatientList] = useState<TodayPatient[]>([]);
 
@@ -99,16 +95,15 @@ export default function TodayDashboard() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
   // 예약 등록 모달
-  const [isReservationModalOpen, setIsReservationModalOpen] =
-    useState(false);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
-  const [selectedPatient, setSelectedPatient] =useState<Member | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<Member | null>(null);
 
-  const [reservationForm, setReservationForm] =useState<ReservationForm>({
-      reservationDate: getToday(),
-      reservationTime: "",
-      memo: "",
-    });
+  const [reservationForm, setReservationForm] = useState<ReservationForm>({
+    reservationDate: getToday(),
+    reservationTime: "",
+    memo: "",
+  });
 
   // 로딩 및 저장 상태
   const [isLoading, setIsLoading] = useState(true);
@@ -121,7 +116,7 @@ export default function TodayDashboard() {
       setIsLoading(true);
 
       const response = await axios.get(
-        `${API_ORIGIN}/api/admin/reservations/today`
+        `${API_ORIGIN}/api/admin/reservations/today`,
       );
 
       setTodayPatientList(response.data.data || []);
@@ -146,14 +141,11 @@ export default function TodayDashboard() {
       }
 
       try {
-        const response = await axios.get(
-          `${API_ORIGIN}/api/admin/users`,
-          {
-            params: {
-              search: debouncedSearchTerm,
-            },
-          }
-        );
+        const response = await axios.get(`${API_ORIGIN}/api/admin/users`, {
+          params: {
+            search: debouncedSearchTerm,
+          },
+        });
         setSearchedMemberList(response.data.data || []);
       } catch (error) {
         console.error("환자 검색 실패:", error);
@@ -168,19 +160,19 @@ export default function TodayDashboard() {
   const counts = useMemo(() => {
     return {
       RESERVED: todayPatientList.filter(
-        patient => patient.status === "RESERVED"
+        (patient) => patient.status === "RESERVED",
       ).length,
 
       WAITING: todayPatientList.filter(
-        patient => patient.status === "WAITING"
+        (patient) => patient.status === "WAITING",
       ).length,
 
       CONSULTING: todayPatientList.filter(
-        patient => patient.status === "CONSULTING"
+        (patient) => patient.status === "CONSULTING",
       ).length,
 
       TREATING: todayPatientList.filter(
-        patient => patient.status === "TREATING"
+        (patient) => patient.status === "TREATING",
       ).length,
     };
   }, [todayPatientList]);
@@ -219,7 +211,8 @@ export default function TodayDashboard() {
 
   //예약 정보 입력
 
-  const handleReservationFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  const handleReservationFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -231,7 +224,9 @@ export default function TodayDashboard() {
 
   // 예약 등록
 
-  const handleCreateReservation = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateReservation = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
     if (!selectedPatient) {
@@ -239,10 +234,7 @@ export default function TodayDashboard() {
       return;
     }
 
-    if (
-      !reservationForm.reservationDate ||
-      !reservationForm.reservationTime
-    ) {
+    if (!reservationForm.reservationDate || !reservationForm.reservationTime) {
       alert("예약 날짜와 시간을 입력해 주세요.");
       return;
     }
@@ -250,18 +242,15 @@ export default function TodayDashboard() {
     try {
       setIsSaving(true);
 
-      await axios.post(
-        `${API_ORIGIN}/api/admin/reservations`,
-        {
-          chartNo: selectedPatient.chartNo,
-          reservationDate: reservationForm.reservationDate,
-          reservationTime: reservationForm.reservationTime,
-          status: "RESERVED",
-          visitType: "RESERVATION",
-          arrivalTime: null,
-          memo: reservationForm.memo,
-        }
-      );
+      await axios.post(`${API_ORIGIN}/api/admin/reservations`, {
+        chartNo: selectedPatient.chartNo,
+        reservationDate: reservationForm.reservationDate,
+        reservationTime: reservationForm.reservationTime,
+        status: "RESERVED",
+        visitType: "RESERVATION",
+        arrivalTime: null,
+        memo: reservationForm.memo,
+      });
 
       alert("예약이 등록되었습니다.");
 
@@ -280,11 +269,13 @@ export default function TodayDashboard() {
 
   //  환자 상태 변경
 
-  const handleChangeStatus = async (patient: TodayPatient, nextStatus: PatientStatus ) => {
+  const handleChangeStatus = async (
+    patient: TodayPatient,
+    nextStatus: PatientStatus,
+  ) => {
     if (nextStatus === patient.status) return;
 
-    const availableStatuses =
-      AVAILABLE_STATUSES[patient.status];
+    const availableStatuses = AVAILABLE_STATUSES[patient.status];
 
     if (!availableStatuses.includes(nextStatus)) {
       alert("변경할 수 없는 상태입니다.");
@@ -296,7 +287,7 @@ export default function TodayDashboard() {
         `${API_ORIGIN}/api/admin/reservations/${patient.reservationIdx}/status`,
         {
           status: nextStatus,
-        }
+        },
       );
 
       // 서버 변경 성공 후 화면 반영
@@ -304,8 +295,8 @@ export default function TodayDashboard() {
         prev.map((item) =>
           item.reservationIdx === patient.reservationIdx
             ? { ...item, status: nextStatus }
-            : item
-        )
+            : item,
+        ),
       );
     } catch (error) {
       console.error("환자 상태 변경 실패:", error);
@@ -326,7 +317,7 @@ export default function TodayDashboard() {
     };
 
     return [...todayPatientList].sort((a, b) => {
-      const statusOrder =priority[a.status] - priority[b.status];
+      const statusOrder = priority[a.status] - priority[b.status];
 
       if (statusOrder !== 0) return statusOrder;
 
@@ -337,17 +328,12 @@ export default function TodayDashboard() {
   return (
     <Layout>
       <S.PageContainer>
-
         {/* 상단 헤더 */}
         <S.PageHeader>
           <S.PageHeading>
-            <S.Eyebrow>
-              CLINIC RECEPTION & APPOINTMENT DASHBOARD
-            </S.Eyebrow>
+            <S.Eyebrow>CLINIC RECEPTION & APPOINTMENT DASHBOARD</S.Eyebrow>
 
-            <S.PageTitle>
-              오늘의 예약 및 내원 현황
-            </S.PageTitle>
+            <S.PageTitle>오늘의 예약 및 내원 현황</S.PageTitle>
 
             <S.PageDescription>
               오늘 예약된 환자와 내원 진행 상황을 관리합니다.
@@ -355,10 +341,7 @@ export default function TodayDashboard() {
           </S.PageHeading>
 
           <S.ButtonWrapper>
-            <S.PrimaryButton
-              type="button"
-              onClick={handleOpenReservationModal}
-            >
+            <S.PrimaryButton type="button" onClick={handleOpenReservationModal}>
               <FaPlus />
               <span>예약 등록</span>
             </S.PrimaryButton>
@@ -376,7 +359,6 @@ export default function TodayDashboard() {
 
         {/* 요약 카드 */}
         <S.SummaryGrid>
-
           <S.SummaryCard>
             <S.SummaryIcon $variant="pink">
               <FaCalendarCheck />
@@ -384,7 +366,15 @@ export default function TodayDashboard() {
 
             <S.SummaryContent>
               <span>오늘 총 예약</span>
-              <strong>{counts.RESERVED + counts.WAITING + counts.CONSULTING + counts.TREATING + todayPatientList.filter(p => p.status === "COMPLETED").length}명</strong>
+              <strong>
+                {counts.RESERVED +
+                  counts.WAITING +
+                  counts.CONSULTING +
+                  counts.TREATING +
+                  todayPatientList.filter((p) => p.status === "COMPLETED")
+                    .length}
+                명
+              </strong>
               <small>오늘 예약된 전체 환자</small>
             </S.SummaryContent>
           </S.SummaryCard>
@@ -424,12 +414,10 @@ export default function TodayDashboard() {
               <small>시술 및 치료 진행 환자</small>
             </S.SummaryContent>
           </S.SummaryCard>
-
         </S.SummaryGrid>
 
         {/* 중앙 예약 목록 */}
         <S.Panel>
-
           <S.PanelHeader>
             <S.PanelHeading>
               <S.PanelIcon>
@@ -437,9 +425,7 @@ export default function TodayDashboard() {
               </S.PanelIcon>
 
               <div>
-                <S.PanelTitle>
-                  오늘의 예약 및 내원 환자
-                </S.PanelTitle>
+                <S.PanelTitle>오늘의 예약 및 내원 환자</S.PanelTitle>
 
                 <S.PanelDescription>
                   환자별 현재 진행 상태를 직접 변경할 수 있습니다.
@@ -447,17 +433,12 @@ export default function TodayDashboard() {
               </div>
             </S.PanelHeading>
 
-            <S.ItemCount>
-              총 {todayPatientList.length}명
-            </S.ItemCount>
+            <S.ItemCount>총 {todayPatientList.length}명</S.ItemCount>
           </S.PanelHeader>
 
           <S.RecordList>
-
             {isLoading ? (
-              <S.EmptyState>
-                예약 목록을 불러오는 중입니다.
-              </S.EmptyState>
+              <S.EmptyState>예약 목록을 불러오는 중입니다.</S.EmptyState>
             ) : sortedPatientList.length === 0 ? (
               <S.EmptyState>
                 <FaCalendarCheck />
@@ -467,12 +448,9 @@ export default function TodayDashboard() {
             ) : (
               sortedPatientList.map((patient) => (
                 <S.RecordCard key={patient.reservationIdx}>
-
                   <S.RecordTop>
                     <S.RecordIdentity $gender={patient.gender}>
-                      <div className="avatar">
-                        {patient.name?.[0]}
-                      </div>
+                      <div className="avatar">{patient.name?.[0]}</div>
 
                       <div>
                         <S.RecordName>
@@ -490,14 +468,12 @@ export default function TodayDashboard() {
 
                     <StatusSelect
                       value={patient.status}
-                      disabled={
-                        AVAILABLE_STATUSES[patient.status].length === 0
-                      }
+                      disabled={AVAILABLE_STATUSES[patient.status].length === 0}
                       $status={patient.status}
                       onChange={(e) =>
                         handleChangeStatus(
                           patient,
-                          e.target.value as PatientStatus
+                          e.target.value as PatientStatus,
                         )
                       }
                     >
@@ -505,29 +481,20 @@ export default function TodayDashboard() {
                         {STATUS_LABEL[patient.status]}
                       </option>
 
-                      {AVAILABLE_STATUSES[patient.status].map(
-                        (status) => (
-                          <option key={status} value={status}>
-                            {STATUS_LABEL[status]}
-                          </option>
-                        )
-                      )}
+                      {AVAILABLE_STATUSES[patient.status].map((status) => (
+                        <option key={status} value={status}>
+                          {STATUS_LABEL[status]}
+                        </option>
+                      ))}
                     </StatusSelect>
                   </S.RecordTop>
 
-                  {patient.memo && (
-                    <PatientMemo>
-                      {patient.memo}
-                    </PatientMemo>
-                  )}
-
+                  {patient.memo && <PatientMemo>{patient.memo}</PatientMemo>}
                 </S.RecordCard>
               ))
             )}
-
           </S.RecordList>
         </S.Panel>
-
       </S.PageContainer>
 
       {/* --------------------------------
@@ -536,26 +503,19 @@ export default function TodayDashboard() {
 
       {isReservationModalOpen && (
         <ModalOverlay onClick={handleCloseReservationModal}>
-          <ReservationModal
-            onClick={(e) => e.stopPropagation()}
-          >
-
+          <ReservationModal onClick={(e) => e.stopPropagation()}>
             <ModalHeader>
               <div>
                 <h2>신규 예약 등록</h2>
                 <p>환자를 검색하고 예약 정보를 입력해 주세요.</p>
               </div>
 
-              <CloseButton
-                type="button"
-                onClick={handleCloseReservationModal}
-              >
+              <CloseButton type="button" onClick={handleCloseReservationModal}>
                 <FaTimes />
               </CloseButton>
             </ModalHeader>
 
             <form onSubmit={handleCreateReservation}>
-
               {/* 환자 검색 */}
               <FormSection>
                 <FormLabel>예약 환자 검색</FormLabel>
@@ -587,9 +547,7 @@ export default function TodayDashboard() {
                         type="text"
                         placeholder="이름 또는 차트번호 검색"
                         value={searchTerm}
-                        onChange={(e) =>
-                          setSearchTerm(e.target.value)
-                        }
+                        onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </SearchBox>
 
@@ -602,9 +560,7 @@ export default function TodayDashboard() {
                             <SearchResultItem
                               type="button"
                               key={patient.chartNo}
-                              onClick={() =>
-                                handleSelectPatient(patient)
-                              }
+                              onClick={() => handleSelectPatient(patient)}
                             >
                               <div>
                                 <strong>{patient.name}</strong>
@@ -680,9 +636,7 @@ export default function TodayDashboard() {
                   {isSaving ? "저장 중..." : "예약 등록"}
                 </SubmitButton>
               </ModalButtonGroup>
-
             </form>
-
           </ReservationModal>
         </ModalOverlay>
       )}

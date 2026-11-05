@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
+import ConsultCaptcha, {
+  consultCaptchaEnabled,
+} from "@/components/security/ConsultCaptcha";
 import * as S from "@/components/ui/EventPopup.styles";
 import { stripLocalePrefix } from "@/i18n/url";
 import { API_ORIGIN } from "@/lib/api/config";
@@ -64,6 +67,8 @@ function PopupCard({
   const [phone, setPhone] = useState("");
   const [department, setDepartment] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [hideToday, setHideToday] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -78,6 +83,8 @@ function PopupCard({
     }
     if (!department.trim()) return setFeedback("상담 부위를 입력해 주세요.");
     if (!isAgreed) return setFeedback("개인정보 수집·이용에 동의해 주세요.");
+    if (consultCaptchaEnabled && !captchaToken)
+      return setFeedback("자동 신청 방지 인증을 완료해 주세요.");
 
     try {
       setIsSubmitting(true);
@@ -86,7 +93,13 @@ function PopupCard({
       // 원래 이벤트 팝업에서 사용하던 API와 데이터 키를 유지한다.
       const { data } = await axios.post<QuickConsultResponse>(
         `${API_URL}/api/consult/quick`,
-        { name: name.trim(), phone, department: department.trim(), privacyConsent: isAgreed },
+        {
+          name: name.trim(),
+          phone,
+          department: department.trim(),
+          privacyConsent: isAgreed,
+          captchaToken,
+        },
       );
 
       if (!data.success) throw new Error(data.message || "상담 접수 실패");
@@ -102,6 +115,7 @@ function PopupCard({
       setFeedback("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setIsSubmitting(false);
+      setCaptchaReset((v) => v + 1);
     }
   };
 
@@ -200,6 +214,7 @@ function PopupCard({
             </S.PrivacyLabel>
           </S.ConsentRow>
 
+          <ConsultCaptcha onToken={setCaptchaToken} resetKey={captchaReset} />
           {feedback && <S.FormFeedback role="alert">{feedback}</S.FormFeedback>}
 
           <S.SubmitBtn
@@ -209,7 +224,8 @@ function PopupCard({
               !isAgreed ||
               !name.trim() ||
               !phone.trim() ||
-              !department
+              !department ||
+              (consultCaptchaEnabled && !captchaToken)
             }
           >
             {isSubmitting ? "신청 중..." : "빠른 상담 신청하기"}

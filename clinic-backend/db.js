@@ -23,7 +23,12 @@ const DetailPage = require("./src/entity/DetailPage");
 const DetailSection = require("./src/entity/DetailSection");
 const ReservationBlock = require("./src/entity/ReservationBlock");
 const AdminReservation = require("./src/entity/AdminReservation");
-
+const AdminNotification = require("./src/entity/AdminNotification");
+const ConsultActivity = require("./src/entity/ConsultActivity");
+const ReservationStatusAudit = require("./src/entity/ReservationStatusAudit");
+const ReservationReminder = require("./src/entity/ReservationReminder");
+const ReservationMessage = require("./src/entity/ReservationMessage");
+const ReservationMessagePolicy = require("./src/entity/ReservationMessagePolicy");
 
 const AppDataSource = new DataSource({
   type: "oracle",
@@ -60,6 +65,12 @@ const AppDataSource = new DataSource({
     Reservation,
     ReservationBlock,
     AdminReservation,
+    AdminNotification,
+    ConsultActivity,
+    ReservationStatusAudit,
+    ReservationReminder,
+    ReservationMessage,
+    ReservationMessagePolicy,
   ],
   extra: {
     poolMin: 2,

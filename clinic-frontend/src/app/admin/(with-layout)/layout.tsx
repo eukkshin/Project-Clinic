@@ -23,11 +23,13 @@ import {
   FiMenu,
   FiMessageSquare,
   FiRadio,
+  FiSettings,
   FiShield,
   FiUsers,
   FiVideo,
 } from "react-icons/fi";
 
+import AdminNotifications from "@/components/admin/AdminNotifications";
 import { Popup } from "@/components/ui/Popup";
 import { API_ORIGIN } from "@/lib/api/config";
 import * as A from "@/styles/admin/AdminShell.styles";
@@ -49,6 +51,7 @@ const menuGroups = [
         title: "상담신청 관리",
         icon: FiMessageSquare,
       },
+      { href: "/admin/reservations", title: "예약 관리", icon: FiCalendar },
       { href: "/admin/boards", title: "게시판 관리", icon: FiClipboard },
     ],
   },
@@ -65,7 +68,6 @@ const menuGroups = [
       { href: "/admin/safety", title: "안전 시스템", icon: FiShield },
       { href: "/admin/qna", title: "QnA 관리", icon: FiHelpCircle },
       { href: "/admin/details", title: "상세페이지", icon: FiFileText },
-      { href: "/admin/reservations", title: "예약 관리", icon: FiCalendar },
       { href: "/admin/translations", title: "번역 관리", icon: FiGlobe },
     ],
   },
@@ -74,6 +76,7 @@ const menuGroups = [
     items: [
       { href: "/admin/tone", title: "톤앤매너", icon: FiFeather },
       { href: "/admin/footer", title: "푸터", icon: FiLayout },
+      { href: "/admin/settings", title: "환경 설정", icon: FiSettings },
     ],
   },
 ] as const;
@@ -239,6 +242,14 @@ export default function AdminLayout({
             </A.TopbarLead>
             <A.TopbarActions>
               <A.SiteLink
+                href="/admin/settings"
+                title="관리자 환경 설정"
+                aria-label="관리자 환경 설정"
+              >
+                <A.StyledFiIcon size={17} />
+                <span>설정</span>
+              </A.SiteLink>
+              <A.SiteLink
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -263,6 +274,7 @@ export default function AdminLayout({
           <A.Main className="ahns-ops-main">{children}</A.Main>
         </A.Workspace>
       </A.Shell>
+      <AdminNotifications />
       <Popup
         isOpen={popupConfig.isOpen}
         title={popupConfig.title}

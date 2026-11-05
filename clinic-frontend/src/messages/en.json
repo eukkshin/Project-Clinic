@@ -325,7 +325,22 @@
     "deptAntiAging": "Anti-aging",
     "deptLifting": "Lifting",
     "deptPetit": "Minimally invasive treatments",
-    "deptOther": "Other"
+    "deptOther": "Other",
+    "lookupCodeLabel": "Private lookup code",
+    "lookupCodeNotice": "This code is displayed only once. Store it securely and never share it.",
+    "copyLookupCode": "Copy receipt and lookup code",
+    "lookupAnswers": "Check consultation reply",
+    "lookupPageTitle": "View your consultation reply",
+    "lookupPageDescription": "Paste your private lookup code to view your consultation reference number and reply. If you lost the code, please contact the clinic.",
+    "lookupStatus": "Status",
+    "lookupPending": "A reply has not been posted yet.",
+    "lookupBack": "Back to consultation",
+    "captchaRequired": "Complete the anti-spam verification.",
+    "lookupCodeHint": "Enter the lookup code only. Your reference number will appear after verification.",
+    "copyReceiptNo": "Copy receipt number",
+    "copyAccessKey": "Copy lookup code",
+    "lookupCodeCopied": "Lookup code copied. Please keep it in a safe place.",
+    "lookupCodeCopyFailed": "Copy failed. Please select and copy the code manually."
   },
   "MyPage": {
     "descProfile": "Manage your profile, reservations and consultation history in one place.",

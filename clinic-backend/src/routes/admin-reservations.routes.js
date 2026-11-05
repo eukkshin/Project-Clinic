@@ -1,7 +1,21 @@
 "use strict";
 const express = require("express");
-const { Between, In } = require("typeorm");
+const { Between, In, MoreThanOrEqual } = require("typeorm");
 const Reservation = require("../entity/Reservation");
+const ReservationStatusAudit = require("../entity/ReservationStatusAudit");
+const ReservationReminder = require("../entity/ReservationReminder");
+const {
+  upsertReminder,
+  cancelReminder,
+} = require("../reservations/reminder-service");
+const {
+  queueCreated,
+  queueCancelled,
+} = require("../messaging/message-service");
+const {
+  recordNotification,
+  broadcastNotification,
+} = require("../services/admin-notifications");
 const ReservationBlock = require("../entity/ReservationBlock");
 const Member = require("../entity/Member");
 const {
@@ -59,8 +73,37 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
           })
         : [];
       const memberMap = new Map(members.map((m) => [Number(m.USER_IDX), m]));
+      const reminderRows = reservations.length
+        ? await dataSource.getRepository(ReservationReminder).find({
+            where: { RESERVATION_ID: In(reservations.map((r) => r.ID)) },
+          })
+        : [];
+      const reminderMap = new Map(
+        reminderRows.map((r) => [Number(r.RESERVATION_ID), r]),
+      );
+      // 자동 차단에 사용하지 않는 관리자용 반복 노쇼 참고 정보 (최근 365일 기준).
+      const since = new Date(Date.now() - 365 * 86400000)
+        .toISOString()
+        .slice(0, 10);
+      const noShows = await dataSource.getRepository(Reservation).find({
+        where: { STATUS: "노쇼", SLOT_DATE: MoreThanOrEqual(since) },
+        select: { USER_IDX: true, CONTACT_PHONE: true },
+      });
+      const memberCount = new Map();
+      const phoneCount = new Map();
+      const digits = (v) => String(v || "").replace(/\D/g, "");
+      for (const record of noShows) {
+        if (record.USER_IDX != null)
+          memberCount.set(
+            Number(record.USER_IDX),
+            (memberCount.get(Number(record.USER_IDX)) || 0) + 1,
+          );
+        const phone = digits(record.CONTACT_PHONE);
+        if (phone) phoneCount.set(phone, (phoneCount.get(phone) || 0) + 1);
+      }
       const data = reservations.map((row) => {
         const member = memberMap.get(Number(row.USER_IDX));
+        const reminder = reminderMap.get(Number(row.ID));
         return {
           id: row.ID,
           userIdx: row.USER_IDX,
@@ -73,6 +116,14 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
           name: row.CONTACT_NAME || member?.USER_NAME || "미등록",
           phone: row.CONTACT_PHONE || member?.PHONE || "",
           source: row.SOURCE || "MEMBER",
+          visitConfirmedAt: row.VISIT_CONFIRMED_AT || null,
+          reminderState: reminder?.STATE || null,
+          reminderDueAtKst: reminder?.DUE_AT_KST || null,
+          reminderContactedAt: reminder?.CONTACTED_AT || null,
+          noShowCount: Math.max(
+            memberCount.get(Number(row.USER_IDX)) || 0,
+            phoneCount.get(digits(row.CONTACT_PHONE || member?.PHONE)) || 0,
+          ),
         };
       });
       res.set("Cache-Control", "no-store");
@@ -186,7 +237,7 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
             throw new BookingError(404, "해당 회원 아이디를 찾을 수 없습니다.");
           userIdx = member.USER_IDX;
         }
-        return insertConfirmed(manager, {
+        const booked = await insertConfirmed(manager, {
           userIdx,
           department: req.body.department,
           date: req.body.date,
@@ -197,14 +248,69 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
           source: "MANUAL",
           manual: true,
         });
+        await upsertReminder(manager, booked);
+        await queueCreated(manager, booked);
+        const notification = await recordNotification(
+          manager,
+          "RESERVATION",
+          Number(booked.ID),
+          "새 방문예약이 등록되었습니다.",
+        );
+        return { booked, notification };
       });
+      broadcastNotification(row.notification);
       return res.status(201).json({
         success: true,
-        data: { id: row.ID },
+        data: { id: row.booked.ID },
         message: "예약자를 추가하고 바로 확정했습니다.",
       });
     } catch (error) {
       return sendError(res, error, "관리자 예약 수동 추가 오류:");
+    }
+  });
+
+  // 직원이 전화/문자 등으로 직접 안내한 경우에만 표시합니다.
+  router.patch("/:id/reminder/contacted", trustedOrigin, async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id <= 0)
+      return res
+        .status(400)
+        .json({ success: false, message: "예약번호 확인이 필요합니다." });
+    try {
+      await dataSource.transaction(async (manager) => {
+        const repo = manager.getRepository(ReservationReminder);
+        await manager.query(
+          "SELECT ID FROM RESERVATION_REMINDER_TB WHERE RESERVATION_ID=:1 FOR UPDATE",
+          [id],
+        );
+        const reminder = await repo.findOne({ where: { RESERVATION_ID: id } });
+        if (!reminder)
+          throw new BookingError(404, "리마인더가 존재하지 않습니다.");
+        if (reminder.STATE !== "READY")
+          throw new BookingError(409, "안내 대기 상태가 아닙니다.");
+        const reservation = await manager
+          .getRepository(Reservation)
+          .findOne({ where: { ID: id } });
+        if (!reservation || !ACTIVE_STATUSES.includes(reservation.STATUS))
+          throw new BookingError(
+            409,
+            "취소·종료된 예약은 안내 완료로 처리할 수 없습니다.",
+          );
+        await repo.update(
+          { ID: reminder.ID, STATE: "READY" },
+          {
+            STATE: "CONTACTED",
+            CONTACTED_AT: new Date(),
+            CONTACTED_BY: String(req.admin.userId).slice(0, 50),
+          },
+        );
+      });
+      return res.json({
+        success: true,
+        message: "직접 안내 완료로 기록했습니다.",
+      });
+    } catch (error) {
+      return sendError(res, error, "관리자 리마인더 처리 오류:");
     }
   });
 
@@ -223,6 +329,18 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
         if (!ACTIVE_STATUSES.includes(row.STATUS))
           throw new BookingError(409, "이미 취소되었거나 종료된 예약입니다.");
         await repo.update({ ID: id, STATUS: row.STATUS }, { STATUS: "취소" });
+        await cancelReminder(manager, id);
+        await queueCancelled(manager, row);
+        const audit = manager.getRepository(ReservationStatusAudit);
+        await audit.save(
+          audit.create({
+            RESERVATION_ID: id,
+            PREVIOUS_STATUS: row.STATUS,
+            NEXT_STATUS: "취소",
+            REASON: "관리자 강제 취소",
+            ADMIN_USER_ID: req.admin.userId,
+          }),
+        );
       });
       return res.json({
         success: true,

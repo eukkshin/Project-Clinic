@@ -20,14 +20,19 @@ import {
   cancelAdminReservation,
   getAdminReservations,
   getReservationAvailability,
+  getReservationStatusHistory,
+  markReminderContacted,
   removeReservationBlock,
+  setReservationAttendance,
 } from "@/lib/reservation/api";
 import * as S from "@/styles/reservation/AdminReservation.styles";
 import {
   AdminReservationData,
+  AttendanceAction,
   AvailabilityCalendar,
   RESERVATION_DEPARTMENTS,
   ReservationDepartment,
+  ReservationStatusHistory,
 } from "@/types/reservation";
 
 const nowKst = () =>
@@ -68,8 +73,17 @@ export default function AdminReservationsPage() {
   const [memo, setMemo] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const [attendanceReason, setAttendanceReason] = useState("");
+  const [historyFor, setHistoryFor] = useState<number | null>(null);
+  const [statusHistory, setStatusHistory] = useState<
+    ReservationStatusHistory[]
+  >([]);
 
   const refresh = useCallback(() => setRefreshKey((value) => value + 1), []);
+  useEffect(() => {
+    const timer = window.setInterval(refresh, 60_000);
+    return () => window.clearInterval(timer);
+  }, [refresh]);
 
   useEffect(() => {
     let alive = true;
@@ -119,9 +133,58 @@ export default function AdminReservationsPage() {
     return (new Date(Date.UTC(year, m - 1, 1)).getUTCDay() + 6) % 7;
   }, [month]);
   const monthDisplay = `${month.slice(0, 4)}년 ${Number(month.slice(5))}월`;
+  const readyReminders = (adminData?.reservations ?? []).filter(
+    (r) => r.reminderState === "READY",
+  ).length;
   const activeReservations = selectedBookings.filter((booking) =>
     ["예약확정", "예약대기"].includes(booking.status),
   ).length;
+
+  async function toggleAttendanceHistory(id: number) {
+    if (historyFor === id) {
+      setHistoryFor(null);
+      return;
+    }
+    try {
+      const rows = await getReservationStatusHistory(id);
+      setStatusHistory(rows);
+      setHistoryFor(id);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "예약 판정 이력 조회 실패",
+      );
+    }
+  }
+  function askAttendance(
+    bookingId: number,
+    customerName: string,
+    action: AttendanceAction,
+  ) {
+    const text = attendanceReason.trim();
+    if (
+      (action === "NO_SHOW" || action === "REVOKE_NO_SHOW") &&
+      (text.length < 5 || text.length > 500)
+    ) {
+      setError("노쇼·판정 취소 시 사유를 최소 5자 이상 입력해 주세요.");
+      return;
+    }
+    const name =
+      action === "VISITED"
+        ? "방문 완료"
+        : action === "NO_SHOW"
+          ? "노쇼 확정"
+          : "노쇼 판정 취소";
+    askConfirm({
+      title: name,
+      message: `${customerName} 님의 예약을 '${name}' 처리하시겠습니까? 이력에 담당자와 사유가 기록됩니다.`,
+      action: () => setReservationAttendance(bookingId, action, text),
+      success: `${name} 처리했습니다.`,
+      afterSuccess: () => {
+        setAttendanceReason("");
+        setHistoryFor(null);
+      },
+    });
+  }
 
   async function execute(operation: Confirmation) {
     if (pending) return;
@@ -222,7 +285,8 @@ export default function AdminReservationsPage() {
           </div>
           <S.HeaderActions>
             <S.Counter>
-              이번 달 예약 {adminData?.reservations.length ?? 0}건
+              이번 달 예약 {adminData?.reservations.length ?? 0}건 · 하루 전
+              안내 대기 {readyReminders}건
             </S.Counter>
             <S.BackLink as={Link} href="/admin">
               <FiArrowLeft size={14} aria-hidden="true" /> 관리자 홈
@@ -446,6 +510,28 @@ export default function AdminReservationsPage() {
                 <S.PanelTitle>{date} 예약자 현황</S.PanelTitle>
                 <S.Counter>활성 예약 {activeReservations}건</S.Counter>
               </S.PanelHead>
+              <S.PanelBody
+                className="admin-panel-body"
+                style={{ paddingBottom: 10 }}
+              >
+                <S.Description>
+                  방문 여부는 직원이 실제로 확인하고 기록해 주세요. 예약시간
+                  경과만으로 노쇼가 자동 확정되지는 않습니다.
+                </S.Description>
+                <S.Label
+                  className="admin-form-field"
+                  htmlFor="attendance-reason"
+                >
+                  방문/노쇼 처리 사유 (노쇼 또는 판정 취소는 5자 이상 필수)
+                  <S.Textarea
+                    id="attendance-reason"
+                    value={attendanceReason}
+                    maxLength={500}
+                    placeholder="예: 예약시간 30분 경과, 연락 2회 시도 후 미방문 확인"
+                    onChange={(e) => setAttendanceReason(e.target.value)}
+                  />
+                </S.Label>
+              </S.PanelBody>
               {selectedBookings.length === 0 ? (
                 <S.EmptyState>
                   선택한 날짜에 등록된 예약 내역이 없습니다.
@@ -475,6 +561,14 @@ export default function AdminReservationsPage() {
                               {booking.memo && (
                                 <small>요청: {booking.memo}</small>
                               )}
+                              {(booking.noShowCount ?? 0) >= 2 && (
+                                <small
+                                  style={{ color: "#ad5951", fontWeight: 700 }}
+                                >
+                                  최근 1년 노쇼 {booking.noShowCount}회 · 관리자
+                                  검토
+                                </small>
+                              )}
                             </S.PersonCell>
                           </td>
                           <td>{booking.department}</td>
@@ -486,9 +580,128 @@ export default function AdminReservationsPage() {
                               {booking.source === "MANUAL"
                                 ? "관리자 등록"
                                 : "회원 예약"}
+                              {booking.visitConfirmedAt
+                                ? " · 방문 예정 확인됨"
+                                : " · 고객 미확인"}
                             </S.SourceText>
+                            {booking.reminderState === "PENDING" && (
+                              <S.SourceText>
+                                방문 전날 안내 예정 ·{" "}
+                                {booking.reminderDueAtKst?.replace(" ", " ")}{" "}
+                                (KST)
+                              </S.SourceText>
+                            )}
+                            {booking.reminderState === "READY" && (
+                              <S.SourceText
+                                style={{ color: "#a45a2a", fontWeight: 700 }}
+                              >
+                                하루 전 안내 대기 · 아직 문자 미발송
+                              </S.SourceText>
+                            )}
+                            {booking.reminderState === "CONTACTED" && (
+                              <S.SourceText>직원 직접 안내 완료</S.SourceText>
+                            )}
                           </td>
                           <td>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 5,
+                              }}
+                            >
+                              {["예약대기", "예약확정"].includes(
+                                booking.status,
+                              ) &&
+                                Date.now() >=
+                                  new Date(
+                                    `${booking.slotDate}T${booking.slotTime}:00+09:00`,
+                                  ).getTime() -
+                                    2 * 60 * 60 * 1000 && (
+                                  <S.Button
+                                    type="button"
+                                    $compact
+                                    disabled={pending}
+                                    onClick={() =>
+                                      askAttendance(
+                                        booking.id,
+                                        booking.name,
+                                        "VISITED",
+                                      )
+                                    }
+                                  >
+                                    방문완료
+                                  </S.Button>
+                                )}
+                              {["예약대기", "예약확정"].includes(
+                                booking.status,
+                              ) &&
+                                Date.now() >=
+                                  new Date(
+                                    `${booking.slotDate}T${booking.slotTime}:00+09:00`,
+                                  ).getTime() +
+                                    30 * 60 * 1000 && (
+                                  <S.Button
+                                    type="button"
+                                    $compact
+                                    $danger
+                                    disabled={pending}
+                                    onClick={() =>
+                                      askAttendance(
+                                        booking.id,
+                                        booking.name,
+                                        "NO_SHOW",
+                                      )
+                                    }
+                                  >
+                                    노쇼
+                                  </S.Button>
+                                )}
+                              {booking.status === "노쇼" && (
+                                <S.Button
+                                  type="button"
+                                  $compact
+                                  disabled={pending}
+                                  onClick={() =>
+                                    askAttendance(
+                                      booking.id,
+                                      booking.name,
+                                      "REVOKE_NO_SHOW",
+                                    )
+                                  }
+                                >
+                                  노쇼 판정 취소
+                                </S.Button>
+                              )}
+                              {booking.reminderState === "READY" && (
+                                <S.Button
+                                  type="button"
+                                  $compact
+                                  disabled={pending}
+                                  onClick={() =>
+                                    askConfirm({
+                                      title: "직접 안내 완료 기록",
+                                      message: `${booking.name} 님에게 전화·문자 등으로 실제 안내한 경우에만 완료 처리하세요. 시스템은 메시지를 자동 발송하지 않습니다.`,
+                                      action: () =>
+                                        markReminderContacted(booking.id),
+                                      success: "직접 안내 완료로 기록했습니다.",
+                                    })
+                                  }
+                                >
+                                  직접 안내 완료
+                                </S.Button>
+                              )}
+                              <S.Button
+                                type="button"
+                                $compact
+                                disabled={pending}
+                                onClick={() =>
+                                  void toggleAttendanceHistory(booking.id)
+                                }
+                              >
+                                이력
+                              </S.Button>
+                            </div>
                             {["예약대기", "예약확정"].includes(
                               booking.status,
                             ) ? (
@@ -518,6 +731,31 @@ export default function AdminReservationsPage() {
                     </tbody>
                   </S.Table>
                 </S.TableWrapper>
+              )}
+              {historyFor !== null && (
+                <S.PanelBody
+                  className="admin-panel-body"
+                  style={{ borderTop: "1px solid #e4eae5" }}
+                >
+                  <S.SectionTitle>예약 #{historyFor} 처리 이력</S.SectionTitle>
+                  {statusHistory.length === 0 ? (
+                    <S.Description>
+                      방문/노쇼 처리 이력이 없습니다.
+                    </S.Description>
+                  ) : (
+                    statusHistory.map((item) => (
+                      <S.Description
+                        key={item.id}
+                        style={{ marginTop: 9, whiteSpace: "pre-wrap" }}
+                      >
+                        {new Date(item.createdAt).toLocaleString("ko-KR")} ·{" "}
+                        {item.adminId}
+                        <br />
+                        {item.from} → {item.to} · {item.reason}
+                      </S.Description>
+                    ))
+                  )}
+                </S.PanelBody>
               )}
             </S.Panel>
 

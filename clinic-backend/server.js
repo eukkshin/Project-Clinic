@@ -19,6 +19,23 @@ const {
 } = require("./src/middleware/loginRateLimit");
 const FooterSettings = require("./src/entity/FooterSettings");
 const Consult = require("./src/entity/Consult");
+const {
+  createPublicConsultRouter,
+} = require("./src/routes/consult-public.routes");
+const {
+  createAdminConsultRouter,
+} = require("./src/routes/admin-consult.routes");
+const {
+  createAdminAttendanceRouter,
+} = require("./src/routes/admin-attendance.routes");
+const { startReminderWorker } = require("./src/reservations/reminder-service");
+const { startMessageWorker } = require("./src/messaging/message-service");
+const {
+  createAdminReservationMessagesRouter,
+} = require("./src/routes/admin-reservation-messages.routes");
+const {
+  createAdminNotificationRouter,
+} = require("./src/services/admin-notifications");
 const NavSetting = require("./src/entity/NavSetting");
 const MainVisual = require("./src/entity/MainVisual");
 const ToneSetting = require("./src/entity/ToneSetting");
@@ -68,16 +85,25 @@ const {
   createAdminReservationRouter,
 } = require("./src/routes/admin-reservations.routes");
 
-// 1. CORS 설정 (프론트엔드 3000번 포트의 접근만 안전하게 허용)
+// 1. 배포 시 FRONTEND_ORIGIN=https://your-domain.com 설정 (여러 개는 쉼표 구분)
+const configuredCorsOrigins = (process.env.FRONTEND_ORIGIN || "")
+  .split(",")
+  .map((v) => v.trim())
+  .filter(Boolean);
+const devCorsOrigins =
+  process.env.NODE_ENV === "production"
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+      ];
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-    ],
+    origin: [...new Set([...configuredCorsOrigins, ...devCorsOrigins])],
     credentials: true,
   }),
 );
@@ -132,6 +158,8 @@ app.post("/api/admin/upload", upload.single("logoImage"), async (req, res) => {
 AppDataSource.initialize()
   .then(() => {
     console.log("✅ 오라클 DB가 성공적으로 연결되었습니다.");
+    startReminderWorker(AppDataSource);
+    startMessageWorker(AppDataSource);
   })
   .catch((error) => {
     console.error("❌ DB 연결 실패:", error);
@@ -341,254 +369,20 @@ app.post("/api/admin/footer", async (req, res) => {
   }
 });
 
-// ============================================================================
-// 퀵상담 관리
-// ============================================================================
-// 빠른 상담: 개인정보 수집 동의, Origin 및 반복 요청 방어
-const quickConsultAttempts = new Map();
-app.post("/api/consult/quick", async (req, res) => {
-  const configured = (
-    process.env.FRONTEND_ORIGIN ||
-    (process.env.NODE_ENV === "production"
-      ? ""
-      : "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000")
-  )
-    .split(",")
-    .map((x) => x.trim())
-    .filter(Boolean);
-  if (!configured.includes(req.get("Origin"))) {
-    return res
-      .status(403)
-      .json({ success: false, message: "허용되지 않은 요청입니다." });
-  }
-
-  const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
-  const phone =
-    typeof req.body?.phone === "string"
-      ? req.body.phone.replace(/[\s-]/g, "")
-      : "";
-  const department =
-    typeof req.body?.department === "string" ? req.body.department.trim() : "";
-  if (
-    !/^[가-힣a-zA-Z\s]{2,50}$/.test(name) ||
-    !/^01[016789]\d{7,8}$/.test(phone) ||
-    !department ||
-    department.length > 50 ||
-    req.body?.privacyConsent !== true
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "상담 입력값과 개인정보 수집 동의를 확인해 주세요.",
-    });
-  }
-
-  const key = `quick:${req.ip}`;
-  const now = Date.now();
-  if (quickConsultAttempts.size > 3000) {
-    for (const [k, v] of quickConsultAttempts) {
-      if (v.until <= now) quickConsultAttempts.delete(k);
-    }
-  }
-  const prev = quickConsultAttempts.get(key);
-  if (!prev || prev.until <= now) {
-    quickConsultAttempts.set(key, { count: 1, until: now + 15 * 60_000 });
-  } else {
-    prev.count += 1;
-    if (prev.count > 5) {
-      return res
-        .status(429)
-        .json({
-          success: false,
-          message: "상담 신청이 많습니다. 잠시 후 다시 시도해 주세요.",
-        });
-    }
-  }
-
-  try {
-    const { randomBytes } = require("node:crypto");
-    const passwordHash = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
-    const consultRepo = AppDataSource.getRepository(Consult);
-    const record = consultRepo.create({
-      NAME: name,
-      PHONE: phone,
-      DEPARTMENT: department,
-      PASSWORD: passwordHash, // 기존 NOT NULL 컬럼 호환용 임의 비밀값, 고정 비밀번호 저장 금지
-      USER_ID: "비회원",
-      TITLE: `[빠른상담] ${department} 문의입니다`,
-      CONTENT: `${name}님의 빠른 상담 신청입니다. 연락 부탁드립니다.`,
-      STATUS: "대기중",
-    });
-    await consultRepo.save(record);
-    res.set("Cache-Control", "no-store");
-    return res
-      .status(201)
-      .json({ success: true, message: "빠른 상담 신청이 완료되었습니다." });
-  } catch (error) {
-    console.error("빠른 상담 저장 오류:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "상담 신청 중 오류가 발생했습니다." });
-  }
-});
-
-// ============================================================================
-// 비회원 일반 상담 신청 (/consultation, /community/consultation)
-// 프론트: src/lib/consultation/api.ts -> POST /api/consult
-// 관리자 API는 위의 /api/admin 공통 인증 미들웨어로 별도 보호한다.
-// ============================================================================
-const regularConsultAttempts = new Map();
-const regularConsultDepartments = new Set([
-  "눈성형",
-  "코성형",
-  "안면윤곽",
-  "동안성형",
-  "리프팅",
-  "쁘띠시술",
-  "기타 상담",
-]);
-
-app.post("/api/consult", async (req, res) => {
-  // 프론트 페이지에서 보낸 요청만 받는다. 쿠키/관리자 로그인이 필요 없는 공개 접수 API다.
-  const allowedOrigins = (
-    process.env.FRONTEND_ORIGIN ||
-    (process.env.NODE_ENV === "production"
-      ? ""
-      : "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000")
-  )
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-  if (!allowedOrigins.includes(req.get("Origin"))) {
-    return res.status(403).json({
-      success: false,
-      message: "허용되지 않은 요청입니다.",
-    });
-  }
-
-  // in-memory 제한은 단일 프로세스 개발 환경용이다. 운영 환경은 외부 저장소 기반 제한 권장.
-  const now = Date.now();
-  if (regularConsultAttempts.size > 3000) {
-    for (const [key, value] of regularConsultAttempts) {
-      if (value.until <= now) regularConsultAttempts.delete(key);
-    }
-  }
-  const attemptKey = `regular:${req.ip}`;
-  const previous = regularConsultAttempts.get(attemptKey);
-  if (!previous || previous.until <= now) {
-    regularConsultAttempts.set(attemptKey, {
-      count: 1,
-      until: now + 15 * 60_000,
-    });
-  } else {
-    previous.count += 1;
-    if (previous.count > 5) {
-      return res.status(429).json({
-        success: false,
-        message: "상담 신청이 많습니다. 잠시 후 다시 시도해 주세요.",
-      });
-    }
-  }
-
-  const input = req.body || {};
-  const name = typeof input.name === "string" ? input.name.trim() : "";
-  const phone =
-    typeof input.phone === "string" ? input.phone.replace(/[\s-]/g, "") : "";
-  const department =
-    typeof input.department === "string" ? input.department.trim() : "";
-  const title = typeof input.title === "string" ? input.title.trim() : "";
-  const content = typeof input.content === "string" ? input.content.trim() : "";
-  const website = typeof input.website === "string" ? input.website.trim() : "";
-
-  // 자동 입력 봇용 숨김 필드. 실제 상담 데이터는 저장하지 않는다.
-  if (website) {
-    return res.status(200).json({ success: true, data: { id: 0 } });
-  }
-  if (
-    !/^[가-힣a-zA-Z\s]{2,50}$/.test(name) ||
-    !/^01[016789]\d{7,8}$/.test(phone) ||
-    !regularConsultDepartments.has(department) ||
-    title.length < 4 ||
-    title.length > 120 ||
-    content.length < 10 ||
-    content.length > 3000 ||
-    input.privacyConsent !== true
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "입력값과 개인정보 수집 동의를 확인해 주세요.",
-    });
-  }
-
-  try {
-    // CONSULT.PASSWORD NOT NULL 제약 호환: 고정 비밀번호나 평문 비밀번호는 저장하지 않는다.
-    const { randomBytes } = require("node:crypto");
-    const passwordHash = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
-    const consultRepo = AppDataSource.getRepository(Consult);
-    const saved = await consultRepo.save(
-      consultRepo.create({
-        NAME: name,
-        PHONE: phone,
-        DEPARTMENT: department,
-        TITLE: title,
-        CONTENT: content,
-        USER_ID: "비회원",
-        PASSWORD: passwordHash,
-        STATUS: "대기중",
-      }),
-    );
-    res.set("Cache-Control", "no-store");
-    return res.status(201).json({
-      success: true,
-      data: { id: Number(saved.ID) },
-      message: "상담이 접수되었습니다.",
-    });
-  } catch (error) {
-    console.error("일반 상담 저장 오류:", error);
-    return res.status(500).json({
-      success: false,
-      message: "상담 접수 중 오류가 발생했습니다.",
-    });
-  }
-});
-
-//상담내역 전체 조회
-app.get("/api/admin/consult", async (req, res) => {
-  try {
-    const consultRepo = AppDataSource.getRepository(Consult);
-    const list = await consultRepo.find({ order: { CREATED_AT: "DESC" } });
-    res.status(200).json({ success: true, data: list });
-  } catch (error) {
-    console.error("상담 내역 조회 에러:", error);
-    res.status(500).json({ success: false });
-  }
-});
-//상담 상태 토글
-app.put("/api/admin/consult/:id/status", async (req, res) => {
-  try {
-    const consultRepo = AppDataSource.getRepository(Consult);
-    const consult = await consultRepo.findOne({ where: { ID: req.params.id } });
-    if (!consult)
-      return res
-        .status(404)
-        .json({ success: false, message: "데이터가 없습니다" });
-    consult.STATUS = consult.STATUS === "대기중" ? "상담완료" : "대기중";
-    await consultRepo.save(consult);
-    res.status(200).json({ success: true, message: "상태가 변경되었습니다" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "상태가 변경 실패" });
-  }
-});
-//상담 내역 삭제
-app.delete("/api/admin/consult/:id", async (req, res) => {
-  try {
-    const consultRepo = AppDataSource.getRepository(Consult);
-    await consultRepo.delete(req.params.id);
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error("상담 삭제 에러:", error);
-    res.status(500).json({ success: false });
-  }
-});
+// 일반/빠른 상담 접수 및 비회원 답변 조회. 서버 측 중복 제한과 접수번호 발급을 공통 처리.
+app.use(
+  "/api/consult",
+  createPublicConsultRouter({ dataSource: AppDataSource }),
+);
+// /api/admin 이하 경로는 상단의 requireAdmin 과 Origin 검사로 이미 보호됩니다.
+app.use(
+  "/api/admin/consult",
+  createAdminConsultRouter({ dataSource: AppDataSource }),
+);
+app.use(
+  "/api/admin/notifications",
+  createAdminNotificationRouter({ dataSource: AppDataSource }),
+);
 
 // ============================================================================
 // 네비게이션 설정
@@ -2272,6 +2066,15 @@ app.post("/api/logout", (req, res) => {
 // 일반 회원 예약
 app.use("/api/reservations", reservationRouter);
 
+// 방문/노쇼 판정 라우터를 기존 예약 관리 라우터보다 먼저 등록합니다.
+app.use(
+  "/api/admin/reservations",
+  createAdminAttendanceRouter({ dataSource: AppDataSource }),
+);
+app.use(
+  "/api/admin/reservation-messages",
+  createAdminReservationMessagesRouter({ dataSource: AppDataSource }),
+);
 // 관리자 예약 관리
 app.use(
   "/api/admin/reservations",

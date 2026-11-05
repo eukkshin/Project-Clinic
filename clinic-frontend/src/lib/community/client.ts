@@ -210,6 +210,7 @@ export async function submitQuickConsultation(payload: {
   phone: string;
   department: string;
   privacyConsent: boolean;
+  captchaToken?: string;
 }): Promise<void> {
   // The same endpoint and payload as existing QuickConsultBar.tsx.
   const response = await fetch(`${API}/api/consult/quick`, {

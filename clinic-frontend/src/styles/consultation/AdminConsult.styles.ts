@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 // AdminReservation.styles.ts (기존 Q&A / 방문예약 관리)와 같은 디자인 토큰
 const forest = "#1b4d3e";
@@ -455,5 +455,76 @@ export const Danger = styled.button`
   &:focus-visible {
     outline: 2px solid #b45e58;
     outline-offset: 3px;
+  }
+`;
+
+export const EditorSection = styled.section`
+  margin-top: 1.3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #e4eae5;
+  h4 {
+    color: #34453c;
+    font-size: 0.88rem;
+    margin: 0 0 0.5rem;
+  }
+  p {
+    color: #738079;
+    font-size: 0.76rem;
+    line-height: 1.6;
+    margin: 0.25rem 0 0.75rem;
+  }
+`;
+export const EditorTextArea = styled.textarea`
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 94px;
+  padding: 12px 14px;
+  font:
+    400 0.84rem/1.65 "Pretendard",
+    Arial,
+    sans-serif;
+  color: #34453c;
+  border: 1px solid #d6e0d8;
+  border-radius: 10px;
+  background: #fff;
+  resize: vertical;
+  &:focus-visible {
+    outline: 2px solid #1b4d3e;
+    outline-offset: 1px;
+  }
+`;
+export const EditorSelect = styled.select`
+  padding: 9px 11px;
+  min-height: 39px;
+  border: 1px solid #d6e0d8;
+  border-radius: 10px;
+  color: #34453c;
+  font:
+    500 0.8rem "Pretendard",
+    sans-serif;
+  background: #fff;
+`;
+export const HistoryList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  li {
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0ed;
+    color: #4c6255;
+    font-size: 0.8rem;
+  }
+  small {
+    display: block;
+    margin-bottom: 6px;
+    color: #839389;
+    font-size: 0.7rem;
+  }
+  p {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 `;

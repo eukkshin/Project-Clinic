@@ -1,5 +1,4 @@
 "use client";
-
 import { useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +7,9 @@ import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import * as S from "@/components/community/Community.styles";
+import ConsultCaptcha, {
+  consultCaptchaEnabled,
+} from "@/components/security/ConsultCaptcha";
 import { stripLocalePrefix } from "@/i18n/url";
 import {
   CommunityEntry,
@@ -771,6 +773,8 @@ function ConsultationPage() {
   const [phone, setPhone] = useState("");
   const [department, setDepartment] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -789,6 +793,11 @@ function ConsultationPage() {
       setMessage("성함·연락처·상담 분야와 개인정보 동의를 확인해 주세요.");
       return;
     }
+    if (consultCaptchaEnabled && !captchaToken) {
+      setIsError(true);
+      setMessage("자동 신청 방지 인증을 완료해 주세요.");
+      return;
+    }
     setWorking(true);
     setMessage("");
     try {
@@ -797,6 +806,7 @@ function ConsultationPage() {
         phone: cleanPhone,
         department,
         privacyConsent: agreed,
+        captchaToken,
       });
       setName("");
       setPhone("");
@@ -809,6 +819,7 @@ function ConsultationPage() {
       setMessage("신청을 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setWorking(false);
+      setCaptchaReset((v) => v + 1);
     }
   };
   return (
@@ -903,7 +914,11 @@ function ConsultationPage() {
                 {message}
               </p>
             )}
-            <S.Button type="submit" disabled={working}>
+            <ConsultCaptcha onToken={setCaptchaToken} resetKey={captchaReset} />
+            <S.Button
+              type="submit"
+              disabled={working || (consultCaptchaEnabled && !captchaToken)}
+            >
               {working ? "접수 중…" : "상담 신청하기 ↗"}
             </S.Button>
           </S.Form>

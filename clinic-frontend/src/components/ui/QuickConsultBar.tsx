@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
 
+import ConsultCaptcha, {
+  consultCaptchaEnabled,
+} from "@/components/security/ConsultCaptcha";
 import * as S from "@/components/ui/QuickConsultBar.styles";
 import { API_ORIGIN } from "@/lib/api/config";
 
@@ -27,6 +30,8 @@ export default function QuickConsultBar() {
   const [phone, setPhone] = useState("");
   const [department, setDepartment] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   // 비동기 POST가 중복 호출되는 일을 방지하고 결과를 화면에 표시한다.
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +66,11 @@ export default function QuickConsultBar() {
       setMessageType("error");
       return;
     }
+    if (consultCaptchaEnabled && !captchaToken) {
+      setMessage("자동 신청 방지 인증을 완료해 주세요.");
+      setMessageType("error");
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -74,6 +84,7 @@ export default function QuickConsultBar() {
           phone: trimmedPhone,
           department,
           privacyConsent: isAgreed,
+          captchaToken,
         },
       );
 
@@ -93,6 +104,7 @@ export default function QuickConsultBar() {
       setMessage(tQuick("submitError"));
     } finally {
       setIsSubmitting(false);
+      setCaptchaReset((v) => v + 1);
     }
   };
 
@@ -178,6 +190,7 @@ export default function QuickConsultBar() {
             </S.Select>
           </S.Field>
 
+          <ConsultCaptcha onToken={setCaptchaToken} resetKey={captchaReset} />
           <S.ActionGroup>
             <S.CheckboxLabel>
               <S.Checkbox
@@ -195,7 +208,8 @@ export default function QuickConsultBar() {
                 !isAgreed ||
                 !name.trim() ||
                 !phone.trim() ||
-                !department
+                !department ||
+                (consultCaptchaEnabled && !captchaToken)
               }
             >
               {isSubmitting ? tQuick("submitting") : tQuick("submit")}

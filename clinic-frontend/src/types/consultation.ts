@@ -18,9 +18,14 @@ export type CreateConsultInput = {
   content: string;
   privacyConsent: true;
   website?: string;
+  captchaToken?: string;
 };
 export type ConsultRecord = {
   id: number;
+  receiptNo: string;
+  answer: string;
+  answeredAt: string | null;
+  assignedTo: string;
   name: string;
   phone: string;
   department: string;
@@ -34,4 +39,17 @@ export type ConsultResponse<T> = {
   success: boolean;
   data?: T;
   message?: string;
+};
+
+export type ConsultActivity = {
+  id: number;
+  kind:
+    | "REPLY"
+    | "STATUS_CHANGE"
+    | "CALL_ATTEMPT"
+    | "CALL_COMPLETED"
+    | "INTERNAL_NOTE";
+  text: string;
+  adminId: string;
+  createdAt: string;
 };

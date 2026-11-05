@@ -325,7 +325,22 @@
     "deptAntiAging": "抗老整形",
     "deptLifting": "拉提緊緻",
     "deptPetit": "微整形",
-    "deptOther": "其他諮詢"
+    "deptOther": "其他諮詢",
+    "lookupCodeLabel": "私人查詢碼",
+    "lookupCodeNotice": "查詢碼僅顯示一次，請妥善保管，切勿向他人透露。",
+    "copyLookupCode": "複製受理編號與查詢碼",
+    "lookupAnswers": "查詢諮詢回覆",
+    "lookupPageTitle": "查詢諮詢回覆",
+    "lookupPageDescription": "只需貼上申請時取得的私人查詢碼，即可查看受理編號及回覆。若遺失查詢碼，請聯絡診所。",
+    "lookupStatus": "處理狀態",
+    "lookupPending": "目前尚未收到回覆。",
+    "lookupBack": "返回諮詢申請",
+    "captchaRequired": "請完成防機器人驗證。",
+    "lookupCodeHint": "只需輸入查詢碼，驗證成功後將自動顯示受理編號。",
+    "copyReceiptNo": "複製受理編號",
+    "copyAccessKey": "複製查詢碼",
+    "lookupCodeCopied": "查詢碼已複製，請妥善保管。",
+    "lookupCodeCopyFailed": "複製失敗，請手動選取並複製查詢碼。"
   },
   "MyPage": {
     "descProfile": "集中查看個人資料、預約與諮詢紀錄。",

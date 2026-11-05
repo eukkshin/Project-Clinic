@@ -1,4 +1,9 @@
-export type ReservationStatus = "예약대기" | "예약확정" | "방문완료" | "취소";
+export type ReservationStatus =
+  | "예약대기"
+  | "예약확정"
+  | "방문완료"
+  | "노쇼"
+  | "취소";
 export type ConsultationStatus = "대기중" | "상담중" | "상담완료";
 
 export interface MyProfile {
@@ -15,6 +20,11 @@ export interface MyReservation {
   status: ReservationStatus;
   createdAt?: string | null;
   memo?: string | null;
+  slotDate?: string;
+  slotTime?: string;
+  visitConfirmedAt?: string | null;
+  reminderState?: "PENDING" | "READY" | "CONTACTED" | "CANCELLED" | null;
+  reminderDueAtKst?: string | null;
 }
 export interface MyConsultation {
   id: string | number;

@@ -1,6 +1,12 @@
 import { API_ORIGIN } from "@/lib/api/config";
 
 export type CmsType =
+  | "NAV_SETTING"
+  | "MAIN_VISUAL"
+  | "CATEGORY"
+  | "VLOG"
+  | "SAFETY"
+  | "FOOTER"
   | "EVENT"
   | "FAQ"
   | "DETAIL_CATEGORY"

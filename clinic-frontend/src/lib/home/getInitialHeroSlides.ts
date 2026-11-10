@@ -27,12 +27,17 @@ function isSlideItem(value: unknown): value is InitialHeroSlide {
   );
 }
 
-export async function getInitialHeroSlides(): Promise<InitialHeroSlide[]> {
+export async function getInitialHeroSlides(
+  locale = "ko",
+): Promise<InitialHeroSlide[]> {
   try {
-    const response = await fetch(`${API_URL}/api/public/site/visual`, {
-      next: { revalidate: 60 },
-      signal: AbortSignal.timeout(1200),
-    });
+    const response = await fetch(
+      `${API_URL}/api/public/content/visual?locale=${encodeURIComponent(locale)}`,
+      {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(1200),
+      },
+    );
     if (!response.ok) return [];
     const json: unknown = await response.json();
     if (!json || typeof json !== "object") return [];

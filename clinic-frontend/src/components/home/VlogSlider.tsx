@@ -1,14 +1,15 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import * as S from "@/components/home/VlogSlider.styles";
+import { API_ORIGIN } from "@/lib/api/config";
 
 // ScrollTrigger는 GSAP 기본 애니메이션과 달리 스크롤 위치를 기준으로 실행하는 플러그인이다.
 // Hero/CategoryNav에서 이미 사용하더라도 모듈별로 등록해 두면 이 파일만 보아도 의존성을 알 수 있다.
@@ -113,6 +114,8 @@ function getYoutubeEmbedUrl(videoUrl: string): string | null {
  * 그러므로 기존과 동일하게 named export를 유지한다.
  */
 export function VlogSlider() {
+  const locale = useLocale();
+  const tVlog = useTranslations("VlogSection");
   // DB에서 받아온 영상 목록, 요청 상태, 현재 대표로 선택한 영상 번호.
   const [videos, setVideos] = useState<VlogItem[]>([]);
   const [status, setStatus] = useState<RequestStatus>("loading");
@@ -137,8 +140,8 @@ export function VlogSlider() {
       setStatus("loading");
       try {
         const response = await axios.get<VlogApiResponse>(
-          `${API_URL}/api/public/site/vlogs`,
-          { signal: controller.signal },
+          `${API_URL}/api/public/content/vlogs`,
+          { signal: controller.signal, params: { locale } },
         );
 
         if (!response.data.success || !Array.isArray(response.data.data)) {
@@ -172,7 +175,7 @@ export function VlogSlider() {
     void fetchVlogs();
     // 컴포넌트가 사라지면 미완료 HTTP 요청을 취소하여 잘못된 setState를 방지한다.
     return () => controller.abort();
-  }, [retryKey]);
+  }, [retryKey, locale]);
 
   // 모달(createPortal)은 document.body가 존재하는 브라우저에서만 렌더링한다.
   // 서버 렌더링 중 document 접근 오류가 발생하지 않도록 useEffect 안에서 준비한다.
@@ -320,9 +323,9 @@ export function VlogSlider() {
               Clinic <em>Vlog.</em>
             </S.Title>
             <S.Description>
-              아름다움을 만드는 순간과 그 안에 담긴 이야기.
+              {tVlog("descriptionLine1")}
               <br />
-              안스의 일상을 영상으로 만나보세요.
+              {tVlog("descriptionLine2")}
             </S.Description>
           </S.HeaderLeft>
           <S.HeaderRight>
@@ -333,21 +336,19 @@ export function VlogSlider() {
         </S.Header>
 
         {status === "loading" ? (
-          <S.StatusPanel role="status">
-            LOADING THE FILM ARCHIVE...
-          </S.StatusPanel>
+          <S.StatusPanel role="status">{tVlog("loading")}</S.StatusPanel>
         ) : status === "error" ? (
           <S.StatusPanel role="alert">
-            영상을 불러오지 못했습니다.
+            {tVlog("error")}
             <S.RetryButton
               type="button"
               onClick={() => setRetryKey((v) => v + 1)}
             >
-              다시 시도 ↗
+              {tVlog("retry")} ↗
             </S.RetryButton>
           </S.StatusPanel>
         ) : videos.length === 0 ? (
-          <S.StatusPanel>등록된 영상이 없습니다.</S.StatusPanel>
+          <S.StatusPanel>{tVlog("empty")}</S.StatusPanel>
         ) : (
           <S.CinemaLayout>
             {/* 왼쪽: 선택된 영상 한 개를 크게 보여 준다. */}
@@ -378,7 +379,9 @@ export function VlogSlider() {
                       <S.PlayButton
                         type="button"
                         onClick={() => playVideo(selected.videoUrl)}
-                        aria-label={`${selected.title} 영상 재생`}
+                        aria-label={tVlog("playVideo", {
+                          title: selected.title,
+                        })}
                       >
                         <S.PlayTriangle aria-hidden="true">▶</S.PlayTriangle>
                         <span>PLAY FILM</span>
@@ -403,7 +406,7 @@ export function VlogSlider() {
                   <S.ArrowButton
                     type="button"
                     onClick={() => moveSelection(-1)}
-                    aria-label="이전 영상 선택"
+                    aria-label={tVlog("previous")}
                     disabled={videos.length < 2}
                   >
                     ←
@@ -411,7 +414,7 @@ export function VlogSlider() {
                   <S.ArrowButton
                     type="button"
                     onClick={() => moveSelection(1)}
-                    aria-label="다음 영상 선택"
+                    aria-label={tVlog("next")}
                     disabled={videos.length < 2}
                   >
                     →
@@ -421,7 +424,7 @@ export function VlogSlider() {
             </S.MainColumn>
 
             {/* 오른쪽: 다른 영상을 고르는 목록. 영상 개수와 관계없이 세로 스크롤이 가능하다. */}
-            <S.Playlist data-vlog-list aria-label="영상 목록">
+            <S.Playlist data-vlog-list aria-label={tVlog("videoList")}>
               <S.PlaylistHeader>
                 <S.PlaylistTitle>THE COLLECTION</S.PlaylistTitle>
                 <S.PlaylistCount>
@@ -436,7 +439,7 @@ export function VlogSlider() {
                     $selected={activeIndex === index}
                     onClick={() => chooseVideo(index)}
                     aria-pressed={activeIndex === index}
-                    aria-label={`${video.title} 대표 영상으로 선택`}
+                    aria-label={tVlog("selectVideo", { title: video.title })}
                   >
                     <S.ListImage>
                       <Image
@@ -492,7 +495,7 @@ export function VlogSlider() {
             <S.ModalPanel
               role="dialog"
               aria-modal="true"
-              aria-label="안스 영상 재생"
+              aria-label={tVlog("dialog")}
             >
               <S.ModalHeader>
                 <S.ModalLabel>NOW PLAYING · AHN'S VISUAL JOURNAL</S.ModalLabel>
@@ -500,7 +503,7 @@ export function VlogSlider() {
                   ref={closeRef}
                   type="button"
                   onClick={closeVideo}
-                  aria-label="영상 닫기"
+                  aria-label={tVlog("close")}
                 >
                   ✕
                 </S.ModalClose>
@@ -508,7 +511,9 @@ export function VlogSlider() {
               <S.IframeFrame>
                 <iframe
                   src={embedUrl}
-                  title={`${selected?.title ?? "Ahn's"} 영상`}
+                  title={tVlog("videoTitle", {
+                    title: selected?.title ?? "Ahn's",
+                  })}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen

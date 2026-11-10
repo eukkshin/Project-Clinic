@@ -1,13 +1,14 @@
 "use client";
 
-import { API_ORIGIN } from "@/lib/api/config";
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import * as S from "@/components/home/SafetySlider.styles";
+import { API_ORIGIN } from "@/lib/api/config";
 
 /*
  * SafetySlider — AHN'S SAFETY ARCHIVE
@@ -86,6 +87,8 @@ function isSafetyApiItem(value: unknown): value is SafetyApiItem {
  * 반드시 이름 있는 export를 유지한다.
  */
 export function SafetySlider() {
+  const locale = useLocale();
+  const t = useTranslations("SafetySection");
   // 1. DB 응답으로 만든 전체 목록
   const [items, setItems] = useState<SafetyItem[]>([]);
   const [status, setStatus] = useState<LoadStatus>("loading");
@@ -112,8 +115,8 @@ export function SafetySlider() {
 
       try {
         const response = await axios.get<SafetyApiResponse>(
-          `${API_URL}/api/public/site/safety`,
-          { signal: controller.signal },
+          `${API_URL}/api/public/content/safety`,
+          { signal: controller.signal, params: { locale } },
         );
 
         // 응답에서 data가 배열이 아니면 안전하게 오류 상태로 전환한다.
@@ -163,7 +166,7 @@ export function SafetySlider() {
 
     void fetchSafety();
     return () => controller.abort();
-  }, [retryCount]);
+  }, [retryCount, locale]);
 
   /* ----------------------------------------------------------------------
    * 실행 순서 2: 데이터가 렌더링되면 GSAP을 등록한다.
@@ -272,32 +275,32 @@ export function SafetySlider() {
           </S.Title>
           <S.HeaderBottom>
             <S.HeaderDescription>
-              아름다움의 완성은 섬세한 과정에서 시작됩니다.
+              {t("descriptionLine1")}
               <br />
-              안스성형외과가 전하는 안전에 관한 이야기를 만나보세요.
+              {t("descriptionLine2")}
             </S.HeaderDescription>
-            <S.HeaderCounter>05 / OUR STANDARD</S.HeaderCounter>
+            <S.HeaderCounter>{t("standard")}</S.HeaderCounter>
           </S.HeaderBottom>
         </S.Header>
 
         {status === "loading" && (
-          <S.Status role="status">SAFETY ARCHIVE LOADING...</S.Status>
+          <S.Status role="status">{t("loading")}</S.Status>
         )}
 
         {status === "error" && (
           <S.Status role="alert">
-            안전 콘텐츠를 불러오지 못했습니다.
+            {t("loadError")}
             <S.RetryButton
               type="button"
               onClick={() => setRetryCount((count) => count + 1)}
             >
-              다시 시도 <span aria-hidden="true">↗</span>
+              {t("retry")} <span aria-hidden="true">↗</span>
             </S.RetryButton>
           </S.Status>
         )}
 
         {status === "ready" && items.length === 0 && (
-          <S.Status>등록된 안전 콘텐츠가 없습니다.</S.Status>
+          <S.Status>{t("empty")}</S.Status>
         )}
 
         {status === "ready" && items.length > 0 && activeItem && (
@@ -332,12 +335,12 @@ export function SafetySlider() {
                     </span>
                   </S.PhotoTop>
                   <S.PhotoBottom>
-                    <S.PhotoMicrocopy>OUR COMMITMENT</S.PhotoMicrocopy>
+                    <S.PhotoMicrocopy>{t("commitment")}</S.PhotoMicrocopy>
                     <S.PhotoTitle>{activeItem.title}</S.PhotoTitle>
                   </S.PhotoBottom>
                 </S.StageMedia>
                 <S.PhotoFootnote>
-                  <span>BEAUTY IS MORE THAN WHAT YOU SEE.</span>
+                  <span>{t("photoFootnote")}</span>
                   <span>AHN'S PLASTIC SURGERY</span>
                 </S.PhotoFootnote>
               </S.StickyStage>
@@ -349,8 +352,12 @@ export function SafetySlider() {
             */}
             <S.ContentColumn>
               <S.ListLabel>
-                <span>OUR SAFETY PRINCIPLES</span>
-                <span>{String(items.length).padStart(2, "0")} STORIES</span>
+                <span>{t("principles")}</span>
+                <span>
+                  {t("stories", {
+                    count: String(items.length).padStart(2, "0"),
+                  })}
+                </span>
               </S.ListLabel>
 
               <S.List>
@@ -373,7 +380,10 @@ export function SafetySlider() {
                       $active={activeIndex === index}
                       onClick={() => setActiveIndex(index)}
                       aria-pressed={activeIndex === index}
-                      aria-label={`${String(index + 1).padStart(2, "0")}번 ${item.title} 이미지 보기`}
+                      aria-label={t("viewImage", {
+                        number: String(index + 1).padStart(2, "0"),
+                        title: item.title,
+                      })}
                     >
                       <S.ItemIndex>
                         {String(index + 1).padStart(2, "0")}
@@ -394,7 +404,7 @@ export function SafetySlider() {
 
               <S.Endmark>
                 <span aria-hidden="true">✦</span>
-                EVERY DETAIL MATTERS.
+                {t("endmark")}
               </S.Endmark>
             </S.ContentColumn>
           </S.Layout>
@@ -402,7 +412,7 @@ export function SafetySlider() {
 
         <S.Footer>
           <span>AHN'S PLASTIC SURGERY</span>
-          <span>EXCELLENCE THROUGH CARE.</span>
+          <span>{t("footerTagline")}</span>
         </S.Footer>
       </S.Inner>
     </S.Section>

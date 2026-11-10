@@ -30,7 +30,7 @@ const API = API_ORIGIN;
 const VERIFIED_ENDPOINTS: Partial<Record<CommunityKind, string>> = {
   events: "/api/public/content/events",
   qna: "/api/public/content/faq",
-  vlog: "/api/public/site/vlogs",
+  vlog: "/api/public/content/vlogs",
 };
 
 const OPTIONAL_PUBLIC_ENDPOINTS: Partial<
@@ -158,7 +158,7 @@ export async function loadCommunity(
   if (!endpoint) return { connected: false, entries: [] };
 
   const localizedEndpoint =
-    kind === "events" || kind === "qna"
+    kind === "events" || kind === "qna" || kind === "vlog"
       ? `${endpoint}?locale=${encodeURIComponent(locale)}`
       : endpoint;
   const response = await fetch(localizedEndpoint, {

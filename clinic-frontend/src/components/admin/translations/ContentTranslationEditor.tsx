@@ -15,6 +15,12 @@ import * as S from "./ContentTranslation.styles";
 
 const types: { type: CmsType; label: string }[] = [
   { type: "EVENT", label: "이벤트" },
+  { type: "NAV_SETTING", label: "헤더 메뉴" },
+  { type: "MAIN_VISUAL", label: "메인 비주얼 슬라이드" },
+  { type: "CATEGORY", label: "메인 카테고리 카드" },
+  { type: "VLOG", label: "VLOG 영상" },
+  { type: "SAFETY", label: "안전 콘텐츠" },
+  { type: "FOOTER", label: "푸터 병원정보" },
   { type: "FAQ", label: "FAQ" },
   { type: "DETAIL_CATEGORY", label: "시술 분류" },
   { type: "DETAIL_PAGE", label: "시술 상세페이지" },
@@ -31,6 +37,20 @@ const fields: Record<
   { key: string; label: string; long?: boolean }[]
 > = {
   EVENT: [{ key: "title", label: "이벤트 제목" }],
+  NAV_SETTING: [{ key: "content", label: "메뉴 이름 (JSON)", long: true }],
+  MAIN_VISUAL: [{ key: "content", label: "슬라이드 제목 (JSON)", long: true }],
+  CATEGORY: [{ key: "title", label: "카테고리 제목" }],
+  VLOG: [{ key: "title", label: "영상 제목" }],
+  SAFETY: [
+    { key: "title", label: "안전 콘텐츠 제목" },
+    { key: "description", label: "안전 콘텐츠 설명", long: true },
+  ],
+  FOOTER: [
+    { key: "name", label: "병원명" },
+    { key: "clinicName", label: "의료기관 명칭" },
+    { key: "address", label: "주소", long: true },
+    { key: "content", label: "진료과목·패밀리 사이트 이름 (JSON)", long: true },
+  ],
   FAQ: [
     { key: "categoryName", label: "카테고리명" },
     { key: "question", label: "질문" },

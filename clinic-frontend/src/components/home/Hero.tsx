@@ -4,6 +4,7 @@ import axios from "axios";
 import useEmblaCarousel from "embla-carousel-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -135,6 +136,8 @@ export default function Hero({
   initialSlides = [],
   introPlaying = false,
 }: HeroProps) {
+  const locale = useLocale();
+  const tHero = useTranslations("Hero");
   // Embla는 슬라이드의 '좌우 이동'만 담당한다.
 
   // GSAP은 바깥 viewport만 흐림/페이드하므로 Embla와 transform이 충돌하지 않는다.
@@ -203,17 +206,16 @@ export default function Hero({
   // 1. 관리자 Hero 설정 불러오기
 
   useEffect(() => {
-    // 초기 슬라이드는 서버가 전달했으므로 클라이언트 API를 중복 호출하지 않는다.
-    if (initialSlides.length > 0) return;
+    // 초기 슬라이드는 현재 언어로 서버에서 조회한다. 언어 전환 시 목록 갱신을 위해 재요청한다.
 
     const controller = new AbortController();
 
     const fetchVisualSettings = async () => {
       try {
         const response = await axios.get<VisualResponse>(
-          `${API_URL}/api/public/site/visual`,
+          `${API_URL}/api/public/content/visual`,
 
-          { signal: controller.signal },
+          { signal: controller.signal, params: { locale } },
         );
 
         // 서버 요청에는 성공했지만, 응답 결과가 실패인 경우도 처리한다.
@@ -261,7 +263,7 @@ export default function Hero({
     // 페이지를 떠날 때 진행 중이던 API 요청을 취소한다.
 
     return () => controller.abort();
-  }, [initialSlides.length]);
+  }, [locale]);
 
   // 2. Embla가 선택한 슬라이드 번호를 React state와 동기화
 
@@ -781,7 +783,7 @@ export default function Hero({
                   <S.SlideTitle data-animate>{slide.title}</S.SlideTitle>
 
                   <S.SlideDescription data-animate data-hero-description>
-                    당신만의 아름다움을 발견하는 시간
+                    {tHero("description")}
                   </S.SlideDescription>
 
                   <S.ExploreLink data-animate data-hero-explore>

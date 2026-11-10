@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import gsap from "gsap";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -119,6 +119,7 @@ function findHeaderSearchInput(root: ParentNode): HTMLInputElement | null {
 }
 
 export default function Header() {
+  const currentLocale = useLocale();
   const tHeader = useTranslations("Header");
   const tAuth = useTranslations("Auth");
   const tNavigation = useTranslations("Navigation");
@@ -342,9 +343,9 @@ export default function Header() {
     const fetchSettings = async () => {
       const results = await Promise.allSettled([
         axios.get<{ success: boolean; data: NavSettings }>(
-          `${API_URL}/api/public/site/nav`,
+          `${API_URL}/api/public/content/nav`,
 
-          { signal: controller.signal },
+          { signal: controller.signal, params: { locale: currentLocale } },
         ),
 
         axios.get<{ success: boolean; data: ToneSettings }>(
@@ -442,7 +443,7 @@ export default function Header() {
     void fetchSettings();
 
     return () => controller.abort();
-  }, []);
+  }, [currentLocale]);
 
   // [2] 사용자의 스크롤 방향을 감지한다. 잦은 깜빡임을 막기 위해 임계값을 둔다.
 
@@ -813,7 +814,10 @@ export default function Header() {
             ) : (
               <Link
                 href="/register/login"
-                onClick={(event) => { closeMenu(); handleLoginLinkClick(event); }}
+                onClick={(event) => {
+                  closeMenu();
+                  handleLoginLinkClick(event);
+                }}
                 title={tAuth("login")}
                 aria-label={tAuth("login")}
               >

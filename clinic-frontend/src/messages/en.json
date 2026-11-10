@@ -88,7 +88,17 @@
     "mapLocation": "Clinic location",
     "largerMap": "Open larger map on {provider}",
     "mapLoading": "Loading map",
-    "mapError": "Map unavailable"
+    "mapError": "Map unavailable",
+    "eyebrow": "WE ARE HERE FOR YOU",
+    "heroLine1": "Find Your",
+    "heroLine2": "Own Beauty.",
+    "contactHeading": "CONTACT",
+    "clinicHeading": "CLINIC INFORMATION",
+    "hoursHeading": "OPENING HOURS",
+    "familyHeading": "FAMILY SITES",
+    "quickKakao": "KakaoTalk Consultation",
+    "quickInstagram": "Instagram",
+    "quickYoutube": "YouTube"
   },
   "Navigation": {
     "about": "About Us",
@@ -812,5 +822,73 @@
     "signUpDone": "Your account has been created.",
     "signupBrand": "Begin your own beautiful story.",
     "noticeRequired": "Required item"
+  },
+  "VlogSection": {
+    "descriptionLine1": "The moments we create beauty, and the stories behind them.",
+    "descriptionLine2": "Discover everyday life at AHN’S through our videos.",
+    "loading": "Loading the video collection...",
+    "error": "Unable to load videos.",
+    "retry": "Try again",
+    "empty": "No videos have been added yet.",
+    "playVideo": "Play video: {title}",
+    "previous": "Previous video",
+    "next": "Next video",
+    "videoList": "Video collection",
+    "selectVideo": "Select {title} as featured video",
+    "dialog": "Ahn’s video player",
+    "close": "Close video",
+    "videoTitle": "{title} video"
+  },
+  "SafetySection": {
+    "descriptionLine1": "Beauty begins with a thoughtful process.",
+    "descriptionLine2": "Discover AHN’S approach to safety and care.",
+    "loadError": "Unable to load safety content.",
+    "retry": "Try again",
+    "empty": "No safety content is available.",
+    "viewImage": "View image {number}: {title}",
+    "standard": "05 / OUR STANDARD",
+    "loading": "LOADING SAFETY ARCHIVE...",
+    "stories": "{count} STORIES",
+    "commitment": "OUR COMMITMENT",
+    "photoFootnote": "BEAUTY IS MORE THAN WHAT YOU SEE.",
+    "principles": "OUR SAFETY PRINCIPLES",
+    "endmark": "EVERY DETAIL MATTERS.",
+    "footerTagline": "EXCELLENCE THROUGH CARE."
+  },
+  "Hero": {
+    "description": "A moment to discover your own beauty"
+  },
+  "HospitalMap": {
+    "ctrlZoom": "scroll to zoom the map",
+    "noAddress": "Clinic address is not registered",
+    "unavailable": "Map is unavailable",
+    "loading": "Loading map...",
+    "registerAddress": "Please enter the clinic address in the admin settings.",
+    "locating": "Locating the registered address on the map.",
+    "sectionLabel": "Clinic location",
+    "providerSelect": "Choose map service",
+    "addressPlaceholder": "Please add an address in the admin settings.",
+    "canvasLabel": "{provider} map showing the clinic location",
+    "connecting": "Connecting to {provider} Maps",
+    "missingKey": "Please configure the {key} environment variable.",
+    "openLarger": "View larger map on {provider}",
+    "naverInitError": "Unable to initialize Naver Maps.",
+    "naverModuleLoadError": "Unable to load the Naver address search module.",
+    "naverModuleError": "Naver address search is unavailable.",
+    "naverGeocodeError": "Naver could not find the clinic address. Please check the registered address.",
+    "naverCoordinatesError": "No coordinates found for this address on Naver Maps.",
+    "kakaoInitError": "Unable to initialize Kakao Maps.",
+    "kakaoModuleError": "Kakao address search is unavailable.",
+    "kakaoGeocodeError": "Kakao could not find the registered address.",
+    "googleInitError": "Unable to initialize Google Maps.",
+    "googleGeocodeError": "Google Maps could not locate the address. Check the API and address.",
+    "loadError": "Unable to load the map.",
+    "providerNaver": "Naver",
+    "providerKakao": "Kakao",
+    "providerGoogle": "Google"
+  },
+  "QnaStandalone": {
+    "other": "Other",
+    "loading": "Loading frequently asked questions..."
   }
 }

@@ -88,7 +88,17 @@
     "mapLocation": "クリニック所在地",
     "largerMap": "{provider}で地図を拡大表示",
     "mapLoading": "地図を読み込み中",
-    "mapError": "地図を表示できません"
+    "mapError": "地図を表示できません",
+    "eyebrow": "あなたのそばに",
+    "heroLine1": "あなたらしい",
+    "heroLine2": "美しさを。",
+    "contactHeading": "お問い合わせ",
+    "clinicHeading": "クリニック情報",
+    "hoursHeading": "診療時間",
+    "familyHeading": "関連サイト",
+    "quickKakao": "カカオトーク相談",
+    "quickInstagram": "インスタグラム",
+    "quickYoutube": "YouTube"
   },
   "Navigation": {
     "about": "クリニック紹介",
@@ -812,5 +822,73 @@
     "signUpDone": "会員登録が完了しました。",
     "signupBrand": "あなただけの美しい物語を始めましょう。",
     "noticeRequired": "必須項目"
+  },
+  "VlogSection": {
+    "descriptionLine1": "美しさが生まれる瞬間と、そこに込められたストーリー。",
+    "descriptionLine2": "AHN’Sの日常を動画でご覧ください。",
+    "loading": "動画一覧を読み込み中…",
+    "error": "動画を読み込めませんでした。",
+    "retry": "再試行",
+    "empty": "登録された動画はありません。",
+    "playVideo": "{title} の動画を再生",
+    "previous": "前の動画",
+    "next": "次の動画",
+    "videoList": "動画一覧",
+    "selectVideo": "{title} をメイン動画に選択",
+    "dialog": "AHN’S 動画プレーヤー",
+    "close": "動画を閉じる",
+    "videoTitle": "{title} の動画"
+  },
+  "SafetySection": {
+    "descriptionLine1": "美しさの完成は、細やかなプロセスから始まります。",
+    "descriptionLine2": "AHN’S美容外科が大切にする安全への想いをご覧ください。",
+    "loadError": "安全に関するコンテンツを読み込めませんでした。",
+    "retry": "再試行",
+    "empty": "安全に関するコンテンツはまだありません。",
+    "viewImage": "{number}番 {title} の画像を見る",
+    "standard": "05 / 私たちの基準",
+    "loading": "安全コンテンツを読み込み中...",
+    "stories": "{count}件のストーリー",
+    "commitment": "私たちの約束",
+    "photoFootnote": "美しさは目に見えるものだけではありません。",
+    "principles": "安全のための原則",
+    "endmark": "細部まで大切に。",
+    "footerTagline": "丁寧なケアで生まれる確かな品質。"
+  },
+  "Hero": {
+    "description": "あなただけの美しさを見つける時間"
+  },
+  "HospitalMap": {
+    "ctrlZoom": "スクロールして地図を拡大・縮小",
+    "noAddress": "クリニックの住所が未登録です",
+    "unavailable": "地図を表示できません",
+    "loading": "地図を読み込み中…",
+    "registerAddress": "管理画面でクリニックの住所を登録してください。",
+    "locating": "登録住所を地図上に表示しています。",
+    "sectionLabel": "クリニックの所在地",
+    "providerSelect": "地図サービスを選択",
+    "addressPlaceholder": "管理画面で住所を登録してください。",
+    "canvasLabel": "{provider} のクリニック所在地マップ",
+    "connecting": "{provider} マップに接続中",
+    "missingKey": "環境変数 {key} を設定してください。",
+    "openLarger": "{provider} で大きな地図を見る",
+    "naverInitError": "NAVER地図を初期化できません。",
+    "naverModuleLoadError": "NAVER住所検索モジュールを読み込めません。",
+    "naverModuleError": "NAVER住所検索を利用できません。",
+    "naverGeocodeError": "NAVERで住所を検索できませんでした。登録住所をご確認ください。",
+    "naverCoordinatesError": "NAVER地図で座標を取得できません。",
+    "kakaoInitError": "Kakao地図を初期化できません。",
+    "kakaoModuleError": "Kakao住所検索を利用できません。",
+    "kakaoGeocodeError": "Kakaoで住所を検索できません。",
+    "googleInitError": "Googleマップを初期化できません。",
+    "googleGeocodeError": "Googleマップで住所を検索できません。APIと住所をご確認ください。",
+    "loadError": "地図を読み込めませんでした。",
+    "providerNaver": "ネイバー",
+    "providerKakao": "カカオ",
+    "providerGoogle": "グーグル"
+  },
+  "QnaStandalone": {
+    "other": "その他",
+    "loading": "よくある質問を読み込んでいます…"
   }
 }

@@ -88,7 +88,17 @@
     "mapLocation": "医院位置",
     "largerMap": "在{provider}上查看大地图",
     "mapLoading": "正在加载地图",
-    "mapError": "地图暂时不可用"
+    "mapError": "地图暂时不可用",
+    "eyebrow": "我们始终与您同行",
+    "heroLine1": "发现专属于您的",
+    "heroLine2": "美丽。",
+    "contactHeading": "联系我们",
+    "clinicHeading": "医院信息",
+    "hoursHeading": "诊疗时间",
+    "familyHeading": "相关网站",
+    "quickKakao": "KakaoTalk 咨询",
+    "quickInstagram": "Instagram",
+    "quickYoutube": "YouTube"
   },
   "Navigation": {
     "about": "医院介绍",
@@ -812,5 +822,73 @@
     "signUpDone": "您的账号已创建。",
     "signupBrand": "开始属于您的美丽故事。",
     "noticeRequired": "必填项目"
+  },
+  "VlogSection": {
+    "descriptionLine1": "创造美丽的瞬间，以及其中蕴藏的故事。",
+    "descriptionLine2": "通过视频走近 AHN’S 的日常。",
+    "loading": "正在加载视频列表…",
+    "error": "无法加载视频。",
+    "retry": "重试",
+    "empty": "暂无视频。",
+    "playVideo": "播放视频：{title}",
+    "previous": "上一个视频",
+    "next": "下一个视频",
+    "videoList": "视频列表",
+    "selectVideo": "将 {title} 设为精选视频",
+    "dialog": "AHN’S 视频播放器",
+    "close": "关闭视频",
+    "videoTitle": "{title} 视频"
+  },
+  "SafetySection": {
+    "descriptionLine1": "美丽的呈现，始于每一个细致的过程。",
+    "descriptionLine2": "了解 AHN’S 整形外科对安全与关怀的坚持。",
+    "loadError": "无法加载安全相关内容。",
+    "retry": "重试",
+    "empty": "暂无安全相关内容。",
+    "viewImage": "查看第{number}项 {title} 的图片",
+    "standard": "05 / 我们的标准",
+    "loading": "正在加载安全内容...",
+    "stories": "{count}篇故事",
+    "commitment": "我们的承诺",
+    "photoFootnote": "美丽不止于外在。",
+    "principles": "我们的安全原则",
+    "endmark": "每个细节都很重要。",
+    "footerTagline": "以细致关怀追求卓越。"
+  },
+  "Hero": {
+    "description": "发现专属于您的美丽时刻"
+  },
+  "HospitalMap": {
+    "ctrlZoom": "滚动以缩放地图",
+    "noAddress": "尚未登记医院地址",
+    "unavailable": "无法显示地图",
+    "loading": "地图加载中…",
+    "registerAddress": "请在管理后台登记医院地址。",
+    "locating": "正在地图上定位已登记的地址。",
+    "sectionLabel": "医院位置",
+    "providerSelect": "选择地图服务",
+    "addressPlaceholder": "请在管理后台添加地址。",
+    "canvasLabel": "{provider} 医院位置地图",
+    "connecting": "正在连接 {provider} 地图",
+    "missingKey": "请配置环境变量 {key}。",
+    "openLarger": "在 {provider} 查看大地图",
+    "naverInitError": "NAVER地图初始化失败。",
+    "naverModuleLoadError": "无法加载NAVER地址搜索模块。",
+    "naverModuleError": "NAVER地址搜索不可用。",
+    "naverGeocodeError": "NAVER无法找到医院地址，请检查登记的地址。",
+    "naverCoordinatesError": "NAVER地图无法找到该地址的坐标。",
+    "kakaoInitError": "Kakao地图初始化失败。",
+    "kakaoModuleError": "Kakao地址搜索不可用。",
+    "kakaoGeocodeError": "Kakao无法找到登记的地址。",
+    "googleInitError": "Google地图初始化失败。",
+    "googleGeocodeError": "Google地图地址搜索失败，请检查API和地址。",
+    "loadError": "无法加载地图。",
+    "providerNaver": "NAVER",
+    "providerKakao": "Kakao",
+    "providerGoogle": "谷歌"
+  },
+  "QnaStandalone": {
+    "other": "其他",
+    "loading": "正在加载常见问题…"
   }
 }

@@ -88,7 +88,17 @@
     "mapLocation": "診所位置",
     "largerMap": "在{provider}上查看大地圖",
     "mapLoading": "正在載入地圖",
-    "mapError": "地圖暫時無法顯示"
+    "mapError": "地圖暫時無法顯示",
+    "eyebrow": "我們始終陪伴您",
+    "heroLine1": "探索專屬於您的",
+    "heroLine2": "美麗。",
+    "contactHeading": "聯絡我們",
+    "clinicHeading": "診所資訊",
+    "hoursHeading": "看診時間",
+    "familyHeading": "相關網站",
+    "quickKakao": "KakaoTalk 諮詢",
+    "quickInstagram": "Instagram",
+    "quickYoutube": "YouTube"
   },
   "Navigation": {
     "about": "診所介紹",
@@ -812,5 +822,73 @@
     "signUpDone": "您的帳戶已建立。",
     "signupBrand": "開始屬於您的美麗故事。",
     "noticeRequired": "必填項目"
+  },
+  "VlogSection": {
+    "descriptionLine1": "創造美麗的瞬間，以及其中蘊藏的故事。",
+    "descriptionLine2": "透過影片走近 AHN’S 的日常。",
+    "loading": "正在載入影片列表…",
+    "error": "無法載入影片。",
+    "retry": "重試",
+    "empty": "目前沒有影片。",
+    "playVideo": "播放影片：{title}",
+    "previous": "上一部影片",
+    "next": "下一部影片",
+    "videoList": "影片列表",
+    "selectVideo": "將 {title} 設為精選影片",
+    "dialog": "AHN’S 影片播放器",
+    "close": "關閉影片",
+    "videoTitle": "{title} 影片"
+  },
+  "SafetySection": {
+    "descriptionLine1": "美麗的呈現，始於每一個細緻的過程。",
+    "descriptionLine2": "了解 AHN’S 整形外科對安全與關懷的堅持。",
+    "loadError": "無法載入安全相關內容。",
+    "retry": "重試",
+    "empty": "目前尚無安全相關內容。",
+    "viewImage": "查看第{number}項 {title} 的圖片",
+    "standard": "05 / 我們的標準",
+    "loading": "正在載入安全內容...",
+    "stories": "{count}篇故事",
+    "commitment": "我們的承諾",
+    "photoFootnote": "美麗不止於外在。",
+    "principles": "我們的安全原則",
+    "endmark": "每個細節都很重要。",
+    "footerTagline": "以細緻關懷追求卓越。"
+  },
+  "Hero": {
+    "description": "發現專屬於您的美麗時刻"
+  },
+  "HospitalMap": {
+    "ctrlZoom": "捲動以縮放地圖",
+    "noAddress": "尚未登記診所地址",
+    "unavailable": "無法顯示地圖",
+    "loading": "地圖載入中…",
+    "registerAddress": "請在管理後台登記診所地址。",
+    "locating": "正在地圖上定位已登記的地址。",
+    "sectionLabel": "診所位置",
+    "providerSelect": "選擇地圖服務",
+    "addressPlaceholder": "請在管理後台新增地址。",
+    "canvasLabel": "{provider} 診所位置地圖",
+    "connecting": "正在連線至 {provider} 地圖",
+    "missingKey": "請設定環境變數 {key}。",
+    "openLarger": "在 {provider} 查看較大的地圖",
+    "naverInitError": "NAVER地圖初始化失敗。",
+    "naverModuleLoadError": "無法載入NAVER地址搜尋模組。",
+    "naverModuleError": "NAVER地址搜尋無法使用。",
+    "naverGeocodeError": "NAVER無法找到診所地址，請檢查登記的地址。",
+    "naverCoordinatesError": "NAVER地圖無法找到該地址的座標。",
+    "kakaoInitError": "Kakao地圖初始化失敗。",
+    "kakaoModuleError": "Kakao地址搜尋無法使用。",
+    "kakaoGeocodeError": "Kakao無法找到登記的地址。",
+    "googleInitError": "Google地圖初始化失敗。",
+    "googleGeocodeError": "Google地圖地址搜尋失敗，請檢查API與地址。",
+    "loadError": "無法載入地圖。",
+    "providerNaver": "NAVER",
+    "providerKakao": "Kakao",
+    "providerGoogle": "Google"
+  },
+  "QnaStandalone": {
+    "other": "其他",
+    "loading": "正在載入常見問題…"
   }
 }

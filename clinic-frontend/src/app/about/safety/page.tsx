@@ -1,5 +1,5 @@
-import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 import SafetyPage from "@/components/about/pages/SafetyPage";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
 export async function generateMetadata() {
   return publicPageMetadata("/about/safety");

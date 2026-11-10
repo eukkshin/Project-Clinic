@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -95,6 +96,7 @@ const ScrollZoomGuide = styled.div`
 interface HospitalMapProps {
   address: string;
   clinicName: string;
+  displayAddress?: string;
 }
 
 interface ZoomMap {
@@ -330,12 +332,6 @@ function getExternalMapUrl(provider: MapProvider, address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-function getProviderName(provider: MapProvider): string {
-  if (provider === "naver") return "네이버";
-  if (provider === "kakao") return "카카오";
-  return "구글";
-}
-
 function SdkMap({
   provider,
   address,
@@ -347,6 +343,12 @@ function SdkMap({
   clinicName: string;
   enabled: boolean;
 }) {
+  const tMap = useTranslations("HospitalMap");
+  const providerNames: Record<MapProvider, string> = {
+    naver: tMap("providerNaver"),
+    kakao: tMap("providerKakao"),
+    google: tMap("providerGoogle"),
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<MapStatus>("loading");
   const [error, setError] = useState("");
@@ -406,15 +408,12 @@ function SdkMap({
           if (cancelled) return;
 
           const naver = (window as MapWindow).naver;
-          if (!naver?.maps)
-            throw new Error("네이버 지도 SDK 초기화에 실패했습니다.");
+          if (!naver?.maps) throw new Error(tMap("naverInitError"));
 
           if (!naver.maps.Service) {
             await new Promise<void>((resolve, reject) => {
               const timeout = window.setTimeout(() => {
-                reject(
-                  new Error("네이버 주소 검색 모듈을 불러오지 못했습니다."),
-                );
+                reject(new Error(tMap("naverModuleLoadError")));
               }, 6000);
               const previous = naver.maps.onJSContentLoaded;
               naver.maps.onJSContentLoaded = () => {
@@ -427,15 +426,12 @@ function SdkMap({
           if (cancelled) return;
 
           const service = naver.maps.Service;
-          if (!service)
-            throw new Error("네이버 주소 검색 모듈을 사용할 수 없습니다.");
+          if (!service) throw new Error(tMap("naverModuleError"));
 
           service.geocode({ query: address }, (resultStatus, response) => {
             if (cancelled) return;
             if (resultStatus !== service.Status.OK) {
-              setMapError(
-                "네이버에서 주소를 검색하지 못했습니다. 등록된 병원 주소를 확인하세요.",
-              );
+              setMapError(tMap("naverGeocodeError"));
               return;
             }
 
@@ -447,9 +443,7 @@ function SdkMap({
               !validCoordinate(latitude) ||
               !validCoordinate(longitude)
             ) {
-              setMapError(
-                "네이버 지도에서 해당 주소의 좌표를 찾지 못했습니다.",
-              );
+              setMapError(tMap("naverCoordinatesError"));
               return;
             }
 
@@ -489,13 +483,12 @@ function SdkMap({
           if (cancelled) return;
 
           const kakao = (window as MapWindow).kakao;
-          if (!kakao?.maps?.load)
-            throw new Error("카카오 지도 SDK 초기화에 실패했습니다.");
+          if (!kakao?.maps?.load) throw new Error(tMap("kakaoInitError"));
 
           kakao.maps.load(() => {
             if (cancelled) return;
             if (!kakao.maps.services?.Geocoder) {
-              setMapError("카카오 주소 검색 모듈을 사용할 수 없습니다.");
+              setMapError(tMap("kakaoModuleError"));
               return;
             }
 
@@ -511,9 +504,7 @@ function SdkMap({
                 !validCoordinate(latitude) ||
                 !validCoordinate(longitude)
               ) {
-                setMapError(
-                  "카카오에서 주소를 찾지 못했습니다. 관리자 주소를 확인하세요.",
-                );
+                setMapError(tMap("kakaoGeocodeError"));
                 return;
               }
 
@@ -551,7 +542,7 @@ function SdkMap({
 
         const google = (window as MapWindow).google;
         if (!google?.maps?.Map || !google.maps.Geocoder) {
-          throw new Error("구글 지도 SDK 초기화에 실패했습니다.");
+          throw new Error(tMap("googleInitError"));
         }
 
         const geocoder = new google.maps.Geocoder();
@@ -559,9 +550,7 @@ function SdkMap({
           if (cancelled) return;
           const center = results?.[0]?.geometry?.location;
           if (resultStatus !== "OK" || !center) {
-            setMapError(
-              "구글 주소 검색에 실패했습니다. Maps API 및 주소를 확인하세요.",
-            );
+            setMapError(tMap("googleGeocodeError"));
             return;
           }
 
@@ -584,11 +573,7 @@ function SdkMap({
           setStatus("ready");
         });
       } catch (cause) {
-        setMapError(
-          cause instanceof Error
-            ? cause.message
-            : "지도를 불러오지 못했습니다.",
-        );
+        setMapError(cause instanceof Error ? cause.message : tMap("loadError"));
       }
     };
 
@@ -598,7 +583,7 @@ function SdkMap({
       if (hintHideTimer !== undefined) window.clearTimeout(hintHideTimer);
       removeWheelHandler?.();
     };
-  }, [address, clinicName, enabled, provider, selectedKey]);
+  }, [address, clinicName, enabled, provider, selectedKey, tMap]);
 
   const noKey = !selectedKey;
   const noAddress = !address.trim();
@@ -607,7 +592,7 @@ function SdkMap({
     <S.MapContent style={{ position: "relative", isolation: "isolate" }}>
       <S.MapCanvas
         ref={containerRef}
-        aria-label={`${getProviderName(provider)} 병원 위치 지도`}
+        aria-label={tMap("canvasLabel", { provider: providerNames[provider] })}
       />
 
       {/* Ctrl 없이 지도에서 휠을 돌릴 때 지도 전체를 덮는 안내. */}
@@ -618,7 +603,7 @@ function SdkMap({
               ⌕
             </span>
             <p className="zoom-hint-label">
-              <kbd>Ctrl</kbd> + 스크롤로 지도 확대·축소
+              <kbd>Ctrl</kbd> + {tMap("ctrlZoom")}
             </p>
           </ScrollZoomGuide>
         </ScrollZoomOverlay>
@@ -631,21 +616,23 @@ function SdkMap({
           </span>
           <strong>
             {noAddress
-              ? "병원 주소 등록이 필요합니다"
+              ? tMap("noAddress")
               : noKey
-                ? `${getProviderName(provider)} 지도 연결 준비 중`
+                ? tMap("connecting", { provider: providerNames[provider] })
                 : status === "error"
-                  ? "지도를 표시할 수 없습니다"
-                  : "지도를 불러오는 중입니다"}
+                  ? tMap("unavailable")
+                  : tMap("loading")}
           </strong>
           <p>
             {noAddress
-              ? "관리자 페이지에서 실제 병원 주소를 등록해 주세요."
+              ? tMap("registerAddress")
               : noKey
-                ? `NEXT_PUBLIC_${provider === "naver" ? "NAVER_MAP_CLIENT_ID" : provider === "kakao" ? "KAKAO_MAP_JAVASCRIPT_KEY" : "GOOGLE_MAPS_API_KEY"} 환경변수를 등록해 주세요.`
+                ? tMap("missingKey", {
+                    key: `NEXT_PUBLIC_${provider === "naver" ? "NAVER_MAP_CLIENT_ID" : provider === "kakao" ? "KAKAO_MAP_JAVASCRIPT_KEY" : "GOOGLE_MAPS_API_KEY"}`,
+                  })
                 : status === "error"
                   ? error
-                  : "등록된 주소를 지도 위에 표시하고 있습니다."}
+                  : tMap("locating")}
           </p>
         </S.MapFallback>
       )}
@@ -653,7 +640,17 @@ function SdkMap({
   );
 }
 
-export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
+export default function HospitalMap({
+  address,
+  clinicName,
+  displayAddress,
+}: HospitalMapProps) {
+  const tMap = useTranslations("HospitalMap");
+  const providerNames: Record<MapProvider, string> = {
+    naver: tMap("providerNaver"),
+    kakao: tMap("providerKakao"),
+    google: tMap("providerGoogle"),
+  };
   const [provider, setProvider] = useState<MapProvider>("kakao");
   const [enabled, setEnabled] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -681,7 +678,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
 
   return (
     // 기존 data-lenis-prevent는 일반 휠 스크롤을 차단할 수 있어 제거한다.
-    <S.MapSection ref={sectionRef} aria-label="병원 위치">
+    <S.MapSection ref={sectionRef} aria-label={tMap("sectionLabel")}>
       <S.MapHeading>
         <div>
           <S.MicroLabel>LOCATION / FIND US</S.MicroLabel>
@@ -691,7 +688,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
         </div>
         <S.MapTabs
           role="group"
-          aria-label="지도 서비스 선택"
+          aria-label={tMap("providerSelect")}
           style={{ flexWrap: "wrap" }}
         >
           {(["naver", "kakao", "google"] as const).map((item) => (
@@ -702,7 +699,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
               aria-pressed={provider === item}
               onClick={() => setProvider(item)}
             >
-              {item.toUpperCase()} <span>↗</span>
+              {providerNames[item]} <span>↗</span>
             </S.MapTab>
           ))}
         </S.MapTabs>
@@ -724,7 +721,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
       <S.MapBottomBar>
         <div>
           <strong>{clinicName || "Ahn's Plastic Surgery"}</strong>
-          <span>{address || "관리자에서 주소를 등록해 주세요."}</span>
+          <span>{displayAddress || address || tMap("addressPlaceholder")}</span>
         </div>
         {!!address.trim() && (
           <S.OutlineLink
@@ -732,7 +729,7 @@ export default function HospitalMap({ address, clinicName }: HospitalMapProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {getProviderName(provider)} 지도에서 크게 보기{" "}
+            {tMap("openLarger", { provider: providerNames[provider] })}{" "}
             <span aria-hidden="true">↗</span>
           </S.OutlineLink>
         )}

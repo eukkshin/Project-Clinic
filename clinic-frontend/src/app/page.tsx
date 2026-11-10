@@ -1,4 +1,4 @@
-import { publicPageMetadata } from "@/lib/seo/publicMetadata";
+import { getLocale } from "next-intl/server";
 import { headers } from "next/headers";
 
 import CategoryNav from "@/components/home/CategoryNav";
@@ -14,6 +14,7 @@ import VlogSafetyFlow from "@/components/home/VlogSafetyFlow";
 import { VlogSlider } from "@/components/home/VlogSlider";
 import BrandIntro from "@/components/intro/BrandIntro";
 import { getInitialHeroSlides } from "@/lib/home/getInitialHeroSlides";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
 export async function generateMetadata() {
   return publicPageMetadata("/");
@@ -59,11 +60,12 @@ type HomeProps = {
 };
 
 export default async function Home({ searchParams }: HomeProps) {
-  const [requestHeaders, params, initialHeroSlides] = await Promise.all([
+  const [requestHeaders, params, locale] = await Promise.all([
     headers(),
     searchParams,
-    getInitialHeroSlides(),
+    getLocale(),
   ]);
+  const initialHeroSlides = await getInitialHeroSlides(locale);
   const preview = params.intro === "1";
   const shouldPlay = preview || isExternalNavigation(requestHeaders);
 

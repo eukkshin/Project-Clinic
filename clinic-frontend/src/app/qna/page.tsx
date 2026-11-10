@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { Accordion } from "@/components/ui/Accordion";
@@ -15,18 +16,22 @@ interface QnAItem {
 type QnAGroup = Record<string, QnAItem[]>;
 
 export default function QuaPage() {
+  const locale = useLocale();
+  const t = useTranslations("QnaStandalone");
   const [qnaData, setQnaData] = useState<QnAGroup>({});
   const [categories, setCategories] = useState<string[]>([]);
   const [tab, setTab] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchPublicQnAs();
-  }, []);
+    void fetchPublicQnAs();
+  }, [locale]);
 
   const fetchPublicQnAs = async () => {
     try {
-      const res = await axios.get(`${API_ORIGIN}/api/public/site/qnas`);
+      const res = await axios.get(`${API_ORIGIN}/api/public/content/faq`, {
+        params: { locale },
+      });
 
       if (res.data.success) {
         const rawData = res.data.data;
@@ -34,7 +39,7 @@ export default function QuaPage() {
         // 1. 카테고리별로 데이터 그룹화하기
         const grouped: QnAGroup = {};
         rawData.forEach((item: any) => {
-          const catName = item.CATEGORY_NAME || item.categoryName || "기타";
+          const catName = item.CATEGORY_NAME || item.categoryName || t("other");
 
           if (!grouped[catName]) {
             grouped[catName] = [];
@@ -66,7 +71,7 @@ export default function QuaPage() {
   if (isLoading) {
     return (
       <S.QnAShell style={{ textAlign: "center", padding: "5rem 0" }}>
-        로딩 중...
+        {t("loading")}
       </S.QnAShell>
     );
   }

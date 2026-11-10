@@ -3,7 +3,7 @@
 import axios from "axios";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -58,6 +58,7 @@ function getSafeLink(link: string | null): string {
 
 export default function CategoryNav() {
   const tHome = useTranslations("Home");
+  const locale = useLocale();
   const tNavigation = useTranslations("Navigation");
   const tProcedures = useTranslations("Procedures");
   // categories: 서버에서 가져와 카드로 표시할 진료 분야 목록.
@@ -89,8 +90,8 @@ export default function CategoryNav() {
     const fetchCategories = async () => {
       try {
         const response = await axios.get<CategoryApiResponse>(
-          `${API_URL}/api/public/site/categories`,
-          { signal: controller.signal },
+          `${API_URL}/api/public/content/categories`,
+          { signal: controller.signal, params: { locale } },
         );
 
         // 응답이 실패했거나 실제 배열이 아니면 카드 데이터로 사용하지 않는다.
@@ -135,7 +136,7 @@ export default function CategoryNav() {
 
     // React 컴포넌트가 사라질 때 요청을 취소한다.
     return () => controller.abort();
-  }, []);
+  }, [locale]);
 
   // ────────────────────────────────────────────────────────────────
   // 2. PC에서는 세로 휠을 가로 카드 이동에 연결한다.

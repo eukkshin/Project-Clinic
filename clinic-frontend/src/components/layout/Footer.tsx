@@ -44,7 +44,8 @@ interface CompanyInfo {
 
 interface ScheduleData {
   id: number;
-  departments: string;
+  department?: string;
+  departments?: string;
   weekday: string;
   night: string;
   weekend: string;
@@ -62,6 +63,7 @@ interface FooterResponse {
     companyInfo?: Partial<CompanyInfo>;
     schedules?: ScheduleData[];
     familySites?: FamilySiteData[];
+    mapAddress?: string;
   };
 }
 
@@ -278,6 +280,7 @@ export default function Footer() {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(INITIAL_COMPANY);
   const [schedules, setSchedules] = useState<ScheduleData[]>([]);
   const [familySites, setFamilySites] = useState<FamilySiteData[]>([]);
+  const [mapAddress, setMapAddress] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -286,18 +289,28 @@ export default function Footer() {
 
     const fetchFooterData = async () => {
       try {
-        const response = await axios.get<FooterResponse>(
-          `${API_URL}/api/public/site/footer`,
-          {
-            signal: controller.signal,
-          },
-        );
+        // The translated endpoint preserves the existing public footer shape.
+        // Older backends can still serve the original public endpoint.
+        let response: { data: FooterResponse };
+        try {
+          response = await axios.get<FooterResponse>(
+            `${API_URL}/api/public/content/footer`,
+            { params: { locale }, signal: controller.signal },
+          );
+        } catch (error) {
+          if (controller.signal.aborted) return;
+          response = await axios.get<FooterResponse>(
+            `${API_URL}/api/public/site/footer`,
+            { signal: controller.signal },
+          );
+        }
         if (!response.data.success || !response.data.data) return;
 
         const {
           companyInfo: info,
           schedules: hours,
           familySites: sites,
+          mapAddress: originalAddress,
         } = response.data.data;
         if (controller.signal.aborted) return;
 
@@ -305,6 +318,8 @@ export default function Footer() {
         if (info && typeof info === "object") {
           setCompanyInfo((previous) => ({ ...previous, ...info }));
         }
+        if (typeof originalAddress === "string") setMapAddress(originalAddress);
+        else if (info?.address) setMapAddress(info.address);
         if (Array.isArray(hours)) setSchedules(hours);
         if (Array.isArray(sites)) setFamilySites(sites);
       } catch (error) {
@@ -317,7 +332,7 @@ export default function Footer() {
 
     void fetchFooterData();
     return () => controller.abort();
-  }, []);
+  }, [locale]);
 
   const clinicName =
     companyInfo.clinicName || companyInfo.name || "Ahn's Plastic Surgery";
@@ -340,12 +355,12 @@ export default function Footer() {
           <S.MainGrid>
             <S.InfoColumn>
               <S.IntroSmall data-footer-motion>
-                WE ARE HERE FOR YOU
+                {tFooter("eyebrow")}
               </S.IntroSmall>
               <S.IntroTitle data-footer-motion>
-                Find Your
+                {tFooter("heroLine1")}
                 <br />
-                <em>Own Beauty.</em>
+                <em>{tFooter("heroLine2")}</em>
               </S.IntroTitle>
               <S.IntroDescription data-footer-motion>
                 {tFooter("introLine1")}
@@ -354,7 +369,7 @@ export default function Footer() {
               </S.IntroDescription>
 
               <S.ContactGroup data-footer-motion>
-                <S.ContactLabel>CONTACT</S.ContactLabel>
+                <S.ContactLabel>{tFooter("contactHeading")}</S.ContactLabel>
                 {phoneHref ? (
                   <S.PhoneAnchor href={phoneHref}>
                     {companyInfo.phone}
@@ -374,7 +389,7 @@ export default function Footer() {
               </S.ContactGroup>
 
               <S.ContactGroup data-footer-motion>
-                <S.ContactLabel>CLINIC INFORMATION</S.ContactLabel>
+                <S.ContactLabel>{tFooter("clinicHeading")}</S.ContactLabel>
                 <S.ClinicTitle>{clinicName}</S.ClinicTitle>
                 <S.AddressText>
                   {companyInfo.address ||
@@ -396,10 +411,10 @@ export default function Footer() {
 
               {schedules.length > 0 && (
                 <S.HoursGroup>
-                  <S.ContactLabel>OPENING HOURS</S.ContactLabel>
+                  <S.ContactLabel>{tFooter("hoursHeading")}</S.ContactLabel>
                   {schedules.map((schedule) => (
                     <S.HoursItem key={schedule.id}>
-                      <strong>{schedule.departments}</strong>
+                      <strong>{schedule.department || schedule.departments}</strong>
                       {schedule.weekday && (
                         <span>
                           {tFooter("weekday")}　{schedule.weekday}
@@ -423,8 +438,9 @@ export default function Footer() {
 
             {/* 지도 Provider 전환 기능은 HospitalMap.tsx에 독립 구현 */}
             <HospitalMap
-              address={companyInfo.address}
+              address={mapAddress || companyInfo.address}
               clinicName={clinicName}
+              displayAddress={companyInfo.address}
             />
           </S.MainGrid>
 
@@ -460,7 +476,7 @@ export default function Footer() {
 
             {familySites.length > 0 && (
               <S.FamilyArea>
-                <S.ContactLabel>FAMILY SITES</S.ContactLabel>
+                <S.ContactLabel>{tFooter("familyHeading")}</S.ContactLabel>
                 <S.FamilyList>
                   {familySites.map((site) => {
                     const href = safeExternalUrl(site.url);
@@ -506,7 +522,7 @@ export default function Footer() {
               >
                 <S.QuickMenuLink
                   href={link.href}
-                  aria-label={link.label}
+                  aria-label={tFooter(link.id === "kakao" ? "quickKakao" : link.id === "instagram" ? "quickInstagram" : "quickYoutube")}
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
                   tabIndex={messageOpen ? 0 : -1}
@@ -514,7 +530,7 @@ export default function Footer() {
                 >
                   {/* 같은 버튼 안에서 왼쪽으로 이름이 펼쳐짐 (별도 툴팁 없음) */}
                   <S.QuickMenuLabel aria-hidden="true">
-                    {link.label}
+                    {tFooter(link.id === "kakao" ? "quickKakao" : link.id === "instagram" ? "quickInstagram" : "quickYoutube")}
                   </S.QuickMenuLabel>
                   <S.QuickMenuIcon aria-hidden="true">
                     {link.icon}

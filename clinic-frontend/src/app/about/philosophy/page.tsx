@@ -1,5 +1,5 @@
-import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 import PhilosophyPage from "@/components/about/pages/PhilosophyPage";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
 export async function generateMetadata() {
   return publicPageMetadata("/about/philosophy");

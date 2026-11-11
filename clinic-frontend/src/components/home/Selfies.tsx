@@ -426,12 +426,14 @@ export default function Selfies() {
                       data-editorial-spotlight
                       type="button"
                       onClick={() => openPhoto(item)}
-                      aria-label={`${index + 1}번 이미지 크게 보기`}
+                      aria-label={tHome("selfiesOpenPhoto", {
+                        index: index + 1,
+                      })}
                     >
                       <S.PhotoFrame>
                         <Image
                           src={item.imageUrl}
-                          alt={`갤러리 사진 ${index + 1}`}
+                          alt={tHome("selfiesPhotoAlt", { index: index + 1 })}
                           fill
                           sizes="(max-width: 640px) 78vw, (max-width: 1080px) 44vw, 29vw"
                           style={{ objectFit: "cover" }}
@@ -483,7 +485,7 @@ export default function Selfies() {
           <S.Lightbox
             role="dialog"
             aria-modal="true"
-            aria-label="선택한 갤러리 사진 확대 보기"
+            aria-label={tHome("selfiesLightboxLabel")}
             onMouseDown={(event) => {
               // 이미지를 누르면 닫히지 않고, 어두운 바깥 배경을 누를 때만 닫힌다.
               if (event.target === event.currentTarget) setSelected(null);
@@ -493,7 +495,7 @@ export default function Selfies() {
               <S.ModalImage>
                 <Image
                   src={selected.imageUrl}
-                  alt="선택한 갤러리 사진 확대"
+                  alt={tHome("selfiesSelectedAlt")}
                   fill
                   sizes="(max-width: 768px) 94vw, 70vw"
                   style={{ objectFit: "contain" }}
@@ -507,7 +509,7 @@ export default function Selfies() {
                 ref={closeButtonRef}
                 type="button"
                 onClick={() => setSelected(null)}
-                aria-label="확대 이미지 닫기"
+                aria-label={tHome("selfiesClosePhoto")}
               >
                 ✕
               </S.CloseButton>

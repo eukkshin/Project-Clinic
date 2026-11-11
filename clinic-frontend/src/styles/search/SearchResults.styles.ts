@@ -7,7 +7,8 @@ const muted = "#718273";
 const gold = "#a59572";
 const line = "rgba(41, 76, 51, 0.14)";
 // 한글은 영문 디스플레이 세리프 폰트를 상속하지 않도록 명시합니다.
-const koreanFont = '"Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
+const koreanFont =
+  '"Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif';
 const englishFont = '"Cormorant Garamond", Georgia, serif';
 
 export const Page = styled.main`
@@ -22,7 +23,11 @@ export const Page = styled.main`
 export const SearchHero = styled.section`
   padding: clamp(125px, 10vw, 156px) 24px clamp(36px, 4.6vw, 62px);
   background:
-    radial-gradient(ellipse at 82% 0%, rgba(218, 229, 211, 0.58), transparent 53%),
+    radial-gradient(
+      ellipse at 82% 0%,
+      rgba(218, 229, 211, 0.58),
+      transparent 53%
+    ),
     #f5f5ee;
   border-bottom: 1px solid #dfe3d9;
 
@@ -44,7 +49,9 @@ export const SearchForm = styled.form`
   border-radius: 2px;
   box-shadow: 0 12px 32px rgba(32, 58, 37, 0.06);
   color: ${ink};
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   > svg {
     flex: 0 0 auto;
@@ -76,9 +83,13 @@ export const SearchInput = styled.input`
   line-height: 1.4;
   letter-spacing: -0.025em;
 
-  &::placeholder { color: #93a194; }
+  &::placeholder {
+    color: #93a194;
+  }
 
-  @media (max-width: 600px) { font-size: 12px; }
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
 `;
 
 export const SubmitButton = styled.button`
@@ -95,20 +106,30 @@ export const SubmitButton = styled.button`
   color: #fff;
   font: 500 12px ${koreanFont};
   cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 
   &:hover:not(:disabled) {
     background: #355f49;
     border-color: #355f49;
   }
-  &:disabled { opacity: 0.48; cursor: not-allowed; }
-  &:focus-visible { outline: 2px solid #9cae8f; outline-offset: 3px; }
+  &:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+  }
+  &:focus-visible {
+    outline: 2px solid #9cae8f;
+    outline-offset: 3px;
+  }
 
   @media (max-width: 600px) {
     min-width: 44px;
     padding: 0 12px;
     gap: 0;
-    span { display: none; }
+    span {
+      display: none;
+    }
   }
 `;
 
@@ -136,6 +157,12 @@ export const ResultHeading = styled.div`
   justify-content: space-between;
   gap: 20px;
 
+  @media (max-width: 600px) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+
   h1 {
     margin: 0;
     color: ${ink};
@@ -146,7 +173,9 @@ export const ResultHeading = styled.div`
     letter-spacing: -0.055em;
     overflow-wrap: anywhere;
 
-    strong { font-weight: 700; }
+    strong {
+      font-weight: 700;
+    }
   }
 `;
 
@@ -156,6 +185,7 @@ export const ResultCount = styled.span`
   color: ${muted};
   font-size: 11px;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 `;
 
 export const Filters = styled.div`
@@ -178,13 +208,19 @@ export const FilterButton = styled.button<{ $active: boolean }>`
   font-size: 11px;
   font-weight: ${({ $active }) => ($active ? "600" : "500")};
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover:not([aria-pressed="true"]) {
     background: #e9eee6;
     border-color: #aebfad;
   }
-  &:focus-visible { outline: 2px solid ${gold}; outline-offset: 3px; }
+  &:focus-visible {
+    outline: 2px solid ${gold};
+    outline-offset: 3px;
+  }
 `;
 
 export const State = styled.div`
@@ -207,7 +243,9 @@ export const Warning = styled.p`
 
 export const Group = styled.section`
   margin-top: 32px;
-  & + & { margin-top: 48px; }
+  & + & {
+    margin-top: 48px;
+  }
 `;
 
 export const GroupTitle = styled.div`
@@ -255,7 +293,9 @@ export const CardGrid = styled.div`
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 
-  @media (max-width: 680px) { grid-template-columns: 1fr; }
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const Card = styled.article`
@@ -266,14 +306,22 @@ export const Card = styled.article`
   background: #fff;
   border: 1px solid #e0e5dd;
   box-shadow: 0 5px 23px rgba(35, 69, 43, 0.035);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.25s ease;
 
   &:hover {
     border-color: #c6d2c3;
     box-shadow: 0 14px 30px rgba(35, 69, 43, 0.09);
     transform: translateY(-2px);
   }
-  @media (prefers-reduced-motion: reduce) { transition: none; &:hover { transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover {
+      transform: none;
+    }
+  }
 `;
 
 export const CardEyebrow = styled.p`
@@ -298,8 +346,13 @@ export const CardTitle = styled.a`
   text-decoration: none;
   overflow-wrap: anywhere;
 
-  &:focus-visible { outline: 2px solid #7b957d; outline-offset: 4px; }
-  &:hover { color: #426b4b; }
+  &:focus-visible {
+    outline: 2px solid #7b957d;
+    outline-offset: 4px;
+  }
+  &:hover {
+    color: #426b4b;
+  }
 `;
 
 export const CardArrow = styled.span`
@@ -310,7 +363,9 @@ export const CardArrow = styled.span`
   color: #667f6c;
   transition: transform 0.2s ease;
 
-  ${Card}:hover & { transform: translate(2px, -2px); }
+  ${Card}:hover & {
+    transform: translate(2px, -2px);
+  }
 `;
 
 export const CardDescription = styled.p`
@@ -366,8 +421,13 @@ export const FaqTitle = styled.a`
   letter-spacing: -0.025em;
   text-decoration: none;
   overflow-wrap: anywhere;
-  &:hover { color: #496f4d; }
-  &:focus-visible { outline: 2px solid #7b957d; outline-offset: 3px; }
+  &:hover {
+    color: #496f4d;
+  }
+  &:focus-visible {
+    outline: 2px solid #7b957d;
+    outline-offset: 3px;
+  }
 `;
 
 export const FaqDescription = styled.p`

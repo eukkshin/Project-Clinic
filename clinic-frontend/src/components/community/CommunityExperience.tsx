@@ -1,5 +1,5 @@
 "use client";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,7 +10,8 @@ import * as S from "@/components/community/Community.styles";
 import ConsultCaptcha, {
   consultCaptchaEnabled,
 } from "@/components/security/ConsultCaptcha";
-import { stripLocalePrefix } from "@/i18n/url";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
+import { localizedPath, stripLocalePrefix } from "@/i18n/url";
 import {
   CommunityEntry,
   CommunityResult,
@@ -25,6 +26,20 @@ import {
 } from "@/lib/community/config";
 
 type DataStatus = "loading" | "ready" | "error";
+const communityNavKeys = {
+  notice: "notice",
+  events: "events",
+  reviews: "reviews",
+  "before-after": "beforeAfter",
+  consultation: "onlineConsultation",
+  qna: "qna",
+  vlog: "vlog",
+} as const;
+
+function useCommunityLocale() {
+  const value = useLocale();
+  return isAppLocale(value) ? value : defaultLocale;
+}
 
 function CommunityMotion() {
   useEffect(() => {
@@ -65,8 +80,11 @@ function CommunityMotion() {
 
 function CommunityNav() {
   const pathname = stripLocalePrefix(usePathname());
+  const locale = useCommunityLocale();
+  const tCommunity = useTranslations("Community");
+  const tNavigation = useTranslations("Navigation");
   return (
-    <S.TopBar aria-label="커뮤니티 하위 페이지">
+    <S.TopBar aria-label={tCommunity("subNavigation")}>
       <S.NavTitle>
         COMMUNITY <span>/</span>
       </S.NavTitle>
@@ -75,11 +93,11 @@ function CommunityNav() {
           <S.NavLink
             as={Link}
             key={page.kind}
-            href={page.href}
+            href={localizedPath(page.href, locale)}
             $active={pathname === page.href}
             aria-current={pathname === page.href ? "page" : undefined}
           >
-            {page.label}
+            {tNavigation(communityNavKeys[page.kind])}
           </S.NavLink>
         ))}
       </S.NavTrack>
@@ -98,6 +116,8 @@ function CommunityFrame({ children }: { children: ReactNode }) {
 }
 
 function BottomCTA() {
+  const locale = useCommunityLocale();
+  const tCommunity = useTranslations("Community");
   return (
     <S.DarkBand>
       <S.Container>
@@ -105,20 +125,24 @@ function BottomCTA() {
           <div data-c-reveal>
             <S.Eyebrow>AHN’S / THE CONVERSATION</S.Eyebrow>
             <h2 style={{ marginTop: 24 }}>
-              당신의 이야기가
+              {tCommunity("ctaTitle1")}
               <br />
-              시작되는 곳.
+              {tCommunity("ctaTitle2")}
             </h2>
           </div>
           <div data-c-reveal>
             <p>
-              일상적인 궁금증부터 상담 예약까지.
+              {tCommunity("ctaLine1")}
               <br />
-              차분하고 편안한 소통을 이어갑니다.
+              {tCommunity("ctaLine2")}
             </p>
             <div style={{ marginTop: 27 }}>
-              <S.TextLink as={Link} href="/community/consultation">
-                온라인 상담하기 <span aria-hidden="true">↗</span>
+              <S.TextLink
+                as={Link}
+                href={localizedPath("/community/consultation", locale)}
+              >
+                {tCommunity("onlineConsultation")}{" "}
+                <span aria-hidden="true">↗</span>
               </S.TextLink>
             </div>
           </div>
@@ -129,6 +153,9 @@ function BottomCTA() {
 }
 
 function CommunityHome() {
+  const locale = useCommunityLocale();
+  const tCommunity = useTranslations("Community");
+  const tNavigation = useTranslations("Navigation");
   const featured = COMMUNITY_PAGES.filter(
     (page) => page.kind !== "consultation",
   );
@@ -139,60 +166,60 @@ function CommunityHome() {
           <S.HeroCopy data-c-reveal>
             <S.Eyebrow>AHN’S COMMUNITY / EDITION 01</S.Eyebrow>
             <S.Display>
-              아름다움에 대한
+              {tCommunity("homeTitle1")}
               <br />
-              모든 이야기,
+              {tCommunity("homeTitle2")}
               <br />
-              <em>Our Stories.</em>
+              <em>{tCommunity("homeStories")}</em>
             </S.Display>
-            <S.Lead>
-              AHN’S가 전하는 소식과 기록, 그리고 궁금한 마음에 대한 답변을
-              한곳에 모았습니다.
-            </S.Lead>
-            <S.TextLink as={Link} href="/community/notice">
-              새로운 소식 살펴보기 <span aria-hidden="true">↗</span>
+            <S.Lead>{tCommunity("homeLead")}</S.Lead>
+            <S.TextLink
+              as={Link}
+              href={localizedPath("/community/notice", locale)}
+            >
+              {tCommunity("viewNotices")} <span aria-hidden="true">↗</span>
             </S.TextLink>
             <S.HeroCounter>
               001 — 007{" "}
               <span style={{ paddingLeft: 15, fontSize: 11 }}>
-                Scroll to explore
+                {tCommunity("scrollExplore")}
               </span>
             </S.HeroCounter>
           </S.HeroCopy>
           <S.HeroPhotoFrame data-c-reveal>
             <Image
               src="/images/community/editorial-hero.webp"
-              alt="따뜻한 자연광 속 인물 에디토리얼 이미지"
+              alt={tCommunity("heroImageAlt")}
               fill
               priority
               sizes="(max-width: 860px) 100vw, 48vw"
             />
-            <S.PhotoCaption>Beyond Beauty.</S.PhotoCaption>
+            <S.PhotoCaption>{tCommunity("heroPhotoCaption")}</S.PhotoCaption>
           </S.HeroPhotoFrame>
         </S.Container>
       </S.MainHero>
       <S.MainFeature>
         <S.MainFeatureCopy data-c-reveal>
-          <S.Eyebrow>FEATURED / IN FOCUS</S.Eyebrow>
+          <S.Eyebrow>{tCommunity("featuredEyebrow")}</S.Eyebrow>
           <div>
             <h2>
-              오늘의 소식부터
+              {tCommunity("featureTitle1")}
               <br />
-              내일의 이야기까지.
+              {tCommunity("featureTitle2")}
             </h2>
-            <p style={{ marginTop: 23 }}>
-              진료 정보는 정확하게, 소식은 명료하게, 소통은 따뜻하게. 필요한
-              이야기를 편안하게 찾아보세요.
-            </p>
+            <p style={{ marginTop: 23 }}>{tCommunity("featureLead")}</p>
           </div>
-          <S.TextLink as={Link} href="/community/events">
-            이벤트 살펴보기 <span aria-hidden="true">↗</span>
+          <S.TextLink
+            as={Link}
+            href={localizedPath("/community/events", locale)}
+          >
+            {tCommunity("viewEvents")} <span aria-hidden="true">↗</span>
           </S.TextLink>
         </S.MainFeatureCopy>
         <S.FeatureImage>
           <Image
             src="/images/community/editorial-shadow.webp"
-            alt="자연광과 식물 그림자의 에디토리얼 이미지"
+            alt={tCommunity("featuredImageAlt")}
             fill
             sizes="(max-width: 860px) 100vw, 50vw"
           />
@@ -202,23 +229,27 @@ function CommunityHome() {
         <S.Container>
           <S.SectionHead data-c-reveal>
             <div>
-              <S.Eyebrow>EXPLORE THE COMMUNITY</S.Eyebrow>
-              <h2 style={{ marginTop: 24 }}>당신을 위한 일곱 가지 이야기.</h2>
+              <S.Eyebrow>{tCommunity("exploreEyebrow")}</S.Eyebrow>
+              <h2 style={{ marginTop: 24 }}>{tCommunity("exploreTitle")}</h2>
             </div>
             <p>
-              찾고 싶은 주제를 선택하세요.
+              {tCommunity("exploreLine1")}
               <br />
-              모든 항목은 각각의 전용 페이지로 연결됩니다.
+              {tCommunity("exploreLine2")}
             </p>
           </S.SectionHead>
           <S.LinkGrid>
             {featured.map((page) => (
-              <S.LinkCard as={Link} href={page.href} key={page.kind}>
+              <S.LinkCard
+                as={Link}
+                href={localizedPath(page.href, locale)}
+                key={page.kind}
+              >
                 <span className="number">
                   {page.number} / {page.english}
                 </span>
-                <h3>{page.label}</h3>
-                <p>{page.description}</p>
+                <h3>{tNavigation(communityNavKeys[page.kind])}</h3>
+                <p>{tCommunity(`pages.${page.kind}.description`)}</p>
                 <span className="arrow" aria-hidden="true">
                   ↗
                 </span>
@@ -233,14 +264,15 @@ function CommunityHome() {
 }
 
 function SubHero({ kind }: { kind: CommunityKind }) {
+  const tCommunity = useTranslations("Community");
   const page = COMMUNITY_BY_KIND[kind];
   return (
     <S.SubHero>
       <S.Container>
         <div data-c-reveal>
           <S.Eyebrow>AHN’S COMMUNITY / {page.english}</S.Eyebrow>
-          <S.Display>{page.title}</S.Display>
-          <S.Lead>{page.description}</S.Lead>
+          <S.Display>{tCommunity(`pages.${kind}.title`)}</S.Display>
+          <S.Lead>{tCommunity(`pages.${kind}.description`)}</S.Lead>
         </div>
         <S.HeroIndex aria-hidden="true">{page.number}</S.HeroIndex>
       </S.Container>
@@ -289,26 +321,28 @@ function EmptyNotice({
   onRetry: () => void;
   query: string;
 }) {
-  const page = COMMUNITY_BY_KIND[kind];
+  const tCommunity = useTranslations("Community");
   const notWired = !connected && status === "ready";
   const heading =
     status === "loading"
-      ? "내용을 불러오고 있습니다."
+      ? tCommunity("loading")
       : status === "error"
-        ? "데이터를 불러오지 못했어요."
+        ? tCommunity("loadError")
         : query
-          ? "검색 결과가 없습니다."
+          ? tCommunity("emptySearch")
           : notWired
-            ? "공개 자료 연결을 준비하고 있어요."
-            : "등록된 내용이 없습니다.";
+            ? tCommunity("notConnected")
+            : tCommunity("empty");
   const explanation =
     status === "error"
-      ? "서버 연결과 API 권한을 확인해 주세요."
+      ? tCommunity("checkServer")
       : query
-        ? "검색어를 바꿔 다시 확인해 주세요."
+        ? tCommunity("changeKeyword")
         : notWired
-          ? `${page.label}은 공개 데이터 API가 확인되면 이 위치에 자동으로 표시됩니다. 임의의 사례나 후기를 만들어 게시하지 않았습니다.`
-          : "새로운 소식이 등록되면 이곳에서 확인하실 수 있습니다.";
+          ? tCommunity("notConnectedDetail", {
+              section: tCommunity(`pages.${kind}.label`),
+            })
+          : tCommunity("emptyDetail");
   return (
     <S.EmptyBox role="status">
       <span className="symbol" aria-hidden="true">
@@ -318,19 +352,19 @@ function EmptyNotice({
       <p>{explanation}</p>
       {status === "error" && (
         <S.Button type="button" onClick={onRetry}>
-          다시 불러오기
+          {tCommunity("retry")}
         </S.Button>
       )}
     </S.EmptyBox>
   );
 }
 
-function formatDate(value: string): string {
+function formatDate(value: string, locale: string): string {
   if (!value) return "";
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime())
     ? value.slice(0, 10)
-    : parsed.toLocaleDateString("ko-KR", {
+    : parsed.toLocaleDateString(locale, {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -346,9 +380,10 @@ function Pagination({
   count: number;
   onChange: (value: number) => void;
 }) {
+  const tCommunity = useTranslations("Community");
   if (count <= 1) return null;
   return (
-    <S.Pages aria-label="목록 페이지 선택">
+    <S.Pages aria-label={tCommunity("pageSelect")}>
       {Array.from({ length: count }, (_, i) => i + 1).map((num) => (
         <button
           key={num}
@@ -372,6 +407,8 @@ function MediaTile({
   kind: CommunityKind;
   onPlay?: (entry: CommunityEntry) => void;
 }) {
+  const tCommunity = useTranslations("Community");
+  const locale = useCommunityLocale();
   const isVideo = kind === "vlog";
   return (
     <S.Tile>
@@ -380,7 +417,7 @@ function MediaTile({
           type="button"
           onClick={() => onPlay?.(item)}
           disabled={!item.video}
-          aria-label={`${item.title} 영상 보기`}
+          aria-label={tCommunity("playVideo", { title: item.title })}
           style={{
             border: 0,
             background: "none",
@@ -432,8 +469,8 @@ function MediaTile({
               src={item.image}
               alt={
                 kind === "before-after"
-                  ? "등록된 이미지 자료"
-                  : "이벤트 관련 이미지"
+                  ? tCommunity("galleryImageAlt")
+                  : tCommunity("eventImageAlt")
               }
               fill
               unoptimized
@@ -446,7 +483,7 @@ function MediaTile({
       )}
       <div className="metadata">
         <span>{item.category}</span>
-        <span>{formatDate(item.date)}</span>
+        <span>{formatDate(item.date, locale)}</span>
       </div>
       <h3>{item.title}</h3>
       {item.subtitle && <p>{item.subtitle}</p>}
@@ -455,6 +492,7 @@ function MediaTile({
 }
 
 function VideoDialog({ source, close }: { source: string; close: () => void }) {
+  const tCommunity = useTranslations("Community");
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
   useEffect(() => {
@@ -480,10 +518,10 @@ function VideoDialog({ source, close }: { source: string; close: () => void }) {
       <S.ModalWindow
         role="dialog"
         aria-modal="true"
-        aria-label="VLOG 영상 보기"
+        aria-label={tCommunity("videoDialog")}
       >
         <button onClick={close} type="button" autoFocus>
-          닫기 ×
+          {tCommunity("close")} ×
         </button>
         <iframe
           src={source}
@@ -504,60 +542,35 @@ function EditorialNote({
 }: {
   kind: "notice" | "reviews" | "before-after";
 }) {
-  const details = {
-    notice: {
-      eyebrow: "AN OPEN LETTER",
-      title: (
-        <>
-          알아야 할 이야기는
-          <br />더 분명하고 정직하게.
-        </>
-      ),
-      text: "운영 일정과 주요 안내는 정확하게 확인된 내용을 중심으로 게시합니다. 준비된 소식은 공지사항에서 차례대로 만나보실 수 있습니다.",
-      photo: "/images/community/editorial-shadow.webp",
-      alt: "차분한 자연광과 실내 공간",
-    },
-    reviews: {
-      eyebrow: "A PERSONAL STORY",
-      title: (
-        <>
-          한 사람의 경험을
-          <br />
-          가볍게 다루지 않습니다.
-        </>
-      ),
-      text: "후기는 실제 작성자의 동의와 공개 범위를 확인한 후 제공해야 합니다. 결과는 사람마다 다를 수 있으며, 후기 하나가 모든 사람의 결과를 대표하지는 않습니다.",
-      photo: "/images/community/editorial-face.webp",
-      alt: "차분한 인물 에디토리얼 이미지",
-    },
-    "before-after": {
-      eyebrow: "RESPONSIBLE PRESENTATION",
-      title: (
-        <>
-          이미지 하나에도
-          <br />
-          충분한 맥락이 필요하니까.
-        </>
-      ),
-      text: "전후 사진은 실제 공개 동의, 촬영 시점과 조건, 필요한 주의 정보를 함께 확인한 뒤 소개합니다. 기존의 단일 셀피 이미지를 전후 비교자료로 표시하지 않았습니다.",
-      photo: "/images/community/editorial-light.webp",
-      alt: "공간의 자연광을 담은 사진",
-    },
+  const tCommunity = useTranslations("Community");
+  const prefix = {
+    notice: "editorialNotice",
+    reviews: "editorialReviews",
+    "before-after": "editorialBeforeAfter",
+  }[kind];
+  const photo = {
+    notice: "/images/community/editorial-shadow.webp",
+    reviews: "/images/community/editorial-face.webp",
+    "before-after": "/images/community/editorial-light.webp",
   }[kind];
   return (
     <S.Essay data-c-reveal>
       <S.EssayImage>
         <Image
-          src={details.photo}
-          alt={details.alt}
+          src={photo}
+          alt={tCommunity(`${prefix}ImageAlt`)}
           fill
           sizes="(max-width:820px) 100vw, 45vw"
         />
       </S.EssayImage>
       <S.EssayCopy>
-        <S.Eyebrow>{details.eyebrow}</S.Eyebrow>
-        <h2>{details.title}</h2>
-        <p>{details.text}</p>
+        <S.Eyebrow>{tCommunity(`${prefix}Eyebrow`)}</S.Eyebrow>
+        <h2>
+          {tCommunity(`${prefix}Title1`)}
+          <br />
+          {tCommunity(`${prefix}Title2`)}
+        </h2>
+        <p>{tCommunity(`${prefix}Text`)}</p>
       </S.EssayCopy>
     </S.Essay>
   );
@@ -568,6 +581,8 @@ function EntriesView({
 }: {
   kind: Exclude<CommunityKind, "consultation">;
 }) {
+  const tCommunity = useTranslations("Community");
+  const locale = useCommunityLocale();
   const { status, result, retry } = useCommunityEntries(kind);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
@@ -587,14 +602,14 @@ function EntriesView({
       result.entries.filter((entry) => {
         const text =
           `${entry.title} ${entry.subtitle} ${entry.question} ${entry.answer} ${entry.category}`.toLocaleLowerCase(
-            "ko-KR",
+            locale,
           );
         return (
           (category === "all" || entry.category === category) &&
-          text.includes(query.trim().toLocaleLowerCase("ko-KR"))
+          text.includes(query.trim().toLocaleLowerCase(locale))
         );
       }),
-    [result.entries, category, query],
+    [result.entries, category, query, locale],
   );
   const limit =
     kind === "notice" || kind === "reviews" || kind === "qna" ? 8 : 9;
@@ -620,25 +635,31 @@ function EntriesView({
           <S.Count>
             {COMMUNITY_BY_KIND[kind].english} &nbsp; / &nbsp;{" "}
             {status === "ready"
-              ? `${filtered.length.toLocaleString("ko-KR")} RECORDS`
-              : "LOADING"}
+              ? tCommunity("recordCount", {
+                  count: filtered.length.toLocaleString(locale),
+                })
+              : tCommunity("loadingShort")}
           </S.Count>
           <S.SearchInput
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`${COMMUNITY_BY_KIND[kind].label} 검색`}
-            aria-label={`${COMMUNITY_BY_KIND[kind].label} 검색`}
+            placeholder={tCommunity("searchSection", {
+              section: tCommunity(`pages.${kind}.label`),
+            })}
+            aria-label={tCommunity("searchSection", {
+              section: tCommunity(`pages.${kind}.label`),
+            })}
           />
         </S.Toolbar>
         {kind === "qna" && categories.length > 1 && (
-          <S.ChipRow aria-label="질문 분류">
+          <S.ChipRow aria-label={tCommunity("questionFilters")}>
             <S.Chip
               type="button"
               $active={category === "all"}
               onClick={() => setCategory("all")}
             >
-              전체
+              {tCommunity("all")}
             </S.Chip>
             {categories.map((c) => (
               <S.Chip
@@ -684,7 +705,7 @@ function EntriesView({
                   </S.FaqQuestion>
                   {expanded && (
                     <S.FaqAnswer id={answerId}>
-                      {item.answer || "답변 준비 중입니다."}
+                      {item.answer || tCommunity("answerPending")}
                     </S.FaqAnswer>
                   )}
                 </S.FaqItem>
@@ -700,7 +721,7 @@ function EntriesView({
                   <h3>{item.title}</h3>
                   {item.subtitle && <p>{item.subtitle}</p>}
                 </div>
-                <time>{formatDate(item.date)}</time>
+                <time>{formatDate(item.date, locale)}</time>
               </S.LineItem>
             ))}
           </S.Lines>
@@ -723,16 +744,16 @@ function EntriesView({
         {kind === "before-after" && (
           <S.InfoGrid>
             <div>
-              <strong>01 / Consent</strong>
-              <span>환자 동의 및 공개 범위 확인</span>
+              <strong>01 / {tCommunity("beforeAfterConsentTitle")}</strong>
+              <span>{tCommunity("beforeAfterConsentText")}</span>
             </div>
             <div>
-              <strong>02 / Context</strong>
-              <span>촬영 시기와 시술 정보를 함께 안내</span>
+              <strong>02 / {tCommunity("beforeAfterContextTitle")}</strong>
+              <span>{tCommunity("beforeAfterContextText")}</span>
             </div>
             <div>
-              <strong>03 / Integrity</strong>
-              <span>보정·조명 등 비교 조건 검토</span>
+              <strong>03 / {tCommunity("beforeAfterIntegrityTitle")}</strong>
+              <span>{tCommunity("beforeAfterIntegrityText")}</span>
             </div>
           </S.InfoGrid>
         )}
@@ -745,13 +766,13 @@ function EntriesView({
           <S.ModalWindow
             role="dialog"
             aria-modal="true"
-            aria-label="외부 VLOG 영상 링크"
+            aria-label={tCommunity("externalVideo")}
           >
             <button onClick={() => setVideoLink(null)} type="button">
-              닫기 ×
+              {tCommunity("close")} ×
             </button>
             <p style={{ fontSize: 18, lineHeight: 1.8, padding: "35px 0" }}>
-              외부 사이트의 영상입니다.
+              {tCommunity("externalVideoNotice")}
             </p>
             <a
               href={videoLink}
@@ -759,7 +780,7 @@ function EntriesView({
               rel="noopener noreferrer"
               style={{ textDecoration: "underline" }}
             >
-              새 탭에서 영상 열기 ↗
+              {tCommunity("openExternalVideo")} ↗
             </a>
           </S.ModalWindow>
         </S.ModalBackdrop>
@@ -769,6 +790,7 @@ function EntriesView({
 }
 
 function ConsultationPage() {
+  const tCommunity = useTranslations("Community");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [department, setDepartment] = useState("");
@@ -790,12 +812,12 @@ function ConsultationPage() {
       !agreed
     ) {
       setIsError(true);
-      setMessage("성함·연락처·상담 분야와 개인정보 동의를 확인해 주세요.");
+      setMessage(tCommunity("consultValidation"));
       return;
     }
     if (consultCaptchaEnabled && !captchaToken) {
       setIsError(true);
-      setMessage("자동 신청 방지 인증을 완료해 주세요.");
+      setMessage(tCommunity("consultCaptcha"));
       return;
     }
     setWorking(true);
@@ -813,10 +835,10 @@ function ConsultationPage() {
       setDepartment("");
       setAgreed(false);
       setIsError(false);
-      setMessage("상담 신청이 접수되었습니다. 담당자가 안내해 드리겠습니다.");
+      setMessage(tCommunity("consultSuccess"));
     } catch {
       setIsError(true);
-      setMessage("신청을 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+      setMessage(tCommunity("consultFail"));
     } finally {
       setWorking(false);
       setCaptchaReset((v) => v + 1);
@@ -827,20 +849,17 @@ function ConsultationPage() {
       <S.Container>
         <S.ConsultGrid>
           <S.ConsultIntro data-c-reveal>
-            <S.Eyebrow>BEGIN WITH A CONVERSATION</S.Eyebrow>
+            <S.Eyebrow>{tCommunity("consultEyebrow")}</S.Eyebrow>
             <h2>
-              조금 더 가까이,
-              <br />한 사람의 이야기를 듣겠습니다.
+              {tCommunity("consultTitle1")}
+              <br />
+              {tCommunity("consultTitle2")}
             </h2>
-            <p>
-              원하시는 상담 분야와 연락처를 남겨 주시면 담당자가 확인 후
-              연락드립니다. 구체적인 진료와 시술 적합성은 의료진 상담에서 확인할
-              수 있습니다.
-            </p>
+            <p>{tCommunity("consultLead")}</p>
             <div className="illustration">
               <Image
                 src="/images/community/editorial-light.webp"
-                alt="햇살이 드는 차분한 공간"
+                alt={tCommunity("consultImageAlt")}
                 fill
                 sizes="(max-width: 860px) 100vw, 43vw"
                 style={{ objectFit: "cover" }}
@@ -849,19 +868,23 @@ function ConsultationPage() {
           </S.ConsultIntro>
           <S.Form onSubmit={handleSubmit} data-c-reveal>
             <div>
-              <label htmlFor="consult-name">01 / 성함</label>
+              <label htmlFor="consult-name">
+                01 / {tCommunity("nameLabel")}
+              </label>
               <input
                 id="consult-name"
                 autoComplete="name"
                 maxLength={40}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="성함을 입력해 주세요"
+                placeholder={tCommunity("namePlaceholder")}
                 required
               />
             </div>
             <div>
-              <label htmlFor="consult-phone">02 / 연락처</label>
+              <label htmlFor="consult-phone">
+                02 / {tCommunity("phoneLabel")}
+              </label>
               <input
                 id="consult-phone"
                 type="tel"
@@ -869,24 +892,26 @@ function ConsultationPage() {
                 autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="연락받으실 번호를 입력해 주세요"
+                placeholder={tCommunity("phonePlaceholder")}
                 required
               />
             </div>
             <div>
-              <label htmlFor="consult-department">03 / 상담 분야</label>
+              <label htmlFor="consult-department">
+                03 / {tCommunity("departmentLabel")}
+              </label>
               <select
                 id="consult-department"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 required
               >
-                <option value="">상담 분야를 선택해 주세요</option>
-                <option value="눈성형">눈성형</option>
-                <option value="코성형">코성형</option>
-                <option value="동안성형">동안성형</option>
-                <option value="쁘띠시술">쁘띠시술</option>
-                <option value="기타">기타</option>
+                <option value="">{tCommunity("selectDepartment")}</option>
+                <option value="눈성형">{tCommunity("eyes")}</option>
+                <option value="코성형">{tCommunity("nose")}</option>
+                <option value="동안성형">{tCommunity("antiAging")}</option>
+                <option value="쁘띠시술">{tCommunity("petit")}</option>
+                <option value="기타">{tCommunity("other")}</option>
               </select>
             </div>
             <div className="privacy">
@@ -898,14 +923,10 @@ function ConsultationPage() {
                 required
               />
               <label htmlFor="consult-consent">
-                이름·연락처·상담 분야를 상담 연락 목적으로 제공하는 것에
-                동의합니다. (필수)
+                {tCommunity("consultConsentText")}
               </label>
             </div>
-            <p className="fine">
-              운영 공개 전 실제 개인정보처리방침과 보유 기간을 안내하는 링크를
-              반드시 연결해 주세요.
-            </p>
+            <p className="fine">{tCommunity("consultPolicyReminder")}</p>
             {message && (
               <p
                 className={`message ${isError ? "error" : "success"}`}
@@ -919,22 +940,24 @@ function ConsultationPage() {
               type="submit"
               disabled={working || (consultCaptchaEnabled && !captchaToken)}
             >
-              {working ? "접수 중…" : "상담 신청하기 ↗"}
+              {working
+                ? tCommunity("submitting")
+                : `${tCommunity("submitConsultation")} ↗`}
             </S.Button>
           </S.Form>
         </S.ConsultGrid>
         <S.InfoGrid>
           <div>
-            <strong>01 / Listen</strong>
-            <span>편안한 첫 상담</span>
+            <strong>01 / {tCommunity("consultInfoListenTitle")}</strong>
+            <span>{tCommunity("consultInfoListenText")}</span>
           </div>
           <div>
-            <strong>02 / Discuss</strong>
-            <span>개인별 상태와 선택지 확인</span>
+            <strong>02 / {tCommunity("consultInfoDiscussTitle")}</strong>
+            <span>{tCommunity("consultInfoDiscussText")}</span>
           </div>
           <div>
-            <strong>03 / Decide</strong>
-            <span>충분한 설명과 신중한 결정</span>
+            <strong>03 / {tCommunity("consultInfoDecideTitle")}</strong>
+            <span>{tCommunity("consultInfoDecideText")}</span>
           </div>
         </S.InfoGrid>
       </S.Container>

@@ -23,7 +23,8 @@ import * as SL from "@/components/dropdown/HeaderSearchLayout.styles";
 import MobileProcedureSubmenu from "@/components/dropdown/MobileProcedureSubmenu";
 import LanguageDropdown from "@/components/i18n/LanguageDropdownI18n";
 import * as S from "@/components/layout/Header.styles";
-import { stripLocalePrefix } from "@/i18n/url";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
+import { localizedPath, stripLocalePrefix } from "@/i18n/url";
 import { API_ORIGIN } from "@/lib/api/config";
 import { usePublishedProcedureMenus } from "@/lib/detail/usePublishedProcedureMenus";
 import { localizeNavigationLabel } from "@/lib/i18n/localizeNavigation";
@@ -120,7 +121,9 @@ function findHeaderSearchInput(root: ParentNode): HTMLInputElement | null {
 
 export default function Header() {
   const currentLocale = useLocale();
+  const locale = isAppLocale(currentLocale) ? currentLocale : defaultLocale;
   const tHeader = useTranslations("Header");
+  const tCommon = useTranslations("Common");
   const tAuth = useTranslations("Auth");
   const tNavigation = useTranslations("Navigation");
   const pathname = stripLocalePrefix(usePathname());
@@ -200,10 +203,12 @@ export default function Header() {
       setSearchOpen(false);
       setMenuOpen(false);
       setHidden(false);
-      router.push(`/search?q=${encodeURIComponent(query)}`);
+      router.push(
+        localizedPath(`/search?q=${encodeURIComponent(query)}`, locale),
+      );
       return true;
     },
-    [router, searchOpen],
+    [router, searchOpen, locale],
   );
 
   // 검색 입력창이 form 내부에 있으면 Enter와 submit 버튼의 제출 이벤트를 처리.
@@ -558,7 +563,11 @@ export default function Header() {
       >
         <S.HeaderInner $searchOpen={searchOpen}>
           <S.LogoGroup>
-            <Link href="/" onClick={closeMenu} aria-label="Ahn's 홈페이지">
+            <Link
+              href="/"
+              onClick={closeMenu}
+              aria-label={tCommon("homeLinkLabel")}
+            >
               {logoType === "IMAGE" && logoFileName ? (
                 <S.LogoImageBox>
                   <Image
@@ -769,7 +778,7 @@ export default function Header() {
             EXPLORE AHN'S
           </S.MobileMenuCaption>
 
-          <S.MobileNav aria-label="모바일 주 메뉴">
+          <S.MobileNav aria-label={tCommon("mobileMainNavigation")}>
             {localizedMenus.map((menu, index) => (
               <div key={menu.id}>
                 <S.MobileNavLink

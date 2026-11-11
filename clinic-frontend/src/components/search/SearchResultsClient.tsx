@@ -1,10 +1,13 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { FiArrowUpRight, FiSearch } from "react-icons/fi";
 
+import { defaultLocale, isAppLocale } from "@/i18n/config";
+import { localizedPath } from "@/i18n/url";
 import { API_ORIGIN } from "@/lib/api/config";
 import { recordSearchKeyword } from "@/lib/search/recordSearchKeyword";
 import * as S from "@/styles/search/SearchResults.styles";
@@ -35,19 +38,17 @@ type SearchResponse = {
   partial: boolean;
 };
 
-const filters: { id: FilterKey; label: string }[] = [
-  { id: "all", label: "전체" },
-  { id: "procedures", label: "시술정보" },
-  { id: "faq", label: "FAQ" },
-  { id: "events", label: "이벤트" },
-  { id: "vlog", label: "영상" },
-];
+const filters: FilterKey[] = ["all", "procedures", "faq", "events", "vlog"];
 
-const groupLabels: Record<GroupKey, string> = {
-  procedures: "시술 정보",
-  faq: "자주 묻는 질문",
-  events: "이벤트",
-  vlog: "영상",
+const labelKeys: Record<
+  FilterKey,
+  "all" | "procedures" | "faq" | "events" | "videos"
+> = {
+  all: "all",
+  procedures: "procedures",
+  faq: "faq",
+  events: "events",
+  vlog: "videos",
 };
 
 const englishTags: Record<GroupKey, string> = {
@@ -58,6 +59,9 @@ const englishTags: Record<GroupKey, string> = {
 };
 
 export default function SearchResultsClient() {
+  const tSearch = useTranslations("Search");
+  const currentLocale = useLocale();
+  const locale = isAppLocale(currentLocale) ? currentLocale : defaultLocale;
   const router = useRouter();
   const params = useSearchParams();
   const query = (params.get("q") ?? "").trim();
@@ -86,9 +90,12 @@ export default function SearchResultsClient() {
     setError("");
     setData(null);
 
-    fetch(`${API_ORIGIN}/api/search?q=${encodeURIComponent(query)}`, {
-      signal: controller.signal,
-    })
+    fetch(
+      `${API_ORIGIN}/api/search?q=${encodeURIComponent(query)}&locale=${encodeURIComponent(locale)}`,
+      {
+        signal: controller.signal,
+      },
+    )
       .then(async (response) => {
         const json: unknown = await response.json();
         if (
@@ -98,7 +105,7 @@ export default function SearchResultsClient() {
           !("success" in json) ||
           json.success !== true
         ) {
-          throw new Error("검색 결과를 불러오지 못했습니다.");
+          throw new Error(tSearch("loadFailed"));
         }
         return json as SearchResponse;
       })
@@ -108,7 +115,7 @@ export default function SearchResultsClient() {
       .catch((cause: unknown) => {
         if (!controller.signal.aborted) {
           setError(
-            cause instanceof Error ? cause.message : "검색에 실패했습니다.",
+            cause instanceof Error ? cause.message : tSearch("searchFailed"),
           );
         }
       })
@@ -117,7 +124,7 @@ export default function SearchResultsClient() {
       });
 
     return () => controller.abort();
-  }, [query]);
+  }, [query, locale, tSearch]);
 
   const visibleGroups = useMemo(
     () =>
@@ -141,7 +148,7 @@ export default function SearchResultsClient() {
 
     // GET 검색 결과 조회와 별개로, 실제 폼 제출만 인기검색어에 집계합니다.
     recordSearchKeyword(term);
-    router.push(`/search?q=${encodeURIComponent(term)}`);
+    router.push(localizedPath(`/search?q=${encodeURIComponent(term)}`, locale));
   }
 
   return (
@@ -154,15 +161,15 @@ export default function SearchResultsClient() {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             maxLength={60}
-            placeholder="관심 있는 시술이나 키워드를 입력하세요"
-            aria-label="통합검색어"
+            placeholder={tSearch("searchInputPrompt")}
+            aria-label={tSearch("searchInput")}
           />
           <S.SubmitButton
             type="submit"
             disabled={!input.trim()}
-            aria-label="검색하기"
+            aria-label={tSearch("searchButtonLabel")}
           >
-            <span>검색</span>
+            <span>{tSearch("searchButton")}</span>
             <FiArrowUpRight aria-hidden="true" size={17} />
           </S.SubmitButton>
         </S.SearchForm>
@@ -170,59 +177,52 @@ export default function SearchResultsClient() {
 
       <S.Body>
         {!query ? (
-          <S.State role="status">
-            검색어를 입력하면 시술 정보, FAQ, 이벤트, 영상을 함께 찾아드립니다.
-          </S.State>
+          <S.State role="status">{tSearch("searchIntro")}</S.State>
         ) : (
           <>
             <S.ResultHeading>
               <div>
                 <S.SmallLabel>01 / SEARCH RESULTS</S.SmallLabel>
                 <h1>
-                  <strong>‘{query}’</strong> 검색 결과
+                  <strong>‘{query}’</strong> {tSearch("resultsSuffix")}
                 </h1>
               </div>
               <S.ResultCount aria-live="polite">
                 {loading
-                  ? "검색 중"
+                  ? tSearch("searching")
                   : data
-                    ? `총 ${active === "all" ? data.total : visibleCount}건`
+                    ? tSearch("totalCount", {
+                        count: active === "all" ? data.total : visibleCount,
+                      })
                     : "—"}
               </S.ResultCount>
             </S.ResultHeading>
 
-            <S.Filters role="group" aria-label="검색 결과 분류">
+            <S.Filters role="group" aria-label={tSearch("filtersLabel")}>
               {filters.map((filter) => (
                 <S.FilterButton
-                  key={filter.id}
+                  key={filter}
                   type="button"
-                  $active={active === filter.id}
-                  aria-pressed={active === filter.id}
-                  onClick={() => setActive(filter.id)}
+                  $active={active === filter}
+                  aria-pressed={active === filter}
+                  onClick={() => setActive(filter)}
                 >
-                  {filter.label}
+                  {tSearch(labelKeys[filter])}
                 </S.FilterButton>
               ))}
             </S.Filters>
 
-            {loading && (
-              <S.State role="status">검색 결과를 가져오는 중입니다.</S.State>
-            )}
+            {loading && <S.State role="status">{tSearch("fetching")}</S.State>}
             {error && <S.State role="alert">{error}</S.State>}
 
             {!loading && !error && data && (
               <>
                 {data.partial && (
-                  <S.Warning role="status">
-                    일부 공개 콘텐츠를 불러오지 못했습니다. 잠시 후 다시 검색해
-                    주세요.
-                  </S.Warning>
+                  <S.Warning role="status">{tSearch("partialError")}</S.Warning>
                 )}
 
                 {visibleCount === 0 ? (
-                  <S.State role="status">
-                    일치하는 검색 결과가 없습니다. 다른 키워드로 검색해 보세요.
-                  </S.State>
+                  <S.State role="status">{tSearch("emptyResult")}</S.State>
                 ) : (
                   visibleGroups.map((group, groupIndex) => (
                     <S.Group key={group.section}>
@@ -231,7 +231,7 @@ export default function SearchResultsClient() {
                           <S.GroupNumber>
                             {String(groupIndex + 1).padStart(2, "0")}
                           </S.GroupNumber>
-                          <h2>{groupLabels[group.section]}</h2>
+                          <h2>{tSearch(labelKeys[group.section])}</h2>
                         </div>
                         <span>{group.items.length} RESULTS</span>
                       </S.GroupTitle>
@@ -243,7 +243,10 @@ export default function SearchResultsClient() {
                               <S.FaqInitial aria-hidden="true">Q.</S.FaqInitial>
                               <S.FaqContent>
                                 {item.href ? (
-                                  <S.FaqTitle as={Link} href={item.href}>
+                                  <S.FaqTitle
+                                    as={Link}
+                                    href={localizedPath(item.href, locale)}
+                                  >
                                     {item.title}
                                     <FiArrowUpRight
                                       aria-hidden="true"
@@ -272,7 +275,10 @@ export default function SearchResultsClient() {
                                 {englishTags[item.type]}
                               </S.CardEyebrow>
                               {item.href ? (
-                                <S.CardTitle as={Link} href={item.href}>
+                                <S.CardTitle
+                                  as={Link}
+                                  href={localizedPath(item.href, locale)}
+                                >
                                   {item.title}
                                   <S.CardArrow aria-hidden="true">
                                     <FiArrowUpRight size={18} />
@@ -288,7 +294,7 @@ export default function SearchResultsClient() {
                               )}
                               {!item.href && (
                                 <S.UnlinkedNote>
-                                  상세 페이지 준비 중
+                                  {tSearch("detailPreparing")}
                                 </S.UnlinkedNote>
                               )}
                             </S.Card>

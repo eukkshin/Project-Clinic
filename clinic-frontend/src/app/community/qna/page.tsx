@@ -1,6 +1,9 @@
 import CommunityExperience from "@/components/community/CommunityExperience";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
-export const metadata = { title: "Q&A | AHN’S" };
+export async function generateMetadata() {
+  return publicPageMetadata("/community/qna");
+}
 
 export default function Page() {
   return <CommunityExperience kind="qna" />;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -216,11 +216,7 @@ function loadMapScript(id: string, src: string): Promise<void> {
     script.onload = () => resolve();
     script.onerror = () => {
       script.remove();
-      reject(
-        new Error(
-          "지도 SDK를 불러오지 못했습니다. 지도 API 키와 허용 도메인을 확인하세요.",
-        ),
-      );
+      reject(new Error("MAP_SDK_LOAD_ERROR"));
     };
     document.head.appendChild(script);
   });
@@ -252,11 +248,7 @@ function loadGoogleScript(key: string): Promise<void> {
         resolve();
       } else {
         script.remove();
-        reject(
-          new Error(
-            "구글맵 로딩 시간이 초과되었습니다. API 키와 네트워크를 확인하세요.",
-          ),
-        );
+        reject(new Error("GOOGLE_MAP_TIMEOUT"));
       }
       delete windowWithMaps.__ahnsGoogleMapsReady;
     }, 15000);
@@ -270,7 +262,7 @@ function loadGoogleScript(key: string): Promise<void> {
       window.clearTimeout(timeout);
       delete windowWithMaps.__ahnsGoogleMapsReady;
       script.remove();
-      reject(new Error("Google Maps JavaScript API를 불러오지 못했습니다."));
+      reject(new Error("GOOGLE_MAP_LOAD_ERROR"));
     };
     document.head.appendChild(script);
   });
@@ -573,7 +565,14 @@ function SdkMap({
           setStatus("ready");
         });
       } catch (cause) {
-        setMapError(cause instanceof Error ? cause.message : tMap("loadError"));
+        const message = cause instanceof Error ? cause.message : "";
+        const errorKey = {
+          MAP_SDK_LOAD_ERROR: "sdkLoadError",
+          GOOGLE_MAP_TIMEOUT: "googleTimeout",
+          GOOGLE_MAP_LOAD_ERROR: "googleScriptError",
+        }[message];
+        // Do not expose untranslated SDK exception details or credentials to visitors.
+        setMapError(errorKey ? tMap(errorKey) : tMap("loadError"));
       }
     };
 

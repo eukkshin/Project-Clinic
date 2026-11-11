@@ -185,8 +185,20 @@ export default function ContentTranslationEditor() {
     setError("");
     setMessage("");
     try {
-      await contentI18nApi.save(type, id, lang, payload, nextStatus);
+      await contentI18nApi.save(
+        type,
+        id,
+        lang,
+        payload,
+        nextStatus,
+        detail.sourceHash,
+      );
       setStatus(nextStatus);
+      setDetail((previous) =>
+        previous
+          ? { ...previous, sourceChanged: false, sourceTrackingAvailable: true }
+          : previous,
+      );
       setMessage(
         nextStatus === "PUBLISHED"
           ? "게시 완료. 공개 사이트에 반영됩니다."
@@ -332,6 +344,18 @@ export default function ContentTranslationEditor() {
           </S.Message>
         )}
         {message && <S.Message role="status">{message}</S.Message>}
+        {detail?.sourceChanged && (
+          <S.Message $error role="alert">
+            한국어 원본이 마지막 번역 저장 후 변경되었습니다. 좌측 원본과 우측
+            번역을 다시 비교한 다음 게시해 주세요.
+          </S.Message>
+        )}
+        {detail && status !== "MISSING" && !detail.sourceTrackingAvailable && (
+          <S.Message role="status">
+            기존에 저장된 번역에는 원본 변경 이력이 없습니다. 이번에 다시
+            저장하면 이후 원본 변경 여부를 확인할 수 있습니다.
+          </S.Message>
+        )}
         {!detail ? (
           <p>선택한 번역 데이터를 불러오는 중입니다.</p>
         ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -12,6 +12,8 @@ import {
 
 import * as S from "@/components/dropdown/HeaderSearch.styles";
 import PopularSearches from "@/components/dropdown/PopularSearches";
+import { defaultLocale, isAppLocale } from "@/i18n/config";
+import { localizedPath } from "@/i18n/url";
 import { recordSearchKeyword } from "@/lib/search/recordSearchKeyword";
 
 interface MenuItem {
@@ -52,6 +54,8 @@ export default function HeaderSearch({
   transparent = false,
 }: HeaderSearchProps) {
   const router = useRouter();
+  const currentLocale = useLocale();
+  const locale = isAppLocale(currentLocale) ? currentLocale : defaultLocale;
   const tSearch = useTranslations("Search");
   const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
@@ -142,7 +146,7 @@ export default function HeaderSearch({
     // 제출을 처리하고 전파를 중단합니다. 이 코드는 단독 사용 시 대비용입니다.
     recordSearchKeyword(term);
     close();
-    router.push(`/search?q=${encodeURIComponent(term)}`);
+    router.push(localizedPath(`/search?q=${encodeURIComponent(term)}`, locale));
   };
 
   return (
@@ -191,7 +195,11 @@ export default function HeaderSearch({
                   {matches.map((item) => (
                     <li key={item.key}>
                       {item.url && item.url !== "/" ? (
-                        <S.ResultLink as={Link} href={item.url} onClick={close}>
+                        <S.ResultLink
+                          as={Link}
+                          href={localizedPath(item.url, locale)}
+                          onClick={close}
+                        >
                           <span>
                             <S.ResultTitle>{item.name}</S.ResultTitle>
                             {item.parent && (

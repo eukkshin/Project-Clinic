@@ -711,7 +711,7 @@ export default function Hero({
   return (
     <S.CarouselSection
       ref={sectionRef}
-      aria-label="메인 비주얼"
+      aria-label={tHero("mainVisual")}
       aria-busy={loading}
     >
       {/* 전체 화면 사진은 줄어들거나 사각형으로 잘리지 않는다. */}
@@ -724,7 +724,7 @@ export default function Hero({
                 as={Link}
                 href={safeHref(slide.link)}
                 tabIndex={index === selectedIndex ? 0 : -1}
-                aria-label={`${slide.title} 자세히 보기`}
+                aria-label={tHero("openSlide", { title: slide.title })}
               >
                 {/* 풀스크린 이미지. 기존 사각형 축소 clip-path는 완전히 제거했다. */}
 
@@ -744,7 +744,7 @@ export default function Hero({
                       ) : (
                         <Image
                           src={`${API_URL}/images/${encodeURIComponent(slide.fileName)}`}
-                          alt={slide.title || "메인 비주얼"}
+                          alt={slide.title || tHero("mainVisual")}
                           fill
                           priority={index === 0}
                           loading={index === 0 ? "eager" : "lazy"}
@@ -809,7 +809,10 @@ export default function Hero({
       */}
 
       {rollingBanner && (
-        <S.HeroRollingOverlay data-hero-rolling aria-label="브랜드 롤링 배너">
+        <S.HeroRollingOverlay
+          data-hero-rolling
+          aria-label={tHero("rollingBanner")}
+        >
           {rollingBanner}
         </S.HeroRollingOverlay>
       )}
@@ -879,7 +882,7 @@ export default function Hero({
                   key={slide.id}
                   type="button"
                   $active={selectedIndex === index}
-                  aria-label={`${index + 1}번 슬라이드`}
+                  aria-label={tHero("slideNumber", { number: index + 1 })}
                   aria-current={selectedIndex === index ? "true" : undefined}
                   onClick={() => scrollTo(index)}
                 />
@@ -890,7 +893,7 @@ export default function Hero({
               <S.NavButton
                 type="button"
                 onClick={scrollPrev}
-                aria-label="이전 슬라이드"
+                aria-label={tHero("previousSlide")}
               >
                 <span aria-hidden="true">←</span>
               </S.NavButton>
@@ -898,7 +901,7 @@ export default function Hero({
               <S.NavButton
                 type="button"
                 onClick={scrollNext}
-                aria-label="다음 슬라이드"
+                aria-label={tHero("nextSlide")}
               >
                 <span aria-hidden="true">→</span>
               </S.NavButton>
@@ -907,7 +910,7 @@ export default function Hero({
         )}
       </S.BottomControls>
 
-      {loading && <S.LoadingOverlay aria-label="메인 비주얼 로딩 중" />}
+      {loading && <S.LoadingOverlay aria-label={tHero("loading")} />}
     </S.CarouselSection>
   );
 }

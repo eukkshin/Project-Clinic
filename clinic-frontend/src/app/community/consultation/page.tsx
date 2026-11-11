@@ -1,6 +1,9 @@
 import CommunityExperience from "@/components/community/CommunityExperience";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
-export const metadata = { title: "온라인 상담 | AHN’S" };
+export async function generateMetadata() {
+  return publicPageMetadata("/community/consultation");
+}
 
 export default function Page() {
   return <CommunityExperience kind="consultation" />;

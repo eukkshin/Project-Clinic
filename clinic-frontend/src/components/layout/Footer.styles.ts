@@ -1,5 +1,5 @@
-import styled, { keyframes } from "styled-components";
 import Link from "next/link";
+import styled, { keyframes } from "styled-components";
 
 const CREAM = "#244535";
 const MUTED = "#647969";
@@ -284,6 +284,8 @@ export const MapTitle = styled.h3`
 `;
 export const MapTabs = styled.div`
   display: inline-flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   gap: 0;
   border-bottom: 1px solid rgba(36, 69, 53, 0.21);
 `;
@@ -432,7 +434,9 @@ export const MapBottomBar = styled.div`
   }
 `;
 export const OutlineLink = styled.a`
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: inline-flex;
   align-items: center;
   gap: 20px;
@@ -799,7 +803,6 @@ export const FloatTop = styled.button<{ $isSafety: boolean }>`
   color: ${({ $isSafety }) => ($isSafety ? "#F7F6F1" : "#244535")};
 `;
 
-
 /* 고지 페이지 링크: 기존 Footer·GSAP 구조는 유지합니다. */
 export const LegalNavigation = styled.nav`
   display: flex;
@@ -815,7 +818,14 @@ export const LegalNavigationLink = styled(Link)`
   font-size: 12px;
   text-decoration: none;
   color: ${CREAM};
-  transition: opacity .2s ease;
-  &:hover { opacity: .65; text-decoration: underline; text-underline-offset: 5px; }
-  &:focus-visible { outline: 2px solid ${CREAM}; outline-offset: 4px; }
+  transition: opacity 0.2s ease;
+  &:hover {
+    opacity: 0.65;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  &:focus-visible {
+    outline: 2px solid ${CREAM};
+    outline-offset: 4px;
+  }
 `;

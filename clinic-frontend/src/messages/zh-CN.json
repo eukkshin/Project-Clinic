@@ -5,7 +5,10 @@
     "confirm": "确认",
     "cancel": "取消",
     "loading": "加载中",
-    "closePopup": "关闭弹窗"
+    "closePopup": "关闭弹窗",
+    "captchaLabel": "防止自动提交咨询的验证",
+    "homeLinkLabel": "AHNS首页",
+    "mobileMainNavigation": "移动端主导航"
   },
   "Header": {
     "about": "医院介绍",
@@ -144,7 +147,12 @@
     "vlogIntroLine2": "到对安全的坚定承诺。",
     "eventIntroLine1": "此刻值得关注的美丽。",
     "eventIntroLine2": "探索为您精选的特别活动。",
-    "eventEmpty": "暂无进行中的活动。"
+    "eventEmpty": "暂无进行中的活动。",
+    "selfiesOpenPhoto": "放大查看第{index}张图库照片",
+    "selfiesPhotoAlt": "图库照片{index}",
+    "selfiesLightboxLabel": "已选图库照片的放大视图",
+    "selfiesSelectedAlt": "放大的图库照片",
+    "selfiesClosePhoto": "关闭放大照片"
   },
   "Account": {
     "logout": "退出登录",
@@ -821,7 +829,9 @@
     "signUpComplete": "注册完成",
     "signUpDone": "您的账号已创建。",
     "signupBrand": "开始属于您的美丽故事。",
-    "noticeRequired": "必填项目"
+    "noticeRequired": "必填项目",
+    "brandPanelLabel": "AHNS品牌介绍",
+    "brandHomeLabel": "返回AHNS首页"
   },
   "VlogSection": {
     "descriptionLine1": "创造美丽的瞬间，以及其中蕴藏的故事。",
@@ -856,7 +866,14 @@
     "footerTagline": "以细致关怀追求卓越。"
   },
   "Hero": {
-    "description": "发现专属于您的美丽时刻"
+    "description": "发现专属于您的美丽时刻",
+    "mainVisual": "主视觉",
+    "openSlide": "查看{title}详情",
+    "rollingBanner": "品牌横幅",
+    "slideNumber": "第{number}张幻灯片",
+    "previousSlide": "上一张",
+    "nextSlide": "下一张",
+    "loading": "正在加载主视觉"
   },
   "HospitalMap": {
     "ctrlZoom": "滚动以缩放地图",
@@ -885,10 +902,212 @@
     "loadError": "无法加载地图。",
     "providerNaver": "NAVER",
     "providerKakao": "Kakao",
-    "providerGoogle": "谷歌"
+    "providerGoogle": "谷歌",
+    "sdkLoadError": "无法加载地图服务。请检查 API 密钥及授权域名。",
+    "googleTimeout": "Google 地图加载超时，请重试。",
+    "googleScriptError": "无法加载 Google 地图脚本。"
   },
   "QnaStandalone": {
     "other": "其他",
     "loading": "正在加载常见问题…"
+  },
+  "Community": {
+    "subNavigation": "社区子页面",
+    "ctaTitle1": "您的故事",
+    "ctaTitle2": "从这里开始。",
+    "ctaLine1": "从日常疑问到到院咨询预约。",
+    "ctaLine2": "我们重视舒适、细致的沟通。",
+    "onlineConsultation": "在线咨询",
+    "homeTitle1": "关于美丽的",
+    "homeTitle2": "种种故事，",
+    "homeLead": "在这里查看 AHNS 的最新消息、记录与常见问题解答。",
+    "viewNotices": "查看最新公告",
+    "featureTitle1": "从今天的消息",
+    "featureTitle2": "到明天的故事。",
+    "featureLead": "提供准确的诊疗信息、清晰的通知与温暖的交流。",
+    "viewEvents": "查看活动",
+    "exploreTitle": "为您准备的七个主题。",
+    "exploreLine1": "选择您感兴趣的主题。",
+    "exploreLine2": "每个主题均可进入独立页面。",
+    "loading": "正在加载内容…",
+    "loadError": "无法加载数据。",
+    "emptySearch": "没有匹配的结果。",
+    "notConnected": "公开内容正在准备中。",
+    "empty": "暂无已发布内容。",
+    "checkServer": "请检查服务器连接和 API 权限。",
+    "changeKeyword": "请尝试其他搜索词。",
+    "notConnectedDetail": "{section}将在确认公开数据来源后显示。我们不会发布未经核实的患者案例。",
+    "emptyDetail": "发布新消息后将在此处显示。",
+    "retry": "重新加载",
+    "pages": {
+      "notice": {
+        "label": "公告",
+        "title": "了解我们的最新消息。",
+        "description": "查看 AHNS 重要公告与运营资讯。"
+      },
+      "events": {
+        "label": "活动",
+        "title": "查看近期活动。",
+        "description": "浏览诊所发布的活动资讯。"
+      },
+      "reviews": {
+        "label": "体验分享",
+        "title": "尊重每一段经历。",
+        "description": "本页面仅用于展示完成公开同意与审核的体验分享。"
+      },
+      "before-after": {
+        "label": "术前术后",
+        "title": "负责任地记录变化。",
+        "description": "用于展示已核实同意与拍摄条件的对比资料。"
+      },
+      "consultation": {
+        "label": "在线咨询",
+        "title": "从轻松交流开始。",
+        "description": "如有疑问，请提交咨询，我们的团队将与您联系。"
+      },
+      "qna": {
+        "label": "Q&A",
+        "title": "解答您的疑问。",
+        "description": "按主题浏览常见问题。"
+      },
+      "vlog": {
+        "label": "VLOG",
+        "title": "用视频记录空间与故事。",
+        "description": "通过视频了解 AHNS 的日常与内容。"
+      }
+    },
+    "pageSelect": "选择列表页",
+    "playVideo": "播放视频：{title}",
+    "galleryImageAlt": "已发布的图片资料",
+    "eventImageAlt": "活动图片",
+    "videoDialog": "VLOG 视频播放",
+    "close": "关闭",
+    "recordCount": "{count} 条记录",
+    "loadingShort": "加载中",
+    "searchSection": "搜索{section}",
+    "questionFilters": "问题分类",
+    "all": "全部",
+    "answerPending": "回答准备中。",
+    "externalVideo": "外部 VLOG 链接",
+    "externalVideoNotice": "此视频来自外部网站。",
+    "openExternalVideo": "在新标签页打开视频",
+    "consultValidation": "请核对姓名、联系方式、咨询项目及隐私同意。",
+    "consultCaptcha": "请完成防止自动提交的验证。",
+    "consultSuccess": "您的咨询已提交，工作人员将与您联系。",
+    "consultFail": "提交失败，请稍后重试。",
+    "consultTitle1": "走得更近一些，",
+    "consultTitle2": "倾听您的故事。",
+    "consultLead": "请留下联系方式和希望咨询的项目。工作人员确认后将与您联系，具体适用性须由专业医护人员评估。",
+    "nameLabel": "姓名",
+    "phoneLabel": "联系方式",
+    "departmentLabel": "咨询项目",
+    "namePlaceholder": "请输入姓名",
+    "phonePlaceholder": "请输入联系电话",
+    "selectDepartment": "请选择咨询项目",
+    "eyes": "眼部整形",
+    "nose": "鼻部整形",
+    "antiAging": "抗衰老",
+    "petit": "微整形",
+    "other": "其他",
+    "submitting": "提交中…",
+    "submitConsultation": "提交咨询",
+    "homeStories": "我们的故事。",
+    "scrollExplore": "向下滚动，了解更多",
+    "heroImageAlt": "温暖自然光中的人物形象照",
+    "heroPhotoCaption": "美，不止于此。",
+    "featuredEyebrow": "精选内容",
+    "featuredImageAlt": "自然光与植物光影的形象照",
+    "exploreEyebrow": "探索社区",
+    "editorialNoticeEyebrow": "公开公告",
+    "editorialNoticeTitle1": "重要的信息",
+    "editorialNoticeTitle2": "应当清晰、诚实地传达。",
+    "editorialNoticeText": "诊疗安排和重要通知均以核实的信息为基础发布。后续消息将陆续在公告页面公布。",
+    "editorialNoticeImageAlt": "柔和自然光下的宁静室内空间",
+    "editorialReviewsEyebrow": "个人经历",
+    "editorialReviewsTitle1": "认真对待",
+    "editorialReviewsTitle2": "每个人的亲身经历。",
+    "editorialReviewsText": "发布评价前，应确认作者本人同意及允许公开的范围。效果因人而异，单个案例不代表所有人的结果。",
+    "editorialReviewsImageAlt": "风格简洁的人物形象照",
+    "editorialBeforeAfterEyebrow": "负责任的展示",
+    "editorialBeforeAfterTitle1": "每张照片",
+    "editorialBeforeAfterTitle2": "都需要充分的背景说明。",
+    "editorialBeforeAfterText": "展示术前术后照片前，应确认公开同意、拍摄时间与条件以及必要的注意事项。我们未将现有的单张自拍照作为术前术后对比资料。",
+    "editorialBeforeAfterImageAlt": "自然采光的室内照片",
+    "beforeAfterConsentTitle": "同意",
+    "beforeAfterConsentText": "确认患者同意及公开范围",
+    "beforeAfterContextTitle": "背景",
+    "beforeAfterContextText": "同时说明拍摄时间和项目信息",
+    "beforeAfterIntegrityTitle": "真实性",
+    "beforeAfterIntegrityText": "核查修图、光线等对比条件",
+    "consultEyebrow": "从沟通开始",
+    "consultImageAlt": "阳光洒入的宁静空间",
+    "consultConsentText": "我同意为咨询回访之目的提供姓名、联系电话及咨询项目。（必选）",
+    "consultPolicyReminder": "正式上线前，请务必提供实际隐私政策及数据保存期限的说明链接。",
+    "consultInfoListenTitle": "倾听",
+    "consultInfoListenText": "轻松开启首次咨询",
+    "consultInfoDiscussTitle": "沟通",
+    "consultInfoDiscussText": "了解个人情况与可选方案",
+    "consultInfoDecideTitle": "决定",
+    "consultInfoDecideText": "充分了解后谨慎决定"
+  },
+  "FlatMap": {
+    "section": "AHNS 附近车站示意图",
+    "scroll": "左右滚动浏览地图",
+    "svgDescription": "诺海路周边的抽象示意图，非实际地形。",
+    "cultureStreet": "芦原文化街",
+    "road": "诺海路",
+    "streetAddress": "诺海路460号",
+    "selectStation": "选择{station}（{line}）的路线",
+    "walking": "步行",
+    "driving": "驾车",
+    "walkNowon": "步行约3分钟",
+    "checkRoute": "查看实际路线",
+    "illustrationNotice": "示意路线，与实际路线不同",
+    "stationTabs": "选择车站",
+    "stations": {
+      "nowon7": "芦原站",
+      "nowon4": "芦原站",
+      "junggye7": "中溪站",
+      "sangye4": "上溪站"
+    },
+    "lines": {
+      "7": "7号线",
+      "4": "4号线"
+    }
+  },
+  "EventPopup": {
+    "missingName": "请输入姓名。",
+    "invalidPhone": "请输入9至11位数字联系电话。",
+    "missingDepartment": "请输入咨询项目。",
+    "needConsent": "请同意收集和使用个人信息。",
+    "needCaptcha": "请完成防止自动提交的验证。",
+    "submitFailed": "提交失败，请稍后重试。",
+    "imageAlt": "活动公告图片",
+    "dialog": "活动公告 {number}",
+    "openEvent": "打开活动页面",
+    "viewEvent": "查看活动",
+    "title": "开启您的专属咨询。",
+    "description": "请留下方便我们联系您的必要信息。",
+    "name": "姓名",
+    "phone": "联系电话",
+    "department": "咨询项目",
+    "departmentPlaceholder": "咨询项目（例如：眼部整形）",
+    "consent": "同意收集和使用个人信息",
+    "submitting": "提交中…",
+    "submit": "申请快速咨询",
+    "hideToday": "今天不再显示",
+    "closePopup": "关闭活动弹窗",
+    "close": "关闭"
+  },
+  "Errors": {
+    "title": "出现问题",
+    "descriptionLine1": "显示页面时发生错误。",
+    "descriptionLine2": "请稍后重试。",
+    "retry": "重试"
+  },
+  "Intro": {
+    "dialogLabel": "AHNS品牌介绍",
+    "tagline": "为独属于你的美丽",
+    "skip": "跳过"
   }
 }

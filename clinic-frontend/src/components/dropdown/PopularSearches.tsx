@@ -4,6 +4,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { defaultLocale, isAppLocale } from "@/i18n/config";
+import { localizedPath } from "@/i18n/url";
 import { API_ORIGIN } from "@/lib/api/config";
 import { recordSearchKeyword } from "@/lib/search/recordSearchKeyword";
 
@@ -92,7 +94,12 @@ export default function PopularSearches({ enabled = true, onNavigate }: Props) {
   function openKeyword(keyword: string) {
     recordSearchKeyword(keyword);
     onNavigate?.();
-    router.push(`/search?q=${encodeURIComponent(keyword)}`);
+    router.push(
+      localizedPath(
+        `/search?q=${encodeURIComponent(keyword)}`,
+        isAppLocale(locale) ? locale : defaultLocale,
+      ),
+    );
   }
 
   return (

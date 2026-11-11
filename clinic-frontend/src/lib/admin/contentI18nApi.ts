@@ -24,6 +24,9 @@ export type AdminTranslation = {
   payload: Record<string, unknown>;
   status: ContentStatus;
   updatedAt?: string | null;
+  sourceHash?: string;
+  sourceChanged?: boolean;
+  sourceTrackingAvailable?: boolean;
 };
 export type SourceOption = { id: number; label: string };
 
@@ -55,10 +58,11 @@ export const contentI18nApi = {
     lang: TranslationLocale,
     payload: Record<string, unknown>,
     status: "DRAFT" | "PUBLISHED",
+    sourceHash?: string,
   ) =>
     request<{ status: "DRAFT" | "PUBLISHED" }>(`/${type}/${id}/${lang}`, {
       method: "PUT",
-      body: JSON.stringify({ payload, status }),
+      body: JSON.stringify({ payload, status, sourceHash }),
     }),
   remove: (type: CmsType, id: number, lang: TranslationLocale) =>
     request<{ locale: TranslationLocale }>(`/${type}/${id}/${lang}`, {

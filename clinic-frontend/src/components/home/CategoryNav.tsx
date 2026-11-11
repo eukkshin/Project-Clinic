@@ -318,7 +318,7 @@ export default function CategoryNav() {
           </S.Kicker>
           <S.HeadingRow>
             <S.Title data-editorial-reveal>
-              {tProcedures("discoverYour")} <em>{tProcedures("ownBeauty")}</em>
+              Discover Your <em>Own Beauty</em>
             </S.Title>
             <S.Intro data-editorial-reveal>
               {tHome("categoryIntroLine1")}

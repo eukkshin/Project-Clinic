@@ -66,6 +66,7 @@ function createContentI18nRouters({ dataSource, requireAdmin }) {
           req.body?.payload,
           req.body?.status,
           req.admin?.userId,
+          req.body?.sourceHash,
         ),
       );
     }),
@@ -352,20 +353,16 @@ function createContentI18nRouters({ dataSource, requireAdmin }) {
         .json({ success: false, message: error.message });
     }
     if (/ORA-00001/.test(`${error.code || ""} ${error.message || ""}`)) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "번역 저장 충돌입니다. 다시 시도해 주세요.",
-        });
+      return res.status(409).json({
+        success: false,
+        message: "번역 저장 충돌입니다. 다시 시도해 주세요.",
+      });
     }
     console.error("[CMS i18n]", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "다국어 콘텐츠 처리 중 오류가 발생했습니다.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "다국어 콘텐츠 처리 중 오류가 발생했습니다.",
+    });
   }
   adminRouter.use(errors);
   publicRouter.use(errors);

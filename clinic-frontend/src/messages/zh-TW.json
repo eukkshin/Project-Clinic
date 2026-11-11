@@ -5,7 +5,10 @@
     "confirm": "確認",
     "cancel": "取消",
     "loading": "載入中",
-    "closePopup": "關閉視窗"
+    "closePopup": "關閉視窗",
+    "captchaLabel": "防止自動送出諮詢的驗證",
+    "homeLinkLabel": "AHNS首頁",
+    "mobileMainNavigation": "行動版主選單"
   },
   "Header": {
     "about": "診所介紹",
@@ -144,7 +147,12 @@
     "vlogIntroLine2": "到對安全的堅定承諾。",
     "eventIntroLine1": "此刻值得關注的美麗。",
     "eventIntroLine2": "探索為您精選的特別活動。",
-    "eventEmpty": "目前沒有進行中的活動。"
+    "eventEmpty": "目前沒有進行中的活動。",
+    "selfiesOpenPhoto": "放大檢視第{index}張相簿照片",
+    "selfiesPhotoAlt": "相簿照片{index}",
+    "selfiesLightboxLabel": "已選相簿照片的放大檢視",
+    "selfiesSelectedAlt": "放大的相簿照片",
+    "selfiesClosePhoto": "關閉放大照片"
   },
   "Account": {
     "logout": "登出",
@@ -821,7 +829,9 @@
     "signUpComplete": "註冊完成",
     "signUpDone": "您的帳戶已建立。",
     "signupBrand": "開始屬於您的美麗故事。",
-    "noticeRequired": "必填項目"
+    "noticeRequired": "必填項目",
+    "brandPanelLabel": "AHNS品牌介紹",
+    "brandHomeLabel": "返回AHNS首頁"
   },
   "VlogSection": {
     "descriptionLine1": "創造美麗的瞬間，以及其中蘊藏的故事。",
@@ -856,7 +866,14 @@
     "footerTagline": "以細緻關懷追求卓越。"
   },
   "Hero": {
-    "description": "發現專屬於您的美麗時刻"
+    "description": "發現專屬於您的美麗時刻",
+    "mainVisual": "主視覺",
+    "openSlide": "查看{title}詳情",
+    "rollingBanner": "品牌橫幅",
+    "slideNumber": "第{number}張投影片",
+    "previousSlide": "上一張",
+    "nextSlide": "下一張",
+    "loading": "正在載入主視覺"
   },
   "HospitalMap": {
     "ctrlZoom": "捲動以縮放地圖",
@@ -885,10 +902,212 @@
     "loadError": "無法載入地圖。",
     "providerNaver": "NAVER",
     "providerKakao": "Kakao",
-    "providerGoogle": "Google"
+    "providerGoogle": "Google",
+    "sdkLoadError": "無法載入地圖服務。請檢查 API 金鑰及授權網域。",
+    "googleTimeout": "Google 地圖載入逾時，請再試一次。",
+    "googleScriptError": "無法載入 Google 地圖指令碼。"
   },
   "QnaStandalone": {
     "other": "其他",
     "loading": "正在載入常見問題…"
+  },
+  "Community": {
+    "subNavigation": "社群子頁面",
+    "ctaTitle1": "您的故事",
+    "ctaTitle2": "從這裡開始。",
+    "ctaLine1": "從日常疑問到到院諮詢預約。",
+    "ctaLine2": "我們重視舒適、細緻的溝通。",
+    "onlineConsultation": "線上諮詢",
+    "homeTitle1": "關於美麗的",
+    "homeTitle2": "種種故事，",
+    "homeLead": "在此查看 AHNS 的最新消息、紀錄與常見問題解答。",
+    "viewNotices": "查看最新公告",
+    "featureTitle1": "從今天的消息",
+    "featureTitle2": "到明天的故事。",
+    "featureLead": "提供準確的診療資訊、清楚的通知與溫暖的交流。",
+    "viewEvents": "查看活動",
+    "exploreTitle": "為您準備的七個主題。",
+    "exploreLine1": "選擇您感興趣的主題。",
+    "exploreLine2": "每個主題均可進入專屬頁面。",
+    "loading": "正在載入內容…",
+    "loadError": "無法載入資料。",
+    "emptySearch": "沒有符合的結果。",
+    "notConnected": "公開內容正在準備中。",
+    "empty": "尚無已發布內容。",
+    "checkServer": "請確認伺服器連線與 API 權限。",
+    "changeKeyword": "請嘗試其他搜尋詞。",
+    "notConnectedDetail": "{section}將於確認公開資料來源後顯示。我們不會刊登未經確認的患者案例。",
+    "emptyDetail": "有新消息時將在此顯示。",
+    "retry": "重新載入",
+    "pages": {
+      "notice": {
+        "label": "公告",
+        "title": "了解我們的最新消息。",
+        "description": "查看 AHNS 重要公告與營運資訊。"
+      },
+      "events": {
+        "label": "活動",
+        "title": "查看近期活動。",
+        "description": "瀏覽診所發布的活動資訊。"
+      },
+      "reviews": {
+        "label": "經驗分享",
+        "title": "尊重每一段經歷。",
+        "description": "本頁面僅用於展示完成公開同意與審核的經驗分享。"
+      },
+      "before-after": {
+        "label": "術前術後",
+        "title": "負責任地記錄變化。",
+        "description": "用於展示已確認同意與拍攝條件的對比資料。"
+      },
+      "consultation": {
+        "label": "線上諮詢",
+        "title": "從輕鬆交流開始。",
+        "description": "如有疑問，請提出諮詢，我們的團隊將與您聯繫。"
+      },
+      "qna": {
+        "label": "Q&A",
+        "title": "解答您的疑問。",
+        "description": "依主題瀏覽常見問題。"
+      },
+      "vlog": {
+        "label": "VLOG",
+        "title": "用影片記錄空間與故事。",
+        "description": "透過影片了解 AHNS 的日常與內容。"
+      }
+    },
+    "pageSelect": "選擇清單頁面",
+    "playVideo": "播放影片：{title}",
+    "galleryImageAlt": "已發布的圖片資料",
+    "eventImageAlt": "活動圖片",
+    "videoDialog": "VLOG 影片播放",
+    "close": "關閉",
+    "recordCount": "{count} 筆紀錄",
+    "loadingShort": "載入中",
+    "searchSection": "搜尋{section}",
+    "questionFilters": "問題分類",
+    "all": "全部",
+    "answerPending": "回答準備中。",
+    "externalVideo": "外部 VLOG 連結",
+    "externalVideoNotice": "此影片來自外部網站。",
+    "openExternalVideo": "在新分頁開啟影片",
+    "consultValidation": "請確認姓名、聯絡方式、諮詢項目及隱私同意。",
+    "consultCaptcha": "請完成防止自動提交的驗證。",
+    "consultSuccess": "您的諮詢已提交，工作人員將與您聯繫。",
+    "consultFail": "送出失敗，請稍後再試。",
+    "consultTitle1": "走得更近一些，",
+    "consultTitle2": "傾聽您的故事。",
+    "consultLead": "請留下聯絡方式與希望諮詢的項目。工作人員確認後將與您聯繫，具體適用性須由專業醫護人員評估。",
+    "nameLabel": "姓名",
+    "phoneLabel": "聯絡方式",
+    "departmentLabel": "諮詢項目",
+    "namePlaceholder": "請輸入姓名",
+    "phonePlaceholder": "請輸入聯絡電話",
+    "selectDepartment": "請選擇諮詢項目",
+    "eyes": "眼部整形",
+    "nose": "鼻部整形",
+    "antiAging": "抗老化",
+    "petit": "微整形",
+    "other": "其他",
+    "submitting": "送出中…",
+    "submitConsultation": "提交諮詢",
+    "homeStories": "我們的故事。",
+    "scrollExplore": "向下捲動，了解更多",
+    "heroImageAlt": "溫暖自然光中的人物形象照",
+    "heroPhotoCaption": "美，不止於此。",
+    "featuredEyebrow": "精選內容",
+    "featuredImageAlt": "自然光與植物光影的形象照",
+    "exploreEyebrow": "探索社群",
+    "editorialNoticeEyebrow": "公開公告",
+    "editorialNoticeTitle1": "重要的資訊",
+    "editorialNoticeTitle2": "應當清楚、誠實地傳達。",
+    "editorialNoticeText": "診療安排與重要通知均以查證的資訊為基礎發布。後續消息將陸續在公告頁面公布。",
+    "editorialNoticeImageAlt": "柔和自然光下的寧靜室內空間",
+    "editorialReviewsEyebrow": "個人經歷",
+    "editorialReviewsTitle1": "認真對待",
+    "editorialReviewsTitle2": "每個人的親身經歷。",
+    "editorialReviewsText": "發布心得前，應確認作者本人同意及允許公開的範圍。效果因人而異，單一案例不代表所有人的結果。",
+    "editorialReviewsImageAlt": "風格簡潔的人物形象照",
+    "editorialBeforeAfterEyebrow": "負責任的呈現",
+    "editorialBeforeAfterTitle1": "每張照片",
+    "editorialBeforeAfterTitle2": "都需要充分的背景說明。",
+    "editorialBeforeAfterText": "呈現術前術後照片前，應確認公開同意、拍攝時間與條件，以及必要的注意事項。我們未將現有的單張自拍照作為術前術後對比資料。",
+    "editorialBeforeAfterImageAlt": "自然採光的室內照片",
+    "beforeAfterConsentTitle": "同意",
+    "beforeAfterConsentText": "確認患者同意及公開範圍",
+    "beforeAfterContextTitle": "背景",
+    "beforeAfterContextText": "同時說明拍攝時間與療程資訊",
+    "beforeAfterIntegrityTitle": "真實性",
+    "beforeAfterIntegrityText": "檢查修圖、光線等比較條件",
+    "consultEyebrow": "從溝通開始",
+    "consultImageAlt": "陽光灑入的寧靜空間",
+    "consultConsentText": "我同意為諮詢聯絡之目的提供姓名、聯絡電話及諮詢項目。（必填）",
+    "consultPolicyReminder": "正式上線前，請務必提供實際隱私權政策及資料保存期限的說明連結。",
+    "consultInfoListenTitle": "傾聽",
+    "consultInfoListenText": "輕鬆展開首次諮詢",
+    "consultInfoDiscussTitle": "討論",
+    "consultInfoDiscussText": "了解個人情況與可選方案",
+    "consultInfoDecideTitle": "決定",
+    "consultInfoDecideText": "充分了解後審慎決定"
+  },
+  "FlatMap": {
+    "section": "AHNS 附近車站示意圖",
+    "scroll": "左右捲動瀏覽地圖",
+    "svgDescription": "蘆海道周邊的抽象示意圖，非實際地形。",
+    "cultureStreet": "蘆原文化街",
+    "road": "蘆海道",
+    "streetAddress": "蘆海道460號",
+    "selectStation": "選擇{station}（{line}）路線",
+    "walking": "步行",
+    "driving": "開車",
+    "walkNowon": "步行約3分鐘",
+    "checkRoute": "查看實際路線",
+    "illustrationNotice": "示意路線，與實際路線不同",
+    "stationTabs": "選擇車站",
+    "stations": {
+      "nowon7": "蘆原站",
+      "nowon4": "蘆原站",
+      "junggye7": "中溪站",
+      "sangye4": "上溪站"
+    },
+    "lines": {
+      "7": "7號線",
+      "4": "4號線"
+    }
+  },
+  "EventPopup": {
+    "missingName": "請輸入姓名。",
+    "invalidPhone": "請輸入9至11位數字的聯絡電話。",
+    "missingDepartment": "請輸入諮詢項目。",
+    "needConsent": "請同意蒐集與使用個人資料。",
+    "needCaptcha": "請完成防止自動提交的驗證。",
+    "submitFailed": "送出失敗，請稍後再試。",
+    "imageAlt": "活動公告圖片",
+    "dialog": "活動公告 {number}",
+    "openEvent": "開啟活動頁面",
+    "viewEvent": "查看活動",
+    "title": "開啟您的專屬諮詢。",
+    "description": "請留下方便我們聯繫您的必要資訊。",
+    "name": "姓名",
+    "phone": "聯絡電話",
+    "department": "諮詢項目",
+    "departmentPlaceholder": "諮詢項目（例如：眼部整形）",
+    "consent": "同意蒐集與使用個人資料",
+    "submitting": "送出中…",
+    "submit": "申請快速諮詢",
+    "hideToday": "今天不再顯示",
+    "closePopup": "關閉活動視窗",
+    "close": "關閉"
+  },
+  "Errors": {
+    "title": "發生問題",
+    "descriptionLine1": "顯示頁面時發生錯誤。",
+    "descriptionLine2": "請稍後再試。",
+    "retry": "重試"
+  },
+  "Intro": {
+    "dialogLabel": "AHNS品牌介紹",
+    "tagline": "為獨一無二的你而綻放美麗",
+    "skip": "略過"
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import * as S from "@/components/about/location/LocationFlat.styles";
@@ -71,6 +72,7 @@ const roads = [
 ];
 
 export default function LocationFlatMap() {
+  const tMap = useTranslations("FlatMap");
   const [selectedId, setSelectedId] = useState<string>(
     FLAT_LOCATION.stations[0].id,
   );
@@ -79,13 +81,13 @@ export default function LocationFlatMap() {
     FLAT_LOCATION.stations[0];
 
   return (
-    <S.MapSection aria-label="AHN’S 주변 역 안내 일러스트 지도">
-      <S.MapScroll tabIndex={0} aria-label="지도를 좌우로 살펴보기">
+    <S.MapSection aria-label={tMap("section")}>
+      <S.MapScroll tabIndex={0} aria-label={tMap("scroll")}>
         <S.MapSurface>
           <S.CitySvg
             viewBox="0 0 1000 680"
             role="img"
-            aria-label="노해로 주변을 단순한 건물 블록과 도로 선으로 표현한 추상 지도. 실제 지형과 다릅니다."
+            aria-label={tMap("svgDescription")}
           >
             <rect width="1000" height="680" fill="#EEEFE7" />
             <path d="M710-20h290v261l-142 1-78-62-85-58Z" fill="#DCE5D8" />
@@ -162,7 +164,7 @@ export default function LocationFlatMap() {
               letterSpacing="1.4"
             >
               <text x="95" y="117">
-                노원 문화의 거리
+                {tMap("cultureStreet")}
               </text>
               <text x="700" y="222">
                 NOWON · SEOUL
@@ -176,7 +178,7 @@ export default function LocationFlatMap() {
                 fontSize="11"
                 transform="rotate(-13 468 331)"
               >
-                노해로
+                {tMap("road")}
               </text>
             </g>
             <g fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -221,7 +223,7 @@ export default function LocationFlatMap() {
           </S.Compass>
           <S.ClinicFlag style={{ left: "62%", top: "45.2%" }}>
             <span>AHN’S</span>
-            <small>노해로 460</small>
+            <small>{tMap("streetAddress")}</small>
           </S.ClinicFlag>
           {FLAT_LOCATION.stations.map((station) => (
             <S.StationMarker
@@ -233,7 +235,10 @@ export default function LocationFlatMap() {
                 ["--line-color" as string]: station.color,
               }}
               $active={station.id === selectedId}
-              aria-label={`${station.name} ${station.line} 안내 선택`}
+              aria-label={tMap("selectStation", {
+                station: tMap(`stations.${station.id}`),
+                line: tMap(`lines.${station.number}`),
+              })}
               aria-pressed={station.id === selectedId}
               onMouseEnter={() => setSelectedId(station.id)}
               onFocus={() => setSelectedId(station.id)}
@@ -243,8 +248,8 @@ export default function LocationFlatMap() {
                 {station.number}
               </span>
               <span className="station-name">
-                {station.name}
-                <small>{station.line}</small>
+                {tMap(`stations.${station.id}`)}
+                <small>{tMap(`lines.${station.number}`)}</small>
               </span>
             </S.StationMarker>
           ))}
@@ -253,24 +258,29 @@ export default function LocationFlatMap() {
               SELECTED STATION <i />
             </span>
             <strong>
-              {active.name} <small>{active.line}</small>
+              {tMap(`stations.${active.id}`)}{" "}
+              <small>{tMap(`lines.${active.number}`)}</small>
             </strong>
             <div className="rule" />
             <div className="route-info">
-              <span>도보</span>
-              <b>{active.walkLabel}</b>
+              <span>{tMap("walking")}</span>
+              <b>
+                {active.id === "nowon7"
+                  ? tMap("walkNowon")
+                  : tMap("checkRoute")}
+              </b>
             </div>
             <div className="route-info">
-              <span>차량</span>
-              <b>지도에서 확인</b>
+              <span>{tMap("driving")}</span>
+              <b>{tMap("checkRoute")}</b>
             </div>
           </S.RouteCard>
           <S.MapLegend>
-            <i /> 그림으로 표현한 길 · 실제 경로와 다릅니다
+            <i /> {tMap("illustrationNotice")}
           </S.MapLegend>
         </S.MapSurface>
       </S.MapScroll>
-      <S.StationTabs aria-label="지도에서 역 선택">
+      <S.StationTabs aria-label={tMap("stationTabs")}>
         {FLAT_LOCATION.stations.map((station) => (
           <button
             key={station.id}
@@ -279,7 +289,8 @@ export default function LocationFlatMap() {
             onClick={() => setSelectedId(station.id)}
           >
             <i style={{ backgroundColor: station.color }} aria-hidden="true" />
-            {station.name} <span>{station.line}</span>
+            {tMap(`stations.${station.id}`)}{" "}
+            <span>{tMap(`lines.${station.number}`)}</span>
           </button>
         ))}
       </S.StationTabs>

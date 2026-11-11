@@ -16,10 +16,10 @@ export default function AuthBrandPanel({ mode }: AuthBrandPanelProps) {
   const rawLocale = useLocale();
   const locale = isAppLocale(rawLocale) ? rawLocale : defaultLocale;
   return (
-    <S.BrandPanel aria-label="Ahn's 브랜드 소개">
+    <S.BrandPanel aria-label={t("brandPanelLabel")}>
       <S.BrandHome
         href={localizedPath("/", locale)}
-        aria-label="Ahn's 홈으로 이동"
+        aria-label={t("brandHomeLabel")}
       >
         <S.BrandHomeMark aria-hidden="true">A</S.BrandHomeMark>
         AHN&apos;S

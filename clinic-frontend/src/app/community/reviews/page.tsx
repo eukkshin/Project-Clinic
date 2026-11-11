@@ -1,6 +1,9 @@
 import CommunityExperience from "@/components/community/CommunityExperience";
+import { publicPageMetadata } from "@/lib/seo/publicMetadata";
 
-export const metadata = { title: "시술 후기 | AHN’S" };
+export async function generateMetadata() {
+  return publicPageMetadata("/community/reviews");
+}
 
 export default function Page() {
   return <CommunityExperience kind="reviews" />;

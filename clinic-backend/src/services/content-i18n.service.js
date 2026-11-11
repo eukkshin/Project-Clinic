@@ -1,6 +1,7 @@
 "use strict";
 
 const oracledb = require("oracledb");
+const { createHash } = require("node:crypto");
 
 const DEFAULT_LOCALE = "ko";
 const TRANSLATION_LOCALES = Object.freeze(["en", "ja", "zh-CN", "zh-TW"]);
@@ -243,6 +244,23 @@ function validatePayload(type, raw, source) {
   }
   return result;
 }
+// Fingerprint only translatable source fields. The JSON payload holds metadata
+// so existing Oracle tables and CHECK constraints do not need a migration.
+function sourceHash(type, source) {
+  const textFields = {};
+  for (const field of TYPES[type].fields)
+    textFields[field] = source[field] ?? null;
+  return createHash("sha256").update(JSON.stringify(textFields)).digest("hex");
+}
+function unpackStoredPayload(stored) {
+  if (!stored) return { payload: {}, sourceHash: null };
+  const { __sourceHash, ...payload } = stored;
+  return {
+    payload,
+    sourceHash: typeof __sourceHash === "string" ? __sourceHash : null,
+  };
+}
+
 function applyTranslation(source, type, payload) {
   const copy = { ...source };
   for (const field of TYPES[type].fields) {
@@ -487,6 +505,9 @@ function createContentI18nService(dataSource) {
         source,
         payload: {},
         status: "SOURCE",
+        sourceHash: sourceHash(type, source),
+        sourceChanged: false,
+        sourceTrackingAvailable: true,
       };
     const row = (
       await dataSource.query(
@@ -495,21 +516,44 @@ function createContentI18nService(dataSource) {
         [type, itemId, lang],
       )
     )[0];
+    const saved = row ? parsePayload(await clobText(row.PAYLOAD_JSON)) : null;
+    const unpacked = unpackStoredPayload(saved);
+    const currentHash = sourceHash(type, source);
     return {
       type,
       id: itemId,
       locale: lang,
       source,
-      payload: row ? parsePayload(await clobText(row.PAYLOAD_JSON)) : {},
+      payload: unpacked.payload,
       status: row?.STATUS ?? "MISSING",
       updatedAt: row?.UPDATED_AT ?? null,
+      sourceHash: currentHash,
+      sourceTrackingAvailable: Boolean(unpacked.sourceHash),
+      sourceChanged: Boolean(
+        unpacked.sourceHash && unpacked.sourceHash !== currentHash,
+      ),
     };
   }
 
-  async function save(type, itemId, lang, raw, status, updatedBy) {
+  async function save(
+    type,
+    itemId,
+    lang,
+    raw,
+    status,
+    updatedBy,
+    expectedSourceHash,
+  ) {
     if (!["DRAFT", "PUBLISHED"].includes(status))
       throw new ContentI18nError(400, "상태가 잘못되었습니다.");
     const source = await original(type, itemId);
+    const currentHash = sourceHash(type, source);
+    if (expectedSourceHash != null && expectedSourceHash !== currentHash) {
+      throw new ContentI18nError(
+        409,
+        "원본 콘텐츠가 변경되었습니다. 번역 화면을 새로고침한 후 검토해 주세요.",
+      );
+    }
     const payload = validatePayload(type, raw, source);
     if (status === "PUBLISHED" && Object.keys(payload).length === 0) {
       throw new ContentI18nError(400, "공개할 번역을 하나 이상 입력해 주세요.");
@@ -524,7 +568,7 @@ function createContentI18nService(dataSource) {
       )[0];
       const binds = [
         status,
-        clobBind(JSON.stringify(payload)),
+        clobBind(JSON.stringify({ ...payload, __sourceHash: currentHash })),
         updatedBy ?? null,
         type,
         itemId,
@@ -546,7 +590,7 @@ function createContentI18nService(dataSource) {
             itemId,
             lang,
             status,
-            clobBind(JSON.stringify(payload)),
+            clobBind(JSON.stringify({ ...payload, __sourceHash: currentHash })),
             updatedBy ?? null,
           ],
         );

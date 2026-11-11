@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 import SearchResultsClient from "@/components/search/SearchResultsClient";
@@ -7,14 +8,11 @@ export async function generateMetadata() {
   return publicPageMetadata("/search");
 }
 
-export default function SearchPage() {
+export default async function SearchPage() {
+  const t = await getTranslations("Search");
   return (
     <Suspense
-      fallback={
-        <main style={{ padding: "160px 24px" }}>
-          검색 화면을 준비하고 있습니다.
-        </main>
-      }
+      fallback={<main style={{ padding: "160px 24px" }}>{t("preparing")}</main>}
     >
       <SearchResultsClient />
     </Suspense>

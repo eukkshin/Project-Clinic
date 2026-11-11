@@ -5,7 +5,10 @@
     "confirm": "확인",
     "cancel": "취소",
     "loading": "불러오는 중입니다",
-    "closePopup": "팝업 닫기"
+    "closePopup": "팝업 닫기",
+    "captchaLabel": "자동 상담 신청 방지 인증",
+    "homeLinkLabel": "AHNS 홈페이지",
+    "mobileMainNavigation": "모바일 주 메뉴"
   },
   "Header": {
     "about": "병원소개",
@@ -144,7 +147,12 @@
     "vlogIntroLine2": "안전을 생각하는 마음까지.",
     "eventIntroLine1": "지금 가장 주목받는 아름다움.",
     "eventIntroLine2": "당신을 위한 특별한 이벤트를 만나보세요.",
-    "eventEmpty": "현재 진행 중인 이벤트가 없습니다."
+    "eventEmpty": "현재 진행 중인 이벤트가 없습니다.",
+    "selfiesOpenPhoto": "{index}번 이미지 크게 보기",
+    "selfiesPhotoAlt": "갤러리 사진 {index}",
+    "selfiesLightboxLabel": "선택한 갤러리 사진 확대 보기",
+    "selfiesSelectedAlt": "선택한 갤러리 사진 확대",
+    "selfiesClosePhoto": "확대 이미지 닫기"
   },
   "Account": {
     "logout": "로그아웃",
@@ -821,7 +829,9 @@
     "signUpComplete": "가입 완료",
     "signUpDone": "회원가입이 완료되었습니다.",
     "signupBrand": "당신만의 아름다운 이야기를 시작하세요.",
-    "noticeRequired": "필수 항목"
+    "noticeRequired": "필수 항목",
+    "brandPanelLabel": "AHNS 브랜드 소개",
+    "brandHomeLabel": "AHNS 홈으로 이동"
   },
   "VlogSection": {
     "descriptionLine1": "아름다움을 만드는 순간과 그 안에 담긴 이야기.",
@@ -856,7 +866,14 @@
     "footerTagline": "세심한 케어로 완성하는 탁월함."
   },
   "Hero": {
-    "description": "당신만의 아름다움을 발견하는 시간"
+    "description": "당신만의 아름다움을 발견하는 시간",
+    "mainVisual": "메인 비주얼",
+    "openSlide": "{title} 자세히 보기",
+    "rollingBanner": "브랜드 롤링 배너",
+    "slideNumber": "{number}번 슬라이드",
+    "previousSlide": "이전 슬라이드",
+    "nextSlide": "다음 슬라이드",
+    "loading": "메인 비주얼 로딩 중"
   },
   "HospitalMap": {
     "ctrlZoom": "스크롤로 지도 확대·축소",
@@ -885,10 +902,212 @@
     "loadError": "지도를 불러오지 못했습니다.",
     "providerNaver": "네이버",
     "providerKakao": "카카오",
-    "providerGoogle": "구글"
+    "providerGoogle": "구글",
+    "sdkLoadError": "지도 SDK를 불러오지 못했습니다. 지도 API 키와 허용 도메인을 확인해 주세요.",
+    "googleTimeout": "구글 지도 로딩 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.",
+    "googleScriptError": "구글 지도 스크립트를 불러오지 못했습니다."
   },
   "QnaStandalone": {
     "other": "기타",
     "loading": "자주 묻는 질문을 불러오는 중입니다..."
+  },
+  "Community": {
+    "subNavigation": "커뮤니티 하위 페이지",
+    "ctaTitle1": "당신의 이야기가",
+    "ctaTitle2": "시작되는 곳.",
+    "ctaLine1": "일상적인 궁금증부터 상담 예약까지.",
+    "ctaLine2": "차분하고 편안한 소통을 이어갑니다.",
+    "onlineConsultation": "온라인 상담하기",
+    "homeTitle1": "아름다움에 대한",
+    "homeTitle2": "모든 이야기,",
+    "homeLead": "AHN’S가 전하는 소식과 기록, 그리고 궁금한 마음에 대한 답변을 한곳에 모았습니다.",
+    "viewNotices": "새로운 소식 살펴보기",
+    "featureTitle1": "오늘의 소식부터",
+    "featureTitle2": "내일의 이야기까지.",
+    "featureLead": "진료 정보는 정확하게, 소식은 명료하게, 소통은 따뜻하게. 필요한 이야기를 편안하게 찾아보세요.",
+    "viewEvents": "이벤트 살펴보기",
+    "exploreTitle": "당신을 위한 일곱 가지 이야기.",
+    "exploreLine1": "찾고 싶은 주제를 선택하세요.",
+    "exploreLine2": "모든 항목은 각각의 전용 페이지로 연결됩니다.",
+    "loading": "내용을 불러오고 있습니다.",
+    "loadError": "데이터를 불러오지 못했어요.",
+    "emptySearch": "검색 결과가 없습니다.",
+    "notConnected": "공개 자료 연결을 준비하고 있어요.",
+    "empty": "등록된 내용이 없습니다.",
+    "checkServer": "서버 연결과 API 권한을 확인해 주세요.",
+    "changeKeyword": "검색어를 바꿔 다시 확인해 주세요.",
+    "notConnectedDetail": "{section}은 공개 데이터 API가 확인되면 자동으로 표시됩니다. 확인되지 않은 사례는 게시하지 않았습니다.",
+    "emptyDetail": "새로운 소식이 등록되면 이곳에서 확인하실 수 있습니다.",
+    "retry": "다시 불러오기",
+    "pages": {
+      "notice": {
+        "label": "공지사항",
+        "title": "새로운 소식을 전합니다.",
+        "description": "AHN’S의 주요 안내와 운영 소식을 확인하세요."
+      },
+      "events": {
+        "label": "이벤트",
+        "title": "지금의 소식을 만나보세요.",
+        "description": "관리자가 등록한 이벤트 안내를 한곳에서 살펴보세요."
+      },
+      "reviews": {
+        "label": "시술 후기",
+        "title": "각자의 이야기를 존중합니다.",
+        "description": "실제 공개 동의와 검토가 완료된 후기만 게시할 수 있도록 준비한 공간입니다."
+      },
+      "before-after": {
+        "label": "전후사진",
+        "title": "변화를 기록하는 방법.",
+        "description": "촬영 조건과 공개 동의를 확인한 전후 비교 자료를 위한 공간입니다."
+      },
+      "consultation": {
+        "label": "온라인 상담",
+        "title": "편안한 첫 대화를 시작하세요.",
+        "description": "궁금한 점이 있다면 상담을 요청해 주세요. 담당자가 안내해 드립니다."
+      },
+      "qna": {
+        "label": "Q&A",
+        "title": "궁금한 마음에 답합니다.",
+        "description": "관리자가 등록한 자주 묻는 질문을 주제별로 확인하세요."
+      },
+      "vlog": {
+        "label": "VLOG",
+        "title": "공간과 이야기를 영상으로.",
+        "description": "AHN’S의 일상과 콘텐츠를 영상으로 만나보세요."
+      }
+    },
+    "pageSelect": "목록 페이지 선택",
+    "playVideo": "{title} 영상 보기",
+    "galleryImageAlt": "등록된 이미지 자료",
+    "eventImageAlt": "이벤트 관련 이미지",
+    "videoDialog": "VLOG 영상 보기",
+    "close": "닫기",
+    "recordCount": "{count}건",
+    "loadingShort": "불러오는 중",
+    "searchSection": "{section} 검색",
+    "questionFilters": "질문 분류",
+    "all": "전체",
+    "answerPending": "답변 준비 중입니다.",
+    "externalVideo": "외부 VLOG 영상 링크",
+    "externalVideoNotice": "외부 사이트의 영상입니다.",
+    "openExternalVideo": "새 탭에서 영상 열기",
+    "consultValidation": "성함·연락처·상담 분야와 개인정보 동의를 확인해 주세요.",
+    "consultCaptcha": "자동 신청 방지 인증을 완료해 주세요.",
+    "consultSuccess": "상담 신청이 접수되었습니다. 담당자가 안내해 드리겠습니다.",
+    "consultFail": "신청을 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "consultTitle1": "조금 더 가까이,",
+    "consultTitle2": "한 사람의 이야기를 듣겠습니다.",
+    "consultLead": "원하시는 상담 분야와 연락처를 남겨 주시면 담당자가 확인 후 연락드립니다. 구체적인 진료와 시술 적합성은 의료진 상담에서 확인할 수 있습니다.",
+    "nameLabel": "성함",
+    "phoneLabel": "연락처",
+    "departmentLabel": "상담 분야",
+    "namePlaceholder": "성함을 입력해 주세요",
+    "phonePlaceholder": "연락받으실 번호를 입력해 주세요",
+    "selectDepartment": "상담 분야를 선택해 주세요",
+    "eyes": "눈성형",
+    "nose": "코성형",
+    "antiAging": "동안성형",
+    "petit": "쁘띠시술",
+    "other": "기타",
+    "submitting": "접수 중…",
+    "submitConsultation": "상담 신청하기",
+    "homeStories": "Our Stories.",
+    "scrollExplore": "스크롤하여 살펴보기",
+    "heroImageAlt": "따뜻한 자연광 속 인물 에디토리얼 이미지",
+    "heroPhotoCaption": "Beyond Beauty.",
+    "featuredEyebrow": "FEATURED / IN FOCUS",
+    "featuredImageAlt": "자연광과 식물 그림자의 에디토리얼 이미지",
+    "exploreEyebrow": "커뮤니티 둘러보기",
+    "editorialNoticeEyebrow": "AN OPEN LETTER",
+    "editorialNoticeTitle1": "알아야 할 이야기는",
+    "editorialNoticeTitle2": "더 분명하고 정직하게.",
+    "editorialNoticeText": "운영 일정과 주요 안내는 정확하게 확인된 내용을 중심으로 게시합니다. 준비된 소식은 공지사항에서 차례대로 만나보실 수 있습니다.",
+    "editorialNoticeImageAlt": "차분한 자연광과 실내 공간",
+    "editorialReviewsEyebrow": "A PERSONAL STORY",
+    "editorialReviewsTitle1": "한 사람의 경험을",
+    "editorialReviewsTitle2": "가볍게 다루지 않습니다.",
+    "editorialReviewsText": "후기는 실제 작성자의 동의와 공개 범위를 확인한 후 제공해야 합니다. 결과는 사람마다 다를 수 있으며, 후기 하나가 모든 사람의 결과를 대표하지는 않습니다.",
+    "editorialReviewsImageAlt": "차분한 인물 에디토리얼 이미지",
+    "editorialBeforeAfterEyebrow": "RESPONSIBLE PRESENTATION",
+    "editorialBeforeAfterTitle1": "이미지 하나에도",
+    "editorialBeforeAfterTitle2": "충분한 맥락이 필요하니까.",
+    "editorialBeforeAfterText": "전후 사진은 실제 공개 동의, 촬영 시점과 조건, 필요한 주의 정보를 함께 확인한 뒤 소개합니다. 기존의 단일 셀피 이미지를 전후 비교자료로 표시하지 않았습니다.",
+    "editorialBeforeAfterImageAlt": "공간의 자연광을 담은 사진",
+    "beforeAfterConsentTitle": "Consent",
+    "beforeAfterConsentText": "환자 동의 및 공개 범위 확인",
+    "beforeAfterContextTitle": "Context",
+    "beforeAfterContextText": "촬영 시기와 시술 정보를 함께 안내",
+    "beforeAfterIntegrityTitle": "Integrity",
+    "beforeAfterIntegrityText": "보정·조명 등 비교 조건 검토",
+    "consultEyebrow": "BEGIN WITH A CONVERSATION",
+    "consultImageAlt": "햇살이 드는 차분한 공간",
+    "consultConsentText": "이름·연락처·상담 분야를 상담 연락 목적으로 제공하는 것에 동의합니다. (필수)",
+    "consultPolicyReminder": "운영 공개 전 실제 개인정보처리방침과 보유 기간을 안내하는 링크를 반드시 연결해 주세요.",
+    "consultInfoListenTitle": "Listen",
+    "consultInfoListenText": "편안한 첫 상담",
+    "consultInfoDiscussTitle": "Discuss",
+    "consultInfoDiscussText": "개인별 상태와 선택지 확인",
+    "consultInfoDecideTitle": "Decide",
+    "consultInfoDecideText": "충분한 설명과 신중한 결정"
+  },
+  "FlatMap": {
+    "section": "AHN’S 주변 역 안내 일러스트 지도",
+    "scroll": "지도를 좌우로 살펴보기",
+    "svgDescription": "노해로 주변을 단순한 건물 블록과 도로 선으로 표현한 추상 지도. 실제 지형과 다릅니다.",
+    "cultureStreet": "노원 문화의 거리",
+    "road": "노해로",
+    "streetAddress": "노해로 460",
+    "selectStation": "{station} {line} 안내 선택",
+    "walking": "도보",
+    "driving": "차량",
+    "walkNowon": "도보 약 3분",
+    "checkRoute": "실제 경로 확인",
+    "illustrationNotice": "그림으로 표현한 길 · 실제 경로와 다릅니다",
+    "stationTabs": "지도에서 역 선택",
+    "stations": {
+      "nowon7": "노원역",
+      "nowon4": "노원역",
+      "junggye7": "중계역",
+      "sangye4": "상계역"
+    },
+    "lines": {
+      "7": "7호선",
+      "4": "4호선"
+    }
+  },
+  "EventPopup": {
+    "missingName": "이름을 입력해 주세요.",
+    "invalidPhone": "연락처를 숫자 9~11자리로 입력해 주세요.",
+    "missingDepartment": "상담 부위를 입력해 주세요.",
+    "needConsent": "개인정보 수집·이용에 동의해 주세요.",
+    "needCaptcha": "자동 신청 방지 인증을 완료해 주세요.",
+    "submitFailed": "접수에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "imageAlt": "이벤트 안내 이미지",
+    "dialog": "이벤트 안내 {number}",
+    "openEvent": "이벤트 페이지 열기",
+    "viewEvent": "이벤트 보기",
+    "title": "지금, 나만의 상담을 시작하세요.",
+    "description": "필요한 정보만 남겨주시면 상담을 도와드립니다.",
+    "name": "이름",
+    "phone": "연락처",
+    "department": "상담 부위",
+    "departmentPlaceholder": "상담 부위 (예: 눈 성형)",
+    "consent": "개인정보 수집·이용 동의",
+    "submitting": "신청 중…",
+    "submit": "빠른 상담 신청하기",
+    "hideToday": "오늘 하루 보지 않음",
+    "closePopup": "이벤트 팝업 닫기",
+    "close": "닫기"
+  },
+  "Errors": {
+    "title": "문제가 발생했습니다",
+    "descriptionLine1": "페이지를 표시하는 중 오류가 발생했어요.",
+    "descriptionLine2": "잠시 후 다시 시도해 주세요.",
+    "retry": "다시 시도"
+  },
+  "Intro": {
+    "dialogLabel": "AHNS 브랜드 인트로",
+    "tagline": "가장 당신다운 아름다움을 위하여",
+    "skip": "건너뛰기"
   }
 }

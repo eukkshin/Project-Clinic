@@ -1,14 +1,14 @@
 "use client";
 
-import gsap from 'gsap';
-import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import gsap from "gsap";
+import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import HangulTyping from '@/components/ui/TypingText';
+import HangulTyping from "@/components/ui/TypingText";
 
-import * as S from './BrandIntro.styles';
+import * as S from "./BrandIntro.styles";
 
-const TAGLINE = "가장 당신다운 아름다움을 위하여";
 // 기존 HangulTyping이 글자 조합을 담당한다. 새 타이핑 로직을 만들지 않는다.
 const TYPE_SPEED = 35;
 const EXIT_AT = 2.3;
@@ -19,6 +19,8 @@ type BrandIntroProps = {
 };
 
 export default function BrandIntro({ shouldPlay }: BrandIntroProps) {
+  const tIntro = useTranslations("Intro");
+  const locale = useLocale();
   // SSR 첫 페인트에서도 불투명한 배경이 즉시 렌더되도록 초기값에 props 사용.
   const [visible, setVisible] = useState(shouldPlay);
   const [typingStarted, setTypingStarted] = useState(false);
@@ -199,7 +201,7 @@ export default function BrandIntro({ shouldPlay }: BrandIntroProps) {
         id="ahns-brand-intro"
         role="dialog"
         aria-modal="true"
-        aria-label="AHNS 브랜드 인트로"
+        aria-label={tIntro("dialogLabel")}
         style={{
           position: "fixed",
           inset: 0,
@@ -233,9 +235,12 @@ export default function BrandIntro({ shouldPlay }: BrandIntroProps) {
             </S.Title>
             <S.Hairline ref={lineRef} />
             <S.KoreanLine ref={typingRef}>
-              {typingStarted && (
-                <HangulTyping text={TAGLINE} speed={TYPE_SPEED} />
-              )}
+              {typingStarted &&
+                (locale === "ko" ? (
+                  <HangulTyping text={tIntro("tagline")} speed={TYPE_SPEED} />
+                ) : (
+                  tIntro("tagline")
+                ))}
             </S.KoreanLine>
           </S.MainCopy>
           <S.Footer ref={footerRef}>
@@ -268,7 +273,7 @@ export default function BrandIntro({ shouldPlay }: BrandIntroProps) {
         </S.RightPane>
 
         <S.Skip ref={skipRef} type="button" onClick={() => exit(true)}>
-          SKIP <span aria-hidden="true">↗</span>
+          {tIntro("skip")} <span aria-hidden="true">↗</span>
         </S.Skip>
       </S.Overlay>
       <S.LightWash ref={washRef} aria-hidden="true" />

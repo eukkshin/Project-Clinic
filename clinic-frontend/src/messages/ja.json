@@ -5,7 +5,10 @@
     "confirm": "確認",
     "cancel": "キャンセル",
     "loading": "読み込み中",
-    "closePopup": "ダイアログを閉じる"
+    "closePopup": "ダイアログを閉じる",
+    "captchaLabel": "自動相談申請を防ぐための認証",
+    "homeLinkLabel": "AHNSホームページ",
+    "mobileMainNavigation": "モバイルのメインナビゲーション"
   },
   "Header": {
     "about": "クリニック紹介",
@@ -144,7 +147,12 @@
     "vlogIntroLine2": "安全を大切にする想いまで。",
     "eventIntroLine1": "今注目したい美しさ。",
     "eventIntroLine2": "あなたのための特別なイベントをご覧ください。",
-    "eventEmpty": "現在開催中のイベントはありません。"
+    "eventEmpty": "現在開催中のイベントはありません。",
+    "selfiesOpenPhoto": "ギャラリー写真{index}を拡大表示",
+    "selfiesPhotoAlt": "ギャラリー写真{index}",
+    "selfiesLightboxLabel": "選択したギャラリー写真の拡大表示",
+    "selfiesSelectedAlt": "選択したギャラリー写真の拡大画像",
+    "selfiesClosePhoto": "拡大画像を閉じる"
   },
   "Account": {
     "logout": "ログアウト",
@@ -821,7 +829,9 @@
     "signUpComplete": "登録完了",
     "signUpDone": "会員登録が完了しました。",
     "signupBrand": "あなただけの美しい物語を始めましょう。",
-    "noticeRequired": "必須項目"
+    "noticeRequired": "必須項目",
+    "brandPanelLabel": "AHNSブランドのご紹介",
+    "brandHomeLabel": "AHNSホームページに戻る"
   },
   "VlogSection": {
     "descriptionLine1": "美しさが生まれる瞬間と、そこに込められたストーリー。",
@@ -856,7 +866,14 @@
     "footerTagline": "丁寧なケアで生まれる確かな品質。"
   },
   "Hero": {
-    "description": "あなただけの美しさを見つける時間"
+    "description": "あなただけの美しさを見つける時間",
+    "mainVisual": "メインビジュアル",
+    "openSlide": "{title}の詳細を見る",
+    "rollingBanner": "ブランドバナー",
+    "slideNumber": "スライド{number}",
+    "previousSlide": "前のスライド",
+    "nextSlide": "次のスライド",
+    "loading": "メインビジュアルを読み込み中"
   },
   "HospitalMap": {
     "ctrlZoom": "スクロールして地図を拡大・縮小",
@@ -885,10 +902,212 @@
     "loadError": "地図を読み込めませんでした。",
     "providerNaver": "ネイバー",
     "providerKakao": "カカオ",
-    "providerGoogle": "グーグル"
+    "providerGoogle": "グーグル",
+    "sdkLoadError": "地図サービスを読み込めません。APIキーと許可ドメインをご確認ください。",
+    "googleTimeout": "Googleマップの読み込みがタイムアウトしました。再度お試しください。",
+    "googleScriptError": "Googleマップのスクリプトを読み込めません。"
   },
   "QnaStandalone": {
     "other": "その他",
     "loading": "よくある質問を読み込んでいます…"
+  },
+  "Community": {
+    "subNavigation": "コミュニティ内のページ",
+    "ctaTitle1": "あなたの物語が",
+    "ctaTitle2": "ここから始まります。",
+    "ctaLine1": "日常の疑問から来院相談のご予約まで。",
+    "ctaLine2": "落ち着いた対話を大切にしています。",
+    "onlineConsultation": "オンライン相談はこちら",
+    "homeTitle1": "美しさにまつわる",
+    "homeTitle2": "さまざまな物語、",
+    "homeLead": "AHNSからのお知らせや記録、よくあるご質問への回答をまとめました。",
+    "viewNotices": "最新のお知らせを見る",
+    "featureTitle1": "今日のお知らせから",
+    "featureTitle2": "明日の物語まで。",
+    "featureLead": "診療情報は正確に、ニュースはわかりやすく。必要な情報を気軽にご覧ください。",
+    "viewEvents": "イベントを見る",
+    "exploreTitle": "7つのテーマをご紹介。",
+    "exploreLine1": "気になるテーマをお選びください。",
+    "exploreLine2": "各項目から専用ページへ移動できます。",
+    "loading": "読み込み中です…",
+    "loadError": "データを読み込めませんでした。",
+    "emptySearch": "該当する結果がありません。",
+    "notConnected": "公開コンテンツを準備中です。",
+    "empty": "まだ公開された内容がありません。",
+    "checkServer": "サーバー接続とAPIの権限をご確認ください。",
+    "changeKeyword": "検索キーワードを変更してください。",
+    "notConnectedDetail": "{section}は確認済みの公開データが利用可能になり次第表示されます。未確認の体験談は掲載していません。",
+    "emptyDetail": "新しいお知らせはこのページでご案内します。",
+    "retry": "再読み込み",
+    "pages": {
+      "notice": {
+        "label": "お知らせ",
+        "title": "新しいお知らせをお届けします。",
+        "description": "AHNSからの大切なお知らせをご覧ください。"
+      },
+      "events": {
+        "label": "イベント",
+        "title": "現在のイベントをご紹介します。",
+        "description": "クリニックからのイベント案内をご確認ください。"
+      },
+      "reviews": {
+        "label": "施術体験談",
+        "title": "一人ひとりの経験を尊重します。",
+        "description": "公開同意と確認が完了した体験談のためのページです。"
+      },
+      "before-after": {
+        "label": "ビフォーアフター",
+        "title": "変化を正しく記録するために。",
+        "description": "公開同意と撮影条件を確認した比較資料のためのページです。"
+      },
+      "consultation": {
+        "label": "オンライン相談",
+        "title": "まずはお気軽にご相談ください。",
+        "description": "ご質問をお送りいただくと担当者がご案内します。"
+      },
+      "qna": {
+        "label": "Q&A",
+        "title": "疑問にお答えします。",
+        "description": "よくあるご質問をテーマ別にご覧ください。"
+      },
+      "vlog": {
+        "label": "VLOG",
+        "title": "空間と物語を映像で。",
+        "description": "AHNSの日常やコンテンツを動画でご覧ください。"
+      }
+    },
+    "pageSelect": "ページを選択",
+    "playVideo": "動画を再生：{title}",
+    "galleryImageAlt": "掲載画像資料",
+    "eventImageAlt": "イベント画像",
+    "videoDialog": "VLOG動画を見る",
+    "close": "閉じる",
+    "recordCount": "{count}件",
+    "loadingShort": "読み込み中",
+    "searchSection": "{section}を検索",
+    "questionFilters": "質問カテゴリー",
+    "all": "すべて",
+    "answerPending": "回答準備中です。",
+    "externalVideo": "外部VLOGリンク",
+    "externalVideoNotice": "外部サイトの動画です。",
+    "openExternalVideo": "新しいタブで動画を開く",
+    "consultValidation": "お名前・連絡先・相談内容・個人情報への同意をご確認ください。",
+    "consultCaptcha": "不正送信防止の認証を完了してください。",
+    "consultSuccess": "ご相談を受け付けました。担当者からご連絡します。",
+    "consultFail": "送信に失敗しました。しばらくしてから再度お試しください。",
+    "consultTitle1": "もう少し近くで、",
+    "consultTitle2": "あなたのお話を伺います。",
+    "consultLead": "ご相談内容と連絡先をお知らせください。担当者が確認してご連絡します。施術の適応については医療従事者との相談でご確認ください。",
+    "nameLabel": "お名前",
+    "phoneLabel": "連絡先",
+    "departmentLabel": "ご相談内容",
+    "namePlaceholder": "お名前を入力してください",
+    "phonePlaceholder": "連絡先番号を入力してください",
+    "selectDepartment": "相談内容を選択してください",
+    "eyes": "目元の施術",
+    "nose": "鼻の施術",
+    "antiAging": "エイジングケア",
+    "petit": "プチ施術",
+    "other": "その他",
+    "submitting": "送信中…",
+    "submitConsultation": "相談を申し込む",
+    "homeStories": "私たちのストーリー。",
+    "scrollExplore": "スクロールして見る",
+    "heroImageAlt": "温かな自然光の中の人物を写したイメージ",
+    "heroPhotoCaption": "美しさの、その先へ。",
+    "featuredEyebrow": "注目のコンテンツ",
+    "featuredImageAlt": "自然光と植物の影を写したイメージ",
+    "exploreEyebrow": "コミュニティを探す",
+    "editorialNoticeEyebrow": "お知らせ",
+    "editorialNoticeTitle1": "知っておきたい情報を",
+    "editorialNoticeTitle2": "明確に、誠実に。",
+    "editorialNoticeText": "診療スケジュールや重要なお知らせは、確認された情報に基づいて掲載します。新しい情報はお知らせページで順次ご案内します。",
+    "editorialNoticeImageAlt": "柔らかな自然光が差す静かな室内",
+    "editorialReviewsEyebrow": "一人ひとりの体験",
+    "editorialReviewsTitle1": "一人ひとりの体験を",
+    "editorialReviewsTitle2": "大切に扱います。",
+    "editorialReviewsText": "体験談は、投稿者本人の同意と公開範囲を確認したうえで掲載する必要があります。結果には個人差があり、一つの体験談がすべての方の結果を示すものではありません。",
+    "editorialReviewsImageAlt": "落ち着いた雰囲気の人物写真",
+    "editorialBeforeAfterEyebrow": "適切な情報提供",
+    "editorialBeforeAfterTitle1": "一枚の写真にも",
+    "editorialBeforeAfterTitle2": "十分な説明が必要です。",
+    "editorialBeforeAfterText": "施術前後の写真は、公開への同意、撮影時期と条件、必要な注意事項を確認したうえで掲載します。既存の一枚の自撮り写真を比較資料として表示していません。",
+    "editorialBeforeAfterImageAlt": "自然光が差し込む室内の写真",
+    "beforeAfterConsentTitle": "同意",
+    "beforeAfterConsentText": "患者様の同意と公開範囲を確認",
+    "beforeAfterContextTitle": "情報",
+    "beforeAfterContextText": "撮影時期と施術情報をあわせて案内",
+    "beforeAfterIntegrityTitle": "適正性",
+    "beforeAfterIntegrityText": "補正・照明など比較条件を確認",
+    "consultEyebrow": "まずはご相談から",
+    "consultImageAlt": "日差しが差し込む落ち着いた空間",
+    "consultConsentText": "相談に関するご連絡を目的として、氏名・連絡先・相談分野を提供することに同意します。（必須）",
+    "consultPolicyReminder": "公開前に実際のプライバシーポリシーと保存期間を案内するリンクを必ず設定してください。",
+    "consultInfoListenTitle": "お話を伺う",
+    "consultInfoListenText": "安心して始める初回相談",
+    "consultInfoDiscussTitle": "ご相談",
+    "consultInfoDiscussText": "一人ひとりの状態と選択肢を確認",
+    "consultInfoDecideTitle": "ご判断",
+    "consultInfoDecideText": "十分な説明を受けて慎重に判断"
+  },
+  "FlatMap": {
+    "section": "AHNS周辺駅のイラストマップ",
+    "scroll": "地図を左右にスクロール",
+    "svgDescription": "ノヘ路周辺をイラストで示した地図です。実際の地形とは異なります。",
+    "cultureStreet": "蘆原文化通り",
+    "road": "ノヘ路",
+    "streetAddress": "ノヘ路460",
+    "selectStation": "{station}（{line}）の案内を選択",
+    "walking": "徒歩",
+    "driving": "車",
+    "walkNowon": "徒歩約3分",
+    "checkRoute": "実際の経路を確認",
+    "illustrationNotice": "イラスト上の道であり、実際の経路ではありません",
+    "stationTabs": "駅を選択",
+    "stations": {
+      "nowon7": "蘆原駅",
+      "nowon4": "蘆原駅",
+      "junggye7": "中渓駅",
+      "sangye4": "上渓駅"
+    },
+    "lines": {
+      "7": "7号線",
+      "4": "4号線"
+    }
+  },
+  "EventPopup": {
+    "missingName": "お名前を入力してください。",
+    "invalidPhone": "連絡先を9～11桁の数字で入力してください。",
+    "missingDepartment": "ご相談内容を入力してください。",
+    "needConsent": "個人情報の収集・利用に同意してください。",
+    "needCaptcha": "不正送信防止の認証を完了してください。",
+    "submitFailed": "送信できませんでした。しばらくしてから再度お試しください。",
+    "imageAlt": "イベント案内画像",
+    "dialog": "イベント案内 {number}",
+    "openEvent": "イベントページを開く",
+    "viewEvent": "イベントを見る",
+    "title": "あなただけのご相談を始めましょう。",
+    "description": "ご連絡に必要な情報だけをご入力ください。",
+    "name": "お名前",
+    "phone": "連絡先",
+    "department": "ご相談内容",
+    "departmentPlaceholder": "ご相談内容（例：目元の施術）",
+    "consent": "個人情報の収集・利用への同意",
+    "submitting": "送信中…",
+    "submit": "クイック相談を申し込む",
+    "hideToday": "今日は表示しない",
+    "closePopup": "イベントポップアップを閉じる",
+    "close": "閉じる"
+  },
+  "Errors": {
+    "title": "エラーが発生しました",
+    "descriptionLine1": "ページの表示中にエラーが発生しました。",
+    "descriptionLine2": "しばらくしてから、もう一度お試しください。",
+    "retry": "再試行"
+  },
+  "Intro": {
+    "dialogLabel": "AHNSブランドイントロ",
+    "tagline": "あなたらしい美しさのために",
+    "skip": "スキップ"
   }
 }

@@ -1,14 +1,16 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { FiAlertTriangle, FiRefreshCcw } from "react-icons/fi";
 import styled from "styled-components";
 
 interface ErrorProps {
   error: Error & { digest?: string }; //diget:서버 오류 식별자
-  reset: () => {};
+  reset: () => void;
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const t = useTranslations("Errors");
   useEffect(() => {
     console.log(error);
   }, [error]);
@@ -19,17 +21,17 @@ export default function Error({ error, reset }: ErrorProps) {
         <FiAlertTriangle />
       </ErrorIcon>
 
-      <ErrorTitle>문제가 발생했습니다</ErrorTitle>
+      <ErrorTitle>{t("title")}</ErrorTitle>
 
       <ErrorDescription>
-        페이지를 표시하는 중 오류가 발생했어요.
+        {t("descriptionLine1")}
         <br />
-        잠시 후 다시 시도해 주세요.
+        {t("descriptionLine2")}
       </ErrorDescription>
 
       <RetryButton type="button" onClick={() => reset()}>
         <FiRefreshCcw />
-        다시 시도
+        {t("retry")}
       </RetryButton>
     </ErrorContainer>
   );

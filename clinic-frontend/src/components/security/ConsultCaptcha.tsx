@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 
 declare global {
@@ -29,6 +30,7 @@ export default function ConsultCaptcha({
   onToken: (value: string) => void;
   resetKey?: number;
 }) {
+  const t = useTranslations("Common");
   const divRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<string | null>(null);
   useEffect(() => {
@@ -83,7 +85,7 @@ export default function ConsultCaptcha({
     <div
       style={{ margin: "10px 0", minHeight: 65 }}
       ref={divRef}
-      aria-label="자동 상담 신청 방지 인증"
+      aria-label={t("captchaLabel")}
     />
   ) : null;
 }

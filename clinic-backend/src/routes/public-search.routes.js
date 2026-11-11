@@ -3,6 +3,17 @@
 const express = require("express");
 const AppDataSource = require("../../db");
 const router = express.Router();
+const {
+  createContentI18nService,
+} = require("../services/content-i18n.service");
+const contentI18n = createContentI18nService(AppDataSource);
+const SUPPORTED_LOCALES = new Set(["ko", "en", "ja", "zh-CN", "zh-TW"]);
+const CONTENT_TYPES = {
+  procedures: "CATEGORY",
+  faq: "FAQ",
+  events: "EVENT",
+  vlog: "VLOG",
+};
 
 // 공개 페이지 자료만 검색합니다. 회원/예약/상담/관리자 데이터는 검색하지 않습니다.
 // Oracle LIKE의 와일드카드를 이스케이프하여 일반 검색어로 처리합니다.
@@ -107,16 +118,66 @@ router.get("/", async (req, res) => {
       .json({ success: false, message: "검색어를 1~60자로 입력해 주세요." });
   }
   const keyword = `%${escapeLike(raw)}%`;
+  const lang = typeof req.query.locale === "string" ? req.query.locale : "ko";
+  if (!SUPPORTED_LOCALES.has(lang)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "지원하지 않는 언어 코드입니다." });
+  }
 
   try {
     const results = await Promise.allSettled(
       SOURCES.map(async (source) => {
         const binds = source.section === "faq" ? [keyword, keyword] : [keyword];
         const rows = await AppDataSource.query(source.sql, binds);
+        const items = rows.map(source.map);
+        if (lang !== "ko" && rows.length) {
+          // 검색 대상은 기존 원본 DB입니다. 검색 결과의 게시된 번역만 표시합니다.
+          const entityType = CONTENT_TYPES[source.section];
+          let translations = new Map();
+          try {
+            translations = await contentI18n.publishedMany(
+              entityType,
+              rows.map((row) => Number(row.ITEM_ID)),
+              lang,
+            );
+          } catch (error) {
+            // 검색 자료 조회 성공은 유지하고 번역 장애만 한국어 원본으로 대체합니다.
+            console.error(
+              `[public-search] ${source.section} 번역 조회 실패`,
+              error,
+            );
+          }
+          items.forEach((item, index) => {
+            const row = rows[index];
+            const translated = translations.get(Number(row.ITEM_ID));
+            if (!translated) return;
+            const title =
+              source.section === "faq" ? translated.question : translated.title;
+            if (typeof title === "string" && title.trim())
+              item.title = plain(title);
+            if (source.section === "faq") {
+              const category =
+                typeof translated.categoryName === "string" &&
+                translated.categoryName.trim()
+                  ? translated.categoryName
+                  : row.CATEGORY_NAME;
+              const excerpt =
+                typeof translated.answer === "string" &&
+                translated.answer.trim()
+                  ? translated.answer
+                  : row.EXCERPT;
+              item.description = `${plain(category)} · ${plain(excerpt)}`.slice(
+                0,
+                260,
+              );
+            }
+          });
+        }
         return {
           section: source.section,
           label: source.label,
-          items: rows.map(source.map),
+          items,
         };
       }),
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { FiArrowUpRight, FiX } from "react-icons/fi";
@@ -62,6 +63,7 @@ function PopupCard({
   popup: PopupData;
   onClose: (id: number, hideToday: boolean) => void;
 }) {
+  const tPopup = useTranslations("EventPopup");
   // 카드마다 독립된 상담 입력값과 오늘 하루 숨김 체크 여부를 갖는다.
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -77,14 +79,14 @@ function PopupCard({
     event.preventDefault();
     if (isSubmitting) return;
 
-    if (!name.trim()) return setFeedback("이름을 입력해 주세요.");
+    if (!name.trim()) return setFeedback(tPopup("missingName"));
     if (!/^\d{9,11}$/.test(phone) || /^(\d)\1{8,}$/.test(phone)) {
-      return setFeedback("연락처를 숫자 9~11자리로 입력해 주세요.");
+      return setFeedback(tPopup("invalidPhone"));
     }
-    if (!department.trim()) return setFeedback("상담 부위를 입력해 주세요.");
-    if (!isAgreed) return setFeedback("개인정보 수집·이용에 동의해 주세요.");
+    if (!department.trim()) return setFeedback(tPopup("missingDepartment"));
+    if (!isAgreed) return setFeedback(tPopup("needConsent"));
     if (consultCaptchaEnabled && !captchaToken)
-      return setFeedback("자동 신청 방지 인증을 완료해 주세요.");
+      return setFeedback(tPopup("needCaptcha"));
 
     try {
       setIsSubmitting(true);
@@ -112,7 +114,7 @@ function PopupCard({
       onClose(popup.id, popup.useTodayClose && hideToday);
     } catch (error) {
       console.error("이벤트 팝업 상담 신청 실패:", error);
-      setFeedback("접수에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      setFeedback(tPopup("submitFailed"));
     } finally {
       setIsSubmitting(false);
       setCaptchaReset((v) => v + 1);
@@ -122,7 +124,7 @@ function PopupCard({
   // 이벤트가 실제 URL을 갖고 있을 때만 클릭 가능한 이미지로 만든다.
   const image = (
     <S.ImageWrapper>
-      <S.PopupImage src={popup.imageUrl} alt="이벤트 안내 이미지" />
+      <S.PopupImage src={popup.imageUrl} alt={tPopup("imageAlt")} />
       <S.ImageBadge>AHN'S SPECIAL OFFER</S.ImageBadge>
     </S.ImageWrapper>
   );
@@ -132,7 +134,7 @@ function PopupCard({
       $top={popup.top}
       $left={popup.left}
       role="dialog"
-      aria-label={`이벤트 안내 ${popup.id}`}
+      aria-label={tPopup("dialog", { number: popup.id })}
     >
       <S.ImageArea>
         {popup.link ? (
@@ -140,7 +142,7 @@ function PopupCard({
             href={popup.link}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="이벤트 페이지 열기"
+            aria-label={tPopup("openEvent")}
           >
             {image}
           </S.PopupLink>
@@ -149,7 +151,8 @@ function PopupCard({
         )}
         {popup.link && (
           <S.ImageLinkCaption>
-            이벤트 보기 <FiArrowUpRight aria-hidden="true" size={14} />
+            {tPopup("viewEvent")}{" "}
+            <FiArrowUpRight aria-hidden="true" size={14} />
           </S.ImageLinkCaption>
         )}
       </S.ImageArea>
@@ -157,18 +160,16 @@ function PopupCard({
       <S.FormWrapper>
         <S.FormHeading>
           <S.Eyebrow>PERSONAL CONSULTATION</S.Eyebrow>
-          <S.FormTitle>지금, 나만의 상담을 시작하세요.</S.FormTitle>
-          <S.FormCaption>
-            필요한 정보만 남겨주시면 상담을 도와드립니다.
-          </S.FormCaption>
+          <S.FormTitle>{tPopup("title")}</S.FormTitle>
+          <S.FormCaption>{tPopup("description")}</S.FormCaption>
         </S.FormHeading>
 
         <S.ConsultForm onSubmit={handleSubmit}>
           <S.InputGroup>
             <S.Input
               type="text"
-              placeholder="이름"
-              aria-label="이름"
+              placeholder={tPopup("name")}
+              aria-label={tPopup("name")}
               autoComplete="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -177,8 +178,8 @@ function PopupCard({
             />
             <S.Input
               type="tel"
-              placeholder="연락처"
-              aria-label="연락처"
+              placeholder={tPopup("phone")}
+              aria-label={tPopup("phone")}
               autoComplete="tel"
               inputMode="numeric"
               value={phone}
@@ -193,8 +194,8 @@ function PopupCard({
           <S.InputGroup>
             <S.Input
               type="text"
-              placeholder="상담 부위 (예: 눈 성형)"
-              aria-label="상담 부위"
+              placeholder={tPopup("departmentPlaceholder")}
+              aria-label={tPopup("department")}
               value={department}
               onChange={(event) => setDepartment(event.target.value)}
               maxLength={60}
@@ -210,7 +211,7 @@ function PopupCard({
                 onChange={(event) => setIsAgreed(event.target.checked)}
                 required
               />
-              <S.PrivacyText>개인정보 수집·이용 동의</S.PrivacyText>
+              <S.PrivacyText>{tPopup("consent")}</S.PrivacyText>
             </S.PrivacyLabel>
           </S.ConsentRow>
 
@@ -228,7 +229,7 @@ function PopupCard({
               (consultCaptchaEnabled && !captchaToken)
             }
           >
-            {isSubmitting ? "신청 중..." : "빠른 상담 신청하기"}
+            {isSubmitting ? tPopup("submitting") : tPopup("submit")}
             <FiArrowUpRight aria-hidden="true" size={17} />
           </S.SubmitBtn>
         </S.ConsultForm>
@@ -242,7 +243,7 @@ function PopupCard({
               checked={hideToday}
               onChange={(event) => setHideToday(event.target.checked)}
             />
-            오늘 하루 보지 않음
+            {tPopup("hideToday")}
           </S.CloseLabel>
         ) : (
           <S.FooterSmall>AHN'S PLASTIC SURGERY</S.FooterSmall>
@@ -251,9 +252,9 @@ function PopupCard({
         <S.CloseBtn
           type="button"
           onClick={() => onClose(popup.id, popup.useTodayClose && hideToday)}
-          aria-label="이벤트 팝업 닫기"
+          aria-label={tPopup("closePopup")}
         >
-          닫기 <FiX size={15} aria-hidden="true" />
+          {tPopup("close")} <FiX size={15} aria-hidden="true" />
         </S.CloseBtn>
       </S.FooterWrapper>
     </S.PopupContainer>

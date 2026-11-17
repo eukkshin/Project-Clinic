@@ -110,11 +110,14 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       "AppDataSource and existing issueMemberSession are required",
     );
   }
-  const frontendOrigins = process.env.FRONTEND_ORIGIN.split(",").map(
-    (origin) => new URL(origin.trim()),
-  );
+  const frontendOrigins = (process.env.FRONTEND_ORIGIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .map((origin) => new URL(origin));
 
   if (
+    frontendOrigins.length === 0 ||
     frontendOrigins.some(
       (origin) =>
         origin.pathname !== "/" ||

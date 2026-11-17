@@ -10,33 +10,51 @@ import EventPopup from "@/components/ui/EventPopup";
 import QuickConsultBar from "@/components/ui/QuickConsultBar";
 import { stripLocalePrefix } from "@/i18n/url";
 
+interface ConditionalLayoutProps {
+  children: React.ReactNode;
+}
+
 export default function ConditionalLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  // pathname변수에 현재 주소를 저장
-  const pathname = stripLocalePrefix(usePathname());
-  const isAdmin = pathname.startsWith("/admin") || pathname.startsWith("/find");
-  // ⭕ 백틱(`)을 사용해 문자열과 변수를 합칩니다.
-  const AdminBoardPage = /^\/board\/.+/.test(pathname);
-  const isAuthPage =
-    pathname === "/register/login" ||
-    pathname === "/register/terms" ||
-    "/register/social";
+}: ConditionalLayoutProps) {
+  const rawPathname = usePathname() ?? "/";
+
+  // 다국어 경로 및 마지막 슬래시 정규화
+  const pathname = stripLocalePrefix(rawPathname).replace(/\/+$/, "") || "/";
+
+  // 관리자 및 계정 찾기 페이지
+  const isAdmin =
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/find" ||
+    pathname.startsWith("/find/");
+
+  // 게시판 상세 페이지
+  const isBoardPage = /^\/board\/.+/.test(pathname);
+
+  // 회원가입 페이지 (로그인 모달은 제외)
+  const isRegisterPage =
+    pathname === "/register" ||
+    (pathname.startsWith("/register/") && pathname !== "/register/login");
+
+  // 상담 및 예약 페이지
   const isConRes = pathname === "/consultation" || pathname === "/reservation";
+
+  const showCommonLayout = !isAdmin && !isBoardPage && !isRegisterPage;
 
   return (
     <>
       {!isAdmin && <EventPopup />}
-      {/* 관리자 페이지가 아닐때만 헤더(상단메뉴를 보여줌) */}
-      {!isAdmin && !AdminBoardPage && !isAuthPage && <Header />}
+
+      {showCommonLayout && <Header />}
 
       {children}
 
-      {!isAdmin && !AdminBoardPage && !isAuthPage && !isConRes && <Footer />}
-      {!isAdmin && !AdminBoardPage && !isAuthPage && <QuickConsultBar />}
-      {!isAdmin && !AdminBoardPage && !isAuthPage && <AuthModalHost />}
+      {showCommonLayout && !isConRes && <Footer />}
+
+      {showCommonLayout && <QuickConsultBar />}
+
+      {showCommonLayout && <AuthModalHost />}
     </>
   );
 }

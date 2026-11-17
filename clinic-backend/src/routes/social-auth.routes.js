@@ -110,18 +110,24 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       "AppDataSource and existing issueMemberSession are required",
     );
   }
-  const frontendOrigin = new URL(process.env.FRONTEND_ORIGIN);
+  const frontendOrigins = process.env.FRONTEND_ORIGIN.split(",").map(
+    (origin) => new URL(origin.trim()),
+  );
+
   if (
-    frontendOrigin.pathname !== "/" ||
-    frontendOrigin.search ||
-    frontendOrigin.hash ||
-    (frontendOrigin.protocol !== "https:" &&
-      frontendOrigin.hostname !== "localhost")
+    frontendOrigins.some(
+      (origin) =>
+        origin.pathname !== "/" ||
+        origin.search ||
+        origin.hash ||
+        (origin.protocol !== "https:" && origin.hostname !== "localhost"),
+    )
   ) {
     throw new Error(
-      "FRONTEND_ORIGIN must be a valid HTTPS origin (localhost permitted)",
+      "FRONTEND_ORIGIN must contain valid HTTPS origins (localhost permitted)",
     );
   }
+
   const router = express.Router();
   router.use((_req, res, next) => {
     res.set("Cache-Control", "no-store");

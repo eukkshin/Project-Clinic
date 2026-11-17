@@ -70,12 +70,8 @@ const path = require("path");
 
 const app = express();
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const {
-  COOKIE_NAME,
-  JWT_ISSUER,
-  JWT_AUDIENCE,
-} = require("./src/middleware/authenticateMember");
+const { issueMemberSession } = require("./src/auth/member-session");
+const { createSocialAuthRouter } = require("./src/routes/social-auth.routes");
 const mypageRouter = require("./src/routes/mypage.routes");
 const {
   router: reservationRouter,
@@ -248,28 +244,8 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
-    // 6. JWT 생성
-    // SESSION_VERSION은 모든 기기의 세션을 즉시 무효화하는 기준값입니다.
-    const token = jwt.sign(
-      { sv: Number(user.SESSION_VERSION) },
-      process.env.JWT_SECRET,
-      {
-        algorithm: "HS256",
-        subject: String(user.USER_IDX),
-        issuer: JWT_ISSUER,
-        audience: JWT_AUDIENCE,
-        expiresIn: "8h",
-      },
-    );
-
-    // 7. 인증 쿠키 발급
-    res.cookie(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 8 * 60 * 60 * 1000,
-    });
+    // 일반/소셜 로그인이 동일한 세션 발급 정책을 사용합니다.
+    issueMemberSession(req, res, user);
 
     // 8. 기존 로그인 응답 유지
     clearAccountFailures(req, loginId);
@@ -2048,6 +2024,14 @@ const { adminRouter: contentI18nAdmin, publicRouter: contentI18nPublic } =
 app.use("/api/admin/content-i18n", contentI18nAdmin);
 app.use("/api/public/content", contentI18nPublic);
 app.use("/api/admin/detail/images", createDetailImageRouter({ requireAdmin }));
+// 소셜 로그인은 실제 세션 발급 함수가 연결된 경우에만 활성화합니다.
+if (process.env.SOCIAL_AUTH_ENABLED === "true") {
+  app.use(
+    "/api/auth/social",
+    createSocialAuthRouter({ AppDataSource, issueMemberSession }),
+  );
+}
+
 // 마이페이지 API
 app.use("/api/mypage", mypageRouter);
 app.post("/api/logout", (req, res) => {

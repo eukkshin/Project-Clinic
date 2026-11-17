@@ -276,25 +276,66 @@ export default function Header() {
     [navigateToIntegratedSearch, searchOpen],
   );
 
+  // Server session is the source of truth. OAuth redirects do not set localStorage.
   useEffect(() => {
-    const syncUserName = () => {
-      setUserName(window.localStorage.getItem("userName")?.trim() || null);
+    let active = true;
+    let requestId = 0;
+
+    const syncUserName = async () => {
+      const currentRequest = ++requestId;
+      try {
+        const response = await fetch(`${API_URL}/api/mypage/me`, {
+          credentials: "include",
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        });
+        const payload = response.ok
+          ? ((await response.json()) as {
+              success?: boolean;
+              data?: { name?: string | null };
+            })
+          : null;
+        if (!active || currentRequest !== requestId) return;
+
+        const name =
+          response.ok && payload?.success === true
+            ? payload.data?.name?.trim() || null
+            : null;
+        setUserName(name);
+        if (name) {
+          window.localStorage.setItem("userName", name);
+        } else {
+          window.localStorage.removeItem("userName");
+        }
+      } catch {
+        if (active && currentRequest === requestId) setUserName(null);
+      }
     };
 
-    syncUserName();
+    const onLogin = () => {
+      void syncUserName();
+    };
+    const onLogout = () => {
+      ++requestId; // Ignore a session lookup started before logout.
+      setUserName(null);
+      window.localStorage.removeItem("userName");
+    };
+    const onFocus = () => {
+      void syncUserName();
+    };
 
-    window.addEventListener("login-success", syncUserName);
-
-    window.addEventListener("logout-success", syncUserName);
-
-    window.addEventListener("storage", syncUserName);
-
+    void syncUserName();
+    window.addEventListener("login-success", onLogin);
+    window.addEventListener("logout-success", onLogout);
+    window.addEventListener("storage", onFocus);
+    window.addEventListener("focus", onFocus);
     return () => {
-      window.removeEventListener("login-success", syncUserName);
-
-      window.removeEventListener("logout-success", syncUserName);
-
-      window.removeEventListener("storage", syncUserName);
+      active = false;
+      ++requestId;
+      window.removeEventListener("login-success", onLogin);
+      window.removeEventListener("logout-success", onLogout);
+      window.removeEventListener("storage", onFocus);
+      window.removeEventListener("focus", onFocus);
     };
   }, []);
 

@@ -14,6 +14,7 @@ import * as S from "@/styles/mypage/AccountSettings.styles";
 import * as M from "@/styles/mypage/MyPage.styles";
 
 import AccountWithdrawal from "./AccountWithdrawal";
+import SocialConnections from "./SocialConnections";
 
 type Tab = "profile" | "password" | "preferences" | "withdraw";
 const menus = [
@@ -439,6 +440,7 @@ export default function AccountSettingsClient() {
                     </form>
                     <S.Note>{t("emailNote")}</S.Note>
                   </S.Panel>
+                  <SocialConnections />
                 </>
               )}
 

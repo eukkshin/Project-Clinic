@@ -1,6 +1,8 @@
 require("dotenv").config();
 require("reflect-metadata");
+
 const { DataSource } = require("typeorm");
+
 const Member = require("./src/entity/Member");
 const FooterSettings = require("./src/entity/FooterSettings");
 const Consult = require("./src/entity/Consult");
@@ -31,16 +33,22 @@ const ReservationMessage = require("./src/entity/ReservationMessage");
 const ReservationMessagePolicy = require("./src/entity/ReservationMessagePolicy");
 
 const AppDataSource = new DataSource({
-  type: "oracle",
-  host: "localhost",
-  port: 1521,
+  type: "mysql",
+
+  host: process.env.DB_HOST || "127.0.0.1",
+  port: Number(process.env.DB_PORT || 3306),
+
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  connectString: process.env.DB_CONNECTION_STRING,
-  database: "XEPDB1",
+  database: process.env.DB_NAME || "plastic_db",
+
+  charset: "utf8mb4",
+
   synchronize: false,
-  //로깅 최적화 (운영환경이 아닐때만 true)
   logging: process.env.NODE_ENV !== "production",
+
+  poolSize: 10,
+
   entities: [
     Member,
     FooterSettings,
@@ -62,7 +70,6 @@ const AppDataSource = new DataSource({
     DetailCategory,
     DetailPage,
     DetailSection,
-    Reservation,
     ReservationBlock,
     AdminReservation,
     AdminNotification,
@@ -72,11 +79,6 @@ const AppDataSource = new DataSource({
     ReservationMessage,
     ReservationMessagePolicy,
   ],
-  extra: {
-    poolMin: 2,
-    poolMax: 10,
-    poolIncrement: 1,
-  },
 });
 
 module.exports = AppDataSource;

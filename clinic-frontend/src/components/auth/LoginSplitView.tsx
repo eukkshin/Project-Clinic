@@ -6,6 +6,7 @@ import { FiX } from "react-icons/fi";
 
 import LoginForm from "@/components/auth/LoginForm";
 import * as S from "@/components/auth/LoginModal.styles";
+import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import AuthLanguageSwitcher from "@/components/i18n/AuthLanguageSwitcher";
 import { defaultLocale, isAppLocale } from "@/i18n/config";
 import { localizedPath } from "@/i18n/url";
@@ -77,6 +78,7 @@ export default function LoginSplitView({
           <S.Lead>{t("modalLead")}</S.Lead>
           <S.LoginFormScope>
             <LoginForm onSuccess={onSuccess} />
+            <SocialLoginButtons />
           </S.LoginFormScope>
         </S.FormBody>
       </S.FormPanel>

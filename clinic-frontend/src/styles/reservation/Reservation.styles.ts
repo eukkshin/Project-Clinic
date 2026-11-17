@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import styled, { keyframes } from 'styled-components';
+import Link from "next/link";
+import styled, { keyframes } from "styled-components";
 
 const green = "#19382e";
 const greenSoft = "#315243";
@@ -17,12 +17,12 @@ const appear = keyframes`
 
 export const Page = styled.main`
   min-height: 100vh;
-  padding-top: 104px;
+  padding-top: 89px;
   background: ${ivory};
   color: ${green};
   font-family: ${sans};
   @media (max-width: 768px) {
-    padding-top: 76px;
+    padding-top: 69px;
   }
 `;
 export const Hero = styled.section`

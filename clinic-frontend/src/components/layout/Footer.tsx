@@ -358,9 +358,9 @@ export default function Footer() {
                 {tFooter("eyebrow")}
               </S.IntroSmall>
               <S.IntroTitle data-footer-motion>
-                {tFooter("heroLine1")}
+                Find Your
                 <br />
-                <em>{tFooter("heroLine2")}</em>
+                <em>Own Beauty.</em>
               </S.IntroTitle>
               <S.IntroDescription data-footer-motion>
                 {tFooter("introLine1")}
@@ -414,7 +414,9 @@ export default function Footer() {
                   <S.ContactLabel>{tFooter("hoursHeading")}</S.ContactLabel>
                   {schedules.map((schedule) => (
                     <S.HoursItem key={schedule.id}>
-                      <strong>{schedule.department || schedule.departments}</strong>
+                      <strong>
+                        {schedule.department || schedule.departments}
+                      </strong>
                       {schedule.weekday && (
                         <span>
                           {tFooter("weekday")}　{schedule.weekday}
@@ -522,7 +524,13 @@ export default function Footer() {
               >
                 <S.QuickMenuLink
                   href={link.href}
-                  aria-label={tFooter(link.id === "kakao" ? "quickKakao" : link.id === "instagram" ? "quickInstagram" : "quickYoutube")}
+                  aria-label={tFooter(
+                    link.id === "kakao"
+                      ? "quickKakao"
+                      : link.id === "instagram"
+                        ? "quickInstagram"
+                        : "quickYoutube",
+                  )}
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
                   tabIndex={messageOpen ? 0 : -1}
@@ -530,7 +538,13 @@ export default function Footer() {
                 >
                   {/* 같은 버튼 안에서 왼쪽으로 이름이 펼쳐짐 (별도 툴팁 없음) */}
                   <S.QuickMenuLabel aria-hidden="true">
-                    {tFooter(link.id === "kakao" ? "quickKakao" : link.id === "instagram" ? "quickInstagram" : "quickYoutube")}
+                    {tFooter(
+                      link.id === "kakao"
+                        ? "quickKakao"
+                        : link.id === "instagram"
+                          ? "quickInstagram"
+                          : "quickYoutube",
+                    )}
                   </S.QuickMenuLabel>
                   <S.QuickMenuIcon aria-hidden="true">
                     {link.icon}

@@ -21,7 +21,10 @@ export default function ConditionalLayout({
   // ⭕ 백틱(`)을 사용해 문자열과 변수를 합칩니다.
   const AdminBoardPage = /^\/board\/.+/.test(pathname);
   const isAuthPage =
-    pathname === "/register/login" || pathname === "/register/terms";
+    pathname === "/register/login" ||
+    pathname === "/register/terms" ||
+    "/register/social";
+  const isConRes = pathname === "/consultation" || pathname === "/reservation";
 
   return (
     <>
@@ -31,7 +34,7 @@ export default function ConditionalLayout({
 
       {children}
 
-      {!isAdmin && !AdminBoardPage && !isAuthPage && <Footer />}
+      {!isAdmin && !AdminBoardPage && !isAuthPage && !isConRes && <Footer />}
       {!isAdmin && !AdminBoardPage && !isAuthPage && <QuickConsultBar />}
       {!isAdmin && !AdminBoardPage && !isAuthPage && <AuthModalHost />}
     </>

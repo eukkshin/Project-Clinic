@@ -9,7 +9,7 @@ const express = require("express");
 const crypto = require("node:crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const AppDataSource = require("../../db");
+const AppDataSource = require("../../db.oracle");
 const {
   authenticateMember,
   COOKIE_NAME,
@@ -187,21 +187,17 @@ router.patch("/preferences", async (req, res) => {
 router.post("/change-password", async (req, res) => {
   const { currentPassword, newPassword } = req.body || {};
   if (typeof currentPassword !== "string" || !validPassword(newPassword)) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message:
-          "새 비밀번호는 10자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.",
-      });
+    return res.status(400).json({
+      success: false,
+      message:
+        "새 비밀번호는 10자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.",
+    });
   }
   if (tooMany(`pw:${req.user.userIdx}:${req.ip}`, 6, 15 * 60_000)) {
-    return res
-      .status(429)
-      .json({
-        success: false,
-        message: "요청이 많습니다. 15분 후 다시 시도해 주세요.",
-      });
+    return res.status(429).json({
+      success: false,
+      message: "요청이 많습니다. 15분 후 다시 시도해 주세요.",
+    });
   }
   class WrongPassword extends Error {}
   try {
@@ -237,26 +233,20 @@ router.post("/change-password", async (req, res) => {
     });
   } catch (error) {
     if (error instanceof WrongPassword)
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "현재 비밀번호가 올바르지 않습니다.",
-        });
-    if (error.message === "SAME_PASSWORD")
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "기존 비밀번호와 다른 비밀번호를 입력해 주세요.",
-        });
-    console.error("[account] 비밀번호 변경 실패:", error);
-    return res
-      .status(500)
-      .json({
+      return res.status(401).json({
         success: false,
-        message: "비밀번호 변경 중 오류가 발생했습니다.",
+        message: "현재 비밀번호가 올바르지 않습니다.",
       });
+    if (error.message === "SAME_PASSWORD")
+      return res.status(400).json({
+        success: false,
+        message: "기존 비밀번호와 다른 비밀번호를 입력해 주세요.",
+      });
+    console.error("[account] 비밀번호 변경 실패:", error);
+    return res.status(500).json({
+      success: false,
+      message: "비밀번호 변경 중 오류가 발생했습니다.",
+    });
   }
 });
 
@@ -271,23 +261,19 @@ router.post("/email/request", async (req, res) => {
     typeof currentPassword !== "string" ||
     currentPassword.length === 0
   ) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "새 이메일과 현재 비밀번호를 입력해 주세요.",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "새 이메일과 현재 비밀번호를 입력해 주세요.",
+    });
   }
   if (
     tooMany(`email-ip:${req.ip}`, 10, 15 * 60_000) ||
     tooMany(`email-member:${req.user.userIdx}`, 3, 15 * 60_000)
   ) {
-    return res
-      .status(429)
-      .json({
-        success: false,
-        message: "인증 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
-      });
+    return res.status(429).json({
+      success: false,
+      message: "인증 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
   }
   let tokenHash;
   try {
@@ -299,12 +285,10 @@ router.post("/email/request", async (req, res) => {
       !rows.length ||
       !(await bcrypt.compare(currentPassword, rows[0].USER_PW))
     ) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "현재 비밀번호가 올바르지 않습니다.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "현재 비밀번호가 올바르지 않습니다.",
+      });
     }
     const previousEmail = String(rows[0].EMAIL || "").trim();
     if (previousEmail.toLowerCase() === newEmail) {
@@ -317,12 +301,10 @@ router.post("/email/request", async (req, res) => {
       [newEmail, req.user.userIdx],
     );
     if (duplicates.length)
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "다른 회원이 사용 중인 이메일입니다.",
-        });
+      return res.status(409).json({
+        success: false,
+        message: "다른 회원이 사용 중인 이메일입니다.",
+      });
     const token = crypto.randomBytes(32).toString("base64url");
     tokenHash = hashToken(token);
     await AppDataSource.query(
@@ -348,13 +330,11 @@ router.post("/email/request", async (req, res) => {
       "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND TOKEN_HASH <> :2 AND USED_AT IS NULL",
       [req.user.userIdx, tokenHash],
     );
-    return res
-      .status(202)
-      .json({
-        success: true,
-        message:
-          "새 이메일 주소로 인증 링크를 보냈습니다. 15분 이내에 확인해 주세요.",
-      });
+    return res.status(202).json({
+      success: true,
+      message:
+        "새 이메일 주소로 인증 링크를 보냈습니다. 15분 이내에 확인해 주세요.",
+    });
   } catch (error) {
     console.error("[account] 이메일 변경 요청 실패:", error);
     if (tokenHash) {
@@ -367,12 +347,10 @@ router.post("/email/request", async (req, res) => {
         console.error("[account] 이메일 토큰 폐기 실패:", rollbackError);
       }
     }
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "인증 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "인증 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    });
   }
 });
 
@@ -384,12 +362,10 @@ router.post("/email/confirm", async (req, res) => {
       .json({ success: false, message: "인증 링크가 올바르지 않습니다." });
   }
   if (tooMany(`email-confirm:${req.user.userIdx}:${req.ip}`, 12, 15 * 60_000)) {
-    return res
-      .status(429)
-      .json({
-        success: false,
-        message: "인증 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
-      });
+    return res.status(429).json({
+      success: false,
+      message: "인증 요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+    });
   }
   class InvalidToken extends Error {}
   try {
@@ -458,21 +434,16 @@ router.post("/email/confirm", async (req, res) => {
     });
   } catch (error) {
     if (error instanceof InvalidToken) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message:
-            "링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "링크가 만료되었거나 이미 사용되었습니다. 다시 요청해 주세요.",
+      });
     }
     if (error.message === "EMAIL_OCCUPIED") {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "다른 회원이 사용 중인 이메일입니다.",
-        });
+      return res.status(409).json({
+        success: false,
+        message: "다른 회원이 사용 중인 이메일입니다.",
+      });
     }
     console.error("[account] 이메일 변경 확정 실패:", error);
     return res
@@ -480,7 +451,6 @@ router.post("/email/confirm", async (req, res) => {
       .json({ success: false, message: "이메일 변경 중 오류가 발생했습니다." });
   }
 });
-
 
 // POST /api/mypage/account/withdraw
 // 진료기록·상담/예약 내역은 보존 기간과 의료법 검토 없이 삭제하지 않습니다.
@@ -571,12 +541,18 @@ router.post("/withdraw", async (req, res) => {
     });
   } catch (error) {
     if (error instanceof InvalidPassword) {
-      return res.status(401).json({ success: false, message: "현재 비밀번호가 올바르지 않습니다." });
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "현재 비밀번호가 올바르지 않습니다.",
+        });
     }
     if (error instanceof ActiveReservation) {
       return res.status(409).json({
         success: false,
-        message: "예정된 예약이 있습니다. 예약을 취소하거나 병원에 문의한 후 탈퇴해 주세요.",
+        message:
+          "예정된 예약이 있습니다. 예약을 취소하거나 병원에 문의한 후 탈퇴해 주세요.",
       });
     }
     console.error("[account] 회원탈퇴 실패:", error);

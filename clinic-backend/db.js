@@ -1,95 +1,106 @@
+"use strict";
 require("dotenv").config();
 require("reflect-metadata");
 
-const { DataSource } = require("typeorm");
+const fs = require("fs");
+const path = require("path");
+const { DataSource, EntitySchema } = require("typeorm");
 
-// 회원 및 기본 설정
-const Member = require("./src/entity/Member");
-const FooterSettings = require("./src/entity/FooterSettings");
-const Consult = require("./src/entity/Consult");
-const NavSetting = require("./src/entity/NavSetting");
-const MainVisual = require("./src/entity/MainVisual");
-const ToneSetting = require("./src/entity/ToneSetting");
+// Keep the existing Oracle entity source files unchanged.
+const sources = [
+  require("./src/entity/Member"),
+  require("./src/entity/FooterSettings"),
+  require("./src/entity/Consult"),
+  require("./src/entity/NavSetting"),
+  require("./src/entity/MainVisual"),
+  require("./src/entity/ToneSetting"),
+  require("./src/entity/Popup"),
+  require("./src/entity/PopupSetting"),
+  require("./src/entity/Category"),
+  require("./src/entity/Safety"),
+  require("./src/entity/Selfie"),
+  require("./src/entity/EventRanking"),
+  require("./src/entity/Vlog"),
+  require("./src/entity/Board"),
+  require("./src/entity/Qna"),
+  require("./src/entity/Reservation"),
+  require("./src/entity/Treatment"),
+  require("./src/entity/DetailCategory"),
+  require("./src/entity/DetailPage"),
+  require("./src/entity/DetailSection"),
+  require("./src/entity/ReservationBlock"),
+  require("./src/entity/AdminReservation"),
+  require("./src/entity/AdminNotification"),
+  require("./src/entity/ConsultActivity"),
+  require("./src/entity/ReservationStatusAudit"),
+  require("./src/entity/ReservationReminder"),
+  require("./src/entity/ReservationMessage"),
+  require("./src/entity/ReservationMessagePolicy"),
+];
 
-// 콘텐츠 관리
-const Popup = require("./src/entity/Popup");
-const PopupSetting = require("./src/entity/PopupSetting");
-const Category = require("./src/entity/Category");
-const Safety = require("./src/entity/Safety");
-const Selfie = require("./src/entity/Selfie");
-const EventRanking = require("./src/entity/EventRanking");
-const Vlog = require("./src/entity/Vlog");
-const Board = require("./src/entity/Board");
-const Qna = require("./src/entity/Qna");
+// Convert Oracle-specific column metadata for a separate SQLite DataSource.
+// Cloning avoids mutating the original imported EntitySchema definitions.
+const entities = sources.map((schema) => {
+  if (!schema?.options?.columns) {
+    throw new Error(
+      `Invalid EntitySchema: ${schema?.options?.name || "unknown"}`,
+    );
+  }
+  const columns = {};
+  for (const [name, definition] of Object.entries(schema.options.columns)) {
+    const column = { ...definition };
 
-// 예약 및 시술
-const Reservation = require("./src/entity/Reservation");
-const Treatment = require("./src/entity/Treatment");
-const DetailCategory = require("./src/entity/DetailCategory");
-const DetailPage = require("./src/entity/DetailPage");
-const DetailSection = require("./src/entity/DetailSection");
-const ReservationBlock = require("./src/entity/ReservationBlock");
-const AdminReservation = require("./src/entity/AdminReservation");
+    switch (String(column.type || "").toLowerCase()) {
+      case "char":
+      case "nchar":
+      case "varchar2":
+      case "nvarchar2":
+      case "varchar":
+        column.type = "varchar";
+        break;
 
-// 알림 및 기록
-const AdminNotification = require("./src/entity/AdminNotification");
-const ConsultActivity = require("./src/entity/ConsultActivity");
-const ReservationStatusAudit = require("./src/entity/ReservationStatusAudit");
-const ReservationReminder = require("./src/entity/ReservationReminder");
-const ReservationMessage = require("./src/entity/ReservationMessage");
-const ReservationMessagePolicy = require("./src/entity/ReservationMessagePolicy");
+      case "number":
+        column.type = "integer";
+        break;
 
-// OracleDB 연결 설정
+      case "clob":
+      case "nclob":
+        column.type = "text";
+        break;
+
+      case "timestamp":
+      case "date":
+        column.type = "datetime";
+        break;
+
+      default:
+        break;
+    }
+
+    if (
+      typeof column.default === "function" &&
+      /SYSDATE/i.test(String(column.default))
+    ) {
+      column.default = () => "CURRENT_TIMESTAMP";
+    }
+    if (typeof column.default === "string" && /^'.*'$/.test(column.default)) {
+      column.default = column.default.slice(1, -1);
+    }
+    columns[name] = column;
+  }
+  return new EntitySchema({ ...schema.options, columns });
+});
+
+const file = path.resolve(process.env.SQLITE_PATH || "./data/clinic.sqlite");
+fs.mkdirSync(path.dirname(file), { recursive: true });
+
 const AppDataSource = new DataSource({
-  type: "oracle",
-
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  connectString: process.env.DB_CONNECTION_STRING,
-
-  // 운영 DB 스키마 자동 수정 방지
-  synchronize: false,
-
-  // 개발 환경에서만 SQL 로깅
+  type: "better-sqlite3",
+  database: file,
+  entities,
+  // Demo-only: creates missing tables. Never enable for real patient records.
+  synchronize: process.env.SQLITE_AUTO_SCHEMA === "true",
   logging: process.env.NODE_ENV !== "production",
-
-  entities: [
-    Member,
-    FooterSettings,
-    Consult,
-    NavSetting,
-    MainVisual,
-    ToneSetting,
-    Popup,
-    PopupSetting,
-    Category,
-    Safety,
-    Selfie,
-    EventRanking,
-    Vlog,
-    Board,
-    Qna,
-    Reservation,
-    Treatment,
-    DetailCategory,
-    DetailPage,
-    DetailSection,
-    ReservationBlock,
-    AdminReservation,
-    AdminNotification,
-    ConsultActivity,
-    ReservationStatusAudit,
-    ReservationReminder,
-    ReservationMessage,
-    ReservationMessagePolicy,
-  ],
-
-  // OracleDB 연결 풀 설정
-  extra: {
-    poolMin: 2,
-    poolMax: 10,
-    poolIncrement: 1,
-  },
 });
 
 module.exports = AppDataSource;

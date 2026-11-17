@@ -2,7 +2,7 @@
 
 const express = require("express");
 const crypto = require("crypto");
-const AppDataSource = require("../../db");
+const AppDataSource = require("../../db.oracle");
 
 const router = express.Router();
 

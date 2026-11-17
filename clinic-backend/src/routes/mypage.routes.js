@@ -1,5 +1,5 @@
 const express = require("express");
-const AppDataSource = require("../../db");
+const AppDataSource = require("../../db.oracle");
 const Consult = require("../entity/Consult");
 const Reservation = require("../entity/Reservation");
 const ReservationReminder = require("../entity/ReservationReminder");

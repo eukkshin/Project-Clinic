@@ -1,7 +1,7 @@
 "use strict";
 
 const express = require("express");
-const AppDataSource = require("../../db");
+const AppDataSource = require("../../db.oracle");
 const router = express.Router();
 const {
   createContentI18nService,

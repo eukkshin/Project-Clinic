@@ -1,10 +1,9 @@
-// Presentation-only SQLite entrypoint. Original server.js remains untouched.
 require("dotenv").config();
 const { Like, TreeRepository } = require("typeorm");
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const AppDataSource = require("./db.sqlite");
+const AppDataSource = require("./db.oracle");
 const {
   createPasswordRecoveryRouter,
 } = require("./src/routes/password-recovery.routes");
@@ -151,18 +150,12 @@ app.post("/api/admin/upload", upload.single("logoImage"), async (req, res) => {
   });
 });
 
-// 2. SQLite connection (no external DB server)
+// 2. TypeORM 오라클 DB 연결
 AppDataSource.initialize()
   .then(() => {
-    console.log("✅ SQLite DB connected.");
-    if (process.env.ENABLE_BACKGROUND_WORKERS === "true") {
-      startReminderWorker(AppDataSource);
-      startMessageWorker(AppDataSource);
-    }
-    const PORT = Number(process.env.PORT || 4000);
-    app.listen(PORT, () => {
-      console.log(`🚀 SQLite presentation server: http://localhost:${PORT}`);
-    });
+    console.log("✅ 오라클 DB가 성공적으로 연결되었습니다.");
+    startReminderWorker(AppDataSource);
+    startMessageWorker(AppDataSource);
   })
   .catch((error) => {
     console.error("❌ DB 연결 실패:", error);
@@ -1589,7 +1582,7 @@ app.patch("/api/admin/reservation/:reservationIdx", async (req, res) => {
       success: true,
       message: "예약이 성공적으로 수정되었습니다.",
     });
-  } catch (error) {
+  } catch (err) {
     console.error("예약 수정 중 서버 에러 발생:", error);
 
     return res.status(500).json({
@@ -1635,7 +1628,7 @@ app.get("/api/reservation/patient/:chartNo", requireAdmin, async (req, res) => {
         )
       `,
       )
-      .andWhere("reservation.RESERVATION_DATE >= CURRENT_DATE()")
+      .andWhere("reservation.RESERVATION_DATE >= TRUNC(SYSDATE)")
       .orderBy("reservation.RESERVATION_DATE", "ASC")
       .addOrderBy("reservation.RESERVATION_TIME", "ASC")
       .getMany();
@@ -1738,7 +1731,7 @@ app.post(
         success: true,
         message: "시술권이 등록되었습니다.",
       });
-    } catch (error) {
+    } catch (err) {
       console.error("시술권 등록 에러:", error);
 
       return res.status(500).json({
@@ -1836,19 +1829,18 @@ app.get("/api/admin/today", async (req, res) => {
       .createQueryBuilder("r")
       .innerJoin("r.member", "m")
       .select([
-        "r.RESERVATION_IDX AS `reservationIdx`",
-        "r.CHART_NO AS `chartNo`",
-        "r.TREATMENT_IDX AS `treatmentIdx`",
-        "m.USER_NAME AS `name`",
-        "m.PHONE AS `phone`",
-        "CAST(NULL AS CHAR(6)) AS `birthDate`",
-        "m.GENDER AS `gender`",
-        "r.RESERVATION_TIME AS `reservationTime`",
-        "r.STATUS AS `status`",
-        "r.MEMO AS `memo`",
+        'r.RESERVATION_IDX AS "reservationIdx"',
+        'r.CHART_NO AS "chartNo"',
+        'r.TREATMENT_IDX AS "treatmentIdx"',
+        'm.USER_NAME AS "name"',
+        'm.PHONE AS "phone"',
+        'CAST(NULL AS VARCHAR2(6)) AS "birthDate"',
+        'm.GENDER AS "gender"',
+        'r.RESERVATION_TIME AS "reservationTime"',
+        'r.STATUS AS "status"',
+        'r.MEMO AS "memo"',
       ])
-      .where("r.RESERVATION_DATE >= CURRENT_DATE()")
-      .andWhere("r.RESERVATION_DATE < CURRENT_DATE() + INTERVAL 1 DAY")
+      .where("TRUNC(r.RESERVATION_DATE) = TRUNC(SYSDATE)")
       .andWhere("r.STATUS != 'CANCELLED'")
       .orderBy(
         `CASE r.STATUS
@@ -2077,3 +2069,9 @@ app.use(
 );
 app.use("/api/search", publicSearchRouter);
 app.use("/api/search", searchPopularityRouter);
+
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+});

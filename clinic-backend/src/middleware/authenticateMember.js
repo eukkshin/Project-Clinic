@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const AppDataSource = require("../../db");
+const AppDataSource = require("../../db.oracle");
 const Member = require("../entity/Member");
 
 // 반드시 로그인 성공 시 설정한 쿠키 이름과 일치시켜 주세요.

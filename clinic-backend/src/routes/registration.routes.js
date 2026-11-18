@@ -177,6 +177,7 @@ function createRegistrationRouter({ AppDataSource }) {
         if (!member?.USER_IDX) {
           throw new Error("회원 ID 생성에 실패했습니다.");
         }
+
         for (const [type, agreed] of [
           ["TERMS", true],
           ["PRIVACY_NOTICE", true],
@@ -185,8 +186,8 @@ function createRegistrationRouter({ AppDataSource }) {
         ]) {
           await manager.query(
             `INSERT INTO MEMBER_REGISTRATION_CONSENT
-               (USER_IDX, CONSENT_TYPE, STATUS, POLICY_VERSION)
-             VALUES (:1, :2, :3, :4)`,
+       (USER_IDX, CONSENT_TYPE, STATUS, POLICY_VERSION)
+     VALUES (?, ?, ?, ?)`,
             [member.USER_IDX, type, agreed ? "Y" : "N", POLICY_VERSION],
           );
         }

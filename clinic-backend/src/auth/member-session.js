@@ -33,12 +33,12 @@ function issueMemberSession(_req, res, member) {
     expiresIn: "8h",
   });
 
-  res.cookie(COOKIE_NAME, token, {
+  res.cookie("clinic_session", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     path: "/",
-    maxAge: SESSION_DURATION_MS,
+    maxAge: 8 * 60 * 60 * 1000,
   });
 }
 

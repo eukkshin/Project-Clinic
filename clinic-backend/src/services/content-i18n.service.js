@@ -1,6 +1,5 @@
 "use strict";
 
-const oracledb = require("oracledb");
 const { createHash } = require("node:crypto");
 
 const DEFAULT_LOCALE = "ko";
@@ -9,7 +8,11 @@ const ALLOWED_LOCALES = Object.freeze([DEFAULT_LOCALE, ...TRANSLATION_LOCALES]);
 
 // SQL 식별자는 외부 입력으로 만들지 않습니다. 이 고정 매핑만 사용합니다.
 const TYPES = Object.freeze({
-  EVENT: { table: "EVENT_RANKING_TB", id: "EVENT_IDX", fields: ["title"] },
+  EVENT: {
+    table: "EVENT_RANKING_TB",
+    id: "EVENT_IDX",
+    fields: ["title", "price"],
+  },
   VLOG: { table: "VLOG_TB", id: "VLOG_IDX", fields: ["title"] },
   MAIN_VISUAL: { table: "MAIN_VISUAL", id: "ID", fields: ["content"] },
   CATEGORY: { table: "CATEGORY_TB", id: "CATEGORY_IDX", fields: ["title"] },
@@ -95,7 +98,7 @@ async function clobText(value) {
   throw new Error("CLOB 데이터를 읽을 수 없습니다.");
 }
 function clobBind(value) {
-  return { val: value, type: oracledb.CLOB, dir: oracledb.BIND_IN };
+  return value;
 }
 function parsePayload(value) {
   const obj = JSON.parse(value);
@@ -294,44 +297,44 @@ function createContentI18nService(dataSource) {
     switch (type) {
       case "EVENT":
         sql =
-          "SELECT TITLE, PRICE, FILE_NAME FROM EVENT_RANKING_TB WHERE EVENT_IDX=:1";
+          "SELECT TITLE, PRICE, FILE_NAME FROM EVENT_RANKING_TB WHERE EVENT_IDX=?";
         break;
       case "VLOG":
         sql =
-          "SELECT TITLE, VIDEO_URL, FILE_NAME, SORT_ORDER FROM VLOG_TB WHERE VLOG_IDX=:1";
+          "SELECT TITLE, VIDEO_URL, FILE_NAME, SORT_ORDER FROM VLOG_TB WHERE VLOG_IDX=?";
         break;
       case "CATEGORY":
         sql =
-          "SELECT TITLE, FILE_NAME, LINK, SORT_ORDER FROM CATEGORY_TB WHERE CATEGORY_IDX=:1";
+          "SELECT TITLE, FILE_NAME, LINK, SORT_ORDER FROM CATEGORY_TB WHERE CATEGORY_IDX=?";
         break;
       case "MAIN_VISUAL":
-        sql = "SELECT SLIDES FROM MAIN_VISUAL WHERE ID=:1";
+        sql = "SELECT SLIDES FROM MAIN_VISUAL WHERE ID=?";
         break;
       case "NAV_SETTING":
-        sql = "SELECT MENUS FROM NAV_SETTING WHERE ID=:1";
+        sql = "SELECT MENUS FROM NAV_SETTING WHERE ID=?";
         break;
       case "FOOTER":
         break;
       case "SAFETY":
         sql =
-          "SELECT TITLE, DESCRIPTION, FILE_NAME, SORT_ORDER FROM SAFETY_TB WHERE SAFETY_IDX=:1";
+          "SELECT TITLE, DESCRIPTION, FILE_NAME, SORT_ORDER FROM SAFETY_TB WHERE SAFETY_IDX=?";
         break;
       case "FAQ":
         sql =
-          "SELECT CATEGORY, CATEGORY_NAME, QUESTION, ANSWER FROM QNA_TB WHERE QNA_IDX=:1";
+          "SELECT CATEGORY, CATEGORY_NAME, QUESTION, ANSWER FROM QNA_TB WHERE QNA_IDX=?";
         break;
       case "DETAIL_CATEGORY":
         sql =
-          "SELECT SLUG, NAME, DESCRIPTION FROM DETAIL_CATEGORY WHERE CATEGORY_ID=:1";
+          "SELECT SLUG, NAME, DESCRIPTION FROM DETAIL_CATEGORY WHERE CATEGORY_ID=?";
         break;
       case "DETAIL_PAGE":
         sql = `SELECT SLUG, STATUS, TITLE, HERO_EYEBROW, HERO_TITLE, HERO_DESCRIPTION, HERO_IMAGE_ALT,
-        SEO_TITLE, SEO_DESCRIPTION FROM DETAIL_PAGE WHERE PAGE_ID=:1`;
+        SEO_TITLE, SEO_DESCRIPTION FROM DETAIL_PAGE WHERE PAGE_ID=?`;
         break;
       case "DETAIL_SECTION":
         sql = `SELECT S.SECTION_KEY, S.SECTION_TYPE, S.TITLE, S.EYEBROW, S.CONTENT_JSON,
         S.PAGE_ID, P.STATUS AS PAGE_STATUS FROM DETAIL_SECTION S
-        JOIN DETAIL_PAGE P ON S.PAGE_ID=P.PAGE_ID WHERE S.SECTION_ID=:1`;
+        JOIN DETAIL_PAGE P ON S.PAGE_ID=P.PAGE_ID WHERE S.SECTION_ID=?`;
         break;
       default:
         throw new ContentI18nError(400, "지원하지 않는 종류입니다.");
@@ -477,17 +480,17 @@ function createContentI18nService(dataSource) {
       : [];
     // 독립적인 관리자 선택기: 신규 테이블의 PK만으로 원본을 가정하지 않습니다.
     const queries = {
-      FOOTER: `SELECT "id" AS ID, "name" AS LABEL FROM FOOTER_SETTINGS ${filter ? `WHERE UPPER("name") LIKE UPPER(:1) ESCAPE '\\'` : ""} ORDER BY "id" FETCH NEXT 150 ROWS ONLY`,
-      NAV_SETTING: `SELECT ID, '헤더 메뉴' AS LABEL FROM NAV_SETTING WHERE ID=1 ${filter ? "AND '헤더 메뉴' LIKE :1" : ""} FETCH NEXT 150 ROWS ONLY`,
-      MAIN_VISUAL: `SELECT ID, '메인 슬라이드' AS LABEL FROM MAIN_VISUAL WHERE ID=1 ${filter ? "AND '메인 슬라이드' LIKE :1" : ""} FETCH NEXT 150 ROWS ONLY`,
-      CATEGORY: `SELECT CATEGORY_IDX AS ID, TITLE AS LABEL FROM CATEGORY_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, CATEGORY_IDX DESC FETCH NEXT 150 ROWS ONLY`,
-      VLOG: `SELECT VLOG_IDX AS ID, TITLE AS LABEL FROM VLOG_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, VLOG_IDX DESC FETCH NEXT 150 ROWS ONLY`,
-      SAFETY: `SELECT SAFETY_IDX AS ID, TITLE AS LABEL FROM SAFETY_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, SAFETY_IDX DESC FETCH NEXT 150 ROWS ONLY`,
-      EVENT: `SELECT EVENT_IDX AS ID, TITLE AS LABEL FROM EVENT_RANKING_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY EVENT_IDX DESC FETCH NEXT 150 ROWS ONLY`,
-      FAQ: `SELECT QNA_IDX AS ID, QUESTION AS LABEL FROM QNA_TB ${filter ? "WHERE UPPER(QUESTION) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY QNA_IDX DESC FETCH NEXT 150 ROWS ONLY`,
-      DETAIL_CATEGORY: `SELECT CATEGORY_ID AS ID, NAME AS LABEL FROM DETAIL_CATEGORY ${filter ? "WHERE UPPER(NAME) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY CATEGORY_ID DESC FETCH NEXT 150 ROWS ONLY`,
-      DETAIL_PAGE: `SELECT PAGE_ID AS ID, TITLE AS LABEL FROM DETAIL_PAGE ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY PAGE_ID DESC FETCH NEXT 150 ROWS ONLY`,
-      DETAIL_SECTION: `SELECT SECTION_ID AS ID, TITLE AS LABEL FROM DETAIL_SECTION ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'" : ""} ORDER BY SECTION_ID DESC FETCH NEXT 150 ROWS ONLY`,
+      FOOTER: `SELECT "id" AS ID, "name" AS LABEL FROM FOOTER_SETTINGS ${filter ? `WHERE UPPER("name") LIKE UPPER(?) ESCAPE '\\'` : ""} ORDER BY "id" LIMIT 150`,
+      NAV_SETTING: `SELECT ID, '헤더 메뉴' AS LABEL FROM NAV_SETTING WHERE ID=1 ${filter ? "AND '헤더 메뉴' LIKE ?" : ""} LIMIT 150`,
+      MAIN_VISUAL: `SELECT ID, '메인 슬라이드' AS LABEL FROM MAIN_VISUAL WHERE ID=1 ${filter ? "AND '메인 슬라이드' LIKE ?" : ""} LIMIT 150`,
+      CATEGORY: `SELECT CATEGORY_IDX AS ID, TITLE AS LABEL FROM CATEGORY_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, CATEGORY_IDX DESC LIMIT 150`,
+      VLOG: `SELECT VLOG_IDX AS ID, TITLE AS LABEL FROM VLOG_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, VLOG_IDX DESC LIMIT 150`,
+      SAFETY: `SELECT SAFETY_IDX AS ID, TITLE AS LABEL FROM SAFETY_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY SORT_ORDER ASC, SAFETY_IDX DESC LIMIT 150`,
+      EVENT: `SELECT EVENT_IDX AS ID, TITLE AS LABEL FROM EVENT_RANKING_TB ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY EVENT_IDX DESC LIMIT 150`,
+      FAQ: `SELECT QNA_IDX AS ID, QUESTION AS LABEL FROM QNA_TB ${filter ? "WHERE UPPER(QUESTION) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY QNA_IDX DESC LIMIT 150`,
+      DETAIL_CATEGORY: `SELECT CATEGORY_ID AS ID, NAME AS LABEL FROM DETAIL_CATEGORY ${filter ? "WHERE UPPER(NAME) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY CATEGORY_ID DESC LIMIT 150`,
+      DETAIL_PAGE: `SELECT PAGE_ID AS ID, TITLE AS LABEL FROM DETAIL_PAGE ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY PAGE_ID DESC LIMIT 150`,
+      DETAIL_SECTION: `SELECT SECTION_ID AS ID, TITLE AS LABEL FROM DETAIL_SECTION ${filter ? "WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'" : ""} ORDER BY SECTION_ID DESC LIMIT 150`,
     };
     return (await dataSource.query(queries[type], binds)).map((r) => ({
       id: Number(r.ID),
@@ -512,7 +515,7 @@ function createContentI18nService(dataSource) {
     const row = (
       await dataSource.query(
         `SELECT STATUS, PAYLOAD_JSON, UPDATED_AT FROM CMS_CONTENT_I18N_TB
-       WHERE ENTITY_TYPE=:1 AND ENTITY_ID=:2 AND LOCALE=:3`,
+       WHERE ENTITY_TYPE=? AND ENTITY_ID=? AND LOCALE=?`,
         [type, itemId, lang],
       )
     )[0];
@@ -562,7 +565,7 @@ function createContentI18nService(dataSource) {
       const exists = (
         await manager.query(
           `SELECT ENTITY_ID FROM CMS_CONTENT_I18N_TB
-         WHERE ENTITY_TYPE=:1 AND ENTITY_ID=:2 AND LOCALE=:3 FOR UPDATE`,
+         WHERE ENTITY_TYPE=? AND ENTITY_ID=? AND LOCALE=?`,
           [type, itemId, lang],
         )
       )[0];
@@ -576,15 +579,15 @@ function createContentI18nService(dataSource) {
       ];
       if (exists) {
         await manager.query(
-          `UPDATE CMS_CONTENT_I18N_TB SET STATUS=:1, PAYLOAD_JSON=:2,
-          UPDATED_BY=:3, UPDATED_AT=SYSDATE WHERE ENTITY_TYPE=:4 AND ENTITY_ID=:5 AND LOCALE=:6`,
+          `UPDATE CMS_CONTENT_I18N_TB SET STATUS=?, PAYLOAD_JSON=?,
+          UPDATED_BY=?, UPDATED_AT=CURRENT_TIMESTAMP WHERE ENTITY_TYPE=? AND ENTITY_ID=? AND LOCALE=?`,
           binds,
         );
       } else {
         await manager.query(
           `INSERT INTO CMS_CONTENT_I18N_TB
           (ENTITY_TYPE, ENTITY_ID, LOCALE, STATUS, PAYLOAD_JSON, UPDATED_BY, UPDATED_AT)
-          VALUES (:1,:2,:3,:4,:5,:6,SYSDATE)`,
+          VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)`,
           [
             type,
             itemId,
@@ -602,7 +605,7 @@ function createContentI18nService(dataSource) {
   async function remove(type, itemId, lang) {
     await original(type, itemId);
     await dataSource.query(
-      "DELETE FROM CMS_CONTENT_I18N_TB WHERE ENTITY_TYPE=:1 AND ENTITY_ID=:2 AND LOCALE=:3",
+      "DELETE FROM CMS_CONTENT_I18N_TB WHERE ENTITY_TYPE=? AND ENTITY_ID=? AND LOCALE=?",
       [type, itemId, lang],
     );
     return { type, id: itemId, locale: lang };
@@ -616,10 +619,10 @@ function createContentI18nService(dataSource) {
     const map = new Map();
     for (let start = 0; start < uniqueIds.length; start += 100) {
       const part = uniqueIds.slice(start, start + 100);
-      const slots = part.map((_, index) => `:${index + 3}`).join(",");
+      const slots = part.map((_, index) => "?").join(",");
       const rows = await dataSource.query(
         `SELECT ENTITY_ID, PAYLOAD_JSON FROM CMS_CONTENT_I18N_TB
-        WHERE ENTITY_TYPE=:1 AND LOCALE=:2 AND STATUS='PUBLISHED' AND ENTITY_ID IN (${slots})`,
+        WHERE ENTITY_TYPE=? AND LOCALE=? AND STATUS='PUBLISHED' AND ENTITY_ID IN (${slots})`,
         [type, lang, ...part],
       );
       for (const row of rows) {

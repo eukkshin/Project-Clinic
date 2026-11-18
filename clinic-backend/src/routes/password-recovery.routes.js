@@ -98,7 +98,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
 
     try {
       const users = await AppDataSource.query(
-        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = ?1 AND LOWER(EMAIL) = ?2 AND STATUS = '정상'",
+        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = ? AND LOWER(EMAIL) = ? AND STATUS = '정상'",
         [userId, email],
       );
       // 등록 여부는 방문자에게 공개하지 않습니다.
@@ -113,7 +113,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       // 메일 발송 실패 시 기존의 유효한 링크가 사라지지 않도록 먼저 새 토큰만 저장합니다.
       await AppDataSource.query(
         `INSERT INTO PASSWORD_RESET_TOKEN (USER_IDX, TOKEN_HASH, EXPIRES_AT)
-         VALUES (?1, ?2, datetime('now', '+${TOKEN_LIFETIME_MIN} minutes'))`,
+         VALUES (?, ?, datetime('now', '+${TOKEN_LIFETIME_MIN} minutes'))`,
         [user.USER_IDX, tokenHash],
       );
 
@@ -141,14 +141,14 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
         });
         // 새 링크가 실제 발송된 뒤 이전 미사용 링크를 무효화합니다.
         await AppDataSource.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND TOKEN_HASH <> ?2 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ? AND TOKEN_HASH <> ? AND USED_AT IS NULL",
           [user.USER_IDX, tokenHash],
         );
       } catch (mailError) {
         // 계정 유무가 노출되지 않도록 동일한 응답을 사용하고, 문제는 서버 로그에만 기록합니다.
         console.error("[password-recovery] 이메일 전송 실패:", mailError);
         await AppDataSource.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE TOKEN_HASH = ? AND USED_AT IS NULL",
           [tokenHash],
         );
       }
@@ -189,18 +189,18 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       await AppDataSource.transaction(async (manager) => {
         const matches = await manager.query(
           `SELECT ID, USER_IDX FROM PASSWORD_RESET_TOKEN
-           WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
+           WHERE TOKEN_HASH = ? AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
           [digest],
         );
         if (!matches.length) throw new InvalidTokenError();
         const memberId = matches[0].USER_IDX;
         await manager.query(
-          "UPDATE MEMBER_TB SET USER_PW = ?1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = ?2",
+          "UPDATE MEMBER_TB SET USER_PW = ?, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = ?",
           [newHash, memberId],
         );
         // 같은 회원의 기존 발급 링크까지 함께 무효화하여 재사용을 막습니다.
         await manager.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ? AND USED_AT IS NULL",
           [memberId],
         );
       });

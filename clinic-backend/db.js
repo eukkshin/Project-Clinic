@@ -91,12 +91,19 @@ const entities = sources.map((schema) => {
   return new EntitySchema({ ...schema.options, columns });
 });
 
-const file = path.resolve(process.env.SQLITE_PATH || "./data/clinic.sqlite");
+const file = path.resolve(
+  __dirname,
+  process.env.SQLITE_PATH || "./data/clinic.sqlite",
+);
 fs.mkdirSync(path.dirname(file), { recursive: true });
 
 const AppDataSource = new DataSource({
   type: "better-sqlite3",
   database: file,
+  prepareDatabase: (database) => {
+    database.pragma("busy_timeout = 5000");
+    database.pragma("foreign_keys = ON");
+  },
   entities,
   // Demo-only: creates missing tables. Never enable for real patient records.
   synchronize: process.env.SQLITE_AUTO_SCHEMA === "true",

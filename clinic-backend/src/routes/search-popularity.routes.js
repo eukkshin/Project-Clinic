@@ -138,7 +138,7 @@ router.post("/track", express.json({ limit: "2kb" }), async (req, res) => {
 
   try {
     await AppDataSource.query(
-      "INSERT INTO SEARCH_KEYWORD_LOG_TB (KEYWORD, SEARCHED_AT) VALUES (?1, CURRENT_TIMESTAMP)",
+      "INSERT INTO SEARCH_KEYWORD_LOG_TB (KEYWORD, SEARCHED_AT) VALUES (?, CURRENT_TIMESTAMP)",
       [keyword],
     );
     return res.json({ success: true, counted: true });

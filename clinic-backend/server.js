@@ -71,8 +71,10 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
+if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 const cookieParser = require("cookie-parser");
 const { issueMemberSession } = require("./src/auth/member-session");
+const { sessionCookieOptions } = require("./src/auth/session-cookie-options");
 const { createSocialAuthRouter } = require("./src/routes/social-auth.routes");
 const mypageRouter = require("./src/routes/mypage.routes");
 const {
@@ -107,6 +109,28 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+// SameSite=None cookies require explicit Origin validation for authenticated writes.
+// CORS by itself does not prevent cross-site request forgery.
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  if (!req.cookies?.clinic_session && !req.cookies?.ahns_admin_session) {
+    return next();
+  }
+  const origin = req.get("origin");
+  const allowed = new Set([...configuredCorsOrigins, ...devCorsOrigins]);
+  if (!origin || !allowed.has(origin)) {
+    return res.status(403).json({
+      success: false,
+      message: "허용되지 않은 요청 출처입니다.",
+    });
+  }
+  return next();
+});
+app.use(["/api/admin", "/api/mypage"], (_req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 // 관리자 세션 라우터는 먼저 설치하되, 그 외 /api/admin 경로는 기본 차단합니다.
 // 다른 관리자 API보다 앞에 등록해야 보호가 적용됩니다.
@@ -162,8 +186,8 @@ AppDataSource.initialize()
       startMessageWorker(AppDataSource);
     }
     const PORT = Number(process.env.PORT || 4000);
-    app.listen(PORT, () => {
-      console.log(`🚀 SQLite presentation server: http://localhost:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`✅ SQLite API listening on port ${PORT}`);
     });
   })
   .catch((error) => {
@@ -2039,12 +2063,7 @@ if (process.env.SOCIAL_AUTH_ENABLED === "true") {
 // 마이페이지 API
 app.use("/api/mypage", mypageRouter);
 app.post("/api/logout", (req, res) => {
-  res.clearCookie("clinic_session", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  });
+  res.clearCookie("clinic_session", sessionCookieOptions());
 
   return res.status(200).json({
     success: true,

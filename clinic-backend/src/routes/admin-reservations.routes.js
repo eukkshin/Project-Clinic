@@ -280,7 +280,7 @@ function createAdminReservationRouter({ dataSource, requireAdmin }) {
       await dataSource.transaction(async (manager) => {
         const repo = manager.getRepository(ReservationReminder);
         await manager.query(
-          "SELECT ID FROM RESERVATION_REMINDER_TB WHERE RESERVATION_ID=?1",
+          "SELECT ID FROM RESERVATION_REMINDER_TB WHERE RESERVATION_ID=?",
           [id],
         );
         const reminder = await repo.findOne({ where: { RESERVATION_ID: id } });

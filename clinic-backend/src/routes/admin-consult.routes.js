@@ -115,7 +115,7 @@ function createAdminConsultRouter({ dataSource }) {
         .json({ success: false, message: "상태와 접수 ID를 확인하세요." });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {
@@ -159,7 +159,7 @@ function createAdminConsultRouter({ dataSource }) {
         .json({ success: false, message: "답변은 10~3000자로 작성해 주세요." });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {
@@ -208,7 +208,7 @@ function createAdminConsultRouter({ dataSource }) {
       });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {

@@ -141,7 +141,7 @@ function createAdminReservationMessagesRouter({ dataSource }) {
     try {
       const changed = await dataSource.transaction(async (manager) => {
         await manager.query(
-          "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID=?1",
+          "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID=?",
           [id],
         );
         const repo = manager.getRepository(ReservationMessage);

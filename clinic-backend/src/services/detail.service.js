@@ -6,7 +6,7 @@ const {
   applyTranslation,
 } = require("./content-i18n.service");
 
-// Query strings use Oracle bind placeholders ?1, ?2 ...; never interpolate user input.
+// Query strings use Oracle bind placeholders ?, ? ...; never interpolate user input.
 function createDetailService(dataSource) {
   if (
     !dataSource ||
@@ -114,7 +114,7 @@ function createDetailService(dataSource) {
     CONTENT_JSON, SORT_ORDER, IS_VISIBLE`;
   const readSections = async (pageId, onlyVisible = false, manager) => {
     const rows = await query(
-      `SELECT ${sectionCols} FROM DETAIL_SECTION WHERE PAGE_ID = ?1
+      `SELECT ${sectionCols} FROM DETAIL_SECTION WHERE PAGE_ID = ?
       ${onlyVisible ? "AND IS_VISIBLE = 'Y'" : ""} ORDER BY SORT_ORDER, SECTION_ID`,
       [pageId],
       manager,
@@ -124,7 +124,7 @@ function createDetailService(dataSource) {
   const existsPage = async (pageId, manager) =>
     must(
       await first(
-        `SELECT PAGE_ID FROM DETAIL_PAGE WHERE PAGE_ID = ?1`,
+        `SELECT PAGE_ID FROM DETAIL_PAGE WHERE PAGE_ID = ?`,
         [pageId],
         manager,
       ),
@@ -133,7 +133,7 @@ function createDetailService(dataSource) {
   const existsCategory = async (categoryId, manager) =>
     must(
       await first(
-        `SELECT CATEGORY_ID FROM DETAIL_CATEGORY WHERE CATEGORY_ID = ?1`,
+        `SELECT CATEGORY_ID FROM DETAIL_CATEGORY WHERE CATEGORY_ID = ?`,
         [categoryId],
         manager,
       ),
@@ -142,7 +142,7 @@ function createDetailService(dataSource) {
   async function getPage(id, manager) {
     const row = must(
       await first(
-        `SELECT ${pageCols}${pageFrom} WHERE P.PAGE_ID = ?1`,
+        `SELECT ${pageCols}${pageFrom} WHERE P.PAGE_ID = ?`,
         [id],
         manager,
       ),
@@ -202,8 +202,8 @@ function createDetailService(dataSource) {
     async publicPage(category, slug, lang = "ko") {
       const row = must(
         await first(
-          `SELECT ${pageCols}${pageFrom} WHERE C.SLUG = ?1
-        AND P.SLUG = ?2 AND C.IS_VISIBLE = 'Y' AND P.STATUS = 'PUBLISHED'`,
+          `SELECT ${pageCols}${pageFrom} WHERE C.SLUG = ?
+        AND P.SLUG = ? AND C.IS_VISIBLE = 'Y' AND P.STATUS = 'PUBLISHED'`,
           [category, slug],
         ),
         "공개 상세페이지",
@@ -264,7 +264,7 @@ function createDetailService(dataSource) {
         await query(
           `INSERT INTO DETAIL_CATEGORY
         (CATEGORY_ID, SLUG, NAME, DESCRIPTION, SORT_ORDER, IS_VISIBLE)
-        VALUES (?1,?2,?3,?4,?5,?6)`,
+        VALUES (?,?,?,?,?,?)`,
           [id, p.slug, p.name, p.description, p.sortOrder, p.isVisible],
           m,
         );
@@ -275,8 +275,8 @@ function createDetailService(dataSource) {
       return dataSource.transaction(async (m) => {
         await existsCategory(id, m);
         await query(
-          `UPDATE DETAIL_CATEGORY SET SLUG=?1, NAME=?2, DESCRIPTION=?3,
-        SORT_ORDER=?4, IS_VISIBLE=?5 WHERE CATEGORY_ID=?6`,
+          `UPDATE DETAIL_CATEGORY SET SLUG=?, NAME=?, DESCRIPTION=?,
+        SORT_ORDER=?, IS_VISIBLE=? WHERE CATEGORY_ID=?`,
           [p.slug, p.name, p.description, p.sortOrder, p.isVisible, id],
           m,
         );
@@ -286,11 +286,7 @@ function createDetailService(dataSource) {
     async deleteCategory(id) {
       return dataSource.transaction(async (m) => {
         await existsCategory(id, m);
-        await query(
-          `DELETE FROM DETAIL_CATEGORY WHERE CATEGORY_ID=?1`,
-          [id],
-          m,
-        );
+        await query(`DELETE FROM DETAIL_CATEGORY WHERE CATEGORY_ID=?`, [id], m);
         return { categoryId: id };
       });
     },
@@ -314,7 +310,7 @@ function createDetailService(dataSource) {
           `INSERT INTO DETAIL_PAGE (PAGE_ID, CATEGORY_ID, SLUG, TITLE, STATUS, SORT_ORDER,
         HERO_EYEBROW, HERO_TITLE, HERO_DESCRIPTION, HERO_IMAGE_URL, HERO_IMAGE_ALT,
         HERO_IMAGE_POSITION, SEO_TITLE, SEO_DESCRIPTION)
-        VALUES (?1,?2,?3,?4,'DRAFT',?5,?6,?7,?8,?9,?10,?11,?12,?13)`,
+        VALUES (?,?,?,?,'DRAFT',?,?,?,?,?,?,?,?,?)`,
           [
             id,
             p.categoryId,
@@ -340,10 +336,10 @@ function createDetailService(dataSource) {
         await existsPage(id, m);
         await existsCategory(p.categoryId, m);
         await query(
-          `UPDATE DETAIL_PAGE SET CATEGORY_ID=?1, SLUG=?2, TITLE=?3, SORT_ORDER=?4,
-        HERO_EYEBROW=?5, HERO_TITLE=?6, HERO_DESCRIPTION=?7, HERO_IMAGE_URL=?8,
-        HERO_IMAGE_ALT=?9, HERO_IMAGE_POSITION=?10, SEO_TITLE=?11, SEO_DESCRIPTION=?12
-        WHERE PAGE_ID=?13`,
+          `UPDATE DETAIL_PAGE SET CATEGORY_ID=?, SLUG=?, TITLE=?, SORT_ORDER=?,
+        HERO_EYEBROW=?, HERO_TITLE=?, HERO_DESCRIPTION=?, HERO_IMAGE_URL=?,
+        HERO_IMAGE_ALT=?, HERO_IMAGE_POSITION=?, SEO_TITLE=?, SEO_DESCRIPTION=?
+        WHERE PAGE_ID=?`,
           [
             p.categoryId,
             p.slug,
@@ -368,7 +364,7 @@ function createDetailService(dataSource) {
       return dataSource.transaction(async (m) => {
         await existsPage(id, m);
         await query(
-          `UPDATE DETAIL_PAGE SET STATUS=?1 WHERE PAGE_ID=?2`,
+          `UPDATE DETAIL_PAGE SET STATUS=? WHERE PAGE_ID=?`,
           [status, id],
           m,
         );
@@ -378,7 +374,7 @@ function createDetailService(dataSource) {
     async deletePage(id) {
       return dataSource.transaction(async (m) => {
         await existsPage(id, m);
-        await query(`DELETE FROM DETAIL_PAGE WHERE PAGE_ID=?1`, [id], m);
+        await query(`DELETE FROM DETAIL_PAGE WHERE PAGE_ID=?`, [id], m);
         return { pageId: id };
       });
     },
@@ -397,7 +393,7 @@ function createDetailService(dataSource) {
         const id = await seq("SEQ_DETAIL_SECTION", m);
         await query(
           `INSERT INTO DETAIL_SECTION (SECTION_ID,PAGE_ID,SECTION_KEY,SECTION_TYPE,TITLE,EYEBROW,
-        CONTENT_JSON,SORT_ORDER,IS_VISIBLE) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)`,
+        CONTENT_JSON,SORT_ORDER,IS_VISIBLE) VALUES(?,?,?,?,?,?,?,?,?)`,
           [
             id,
             pageId,
@@ -418,15 +414,15 @@ function createDetailService(dataSource) {
       return dataSource.transaction(async (m) => {
         must(
           await first(
-            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?1`,
+            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?`,
             [id],
             m,
           ),
           "섹션",
         );
         await query(
-          `UPDATE DETAIL_SECTION SET SECTION_KEY=?1,SECTION_TYPE=?2,TITLE=?3,EYEBROW=?4,
-        CONTENT_JSON=?5,SORT_ORDER=?6,IS_VISIBLE=?7 WHERE SECTION_ID=?8`,
+          `UPDATE DETAIL_SECTION SET SECTION_KEY=?,SECTION_TYPE=?,TITLE=?,EYEBROW=?,
+        CONTENT_JSON=?,SORT_ORDER=?,IS_VISIBLE=? WHERE SECTION_ID=?`,
           [
             p.key,
             p.type,
@@ -446,14 +442,14 @@ function createDetailService(dataSource) {
       return dataSource.transaction(async (m) => {
         must(
           await first(
-            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?1`,
+            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?`,
             [id],
             m,
           ),
           "섹션",
         );
         await query(
-          `UPDATE DETAIL_SECTION SET IS_VISIBLE=?1 WHERE SECTION_ID=?2`,
+          `UPDATE DETAIL_SECTION SET IS_VISIBLE=? WHERE SECTION_ID=?`,
           [v, id],
           m,
         );
@@ -464,13 +460,13 @@ function createDetailService(dataSource) {
       return dataSource.transaction(async (m) => {
         must(
           await first(
-            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?1`,
+            `SELECT SECTION_ID FROM DETAIL_SECTION WHERE SECTION_ID=?`,
             [id],
             m,
           ),
           "섹션",
         );
-        await query(`DELETE FROM DETAIL_SECTION WHERE SECTION_ID=?1`, [id], m);
+        await query(`DELETE FROM DETAIL_SECTION WHERE SECTION_ID=?`, [id], m);
         return { sectionId: id };
       });
     },
@@ -484,7 +480,7 @@ function createDetailService(dataSource) {
 
   // Fixed whitelist of table/column names only, never user-supplied identifier SQL.
   async function reorder(manager, table, pk, pageId, ids) {
-    const where = pageId == null ? "" : " WHERE PAGE_ID=?1";
+    const where = pageId == null ? "" : " WHERE PAGE_ID=?";
     const old = (
       await query(
         `SELECT ${pk} AS ID FROM ${table}${where} ORDER BY SORT_ORDER, ${pk}`,
@@ -500,7 +496,7 @@ function createDetailService(dataSource) {
     }
     for (let i = 0; i < ids.length; i++) {
       await query(
-        `UPDATE ${table} SET SORT_ORDER=?1 WHERE ${pk}=?2${pageId == null ? "" : " AND PAGE_ID=?3"}`,
+        `UPDATE ${table} SET SORT_ORDER=? WHERE ${pk}=?${pageId == null ? "" : " AND PAGE_ID=?"}`,
         pageId == null ? [i + 1, ids[i]] : [i + 1, ids[i], pageId],
         manager,
       );

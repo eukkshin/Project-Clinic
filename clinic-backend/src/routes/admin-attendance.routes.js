@@ -41,9 +41,7 @@ function createAdminAttendanceRouter({ dataSource }) {
     try {
       const state = await dataSource.transaction(async (manager) => {
         await lockCalendar(manager);
-        await manager.query("SELECT ID FROM RESERVATION_TB WHERE ID = ?1", [
-          id,
-        ]);
+        await manager.query("SELECT ID FROM RESERVATION_TB WHERE ID = ?", [id]);
         const repo = manager.getRepository(Reservation);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {

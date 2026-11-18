@@ -103,7 +103,7 @@ router.post("/", authenticateMember, trustedOrigin, async (req, res) => {
     const result = await AppDataSource.transaction(async (manager) => {
       // 인증 직후 탈퇴된 계정이 예약을 생성하지 못하도록 DB 상태를 잠가 재검증합니다.
       const accounts = await manager.query(
-        "SELECT STATUS FROM MEMBER_TB WHERE USER_IDX = ?1",
+        "SELECT STATUS FROM MEMBER_TB WHERE USER_IDX = ?",
         [req.user.userIdx],
       );
       if (accounts[0]?.STATUS !== "정상") {

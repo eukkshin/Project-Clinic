@@ -1,6 +1,7 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
+const { sessionCookieOptions } = require("./session-cookie-options");
 const {
   COOKIE_NAME,
   JWT_ISSUER,
@@ -34,10 +35,7 @@ function issueMemberSession(_req, res, member) {
   });
 
   res.cookie("clinic_session", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
+    ...sessionCookieOptions(),
     maxAge: 8 * 60 * 60 * 1000,
   });
 }

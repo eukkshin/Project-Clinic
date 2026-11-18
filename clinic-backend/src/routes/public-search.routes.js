@@ -36,7 +36,7 @@ const SOURCES = [
     label: "시술·카테고리",
     sql: `SELECT CATEGORY_IDX AS ITEM_ID, TITLE AS TITLE, LINK AS ITEM_LINK
           FROM CATEGORY_TB
-          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, CATEGORY_IDX DESC
           LIMIT 8`,
     map: (row) => ({
@@ -55,8 +55,8 @@ const SOURCES = [
                  CATEGORY_NAME AS CATEGORY_NAME,
                  substr(ANSWER, 1, 320) AS EXCERPT
           FROM QNA_TB
-          WHERE UPPER(QUESTION) LIKE UPPER(?1) ESCAPE '\\'
-             OR UPPER(substr(ANSWER, 1, 2000)) LIKE UPPER(?2) ESCAPE '\\'
+          WHERE UPPER(QUESTION) LIKE UPPER(?) ESCAPE '\\'
+             OR UPPER(substr(ANSWER, 1, 2000)) LIKE UPPER(?) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, QNA_IDX DESC
           LIMIT 8`,
     map: (row) => ({
@@ -76,7 +76,7 @@ const SOURCES = [
     label: "이벤트",
     sql: `SELECT EVENT_IDX AS ITEM_ID, TITLE AS TITLE, PRICE AS PRICE
           FROM EVENT_RANKING_TB
-          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, EVENT_IDX DESC
           LIMIT 8`,
     map: (row) => ({
@@ -93,7 +93,7 @@ const SOURCES = [
     label: "영상",
     sql: `SELECT VLOG_IDX AS ITEM_ID, TITLE AS TITLE
           FROM VLOG_TB
-          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, VLOG_IDX DESC
           LIMIT 8`,
     map: (row) => ({

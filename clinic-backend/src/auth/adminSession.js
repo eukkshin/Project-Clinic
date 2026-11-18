@@ -4,6 +4,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("node:crypto");
+const { sessionCookieOptions } = require("./session-cookie-options");
 
 const COOKIE_NAME = "ahns_admin_session";
 const MAX_AGE_MS = 4 * 60 * 60 * 1000; // 4시간
@@ -48,12 +49,7 @@ function jwtSecret() {
 }
 
 function cookieOptions() {
-  return {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // 운영 시 HTTPS 필수
-    sameSite: "lax",
-    path: "/", // Next.js /admin 라우트 검사에도 전송되도록 호스트 전체 경로
-  };
+  return sessionCookieOptions();
 }
 
 function fingerprint(passwordHash) {
@@ -116,7 +112,7 @@ function createAdminSession({ dataSource }) {
         });
       }
       const rows = await dataSource.query(
-        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?1",
+        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?",
         [claims.sub],
       );
       const user = rows[0];
@@ -169,7 +165,7 @@ function createAdminSession({ dataSource }) {
         });
       }
       const rows = await dataSource.query(
-        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?1",
+        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?",
         [userId.trim()],
       );
       const user = rows[0];

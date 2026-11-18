@@ -187,7 +187,7 @@ function createRegistrationRouter({ AppDataSource }) {
           await manager.query(
             `INSERT INTO MEMBER_REGISTRATION_CONSENT
        (USER_IDX, CONSENT_TYPE, STATUS, POLICY_VERSION)
-     VALUES (?1, ?2, ?3, ?4)`,
+     VALUES (?, ?, ?, ?)`,
             [member.USER_IDX, type, agreed ? "Y" : "N", POLICY_VERSION],
           );
         }

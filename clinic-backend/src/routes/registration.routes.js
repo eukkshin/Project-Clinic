@@ -210,13 +210,12 @@ function createRegistrationRouter({ AppDataSource }) {
           message: "이미 사용 중인 회원 정보입니다.",
         });
       }
-      console.error(
-        "[register] 회원가입 저장 실패:",
-        error?.driverError?.code ||
-          error?.code ||
-          error?.name ||
-          "DATABASE_ERROR",
-      );
+      console.error("[register] 회원가입 저장 실패:", {
+        message: error?.message,
+        code: error?.driverError?.code ?? error?.code,
+        sqliteMessage: error?.driverError?.message,
+        query: error?.query,
+      });
       return res.status(500).json({
         success: false,
         message: "회원가입 중 서버 오류가 발생했습니다.",

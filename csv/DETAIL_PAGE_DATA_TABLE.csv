@@ -1,0 +1,8 @@
+"PAGE_ID","CATEGORY_ID","SLUG","TITLE","STATUS","SORT_ORDER","HERO_EYEBROW","HERO_TITLE","HERO_DESCRIPTION","HERO_IMAGE_URL","HERO_IMAGE_ALT","HERO_IMAGE_POSITION","SEO_TITLE","SEO_DESCRIPTION","CREATED_AT","UPDATED_AT"
+1,2,"natural-adhesion","자연유착 쌍꺼풀","PUBLISHED",1,"AHN'S · EYE SURGERY","자연스럽게, 당신답게","섬세한 상담에서 시작하는 나만의 아름다움","http://127.0.0.1:4000/images/detail-cms/ba9a7361-f38d-4de7-99ee-caf0211576a4.webp","뷰티 모델 이미지","center 50%","자연유착 쌍꺼풀 | AHNS","",26/10/27,26/10/28
+4,5,"filler","필러","PUBLISHED",1,"AHN'S PLASTIC SURGERY","필러","","/images/detail-petit/hero-filler.webp","","center center","","",26/10/28,26/10/28
+5,1,"brand","브랜드 소개","PUBLISHED",1,"BRAND STORY — AHN'S","아름다움의 기준이 되는 곳, AHN'S","사람을 이해하는 섬세한 시선으로
+자연스럽고 조화로운 아름다움을 만들어갑니다.","","","center center","","",26/10/28,26/10/28
+2,3,"bridge-tip","코끝성형","PUBLISHED",1,"NOSE SURGERY · PROFILE & BALANCE","콧대·코끝 성형","얼굴의 흐름과 자연스럽게 이어지는 라인.
+섬세한 상담에서 나만의 균형을 찾아갑니다.","/images/detail-nose/hero-bridge-tip.webp","nose image","center center","","",26/10/28,26/10/28
+3,4,"facelift","안면거상","PUBLISHED",1,"AHN'S PLASTIC SURGERY","안면거상","","/images/detail-antiaging/hero-facelift.webp","","center center","","",26/10/28,26/10/28

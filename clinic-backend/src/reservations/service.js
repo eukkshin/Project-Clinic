@@ -21,7 +21,7 @@ class BookingError extends Error {
 // 두 고객이 동시에 마지막 자리를 누르거나 관리자가 동시에 차단하는 경합을 직렬화합니다.
 async function lockCalendar(manager) {
   await manager.query(
-    "SELECT LOCK_ID FROM RESERVATION_BOOKING_LOCK_TB WHERE LOCK_ID = 1 FOR UPDATE",
+    "UPDATE RESERVATION_BOOKING_LOCK_TB SET LOCK_ID=LOCK_ID WHERE LOCK_ID = 1",
   );
 }
 

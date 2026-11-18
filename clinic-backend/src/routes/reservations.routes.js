@@ -1,7 +1,7 @@
 "use strict";
 const express = require("express");
 const { authenticateMember } = require("../middleware/authenticateMember");
-const AppDataSource = require("../../db.oracle");
+const AppDataSource = require("../../db");
 const Reservation = require("../entity/Reservation");
 const ReservationBlock = require("../entity/ReservationBlock");
 const { In } = require("typeorm");
@@ -62,7 +62,13 @@ function sendError(res, error, context) {
     return res
       .status(error.status)
       .json({ success: false, message: error.message });
-  if (String(error?.message).includes("ORA-00001"))
+  if (
+    /ORA-00001|SQLITE_CONSTRAINT_(?:UNIQUE|PRIMARYKEY)|UNIQUE constraint failed/.test(
+      String(error?.driverError?.code || "") +
+        " " +
+        String(error?.message || ""),
+    )
+  )
     return res.status(409).json({
       success: false,
       message: "이미 예약되었거나 차단된 시간입니다.",
@@ -97,7 +103,7 @@ router.post("/", authenticateMember, trustedOrigin, async (req, res) => {
     const result = await AppDataSource.transaction(async (manager) => {
       // 인증 직후 탈퇴된 계정이 예약을 생성하지 못하도록 DB 상태를 잠가 재검증합니다.
       const accounts = await manager.query(
-        "SELECT STATUS FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE",
+        "SELECT STATUS FROM MEMBER_TB WHERE USER_IDX = ?1",
         [req.user.userIdx],
       );
       if (accounts[0]?.STATUS !== "정상") {
@@ -238,12 +244,10 @@ router.patch(
     const id = Number(req.params.id);
     const { date, time } = req.body || {};
     if (!Number.isSafeInteger(id) || id <= 0 || !canBook(date, time))
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "변경 가능한 날짜·시간을 선택해 주세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "변경 가능한 날짜·시간을 선택해 주세요.",
+      });
     try {
       const result = await AppDataSource.transaction(async (manager) => {
         await lockCalendar(manager);

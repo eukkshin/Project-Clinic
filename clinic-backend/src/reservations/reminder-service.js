@@ -74,7 +74,7 @@ async function sweepReminders(dataSource, nowMs = Date.now()) {
   for (const candidate of due) {
     const notification = await dataSource.transaction(async (manager) => {
       await manager.query(
-        "SELECT ID FROM RESERVATION_REMINDER_TB WHERE ID = :1 FOR UPDATE",
+        "SELECT ID FROM RESERVATION_REMINDER_TB WHERE ID = ?1",
         [candidate.ID],
       );
       const rRepo = manager.getRepository(ReservationReminder);

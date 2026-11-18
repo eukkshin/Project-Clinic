@@ -1,7 +1,7 @@
 "use strict";
 
 const express = require("express");
-const AppDataSource = require("../../db.oracle");
+const AppDataSource = require("../../db");
 const router = express.Router();
 const {
   createContentI18nService,
@@ -36,9 +36,9 @@ const SOURCES = [
     label: "시술·카테고리",
     sql: `SELECT CATEGORY_IDX AS ITEM_ID, TITLE AS TITLE, LINK AS ITEM_LINK
           FROM CATEGORY_TB
-          WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, CATEGORY_IDX DESC
-          FETCH NEXT 8 ROWS ONLY`,
+          LIMIT 8`,
     map: (row) => ({
       id: `category-${row.ITEM_ID}`,
       type: "procedures",
@@ -53,12 +53,12 @@ const SOURCES = [
     label: "자주 묻는 질문",
     sql: `SELECT QNA_IDX AS ITEM_ID, QUESTION AS TITLE,
                  CATEGORY_NAME AS CATEGORY_NAME,
-                 DBMS_LOB.SUBSTR(ANSWER, 320, 1) AS EXCERPT
+                 substr(ANSWER, 1, 320) AS EXCERPT
           FROM QNA_TB
-          WHERE UPPER(QUESTION) LIKE UPPER(:1) ESCAPE '\\'
-             OR UPPER(DBMS_LOB.SUBSTR(ANSWER, 2000, 1)) LIKE UPPER(:2) ESCAPE '\\'
+          WHERE UPPER(QUESTION) LIKE UPPER(?1) ESCAPE '\\'
+             OR UPPER(substr(ANSWER, 1, 2000)) LIKE UPPER(?2) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, QNA_IDX DESC
-          FETCH NEXT 8 ROWS ONLY`,
+          LIMIT 8`,
     map: (row) => ({
       id: `faq-${row.ITEM_ID}`,
       type: "faq",
@@ -76,9 +76,9 @@ const SOURCES = [
     label: "이벤트",
     sql: `SELECT EVENT_IDX AS ITEM_ID, TITLE AS TITLE, PRICE AS PRICE
           FROM EVENT_RANKING_TB
-          WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, EVENT_IDX DESC
-          FETCH NEXT 8 ROWS ONLY`,
+          LIMIT 8`,
     map: (row) => ({
       id: `event-${row.ITEM_ID}`,
       type: "events",
@@ -93,9 +93,9 @@ const SOURCES = [
     label: "영상",
     sql: `SELECT VLOG_IDX AS ITEM_ID, TITLE AS TITLE
           FROM VLOG_TB
-          WHERE UPPER(TITLE) LIKE UPPER(:1) ESCAPE '\\'
+          WHERE UPPER(TITLE) LIKE UPPER(?1) ESCAPE '\\'
           ORDER BY SORT_ORDER ASC, VLOG_IDX DESC
-          FETCH NEXT 8 ROWS ONLY`,
+          LIMIT 8`,
     map: (row) => ({
       id: `vlog-${row.ITEM_ID}`,
       type: "vlog",

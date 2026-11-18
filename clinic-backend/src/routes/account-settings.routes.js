@@ -9,7 +9,7 @@ const express = require("express");
 const crypto = require("node:crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const AppDataSource = require("../../db.oracle");
+const AppDataSource = require("../../db");
 const {
   authenticateMember,
   COOKIE_NAME,
@@ -75,20 +75,12 @@ function checkMutationOrigin(req, res, next) {
     return res
       .status(503)
       .json({ success: false, message: "서버 보안 설정이 누락되었습니다." });
-  let allowed;
-  try {
-    allowed = new URL(configured).origin;
-  } catch {
-    return res
-      .status(503)
-      .json({ success: false, message: "서버 보안 설정이 올바르지 않습니다." });
-  }
-  // 브라우저 fetch(credentials:include)로 보내는 POST/PATCH의 Origin 검증.
-  // curl로 직접 테스트할 때는 -H "Origin: http://localhost:3000"을 지정합니다.
-  if (req.get("Origin") !== allowed) {
-    return res
-      .status(403)
-      .json({ success: false, message: "허용되지 않은 요청입니다." });
+  const allowed = configured.split(",").map((v) => v.trim()).filter(Boolean);
+  // Same strict origin allowlist as the API CORS configuration.
+  if (!allowed.includes(req.get("Origin"))) {
+    return res.status(403).json({
+      success: false, message: "허용되지 않은 요청입니다.",
+    });
   }
   next();
 }
@@ -105,7 +97,7 @@ router.use((req, res, next) => {
 router.get("/preferences", async (req, res) => {
   try {
     const rows = await AppDataSource.query(
-      "SELECT IS_MAIL_AGREED, IS_SNS_AGREED FROM MEMBER_TB WHERE USER_IDX = :1",
+      "SELECT IS_MAIL_AGREED, IS_SNS_AGREED FROM MEMBER_TB WHERE USER_IDX = ?1",
       [req.user.userIdx],
     );
     if (!rows.length)
@@ -137,7 +129,7 @@ router.patch("/preferences", async (req, res) => {
   try {
     const result = await AppDataSource.transaction(async (manager) => {
       const rows = await manager.query(
-        "SELECT IS_MAIL_AGREED, IS_SNS_AGREED FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE",
+        "SELECT IS_MAIL_AGREED, IS_SNS_AGREED FROM MEMBER_TB WHERE USER_IDX = ?1",
         [req.user.userIdx],
       );
       if (!rows.length) {
@@ -153,7 +145,7 @@ router.patch("/preferences", async (req, res) => {
         before.IS_SNS_AGREED !== nextSns
       ) {
         await manager.query(
-          "UPDATE MEMBER_TB SET IS_MAIL_AGREED = :1, IS_SNS_AGREED = :2 WHERE USER_IDX = :3",
+          "UPDATE MEMBER_TB SET IS_MAIL_AGREED = ?1, IS_SNS_AGREED = ?2 WHERE USER_IDX = ?3",
           [nextMail, nextSns, req.user.userIdx],
         );
       }
@@ -164,7 +156,7 @@ router.patch("/preferences", async (req, res) => {
         if (previous !== value) {
           await manager.query(
             `INSERT INTO ACCOUNT_CONSENT_HISTORY (USER_IDX, CHANNEL, PREVIOUS_VALUE, NEW_VALUE)
-             VALUES (:1, :2, :3, :4)`,
+             VALUES (?1, ?2, ?3, ?4)`,
             [req.user.userIdx, channel, previous, value],
           );
         }
@@ -204,7 +196,7 @@ router.post("/change-password", async (req, res) => {
     const newHash = await bcrypt.hash(newPassword, 12);
     await AppDataSource.transaction(async (manager) => {
       const rows = await manager.query(
-        "SELECT USER_PW FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE",
+        "SELECT USER_PW FROM MEMBER_TB WHERE USER_IDX = ?1",
         [req.user.userIdx],
       );
       if (!rows.length) throw new WrongPassword();
@@ -216,12 +208,12 @@ router.post("/change-password", async (req, res) => {
         throw e;
       }
       await manager.query(
-        "UPDATE MEMBER_TB SET USER_PW = :1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = :2",
+        "UPDATE MEMBER_TB SET USER_PW = ?1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = ?2",
         [newHash, req.user.userIdx],
       );
       // 비밀번호 찾기로 발급된 기존 미사용 링크도 무효화합니다.
       await manager.query(
-        "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND USED_AT IS NULL",
+        "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND USED_AT IS NULL",
         [req.user.userIdx],
       );
     });
@@ -278,7 +270,7 @@ router.post("/email/request", async (req, res) => {
   let tokenHash;
   try {
     const rows = await AppDataSource.query(
-      "SELECT USER_PW, EMAIL FROM MEMBER_TB WHERE USER_IDX = :1",
+      "SELECT USER_PW, EMAIL FROM MEMBER_TB WHERE USER_IDX = ?1",
       [req.user.userIdx],
     );
     if (
@@ -297,7 +289,7 @@ router.post("/email/request", async (req, res) => {
         .json({ success: false, message: "현재 사용 중인 이메일입니다." });
     }
     const duplicates = await AppDataSource.query(
-      "SELECT USER_IDX FROM MEMBER_TB WHERE LOWER(EMAIL) = :1 AND USER_IDX <> :2",
+      "SELECT USER_IDX FROM MEMBER_TB WHERE LOWER(EMAIL) = ?1 AND USER_IDX <> ?2",
       [newEmail, req.user.userIdx],
     );
     if (duplicates.length)
@@ -309,7 +301,7 @@ router.post("/email/request", async (req, res) => {
     tokenHash = hashToken(token);
     await AppDataSource.query(
       `INSERT INTO ACCOUNT_EMAIL_CHANGE_TOKEN (USER_IDX, TOKEN_HASH, OLD_EMAIL, NEW_EMAIL, EXPIRES_AT)
-       VALUES (:1, :2, :3, :4, LOCALTIMESTAMP + NUMTODSINTERVAL(${EMAIL_TOKEN_MINUTES}, 'MINUTE'))`,
+       VALUES (?1, ?2, ?3, ?4, datetime('now', '+${EMAIL_TOKEN_MINUTES} minutes'))`,
       [req.user.userIdx, tokenHash, previousEmail, newEmail],
     );
     const base = process.env.FRONTEND_ORIGIN;
@@ -327,7 +319,7 @@ router.post("/email/request", async (req, res) => {
     });
     // 실제 메일 발송이 성공한 뒤에만 기존 발급 링크 무효화.
     await AppDataSource.query(
-      "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND TOKEN_HASH <> :2 AND USED_AT IS NULL",
+      "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND TOKEN_HASH <> ?2 AND USED_AT IS NULL",
       [req.user.userIdx, tokenHash],
     );
     return res.status(202).json({
@@ -340,7 +332,7 @@ router.post("/email/request", async (req, res) => {
     if (tokenHash) {
       try {
         await AppDataSource.query(
-          "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE TOKEN_HASH = :1 AND USED_AT IS NULL",
+          "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL",
           [tokenHash],
         );
       } catch (rollbackError) {
@@ -373,14 +365,13 @@ router.post("/email/confirm", async (req, res) => {
       async (manager) => {
         const matches = await manager.query(
           `SELECT USER_IDX, OLD_EMAIL, NEW_EMAIL FROM ACCOUNT_EMAIL_CHANGE_TOKEN
-         WHERE TOKEN_HASH = :1 AND USER_IDX = :2 AND USED_AT IS NULL AND EXPIRES_AT > LOCALTIMESTAMP
-         FOR UPDATE`,
+         WHERE TOKEN_HASH = ?1 AND USER_IDX = ?2 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
           [hashToken(token), req.user.userIdx],
         );
         if (!matches.length) throw new InvalidToken();
         const item = matches[0];
         const members = await manager.query(
-          "SELECT EMAIL FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE",
+          "SELECT EMAIL FROM MEMBER_TB WHERE USER_IDX = ?1",
           [req.user.userIdx],
         );
         if (
@@ -391,7 +382,7 @@ router.post("/email/confirm", async (req, res) => {
           throw new InvalidToken();
         }
         const occupied = await manager.query(
-          "SELECT USER_IDX FROM MEMBER_TB WHERE LOWER(EMAIL) = :1 AND USER_IDX <> :2",
+          "SELECT USER_IDX FROM MEMBER_TB WHERE LOWER(EMAIL) = ?1 AND USER_IDX <> ?2",
           [String(item.NEW_EMAIL).toLowerCase(), req.user.userIdx],
         );
         if (occupied.length) {
@@ -400,16 +391,16 @@ router.post("/email/confirm", async (req, res) => {
           throw e;
         }
         await manager.query(
-          "UPDATE MEMBER_TB SET EMAIL = :1 WHERE USER_IDX = :2",
+          "UPDATE MEMBER_TB SET EMAIL = ?1 WHERE USER_IDX = ?2",
           [item.NEW_EMAIL, req.user.userIdx],
         );
         await manager.query(
-          "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND USED_AT IS NULL",
+          "UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND USED_AT IS NULL",
           [req.user.userIdx],
         );
         // 이전 이메일로 발급한 비밀번호 복구 링크를 더 이상 사용하지 못하게 합니다.
         await manager.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND USED_AT IS NULL",
           [req.user.userIdx],
         );
         return { oldEmail: item.OLD_EMAIL, newEmail: item.NEW_EMAIL };
@@ -483,7 +474,7 @@ router.post("/withdraw", async (req, res) => {
     await AppDataSource.transaction(async (manager) => {
       const members = await manager.query(
         `SELECT USER_PW, STATUS, CHART_NO
-           FROM MEMBER_TB WHERE USER_IDX = :1 FOR UPDATE`,
+           FROM MEMBER_TB WHERE USER_IDX = ?1`,
         [req.user.userIdx],
       );
       const member = members[0];
@@ -494,38 +485,38 @@ router.post("/withdraw", async (req, res) => {
       // 예약을 자동 취소하지 않으며, 예약이 남아 있으면 사용자가 먼저 처리하도록 합니다.
       const active = await manager.query(
         `SELECT COUNT(*) AS CNT FROM RESERVATION_TB
-          WHERE USER_IDX = :1
+          WHERE USER_IDX = ?1
             AND STATUS IN ('예약확정', '예약대기')
-            AND SCHEDULED_AT >= LOCALTIMESTAMP`,
+            AND SCHEDULED_AT >= CURRENT_TIMESTAMP`,
         [req.user.userIdx],
       );
       if (Number(active[0]?.CNT || 0) > 0) throw new ActiveReservation();
       if (member.CHART_NO) {
         const adminActive = await manager.query(
           `SELECT COUNT(*) AS CNT FROM ADMIN_RESERVATION_TB
-           WHERE CHART_NO = :1
+           WHERE CHART_NO = ?1
              AND STATUS IN ('RESERVED', 'CONFIRMED', '예약확정')
-             AND RESERVATION_DATE >= TRUNC(SYSDATE)`,
+             AND RESERVATION_DATE >= date('now')`,
           [member.CHART_NO],
         );
         if (Number(adminActive[0]?.CNT || 0) > 0) throw new ActiveReservation();
       }
       await manager.query(
         `UPDATE MEMBER_TB
-           SET STATUS = '탈퇴', WITHDRAWN_AT = LOCALTIMESTAMP,
+           SET STATUS = '탈퇴', WITHDRAWN_AT = CURRENT_TIMESTAMP,
                SESSION_VERSION = SESSION_VERSION + 1,
                IS_MAIL_AGREED = 'N', IS_SNS_AGREED = 'N'
-         WHERE USER_IDX = :1 AND STATUS = '정상'`,
+         WHERE USER_IDX = ?1 AND STATUS = '정상'`,
         [req.user.userIdx],
       );
       await manager.query(
-        `UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP
-           WHERE USER_IDX = :1 AND USED_AT IS NULL`,
+        `UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP
+           WHERE USER_IDX = ?1 AND USED_AT IS NULL`,
         [req.user.userIdx],
       );
       await manager.query(
-        `UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = LOCALTIMESTAMP
-           WHERE USER_IDX = :1 AND USED_AT IS NULL`,
+        `UPDATE ACCOUNT_EMAIL_CHANGE_TOKEN SET USED_AT = CURRENT_TIMESTAMP
+           WHERE USER_IDX = ?1 AND USED_AT IS NULL`,
         [req.user.userIdx],
       );
     });

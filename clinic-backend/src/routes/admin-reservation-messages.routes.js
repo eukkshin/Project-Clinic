@@ -70,13 +70,11 @@ function createAdminReservationMessagesRouter({ dataSource }) {
         .status(400)
         .json({ success: false, message: "알림 설정값이 올바르지 않습니다." });
     if (input.enabled && !providerReady(input.channel))
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message:
-            "SOLAPI 계정·발신번호 또는 승인된 알림톡 템플릿 설정이 필요합니다.",
-        });
+      return res.status(409).json({
+        success: false,
+        message:
+          "SOLAPI 계정·발신번호 또는 승인된 알림톡 템플릿 설정이 필요합니다.",
+      });
     try {
       const repo = dataSource.getRepository(ReservationMessagePolicy);
       await repo.update(
@@ -136,16 +134,14 @@ function createAdminReservationMessagesRouter({ dataSource }) {
   router.post("/:id/retry", trustedOrigin, async (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isSafeInteger(id) || id <= 0)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "발송 이력 번호가 올바르지 않습니다.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "발송 이력 번호가 올바르지 않습니다.",
+      });
     try {
       const changed = await dataSource.transaction(async (manager) => {
         await manager.query(
-          "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID=:1 FOR UPDATE",
+          "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID=?1",
           [id],
         );
         const repo = manager.getRepository(ReservationMessage);
@@ -191,12 +187,10 @@ function createAdminReservationMessagesRouter({ dataSource }) {
         LIMIT: "재시도 제한 횟수를 초과했습니다.",
         CONFIG: "발송 설정과 공급자 인증 정보를 확인해 주세요.",
       };
-      return res
-        .status(statuses[changed] || 409)
-        .json({
-          success: false,
-          message: messages[changed] || "재시도할 수 없습니다.",
-        });
+      return res.status(statuses[changed] || 409).json({
+        success: false,
+        message: messages[changed] || "재시도할 수 없습니다.",
+      });
     } catch (error) {
       console.error("안내 발송 재시도 오류:", error);
       return res

@@ -5,6 +5,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const AppDataSource = require("./db");
+const { ensureSqliteSchema } = require("./src/sqlite/schema");
 const {
   createPasswordRecoveryRouter,
 } = require("./src/routes/password-recovery.routes");
@@ -153,7 +154,8 @@ app.post("/api/admin/upload", upload.single("logoImage"), async (req, res) => {
 
 // 2. SQLite connection (no external DB server)
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
+    await ensureSqliteSchema(AppDataSource);
     console.log("✅ SQLite DB connected.");
     if (process.env.ENABLE_BACKGROUND_WORKERS === "true") {
       startReminderWorker(AppDataSource);
@@ -1635,7 +1637,7 @@ app.get("/api/reservation/patient/:chartNo", requireAdmin, async (req, res) => {
         )
       `,
       )
-      .andWhere("reservation.RESERVATION_DATE >= CURRENT_DATE()")
+      .andWhere("reservation.RESERVATION_DATE >= date('now')")
       .orderBy("reservation.RESERVATION_DATE", "ASC")
       .addOrderBy("reservation.RESERVATION_TIME", "ASC")
       .getMany();
@@ -1841,14 +1843,14 @@ app.get("/api/admin/today", async (req, res) => {
         "r.TREATMENT_IDX AS `treatmentIdx`",
         "m.USER_NAME AS `name`",
         "m.PHONE AS `phone`",
-        "CAST(NULL AS CHAR(6)) AS `birthDate`",
+        "CAST(NULL AS TEXT) AS `birthDate`",
         "m.GENDER AS `gender`",
         "r.RESERVATION_TIME AS `reservationTime`",
         "r.STATUS AS `status`",
         "r.MEMO AS `memo`",
       ])
-      .where("r.RESERVATION_DATE >= CURRENT_DATE()")
-      .andWhere("r.RESERVATION_DATE < CURRENT_DATE() + INTERVAL 1 DAY")
+      .where("r.RESERVATION_DATE >= date('now')")
+      .andWhere("r.RESERVATION_DATE < date('now', '+1 day')")
       .andWhere("r.STATUS != 'CANCELLED'")
       .orderBy(
         `CASE r.STATUS
@@ -1910,9 +1912,6 @@ app.patch("/api/admin/reservation/:reservationIdx/status", async (req, res) => {
         where: {
           RESERVATION_IDX: reservationIdx,
         },
-        lock: {
-          mode: "pessimistic_write",
-        },
       });
 
       if (!reservation) {
@@ -1938,9 +1937,6 @@ app.patch("/api/admin/reservation/:reservationIdx/status", async (req, res) => {
           where: {
             TREATMENT_IDX: reservation.TREATMENT_IDX,
             CHART_NO: reservation.CHART_NO,
-          },
-          lock: {
-            mode: "pessimistic_write",
           },
         });
 

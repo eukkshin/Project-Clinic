@@ -34,19 +34,16 @@ function createAdminAttendanceRouter({ dataSource }) {
       ((action === "NO_SHOW" || action === "REVOKE_NO_SHOW") &&
         reason.length < 5)
     )
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "판정 종류와 사유(5~500자)를 확인하세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "판정 종류와 사유(5~500자)를 확인하세요.",
+      });
     try {
       const state = await dataSource.transaction(async (manager) => {
         await lockCalendar(manager);
-        await manager.query(
-          "SELECT ID FROM RESERVATION_TB WHERE ID = :1 FOR UPDATE",
-          [id],
-        );
+        await manager.query("SELECT ID FROM RESERVATION_TB WHERE ID = ?1", [
+          id,
+        ]);
         const repo = manager.getRepository(Reservation);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {
@@ -134,19 +131,17 @@ function createAdminAttendanceRouter({ dataSource }) {
           .status(404)
           .json({ success: false, message: "예약 내역이 없습니다." });
       if (err.status === 409)
-        return res
-          .status(409)
-          .json({
-            success: false,
-            message:
-              err.message === "TOO_EARLY"
-                ? "예약시간 30분 이후에 노쇼를 기록할 수 있습니다."
-                : err.message === "TOO_EARLY_VISIT"
-                  ? "방문확인은 예약시간 2시간 전부터 가능합니다."
-                  : err.message === "MISSING_PREVIOUS_STATUS"
-                    ? "이전 예약 상태를 확인할 수 없어 판정 취소할 수 없습니다."
-                    : "현재 상태에서는 선택한 처리가 불가능합니다.",
-          });
+        return res.status(409).json({
+          success: false,
+          message:
+            err.message === "TOO_EARLY"
+              ? "예약시간 30분 이후에 노쇼를 기록할 수 있습니다."
+              : err.message === "TOO_EARLY_VISIT"
+                ? "방문확인은 예약시간 2시간 전부터 가능합니다."
+                : err.message === "MISSING_PREVIOUS_STATUS"
+                  ? "이전 예약 상태를 확인할 수 없어 판정 취소할 수 없습니다."
+                  : "현재 상태에서는 선택한 처리가 불가능합니다.",
+        });
       console.error("방문/노쇼 처리 실패:", err);
       return res
         .status(500)
@@ -160,13 +155,11 @@ function createAdminAttendanceRouter({ dataSource }) {
         .status(400)
         .json({ success: false, message: "예약번호를 확인해 주세요." });
     try {
-      const rows = await dataSource
-        .getRepository(ReservationStatusAudit)
-        .find({
-          where: { RESERVATION_ID: id },
-          order: { ID: "DESC" },
-          take: 50,
-        });
+      const rows = await dataSource.getRepository(ReservationStatusAudit).find({
+        where: { RESERVATION_ID: id },
+        order: { ID: "DESC" },
+        take: 50,
+      });
       return res.json({
         success: true,
         data: rows.map((r) => ({

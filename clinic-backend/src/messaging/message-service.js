@@ -145,7 +145,7 @@ async function dispatchQueued(
   for (const queued of queue) {
     const job = await dataSource.transaction(async (manager) => {
       await manager.query(
-        "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID = :1 FOR UPDATE",
+        "SELECT ID FROM RESERVATION_MESSAGE_TB WHERE ID = ?1",
         [queued.ID],
       );
       const repo = manager.getRepository(ReservationMessage);

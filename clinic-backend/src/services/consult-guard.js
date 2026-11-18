@@ -27,12 +27,10 @@ function consume(key, rule, now = Date.now()) {
 }
 function reject(res, seconds) {
   res.set("Retry-After", String(seconds));
-  return res
-    .status(429)
-    .json({
-      success: false,
-      message: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
-    });
+  return res.status(429).json({
+    success: false,
+    message: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+  });
 }
 function limitConsultRequest(req, res, next) {
   const ip = req.ip || req.socket?.remoteAddress || "unknown";

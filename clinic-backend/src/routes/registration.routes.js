@@ -1,12 +1,12 @@
 "use strict";
 
 /**
- * 회원가입 API (Express / TypeORM / OracleDB)
+ * 회원가입 API (Express / TypeORM / SQLite)
  * - 가입 시 주민등록번호를 수집·저장하지 않습니다.
  * - 회원 생성 + 약관/고지/마케팅 동의 이력을 하나의 DB 트랜잭션으로 저장합니다.
  * - 회원가입 프론트엔드의 `consents` 요청 형태와 호환됩니다.
  *
- * 주의: 배포 전 sql/2026_11_member_registration_consent.sql을 실행해야 합니다.
+ * SQLite 등록 동의 테이블은 src/sqlite/schema.js에서 보장합니다.
  */
 const express = require("express");
 const bcrypt = require("bcrypt");
@@ -187,7 +187,7 @@ function createRegistrationRouter({ AppDataSource }) {
           await manager.query(
             `INSERT INTO MEMBER_REGISTRATION_CONSENT
        (USER_IDX, CONSENT_TYPE, STATUS, POLICY_VERSION)
-     VALUES (?, ?, ?, ?)`,
+     VALUES (?1, ?2, ?3, ?4)`,
             [member.USER_IDX, type, agreed ? "Y" : "N", POLICY_VERSION],
           );
         }
@@ -197,13 +197,26 @@ function createRegistrationRouter({ AppDataSource }) {
         message: "회원가입이 완료되었습니다.",
       });
     } catch (error) {
-      if (error?.errorNum === 1 || /ORA-00001/.test(error?.message || "")) {
+      if (
+        error?.errorNum === 1 ||
+        /ORA-00001|SQLITE_CONSTRAINT_(?:UNIQUE|PRIMARYKEY)|UNIQUE constraint failed/i.test(
+          String(error?.driverError?.code || "") +
+            " " +
+            String(error?.message || ""),
+        )
+      ) {
         return res.status(409).json({
           success: false,
           message: "이미 사용 중인 회원 정보입니다.",
         });
       }
-      console.error("[register] 회원가입 저장 실패:", error);
+      console.error(
+        "[register] 회원가입 저장 실패:",
+        error?.driverError?.code ||
+          error?.code ||
+          error?.name ||
+          "DATABASE_ERROR",
+      );
       return res.status(500).json({
         success: false,
         message: "회원가입 중 서버 오류가 발생했습니다.",

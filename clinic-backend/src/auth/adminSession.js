@@ -22,8 +22,11 @@ const DEFAULT_ORIGINS = [
 
 function allowOriginForWrite(req, res, next) {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
-  const allowed = process.env.ADMIN_FRONTEND_ORIGINS
-    ? process.env.ADMIN_FRONTEND_ORIGINS.split(",")
+  const configured =
+    process.env.ADMIN_FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN;
+  const allowed = configured
+    ? configured
+        .split(",")
         .map((s) => s.trim())
         .filter(Boolean)
     : DEFAULT_ORIGINS;
@@ -113,7 +116,7 @@ function createAdminSession({ dataSource }) {
         });
       }
       const rows = await dataSource.query(
-        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = :1",
+        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?1",
         [claims.sub],
       );
       const user = rows[0];
@@ -166,7 +169,7 @@ function createAdminSession({ dataSource }) {
         });
       }
       const rows = await dataSource.query(
-        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = :1",
+        "SELECT USER_ID, USER_NAME, USER_PW, IS_ADMIN, STATUS FROM MEMBER_TB WHERE USER_ID = ?1",
         [userId.trim()],
       );
       const user = rows[0];

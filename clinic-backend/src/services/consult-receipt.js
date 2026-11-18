@@ -10,9 +10,8 @@ function kstDate() {
     .replace(/-/g, "");
 }
 async function issueReceipt(manager) {
-  const rows = await manager.query(
-    "SELECT CONSULT_RECEIPT_SEQ.NEXTVAL AS N FROM DUAL",
-  );
+  await manager.query("INSERT INTO CONSULT_RECEIPT_COUNTER DEFAULT VALUES");
+  const rows = await manager.query("SELECT last_insert_rowid() AS N");
   const value = Number(rows[0]?.N);
   if (!Number.isSafeInteger(value) || value < 1)
     throw new Error("상담 접수번호 시퀀스 오류");

@@ -115,9 +115,7 @@ function createAdminConsultRouter({ dataSource }) {
         .json({ success: false, message: "상태와 접수 ID를 확인하세요." });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = :1 FOR UPDATE", [
-          id,
-        ]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {
@@ -161,9 +159,7 @@ function createAdminConsultRouter({ dataSource }) {
         .json({ success: false, message: "답변은 10~3000자로 작성해 주세요." });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = :1 FOR UPDATE", [
-          id,
-        ]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {
@@ -206,17 +202,13 @@ function createAdminConsultRouter({ dataSource }) {
     const kind = req.body?.kind;
     const note = typeof req.body?.note === "string" ? req.body.note.trim() : "";
     if (!id || !KINDS.has(kind) || note.length < 2 || note.length > 1000)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "연락 기록/내부 메모를 2~1000자로 작성해 주세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "연락 기록/내부 메모를 2~1000자로 작성해 주세요.",
+      });
     try {
       await dataSource.transaction(async (manager) => {
-        await manager.query("SELECT ID FROM CONSULT WHERE ID = :1 FOR UPDATE", [
-          id,
-        ]);
+        await manager.query("SELECT ID FROM CONSULT WHERE ID = ?1", [id]);
         const repo = manager.getRepository(Consult);
         const row = await repo.findOne({ where: { ID: id } });
         if (!row) {

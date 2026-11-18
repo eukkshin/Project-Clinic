@@ -100,7 +100,8 @@ const AppDataSource = new DataSource({
   entities,
   // Demo-only: creates missing tables. Never enable for real patient records.
   synchronize: process.env.SQLITE_AUTO_SCHEMA === "true",
-  logging: process.env.NODE_ENV !== "production",
+  // Never print signup payloads or password hashes in SQL parameter logs by default.
+  logging: process.env.SQLITE_QUERY_LOGGING === "true",
 });
 
 module.exports = AppDataSource;

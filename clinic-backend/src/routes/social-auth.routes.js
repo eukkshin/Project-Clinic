@@ -63,7 +63,12 @@ function socialFrontendOrigin() {
 
   const url = new URL(configured);
   if (
-    url.protocol !== "https:" ||
+    (url.protocol !== "https:" &&
+      !(
+        process.env.NODE_ENV !== "production" &&
+        url.protocol === "http:" &&
+        ["localhost", "127.0.0.1"].includes(url.hostname)
+      )) ||
     url.username ||
     url.password ||
     url.pathname !== "/" ||
@@ -127,9 +132,9 @@ async function saveFlow(ds, flow) {
 
        (STATE_HASH, PROVIDER, CODE_VERIFIER, NONCE, INTENT, USER_IDX, LOCALE, EXPIRES_AT)
 
-     VALUES (:1, :2, :3, :4, :5, :6, :7,
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7,
 
-       LOCALTIMESTAMP + NUMTODSINTERVAL(10, 'MINUTE'))`,
+       datetime('now', '+10 minutes'))`,
 
     [
       hashToken(flow.state),
@@ -156,9 +161,7 @@ async function consumeFlow(ds, state, provider) {
 
        FROM SOCIAL_AUTH_FLOW_TB
 
-       WHERE STATE_HASH = :1 AND USED_AT IS NULL AND EXPIRES_AT > LOCALTIMESTAMP
-
-       FOR UPDATE`,
+       WHERE STATE_HASH = ?1 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
 
       [hashToken(state)],
     );
@@ -168,9 +171,9 @@ async function consumeFlow(ds, state, provider) {
     if (!flow || flow.PROVIDER !== provider.toUpperCase()) return null;
 
     await manager.query(
-      `UPDATE SOCIAL_AUTH_FLOW_TB SET USED_AT = LOCALTIMESTAMP
+      `UPDATE SOCIAL_AUTH_FLOW_TB SET USED_AT = CURRENT_TIMESTAMP
 
-       WHERE STATE_HASH = :1`,
+       WHERE STATE_HASH = ?1`,
 
       [hashToken(state)],
     );
@@ -284,7 +287,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       const rows = await AppDataSource.query(
         `SELECT PROVIDER, LINKED_AT FROM SOCIAL_ACCOUNT_TB
 
-         WHERE USER_IDX = :1 ORDER BY LINKED_AT`,
+         WHERE USER_IDX = ?1 ORDER BY LINKED_AT`,
 
         [req.user.userIdx],
       );
@@ -321,7 +324,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       const rows = await AppDataSource.query(
         `SELECT PROVIDER, LOCALE FROM SOCIAL_SIGNUP_PENDING_TB
 
-         WHERE TOKEN_HASH = :1 AND USED_AT IS NULL AND EXPIRES_AT > LOCALTIMESTAMP`,
+         WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
 
         [hashToken(token)],
       );
@@ -392,7 +395,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
         const rows = await manager.query(
           `SELECT PROVIDER, PROVIDER_USER_ID FROM SOCIAL_SIGNUP_PENDING_TB
 
-           WHERE TOKEN_HASH = :1 AND USED_AT IS NULL AND EXPIRES_AT > LOCALTIMESTAMP FOR UPDATE`,
+           WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
 
           [hashToken(token)],
         );
@@ -410,7 +413,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
         // Provider identity may have been linked in another session after OAuth.
 
         const linked = await manager.query(
-          `SELECT SOCIAL_ID FROM SOCIAL_ACCOUNT_TB WHERE PROVIDER = :1 AND PROVIDER_USER_ID = :2`,
+          `SELECT SOCIAL_ID FROM SOCIAL_ACCOUNT_TB WHERE PROVIDER = ?1 AND PROVIDER_USER_ID = ?2`,
 
           [pending.PROVIDER, pending.PROVIDER_USER_ID],
         );
@@ -467,7 +470,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
           await manager.query(
             `INSERT INTO MEMBER_REGISTRATION_CONSENT (USER_IDX, CONSENT_TYPE, STATUS, POLICY_VERSION)
 
-             VALUES (:1, :2, :3, :4)`,
+             VALUES (?1, ?2, ?3, ?4)`,
 
             [created.USER_IDX, type, agreed ? "Y" : "N", policyVersion],
           );
@@ -476,13 +479,13 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
         await manager.query(
           `INSERT INTO SOCIAL_ACCOUNT_TB (USER_IDX, PROVIDER, PROVIDER_USER_ID, LINKED_AT)
 
-           VALUES (:1, :2, :3, LOCALTIMESTAMP)`,
+           VALUES (?1, ?2, ?3, CURRENT_TIMESTAMP)`,
 
           [created.USER_IDX, pending.PROVIDER, pending.PROVIDER_USER_ID],
         );
 
         await manager.query(
-          `UPDATE SOCIAL_SIGNUP_PENDING_TB SET USED_AT = LOCALTIMESTAMP WHERE TOKEN_HASH = :1`,
+          `UPDATE SOCIAL_SIGNUP_PENDING_TB SET USED_AT = CURRENT_TIMESTAMP WHERE TOKEN_HASH = ?1`,
 
           [hashToken(token)],
         );
@@ -576,7 +579,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       clearAccountFailures(req, req.user.userId);
 
       const result = await AppDataSource.query(
-        `DELETE FROM SOCIAL_ACCOUNT_TB WHERE USER_IDX = :1 AND PROVIDER = :2`,
+        `DELETE FROM SOCIAL_ACCOUNT_TB WHERE USER_IDX = ?1 AND PROVIDER = ?2`,
 
         [req.user.userIdx, provider.toUpperCase()],
       );
@@ -724,7 +727,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
               await manager.query(
                 `INSERT INTO SOCIAL_ACCOUNT_TB (USER_IDX, PROVIDER, PROVIDER_USER_ID, LINKED_AT)
 
-                 VALUES (:1, :2, :3, LOCALTIMESTAMP)`,
+                 VALUES (?1, ?2, ?3, CURRENT_TIMESTAMP)`,
 
                 [req.user.userIdx, provider.toUpperCase(), sub],
               );
@@ -747,7 +750,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
 
          FROM SOCIAL_ACCOUNT_TB a JOIN MEMBER_TB m ON m.USER_IDX = a.USER_IDX
 
-         WHERE a.PROVIDER = :1 AND a.PROVIDER_USER_ID = :2`,
+         WHERE a.PROVIDER = ?1 AND a.PROVIDER_USER_ID = ?2`,
 
         [provider.toUpperCase(), sub],
       );
@@ -766,7 +769,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
 
            (TOKEN_HASH, PROVIDER, PROVIDER_USER_ID, LOCALE, EXPIRES_AT)
 
-           VALUES (:1, :2, :3, :4, LOCALTIMESTAMP + NUMTODSINTERVAL(10, 'MINUTE'))`,
+           VALUES (?1, ?2, ?3, ?4, datetime('now', '+10 minutes'))`,
 
           [hashToken(signupToken), provider.toUpperCase(), sub, locale],
         );
@@ -784,9 +787,9 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
       await issueMemberSession(req, res, member);
 
       await AppDataSource.query(
-        `UPDATE SOCIAL_ACCOUNT_TB SET LAST_LOGIN_AT = LOCALTIMESTAMP
+        `UPDATE SOCIAL_ACCOUNT_TB SET LAST_LOGIN_AT = CURRENT_TIMESTAMP
 
-         WHERE PROVIDER = :1 AND PROVIDER_USER_ID = :2`,
+         WHERE PROVIDER = ?1 AND PROVIDER_USER_ID = ?2`,
 
         [provider.toUpperCase(), sub],
       );

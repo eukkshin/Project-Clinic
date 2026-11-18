@@ -69,33 +69,27 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       email.length > 100
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "아이디와 이메일을 올바르게 입력해 주세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "아이디와 이메일을 올바르게 입력해 주세요.",
+      });
     }
     if (
       !process.env.SMTP_USER ||
       !process.env.SMTP_PASSWORD ||
       !process.env.FRONTEND_ORIGIN
     ) {
-      return res
-        .status(503)
-        .json({
-          success: false,
-          message:
-            "이메일 서비스를 이용할 수 없습니다. 관리자에게 문의해 주세요.",
-        });
+      return res.status(503).json({
+        success: false,
+        message:
+          "이메일 서비스를 이용할 수 없습니다. 관리자에게 문의해 주세요.",
+      });
     }
     if (limited(`pw-ip:${req.ip}`, 8, 15 * 60_000)) {
-      return res
-        .status(429)
-        .json({
-          success: false,
-          message: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
-        });
+      return res.status(429).json({
+        success: false,
+        message: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+      });
     }
     const accountKey = hashToken(`${userId.toLowerCase()}|${email}`);
     if (limited(`pw-account:${accountKey}`, 2, 60_000)) {
@@ -104,7 +98,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
 
     try {
       const users = await AppDataSource.query(
-        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = :1 AND LOWER(EMAIL) = :2 AND STATUS = '정상'",
+        "SELECT USER_IDX, EMAIL FROM MEMBER_TB WHERE USER_ID = ?1 AND LOWER(EMAIL) = ?2 AND STATUS = '정상'",
         [userId, email],
       );
       // 등록 여부는 방문자에게 공개하지 않습니다.
@@ -119,7 +113,7 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       // 메일 발송 실패 시 기존의 유효한 링크가 사라지지 않도록 먼저 새 토큰만 저장합니다.
       await AppDataSource.query(
         `INSERT INTO PASSWORD_RESET_TOKEN (USER_IDX, TOKEN_HASH, EXPIRES_AT)
-         VALUES (:1, :2, LOCALTIMESTAMP + NUMTODSINTERVAL(${TOKEN_LIFETIME_MIN}, 'MINUTE'))`,
+         VALUES (?1, ?2, datetime('now', '+${TOKEN_LIFETIME_MIN} minutes'))`,
         [user.USER_IDX, tokenHash],
       );
 
@@ -147,14 +141,14 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
         });
         // 새 링크가 실제 발송된 뒤 이전 미사용 링크를 무효화합니다.
         await AppDataSource.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND TOKEN_HASH <> :2 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND TOKEN_HASH <> ?2 AND USED_AT IS NULL",
           [user.USER_IDX, tokenHash],
         );
       } catch (mailError) {
         // 계정 유무가 노출되지 않도록 동일한 응답을 사용하고, 문제는 서버 로그에만 기록합니다.
         console.error("[password-recovery] 이메일 전송 실패:", mailError);
         await AppDataSource.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE TOKEN_HASH = :1 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL",
           [tokenHash],
         );
       }
@@ -176,13 +170,11 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
         .json({ success: false, message: INVALID_LINK_MESSAGE });
     }
     if (!validPassword(newPassword)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message:
-            "비밀번호는 10자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.",
-        });
+      return res.status(400).json({
+        success: false,
+        message:
+          "비밀번호는 10자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.",
+      });
     }
     if (limited(`pw-reset:${req.ip}`, 20, 15 * 60_000)) {
       return res
@@ -197,19 +189,18 @@ function createPasswordRecoveryRouter({ AppDataSource }) {
       await AppDataSource.transaction(async (manager) => {
         const matches = await manager.query(
           `SELECT ID, USER_IDX FROM PASSWORD_RESET_TOKEN
-           WHERE TOKEN_HASH = :1 AND USED_AT IS NULL AND EXPIRES_AT > LOCALTIMESTAMP
-           FOR UPDATE`,
+           WHERE TOKEN_HASH = ?1 AND USED_AT IS NULL AND EXPIRES_AT > CURRENT_TIMESTAMP`,
           [digest],
         );
         if (!matches.length) throw new InvalidTokenError();
         const memberId = matches[0].USER_IDX;
         await manager.query(
-          "UPDATE MEMBER_TB SET USER_PW = :1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = :2",
+          "UPDATE MEMBER_TB SET USER_PW = ?1, SESSION_VERSION = SESSION_VERSION + 1 WHERE USER_IDX = ?2",
           [newHash, memberId],
         );
         // 같은 회원의 기존 발급 링크까지 함께 무효화하여 재사용을 막습니다.
         await manager.query(
-          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = LOCALTIMESTAMP WHERE USER_IDX = :1 AND USED_AT IS NULL",
+          "UPDATE PASSWORD_RESET_TOKEN SET USED_AT = CURRENT_TIMESTAMP WHERE USER_IDX = ?1 AND USED_AT IS NULL",
           [memberId],
         );
       });

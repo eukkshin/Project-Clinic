@@ -2,7 +2,7 @@
 
 const express = require("express");
 const crypto = require("crypto");
-const AppDataSource = require("../../db.oracle");
+const AppDataSource = require("../../db");
 
 const router = express.Router();
 
@@ -61,10 +61,10 @@ router.get("/popular", async (_req, res) => {
     const rows = await AppDataSource.query(`
       SELECT KEYWORD, COUNT(*) AS SEARCH_COUNT
       FROM SEARCH_KEYWORD_LOG_TB
-      WHERE SEARCHED_AT >= LOCALTIMESTAMP - INTERVAL '7' DAY
+      WHERE SEARCHED_AT >= datetime('now', '-7 days')
       GROUP BY KEYWORD
       ORDER BY SEARCH_COUNT DESC, KEYWORD ASC
-      FETCH FIRST 5 ROWS ONLY
+      LIMIT 5
     `);
 
     if (rows.length === 0) {
@@ -138,7 +138,7 @@ router.post("/track", express.json({ limit: "2kb" }), async (req, res) => {
 
   try {
     await AppDataSource.query(
-      "INSERT INTO SEARCH_KEYWORD_LOG_TB (KEYWORD, SEARCHED_AT) VALUES (:1, LOCALTIMESTAMP)",
+      "INSERT INTO SEARCH_KEYWORD_LOG_TB (KEYWORD, SEARCHED_AT) VALUES (?1, CURRENT_TIMESTAMP)",
       [keyword],
     );
     return res.json({ success: true, counted: true });

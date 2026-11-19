@@ -812,7 +812,7 @@ function createSocialAuthRouter({ AppDataSource, issueMemberSession }) {
         [provider.toUpperCase(), sub],
       );
 
-      return go("success");
+      return go("success", "/");
     } catch (error) {
       console.error("[social] callback:", error);
 

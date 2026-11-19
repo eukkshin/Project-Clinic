@@ -61,28 +61,40 @@ function invalidSignup(res) {
 }
 
 // OAuth redirects use one trusted HTTPS frontend, independently of the API CORS list.
+
 function socialFrontendOrigin() {
   const configured = process.env.SOCIAL_FRONTEND_ORIGIN;
+
   if (!configured) {
     throw new Error("SOCIAL_FRONTEND_ORIGIN is required");
   }
 
   const url = new URL(configured);
+
+  // 발표용 도메인에 한해서 HTTP 리다이렉트 허용
+  const allowDemoHttp =
+    process.env.SOCIAL_DEMO_HTTP_ENABLED === "true" &&
+    url.protocol === "http:" &&
+    url.hostname === "heartbreakkid.co.kr" &&
+    !url.port;
+
+  // 로컬 개발 환경에서는 HTTP 허용
+  const allowLocalHttp =
+    process.env.NODE_ENV !== "production" &&
+    url.protocol === "http:" &&
+    ["localhost", "127.0.0.1"].includes(url.hostname);
+
   if (
-    (url.protocol !== "https:" &&
-      !(
-        process.env.NODE_ENV !== "production" &&
-        url.protocol === "http:" &&
-        ["localhost", "127.0.0.1"].includes(url.hostname)
-      )) ||
+    (url.protocol !== "https:" && !allowDemoHttp && !allowLocalHttp) ||
     url.username ||
     url.password ||
     url.pathname !== "/" ||
     url.search ||
     url.hash
   ) {
-    throw new Error("SOCIAL_FRONTEND_ORIGIN must be a valid HTTPS origin");
+    throw new Error("SOCIAL_FRONTEND_ORIGIN must be a valid origin");
   }
+
   return url.origin;
 }
 
